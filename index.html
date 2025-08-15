@@ -12,233 +12,522 @@
         }
         
         body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
-            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: 
+                linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+                url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyMCIgaGVpZ2h0PSIxMDgwIiB2aWV3Qm94PSIwIDAgMTkyMCAxMDgwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZGVmcz4KICA8cmFkaWFsR3JhZGllbnQgaWQ9InNwYWNlR3JhZGllbnQiIGN4PSI1MCUiIGN5PSI1MCUiIHI9IjUwJSI+CiAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMTEwYzJmIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjMwJSIgc3RvcC1jb2xvcj0iIzE5MTU0ZSIvPgogICAgPHN0b3Agb2Zmc2V0PSI3MCUiIHN0b3AtY29sb3I9IiMwYjBiMWYiLz4KICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIvPgogIDwvcmFkaWFsR3JhZGllbnQ+CjwvZGVmcz4KICA8cmVjdCB3aWR0aD0iMTkyMCIgaGVpZ2h0PSIxMDgwIiBmaWxsPSJ1cmwoI3NwYWNlR3JhZGllbnQpIi8+CiAgPGNpcmNsZSBjeD0iMjAwIiBjeT0iMjAwIiByPSIyIiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjciLz4KICA8Y2lyY2xlIGN4PSI1MDAiIGN5PSIxNTAiIHI9IjEuNSIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC42Ii8+CiAgPGNpcmNsZSBjeD0iODAwIiBjeT0iMzAwIiByPSIyLjUiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuOCIvPgogIDxjaXJjbGUgY3g9IjEyMDAiIGN5PSIyNTAiIHI9IjEiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNSIvPgogIDxjaXJjbGUgY3g9IjE1MDAiIGN5PSI0MDAiIHI9IjMiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNyIvPgogIDxjaXJjbGUgY3g9IjMwMCIgY3k9IjYwMCIgcj0iMS41IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjYiLz4KICA8Y2lyY2xlIGN4PSI3MDAiIGN5PSI3MDAiIHI9IjIiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuOCIvPgogIDxjaXJjbGUgY3g9IjExMDAiIGN5PSI2NTAiIHI9IjEiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNSIvPgogIDxjaXJjbGUgY3g9IjE0MDAiIGN5PSI4MDAiIHI9IjIuNSIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC43Ii8+CiAgPGNpcmNsZSBjeD0iMTcwMCIgY3k9IjEwMCIgcj0iMSIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC40Ii8+CiAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iNDAwIiByPSIyIiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjYiLz4KICA8Y2lyY2xlIGN4PSI2MDAiIGN5PSI1MDAiIHI9IjEuNSIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC43Ii8+CiAgPGNpcmNsZSBjeD0iOTAwIiBjeT0iOTAiIHI9IjEiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuNSIvPgogIDxjaXJjbGUgY3g9IjE2MDAiIGN5PSI2MDAiIHI9IjIiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9IjAuOCIvPgo8L3N2Zz4=');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #1e293b;
             min-height: 100vh;
+            display: grid;
+            grid-template-areas: 
+                "header header header"
+                "nav main login"
+                "footer footer footer";
+            grid-template-columns: 250px 1fr 300px;
+            grid-template-rows: auto 1fr auto;
+            gap: 20px;
             padding: 20px;
         }
         
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: rgba(0, 0, 0, 0.7);
-            border: 2px solid #3a5998;
-            border-radius: 10px;
-            padding: 40px;
-            box-shadow: 0 0 20px rgba(58, 89, 152, 0.3);
-        }
-        
+        /* Header */
         .header {
+            grid-area: header;
             text-align: center;
-            margin-bottom: 50px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
         
         .spacenations {
             font-size: 3rem;
-            font-weight: bold;
+            font-weight: 700;
             color: #ff8c42;
-            text-shadow: 0 0 15px rgba(255, 140, 66, 0.5);
-            letter-spacing: 3px;
+            text-shadow: 0 2px 10px rgba(255, 140, 66, 0.2);
+            letter-spacing: 2px;
             margin: 0;
             line-height: 1;
         }
         
         .subtitle {
-            font-size: 1.5rem;
-            color: #4a90e2;
-            margin: 15px 0 0 0;
-            font-weight: normal;
-            text-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
+            font-size: 1.3rem;
+            color: #64748b;
+            margin: 10px 0 0 0;
+            font-weight: 400;
         }
         
-        .description {
-            text-align: center;
-            color: #b0b0b0;
+        /* Navigation */
+        .nav {
+            grid-area: nav;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            height: fit-content;
+        }
+        
+        .nav h3 {
+            color: #1e293b;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .nav-list {
+            list-style: none;
+        }
+        
+        .nav-item {
+            margin-bottom: 12px;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: #475569;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav-link:hover {
+            background: linear-gradient(135deg, #ff8c42, #ff9f5a);
+            color: white;
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(255, 140, 66, 0.3);
+        }
+        
+        .nav-icon {
+            margin-right: 10px;
             font-size: 1.1rem;
-            margin-bottom: 50px;
-            line-height: 1.6;
         }
         
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
+        .coming-soon-link {
+            position: relative;
+            opacity: 0.7;
+            cursor: not-allowed !important;
         }
         
-        .tool-card {
-            background: rgba(16, 16, 16, 0.9);
-            border: 2px solid #3a5998;
+        .coming-soon-link:hover {
+            background: linear-gradient(135deg, #64748b, #94a3b8) !important;
+            color: white !important;
+            transform: none !important;
+            box-shadow: 0 4px 15px rgba(100, 116, 139, 0.3) !important;
+        }
+        
+        .coming-soon-badge {
+            margin-left: auto;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        /* Main Content */
+        .main {
+            grid-area: main;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             border-radius: 15px;
             padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .welcome-content {
             text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
+            padding: 40px 20px;
         }
         
-        .tool-card:hover {
-            transform: translateY(-5px);
-            border-color: #4a90e2;
-            box-shadow: 0 10px 30px rgba(74, 144, 226, 0.3);
-        }
-        
-        .tool-card.available {
-            border-color: #27ae60;
-        }
-        
-        .tool-card.available:hover {
-            border-color: #2ecc71;
-            box-shadow: 0 10px 30px rgba(46, 204, 113, 0.3);
-        }
-        
-        .tool-card.coming-soon {
-            border-color: #f39c12;
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        
-        .tool-card.coming-soon:hover {
-            transform: none;
-            border-color: #f39c12;
-            box-shadow: none;
-        }
-        
-        .tool-icon {
-            font-size: 3rem;
+        .welcome-title {
+            font-size: 2rem;
+            color: #1e293b;
             margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .welcome-text {
+            font-size: 1.1rem;
+            color: #64748b;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto 30px auto;
+        }
+        
+        .feature-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .feature-card {
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #cbd5e1;
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
             display: block;
         }
         
-        .tool-card.available .tool-icon {
-            color: #27ae60;
+        .feature-title {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
         }
         
-        .tool-card.coming-soon .tool-icon {
-            color: #f39c12;
-        }
-        
-        .tool-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #e0e0e0;
-        }
-        
-        .tool-description {
-            color: #b0b0b0;
-            line-height: 1.5;
-            margin-bottom: 20px;
-        }
-        
-        .tool-status {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 20px;
+        .feature-desc {
+            color: #64748b;
             font-size: 0.9rem;
-            font-weight: bold;
+        }
+        
+        /* Admin Embedded */
+        .admin-embedded {
+            background: linear-gradient(135deg, rgba(254, 243, 205, 0.95), rgba(253, 230, 138, 0.95));
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.5);
+            text-align: center;
+        }
+        
+        .admin-embedded h4 {
+            color: #92400e;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .admin-embedded .admin-text {
+            color: #a16207;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+        
+        .admin-embedded .admin-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .admin-embedded .admin-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
+        
+        /* Login */
+        .login {
+            grid-area: login;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            height: fit-content;
+        }
+        
+        .login h3 {
+            color: #1e293b;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #374151;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #ff8c42;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(255, 140, 66, 0.1);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #ff8c42, #ff9f5a);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
             margin-top: 10px;
         }
         
-        .status-available {
-            background: rgba(39, 174, 96, 0.2);
-            color: #27ae60;
-            border: 1px solid #27ae60;
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 140, 66, 0.3);
         }
         
-        .status-coming-soon {
-            background: rgba(243, 156, 18, 0.2);
-            color: #f39c12;
-            border: 1px solid #f39c12;
-        }
-        
-        .footer {
+        /* Admin Area */
+        .admin {
+            grid-area: admin;
+            background: linear-gradient(135deg, rgba(254, 243, 205, 0.95), rgba(253, 230, 138, 0.95));
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(251, 191, 36, 0.5);
+            height: fit-content;
             text-align: center;
-            margin-top: 50px;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        .footer-text {
-            color: #666;
+        .admin h4 {
+            color: #92400e;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .admin-text {
+            color: #a16207;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+        
+        .admin-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
             font-size: 0.9rem;
         }
         
+        .admin-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
+        
+        /* Footer */
+        .footer {
+            grid-area: footer;
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive */
+                    @media (max-width: 1024px) {
+            body {
+                grid-template-areas: 
+                    "header header"
+                    "nav login"
+                    "main main"
+                    "footer footer";
+                grid-template-columns: 1fr 300px;
+                grid-template-rows: auto auto 1fr auto;
+            }
+        }
+        
         @media (max-width: 768px) {
-            .container {
-                padding: 20px;
+            body {
+                grid-template-areas: 
+                    "header"
+                    "nav"
+                    "login"
+                    "main"
+                    "footer";
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto 1fr auto;
+                padding: 10px;
+                gap: 15px;
             }
             
             .spacenations {
-                font-size: 2.5rem;
+                font-size: 2.2rem;
             }
             
             .subtitle {
-                font-size: 1.2rem;
-            }
-            
-            .tools-grid {
-                grid-template-columns: 1fr;
+                font-size: 1.1rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1 class="spacenations">SPACENATIONS</h1>
-            <div class="subtitle">Info-Tool Collection</div>
-        </div>
-        
-        <div class="description">
-            <p>Willkommen zur Spacenations Tool-Sammlung! Hier finden Sie nützliche Werkzeuge und Rechner für Ihr Spacenations-Gameplay.</p>
-        </div>
-        
-        <div class="tools-grid">
-            <div class="tool-card available" onclick="openTool('kampfbericht-rechner')">
-                <span class="tool-icon">⚔️</span>
-                <h3 class="tool-title">Kampfbericht-Rechner</h3>
-                <p class="tool-description">
-                    Analysieren Sie Ihre Kampfberichte und berechnen Sie automatisch die Summen für zerstörte und verlorene Ressourcen. 
-                    Perfekt für die Auswertung Ihrer Schlachten und Effizienzanalyse.
+    <div class="header">
+        <h1 class="spacenations">SPACENATIONS</h1>
+        <div class="subtitle">Info-Tool Collection</div>
+    </div>
+    
+    <nav class="nav">
+        <h3>📊 Counter Tools</h3>
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="openTool('as-counter')">
+                    <span class="nav-icon">⚔️</span>
+                    AS-Counter
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link coming-soon-link" onclick="showComingSoon('Sabo-Counter')">
+                    <span class="nav-icon">💥</span>
+                    Sabo-Counter
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link coming-soon-link" onclick="showComingSoon('Raid-Counter')">
+                    <span class="nav-icon">🏴‍☠️</span>
+                    Raid-Counter
+                </a>
+            </li>
+        </ul>
+    </nav>
+    
+    <main class="main">
+        <div class="welcome-content">
+            <h2 class="welcome-title">Willkommen bei den Spacenations Tools</h2>
+            
+            <!-- Admin Section eingebettet -->
+            <div class="admin-embedded">
+                <h4>🛡️ Allianz-Administration</h4>
+                <p class="admin-text">
+                    Registrieren Sie Ihre Allianz als Administrator und erhalten Sie Zugang zu erweiterten Analyse-Tools und Statistiken.
                 </p>
-                <span class="tool-status status-available">✓ Verfügbar</span>
+                <button class="admin-btn" onclick="openAdminRegistration()">Allianz Anmelden</button>
             </div>
             
-
-        </div>
-        
-        <div class="footer">
-            <p class="footer-text">
-                Spacenations Info-Tools © 2025 | Inoffizielle Tools für die Spacenations Community
+            <p class="welcome-text">
+                Nutzen Sie unsere professionellen Counter-Tools für eine bessere Übersicht über Ihre Spacenations-Aktivitäten. 
+                Wählen Sie links ein Tool aus oder loggen Sie sich ein, um erweiterte Funktionen zu nutzen.
             </p>
+            
+            <div class="feature-cards">
+                <div class="feature-card">
+                    <span class="feature-icon">⚡</span>
+                    <div class="feature-title">Schnell & Effizient</div>
+                    <div class="feature-desc">Alle Tools sind optimiert für maximale Performance</div>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🔒</span>
+                    <div class="feature-title">Sicher & Privat</div>
+                    <div class="feature-desc">Ihre Daten bleiben sicher und privat</div>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">📱</span>
+                    <div class="feature-title">Mobile Ready</div>
+                    <div class="feature-desc">Funktioniert perfekt auf allen Geräten</div>
+                </div>
+            </div>
         </div>
+    </main>
+    
+    <div class="login">
+        <h3>🔐 Benutzer Login</h3>
+        <form onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label class="form-label" for="username">Benutzername:</label>
+                <input type="text" id="username" class="form-input" placeholder="Ihr Benutzername" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="password">Passwort:</label>
+                <input type="password" id="password" class="form-input" placeholder="Ihr Passwort" required>
+            </div>
+            <button type="submit" class="login-btn">Login</button>
+        </form>
     </div>
+    
+    <footer class="footer">
+        <p>Spacenations Info-Tools © 2025 | Inoffizielle Tools für die Spacenations Community</p>
+    </footer>
 
     <script>
         function openTool(toolName) {
-            if (toolName === 'kampfbericht-rechner') {
-                // In einer echten Implementierung würden Sie hier zu einer separaten Seite navigieren
-                // Für die Demo zeigen wir eine Meldung
-                if (confirm('Möchten Sie zum Kampfbericht-Rechner wechseln?\n\n(In einer echten Implementierung würde hier zur calculator.html navigiert werden)')) {
-                    // window.location.href = 'calculator.html';
-                    alert('Navigation zum Kampfbericht-Rechner...\n\nIn der echten Version würde hier die Datei "calculator.html" geladen werden.');
-                }
-            } else {
-                alert('Dieses Tool ist noch nicht verfügbar und befindet sich in Entwicklung.');
+            switch(toolName) {
+                case 'as-counter':
+                    // Navigation zum Kampfbericht-Rechner
+                    if (confirm('Zum AS-Counter (Kampfbericht-Rechner) wechseln?')) {
+                        // window.location.href = 'calculator.html';
+                        alert('Navigation zum Kampfbericht-Rechner...\n\n(In der echten Version: calculator.html)');
+                    }
+                    break;
+                default:
+                    alert('Tool nicht gefunden');
             }
         }
         
-        // Zusätzliche Interaktivität
-        document.querySelectorAll('.tool-card.available').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.background = 'rgba(39, 174, 96, 0.1)';
-            });
+        function showComingSoon(toolName) {
+            alert(`${toolName} ist noch in Entwicklung!\n\n⏳ Coming Soon...\n\nDieses Tool wird in einer zukünftigen Version verfügbar sein.`);
+        }
+        
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
             
-            card.addEventListener('mouseleave', function() {
-                this.style.background = 'rgba(16, 16, 16, 0.9)';
+            // Hier würde die echte Login-Logik implementiert werden
+            if (username && password) {
+                alert(`Login-Versuch für: ${username}\n\n(Hier würde die echte Authentifizierung stattfinden)`);
+            }
+        }
+        
+        function openAdminRegistration() {
+            alert('Allianz-Registrierung wird geöffnet...\n\n(Navigation zu admin-registration.html)');
+            // window.location.href = 'admin-registration.html';
+        }
+        
+        // Smooth scroll for navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Add visual feedback
+                this.style.transform = 'translateX(8px)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 200);
             });
         });
     </script>
