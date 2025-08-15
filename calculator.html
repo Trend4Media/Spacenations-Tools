@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Nations Kampfbericht Rechner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #3a5998;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(58, 89, 152, 0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .spacenations {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ff8c42;
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+            letter-spacing: 2px;
+            margin: 0;
+            line-height: 1;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            margin: 5px 0 0 0;
+            font-weight: normal;
+        }
+        
+        .input-sections {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .input-box {
+            background: rgba(16, 16, 16, 0.9);
+            border: 2px solid #3a5998;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .input-box.destroyed {
+            border-color: #e74c3c;
+        }
+        
+        .input-box.lost {
+            border-color: #f39c12;
+        }
+        
+        .input-box h2 {
+            color: #4a90e2;
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+        }
+        
+        .input-box.destroyed h2 {
+            color: #e74c3c;
+            text-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
+        }
+        
+        .input-box.lost h2 {
+            color: #f39c12;
+            text-shadow: 0 0 5px rgba(243, 156, 18, 0.5);
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #b0b0b0;
+            font-weight: bold;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid rgba(58, 89, 152, 0.5);
+            border-radius: 5px;
+            color: #e0e0e0;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            resize: vertical;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
+        }
+        
+        .button-section {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #3a5998, #4a90e2);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+        }
+        
+        .calculate-btn {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+        }
+        
+        .clear-btn {
+            background: linear-gradient(45deg, #c0392b, #e74c3c);
+        }
+        
+        .results {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .result-box {
+            background: rgba(16, 16, 16, 0.9);
+            border: 2px solid #3a5998;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .result-box h2 {
+            color: #4a90e2;
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+        }
+        
+        .destroyed {
+            border-color: #e74c3c;
+        }
+        
+        .destroyed h2 {
+            color: #e74c3c;
+            text-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
+        }
+        
+        .lost {
+            border-color: #f39c12;
+        }
+        
+        .lost h2 {
+            color: #f39c12;
+            text-shadow: 0 0 5px rgba(243, 156, 18, 0.5);
+        }
+        
+        .stat-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-line:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-name {
+            color: #b0b0b0;
+        }
+        
+        .stat-value {
+            color: #4a90e2;
+            font-weight: bold;
+        }
+        
+        .total-line {
+            border-top: 2px solid #3a5998;
+            margin-top: 10px;
+            padding-top: 10px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .total-line .stat-value {
+            color: #4a90e2;
+            text-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+        }
+        
+        @media (max-width: 768px) {
+            .input-sections,
+            .results {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .button-section {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .spacenations {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="spacenations">SPACENATIONS</h1>
+            <div class="subtitle">Kampfbericht-Rechner</div>
+        </div>
+        
+        <div class="input-sections">
+            <div class="input-box destroyed">
+                <h2>⚔️ Zerstört - Berichte (Funktion A)</h2>
+                <label for="destroyed-reports">Berichte von Angriffen bei denen Sie etwas zerstört haben:</label>
+                <textarea id="destroyed-reports" placeholder="Berichte hier einfügen bei denen Sie etwas ZERSTÖRT haben..."></textarea>
+            </div>
+            
+            <div class="input-box lost">
+                <h2>💀 Verloren - Berichte (Funktion B)</h2>
+                <label for="lost-reports">Berichte von Angriffen bei denen Sie etwas verloren haben:</label>
+                <textarea id="lost-reports" placeholder="Berichte hier einfügen bei denen Sie etwas VERLOREN haben..."></textarea>
+            </div>
+        </div>
+        
+        <div class="button-section">
+            <button class="calculate-btn" onclick="calculateReports()">📊 Berichte Auswerten</button>
+            <button class="clear-btn" onclick="clearAll()">🗑️ Alles Löschen</button>
+        </div>
+        
+        <div class="results">
+            <div class="result-box destroyed">
+                <h2>⚔️ Zerstört - Summen</h2>
+                <div id="destroyed-stats">
+                    <div class="stat-line">
+                        <span class="stat-name">Stabilität:</span>
+                        <span class="stat-value" id="destroyed-stability">0</span>
+                    </div>
+                    <div class="stat-line">
+                        <span class="stat-name">Lagerraum:</span>
+                        <span class="stat-value" id="destroyed-storage">0</span>
+                    </div>
+                    <div class="stat-line">
+                        <span class="stat-name">Panzerung:</span>
+                        <span class="stat-value" id="destroyed-armor">0</span>
+                    </div>
+                    <div class="stat-line">
+                        <span class="stat-name">Angriffsstärke:</span>
+                        <span class="stat-value" id="destroyed-attack">0</span>
+                    </div>
+                    <div class="stat-line total-line">
+                        <span class="stat-name">Anzahl Berichte:</span>
+                        <span class="stat-value" id="destroyed-count">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-box lost">
+                <h2>💀 Verloren - Summen</h2>
+                <div id="lost-stats">
+                    <div class="stat-line">
+                        <span class="stat-name">Stabilität:</span>
+                        <span class="stat-value" id="lost-stability">0</span>
+                    </div>
+                    <div class="stat-line">
+                        <span class="stat-name">Lagerraum:</span>
+                        <span class="stat-value" id="lost-storage">0</span>
+                    </div>
+                    <div class="stat-line">
+                        <span class="stat-name">Panzerung:</span>
+                        <span class="stat-value" id="lost-armor">0</span>
+                    </div>
+                    <div class="stat-line">
+                        <span class="stat-name">Angriffsstärke:</span>
+                        <span class="stat-value" id="lost-attack">0</span>
+                    </div>
+                    <div class="stat-line total-line">
+                        <span class="stat-name">Anzahl Berichte:</span>
+                        <span class="stat-value" id="lost-count">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function parseNumber(str) {
+            // Entfernt Punkte als Tausendertrennzeichen und konvertiert zu Zahl
+            return parseInt(str.replace(/\./g, '')) || 0;
+        }
+
+        function formatNumber(num) {
+            // Formatiert Zahl mit Punkten als Tausendertrennzeichen
+            return num.toLocaleString('de-DE');
+        }
+
+        function parseReports(text, type) {
+            const resources = {
+                stability: 0,
+                storage: 0,
+                armor: 0,
+                attack: 0,
+                count: 0
+            };
+            
+            const lines = text.split('\n');
+            let hasResourceData = false;
+            
+            for (let line of lines) {
+                line = line.trim();
+                
+                // Parse Ressourcen-Zeilen (Zeilen die mit einer Zahl beginnen)
+                if (line.match(/^\d+\.?\d*\s+\w+/)) {
+                    const match = line.match(/^([\d.]+)\s+(.+)/);
+                    if (match) {
+                        const value = parseNumber(match[1]);
+                        const resource = match[2].toLowerCase();
+                        
+                        if (resource.includes('stabilität')) {
+                            resources.stability += value;
+                            hasResourceData = true;
+                        } else if (resource.includes('lagerraum')) {
+                            resources.storage += value;
+                            hasResourceData = true;
+                        } else if (resource.includes('panzerung')) {
+                            resources.armor += value;
+                            hasResourceData = true;
+                        } else if (resource.includes('angriffsstärke')) {
+                            resources.attack += value;
+                            hasResourceData = true;
+                        }
+                    }
+                }
+                
+                // Zähle Berichte basierend auf Zeitstempel-Zeilen
+                if (line.match(/^\d{2}\.\d{2}\.\d{4},\s+\d{2}:\d{2}:\d{2}/)) {
+                    resources.count++;
+                }
+            }
+            
+            return resources;
+        }
+
+        function calculateReports() {
+            // Parse Zerstört-Berichte
+            const destroyedText = document.getElementById('destroyed-reports').value;
+            const destroyed = parseReports(destroyedText, 'destroyed');
+            
+            // Parse Verloren-Berichte
+            const lostText = document.getElementById('lost-reports').value;
+            const lost = parseReports(lostText, 'lost');
+            
+            // Update Zerstört-Anzeige
+            document.getElementById('destroyed-stability').textContent = formatNumber(destroyed.stability);
+            document.getElementById('destroyed-storage').textContent = formatNumber(destroyed.storage);
+            document.getElementById('destroyed-armor').textContent = formatNumber(destroyed.armor);
+            document.getElementById('destroyed-attack').textContent = formatNumber(destroyed.attack);
+            document.getElementById('destroyed-count').textContent = destroyed.count;
+            
+            // Update Verloren-Anzeige
+            document.getElementById('lost-stability').textContent = formatNumber(lost.stability);
+            document.getElementById('lost-storage').textContent = formatNumber(lost.storage);
+            document.getElementById('lost-armor').textContent = formatNumber(lost.armor);
+            document.getElementById('lost-attack').textContent = formatNumber(lost.attack);
+            document.getElementById('lost-count').textContent = lost.count;
+        }
+        
+        function clearAll() {
+            document.getElementById('destroyed-reports').value = '';
+            document.getElementById('lost-reports').value = '';
+            
+            // Reset alle Werte auf 0
+            document.getElementById('destroyed-stability').textContent = '0';
+            document.getElementById('destroyed-storage').textContent = '0';
+            document.getElementById('destroyed-armor').textContent = '0';
+            document.getElementById('destroyed-attack').textContent = '0';
+            document.getElementById('destroyed-count').textContent = '0';
+            
+            document.getElementById('lost-stability').textContent = '0';
+            document.getElementById('lost-storage').textContent = '0';
+            document.getElementById('lost-armor').textContent = '0';
+            document.getElementById('lost-attack').textContent = '0';
+            document.getElementById('lost-count').textContent = '0';
+        }
+    </script>
+</body>
+</html>
