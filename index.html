@@ -489,10 +489,7 @@
             switch(toolName) {
                 case 'as-counter':
                     // Navigation zum Kampfbericht-Rechner
-                    if (confirm('Zum AS-Counter (Kampfbericht-Rechner) wechseln?')) {
-                        // window.location.href = 'calculator.html';
-                        alert('Navigation zum Kampfbericht-Rechner...\n\n(In der echten Version: calculator.html)');
-                    }
+                    window.location.href = 'calculator.html';
                     break;
                 default:
                     alert('Tool nicht gefunden');
@@ -520,19 +517,18 @@
         }
         
         // Smooth scroll for navigation
-        document.querySelectorAll('.nav-link').forEach(link => {
+        document.querySelectorAll('.nav-link:not(.coming-soon-link)').forEach(link => {
             link.addEventListener('click', function(e) {
-                e.preventDefault();
-                // Add visual feedback
-                this.style.transform = 'translateX(8px)';
-                setTimeout(() => {
-                    this.style.transform = '';
-                }, 200);
+                // Nur preventDefault für coming-soon links, nicht für funktionierende Tools
+                if (!this.classList.contains('coming-soon-link')) {
+                    // Add visual feedback für funktionierende Links
+                    this.style.transform = 'translateX(8px)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                }
             });
         });
-    </script>
-</body>
-</html>
     </script>
 </body>
 </html>
