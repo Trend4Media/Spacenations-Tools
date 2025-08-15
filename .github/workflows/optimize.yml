@@ -1,0 +1,43 @@
+name: Auto-Optimize Code
+
+on:
+  schedule:
+    - cron: '0 2 * * 0'  # Jeden Sonntag um 2 Uhr
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: 🔧 Auto-optimize HTML
+      run: |
+        # Remove extra whitespace (simple optimization)
+        for file in *.html; do
+          # Create backup
+          cp "$file" "$file.backup"
+          
+          # Simple optimizations
+          sed -i 's/[[:space:]]*$//' "$file"  # Remove trailing spaces
+          sed -i '/^[[:space:]]*$/d' "$file"  # Remove empty lines
+          
+          echo "📦 Optimized $file"
+        done
+        
+    - name: 📊 Generate Report
+      run: |
+        echo "# 📈 Optimization Report" > optimization-report.md
+        echo "Date: $(date)" >> optimization-report.md
+        echo "" >> optimization-report.md
+        
+        for file in *.html; do
+          if [ -f "$file.backup" ]; then
+            old_size=$(stat -f%z "$file.backup" 2>/dev/null || stat -c%s "$file.backup")
+            new_size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file")
+            saved=$((old_size - new_size))
+            echo "- $file: ${old_size} → ${new_size} bytes (saved: ${saved} bytes)" >> optimization-report.md
+          fi
+        done
+        
+        cat optimization-report.md
