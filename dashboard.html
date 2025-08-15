@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Spacenations Tools</title>
+    <style>
+        /* CSS Variablen für Light/Dark Mode */
+        :root {
+            /* Dark Mode (Standard) */
+            --bg-gradient: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --bg-panel: rgba(0, 0, 0, 0.7);
+            --border-primary: #3a5998;
+            --border-shadow: rgba(58, 89, 152, 0.3);
+            --card-bg: rgba(16, 16, 16, 0.9);
+            --card-border: rgba(58, 89, 152, 0.5);
+            --accent-primary: #ff8c42;
+            --accent-secondary: #4a90e2;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+        }
+        
+        /* Light Mode */
+        :root.light-mode {
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --bg-panel: rgba(255, 255, 255, 0.95);
+            --border-primary: #e2e8f0;
+            --border-shadow: rgba(0, 0, 0, 0.1);
+            --card-bg: linear-gradient(135deg, #ffffff, #f8fafc);
+            --card-border: #e2e8f0;
+            --accent-primary: #ff8c42;
+            --accent-secondary: #4a90e2;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --error-color: #dc2626;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: grid;
+            grid-template-areas: 
+                "header header header"
+                "nav main sidebar"
+                "footer footer footer";
+            grid-template-columns: 250px 1fr 300px;
+            grid-template-rows: auto 1fr auto;
+            gap: 20px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        /* Header */
+        .header {
+            grid-area: header;
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px var(--border-shadow);
+            backdrop-filter: blur(10px);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-left h1 {
+            color: var(--accent-primary);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .header-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .theme-toggle {
+            background: linear-gradient(45deg, #3a5998, #4a90e2);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, #64748b, #475569);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(100, 116, 139, 0.3);
+        }
+        
+        /* Navigation */
+        .nav {
+            grid-area: nav;
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 0 20px var(--border-shadow);
+            height: fit-content;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .nav h3 {
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .nav-list {
+            list-style: none;
+        }
+        
+        .nav-item {
+            margin-bottom: 12px;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav-link:hover {
+            background: linear-gradient(135deg, var(--accent-primary), #ff9f5a);
+            color: white;
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(255, 140, 66, 0.3);
+        }
+        
+        .nav-icon {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .premium-link {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white !important;
+            font-weight: 600;
+        }
+        
+        .premium-link:hover {
+            background: linear-gradient(135deg, #d97706, #b45309) !important;
+        }
+        
+        /* Main Dashboard */
+        .main {
+            grid-area: main;
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 20px var(--border-shadow);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            overflow-y: auto;
+        }
+        
+        .dashboard-title {
+            font-size: 1.8rem;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .dashboard-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px var(--border-shadow);
+        }
+        
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .action-card {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+        
+        .action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--border-shadow);
+            border-color: var(--accent-secondary);
+        }
+        
+        .action-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .action-icon {
+            font-size: 1.5rem;
+            margin-right: 12px;
+            color: var(--accent-secondary);
+        }
+        
+        .action-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .action-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        /* Recent Activity */
+        .recent-activity {
+            margin-bottom: 30px;
+        }
+        
+        .activity-list {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--card-border);
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            font-size: 1.2rem;
+            margin-right: 15px;
+            width: 30px;
+            text-align: center;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-text {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+        
+        .activity-time {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            grid-area: sidebar;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .user-profile {
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 0 20px var(--border-shadow);
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+        
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--accent-primary), #ff9f5a);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            margin: 0 auto 15px auto;
+            font-weight: 700;
+        }
+        
+        .user-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        
+        .user-email {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        
+        .user-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-user {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+        
+        .badge-alliance {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+        }
+        
+        .profile-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .profile-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-secondary), #3a5998);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border: 2px solid var(--card-border);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        .profile-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Alliance Info */
+        .alliance-info {
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px var(--border-shadow);
+            backdrop-filter: blur(10px);
+        }
+        
+        .alliance-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .alliance-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+            color: var(--warning-color);
+        }
+        
+        .alliance-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .alliance-details {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        /* Footer */
+        .footer {
+            grid-area: footer;
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        /* Loading States */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+        
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--card-border);
+            border-top: 2px solid var(--accent-secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            body {
+                grid-template-areas: 
+                    "header header"
+                    "nav sidebar"
+                    "main main"
+                    "footer footer";
+                grid-template-columns: 1fr 300px;
+                grid-template-rows: auto auto 1fr auto;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                grid-template-areas: 
+                    "header"
+                    "main"
+                    "sidebar"
+                    "nav"
+                    "footer";
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto auto auto;
+                padding: 10px;
+                gap: 15px;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .header-right {
+                flex-direction: row;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1>🏠 Dashboard</h1>
+                <div class="header-subtitle">Willkommen zurück, <span id="header-username">User</span>!</div>
+            </div>
+            <div class="header-right">
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <span id="theme-icon">🌙</span>
+                    <span id="theme-text">Light</span>
+                </button>
+                <a href="index.html" class="back-btn">
+                    ← Startseite
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <nav class="nav">
+        <h3>🛠️ Meine Tools</h3>
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="calculator.html" class="nav-link">
+                    <span class="nav-icon">⚔️</span>
+                    AS-Counter
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="raid-counter.html" class="nav-link">
+                    <span class="nav-icon">🏴‍☠️</span>
+                    Raid-Counter
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link premium-link" onclick="showPremiumFeature('Advanced Analytics')">
+                    <span class="nav-icon">📊</span>
+                    Analytics Pro
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link premium-link" onclick="showPremiumFeature('Battle Simulator')">
+                    <span class="nav-icon">🎯</span>
+                    Battle Sim
+                </a>
+            </li>
+        </ul>
+    </nav>
+    
+    <main class="main">
+        <div id="loading-dashboard" class="loading">
+            <div class="spinner"></div>
+            Dashboard wird geladen...
+        </div>
+        
+        <div id="dashboard-content" style="display: none;">
+            <h2 class="dashboard-title">Dein persönliches Dashboard</h2>
+            <p class="dashboard-subtitle">Hier findest du eine Übersicht über deine Aktivitäten und Statistiken</p>
+            
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-icon">⚔️</span>
+                    <div class="stat-value" id="battles-count">-</div>
+                    <div class="stat-label">Schlachten</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">🏴‍☠️</span>
+                    <div class="stat-value" id="raids-count">-</div>
+                    <div class="stat-label">Raids</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">🎯</span>
+                    <div class="stat-value" id="win-rate">-</div>
+                    <div class="stat-label">Erfolgsrate</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">📅</span>
+                    <div class="stat-value" id="days-active">-</div>
+                    <div class="stat-label">Tage aktiv</div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h3 class="section-title">
+                    <span>⚡</span>
+                    Schnellzugriff
+                </h3>
+                <div class="actions-grid">
+                    <a href="calculator.html" class="action-card">
+                        <div class="action-header">
+                            <span class="action-icon">⚔️</span>
+                            <span class="action-title">AS-Counter starten</span>
+                        </div>
+                        <div class="action-desc">Kalkuliere deine Angriffe und verteidige dich strategisch</div>
+                    </a>
+                    <a href="raid-counter.html" class="action-card">
+                        <div class="action-header">
+                            <span class="action-icon">🏴‍☠️</span>
+                            <span class="action-title">Raid planen</span>
+                        </div>
+                        <div class="action-desc">Organisiere erfolgreiche Raids mit präzisen Berechnungen</div>
+                    </a>
+                    <a href="#" class="action-card" onclick="showPremiumFeature('Profile Manager')">
+                        <div class="action-header">
+                            <span class="action-icon">👤</span>
+                            <span class="action-title">Profil bearbeiten</span>
+                        </div>
+                        <div class="action-desc">Aktualisiere deine Informationen und Einstellungen</div>
+                    </a>
+                    <a href="#" class="action-card" onclick="showPremiumFeature('Alliance Tools')">
+                        <div class="action-header">
+                            <span class="action-icon">🛡️</span>
+                            <span class="action-title">Allianz-Tools</span>
+                        </div>
+                        <div class="action-desc">Verwalte deine Allianz und koordiniere Aktivitäten</div>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="recent-activity">
+                <h3 class="section-title">
+                    <span>📝</span>
+                    Letzte Aktivitäten
+                </h3>
+                <div class="activity-list" id="activity-list">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Aktivitäten werden geladen...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <div class="sidebar">
+        <!-- User Profile -->
+        <div class="user-profile">
+            <div class="user-avatar" id="user-avatar">?</div>
+            <div class="user-name" id="user-name">Lädt...</div>
+            <div class="user-email" id="user-email">Lädt...</div>
+            <div class="user-badges" id="user-badges">
+                <span class="badge badge-user">Benutzer</span>
+            </div>
+            <div class="profile-actions">
+                <button class="profile-btn btn-primary" onclick="showPremiumFeature('Profile Settings')">
+                    ⚙️ Einstellungen
+                </button>
+                <button class="profile-btn btn-secondary" onclick="showPremiumFeature('Statistics')">
+                    📊 Statistiken
+                </button>
+                <button class="profile-btn btn-danger" onclick="handleLogout()">
+                    🚪 Abmelden
+                </button>
+            </div>
+        </div>
+        
+        <!-- Alliance Info -->
+        <div class="alliance-info" id="alliance-section" style="display: none;">
+            <div class="alliance-header">
+                <span class="alliance-icon">🛡️</span>
+                <span class="alliance-name" id="alliance-name">Keine Allianz</span>
+            </div>
+            <div class="alliance-details" id="alliance-details">
+                Du bist derzeit keiner Allianz beigetreten.
+            </div>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <p>Spacenations Dashboard © 2025 | Dein persönlicher Bereich</p>
+    </footer>
+
+    <!-- Firebase SDK - MUSS vor dem eigenen JavaScript geladen werden -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Warten bis Firebase vollständig geladen ist
+        document.addEventListener('DOMContentLoaded', function() {
+            // Prüfen ob Firebase verfügbar ist
+            if (typeof firebase === 'undefined') {
+                console.error('Firebase ist nicht geladen!');
+                alert('Fehler: Firebase konnte nicht geladen werden. Bitte laden Sie die Seite neu.');
+                return;
+            }
+            
+            console.log('Firebase erfolgreich geladen');
+            initializeApp();
+        });
+
+        function initializeApp() {
+        // Firebase-Konfiguration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDr4-ap_EubUn0UdP7hkEpS2jkzLIVgvyc",
+            authDomain: "spacenations-tools.firebaseapp.com",
+            projectId: "spacenations-tools",
+            storageBucket: "spacenations-tools.firebasestorage.app",
+            messagingSenderId: "651338201276",
+            appId: "1:651338201276:web:89e7d9c19dbd2611d3f8b9",
+            measurementId: "G-SKWJWH2ERX"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let currentUser = null;
+        let userData = null;
+
+        // Theme Management
+        function toggleTheme() {
+            const root = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            
+            if (root.classList.contains('light-mode')) {
+                root.classList.remove('light-mode');
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Light';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                root.classList.add('light-mode');
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Dark';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const root = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            
+            if (savedTheme === 'light') {
+                root.classList.add('light-mode');
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Dark';
+            } else {
+                root.classList.remove('light-mode');
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Light';
+            }
+        }
+
+        // Auth State Überwachung
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                console.log('User ist eingeloggt:', user.email);
+                await loadUserData(user.uid);
+                await loadDashboardData();
+                showDashboard();
+            } else {
+                console.log('User ist nicht eingeloggt - Weiterleitung...');
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Benutzerdaten laden
+        async function loadUserData(uid) {
+            try {
+                const userDoc = await window.db.collection('users').doc(uid).get();
+                if (userDoc.exists) {
+                    userData = userDoc.data();
+                    console.log('Benutzerdaten geladen:', userData);
+                    
+                    // UI mit Benutzerdaten aktualisieren
+                    updateUserInterface();
+                    
+                    // Last Login aktualisieren
+                    await window.db.collection('users').doc(uid).update({
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } else {
+                    console.error('Benutzerdaten nicht gefunden');
+                    alert('Fehler beim Laden der Benutzerdaten');
+                }
+            } catch (error) {
+                console.error('Fehler beim Laden der Benutzerdaten:', error);
+                alert('Fehler beim Laden der Benutzerdaten');
+            }
+        }
+
+        // UI mit Benutzerdaten aktualisieren
+        function updateUserInterface() {
+            if (!userData) return;
+
+            // Header Username
+            const headerUsername = document.getElementById('header-username');
+            headerUsername.textContent = userData.username || 'User';
+
+            // User Profile Sidebar
+            const userAvatar = document.getElementById('user-avatar');
+            const userName = document.getElementById('user-name');
+            const userEmail = document.getElementById('user-email');
+            const userBadges = document.getElementById('user-badges');
+
+            // Avatar mit erstem Buchstaben des Usernames
+            const firstLetter = (userData.username || userData.email || 'U').charAt(0).toUpperCase();
+            userAvatar.textContent = firstLetter;
+
+            userName.textContent = userData.username || 'Unbekannter Benutzer';
+            userEmail.textContent = userData.email || currentUser.email;
+
+            // Badges aktualisieren
+            userBadges.innerHTML = '<span class="badge badge-user">Benutzer</span>';
+            
+            if (userData.alliance) {
+                userBadges.innerHTML += `<span class="badge badge-alliance">${userData.alliance}</span>`;
+                showAllianceInfo();
+            }
+
+            if (userData.isAllianceAdmin) {
+                userBadges.innerHTML += '<span class="badge" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">Admin</span>';
+            }
+
+            // Account-Erstellungsdatum berechnen
+            if (userData.createdAt) {
+                const createdDate = userData.createdAt.toDate();
+                const now = new Date();
+                const daysDiff = Math.floor((now - createdDate) / (1000 * 60 * 60 * 24));
+                document.getElementById('days-active').textContent = daysDiff;
+            }
+        }
+
+        // Allianz-Informationen anzeigen
+        function showAllianceInfo() {
+            if (!userData.alliance) return;
+
+            const allianceSection = document.getElementById('alliance-section');
+            const allianceName = document.getElementById('alliance-name');
+            const allianceDetails = document.getElementById('alliance-details');
+
+            allianceSection.style.display = 'block';
+            allianceName.textContent = userData.alliance;
+            
+            let details = `Mitglied seit der Registrierung`;
+            if (userData.discord) {
+                details += `\nDiscord: ${userData.discord}`;
+            }
+            if (userData.isAllianceAdmin) {
+                details += `\nStatus: Administrator`;
+            }
+            
+            allianceDetails.textContent = details;
+        }
+
+        // Dashboard-Daten laden
+        async function loadDashboardData() {
+            try {
+                // Benutzer-Statistiken aus der Datenbank laden
+                await loadUserStats();
+                await loadRecentActivity();
+            } catch (error) {
+                console.error('Fehler beim Laden der Dashboard-Daten:', error);
+            }
+        }
+
+        // Benutzer-Statistiken laden
+        async function loadUserStats() {
+            try {
+                // Hier würden normalerweise echte Statistiken aus der Datenbank geladen
+                // Für jetzt verwenden wir Beispieldaten basierend auf dem Benutzer
+                
+                // Simulierte Daten basierend auf Registrierungsdatum
+                const createdDate = userData.createdAt ? userData.createdAt.toDate() : new Date();
+                const daysSinceCreation = Math.floor((new Date() - createdDate) / (1000 * 60 * 60 * 24));
+                
+                // Simulierte Werte basierend auf Account-Alter
+                const battlesCount = Math.floor(daysSinceCreation * 0.5) + Math.floor(Math.random() * 10);
+                const raidsCount = Math.floor(daysSinceCreation * 0.2) + Math.floor(Math.random() * 5);
+                const winRate = Math.floor(60 + Math.random() * 30); // 60-90% Erfolgsrate
+                
+                document.getElementById('battles-count').textContent = battlesCount;
+                document.getElementById('raids-count').textContent = raidsCount;
+                document.getElementById('win-rate').textContent = winRate + '%';
+                
+                // Versuche echte Statistiken aus Firestore zu laden
+                const statsDoc = await window.db.collection('userStats').doc(currentUser.uid).get();
+                if (statsDoc.exists) {
+                    const stats = statsDoc.data();
+                    document.getElementById('battles-count').textContent = stats.battles || battlesCount;
+                    document.getElementById('raids-count').textContent = stats.raids || raidsCount;
+                    document.getElementById('win-rate').textContent = (stats.winRate || winRate) + '%';
+                }
+                
+            } catch (error) {
+                console.error('Fehler beim Laden der Statistiken:', error);
+                // Fallback-Werte setzen
+                document.getElementById('battles-count').textContent = '0';
+                document.getElementById('raids-count').textContent = '0';
+                document.getElementById('win-rate').textContent = '0%';
+            }
+        }
+
+        // Letzte Aktivitäten laden
+        async function loadRecentActivity() {
+            const activityList = document.getElementById('activity-list');
+            
+            try {
+                // Versuche echte Aktivitäten aus Firestore zu laden
+                const activitiesQuery = await window.db.collection('userActivities')
+                    .where('userId', '==', currentUser.uid)
+                    .orderBy('timestamp', 'desc')
+                    .limit(5)
+                    .get();
+                
+                if (!activitiesQuery.empty) {
+                    let activitiesHtml = '';
+                    activitiesQuery.forEach(doc => {
+                        const activity = doc.data();
+                        const time = activity.timestamp.toDate().toLocaleString('de-DE');
+                        activitiesHtml += createActivityItem(activity.icon, activity.text, time);
+                    });
+                    activityList.innerHTML = activitiesHtml;
+                } else {
+                    // Fallback: Beispiel-Aktivitäten generieren
+                    showExampleActivities();
+                }
+                
+            } catch (error) {
+                console.error('Fehler beim Laden der Aktivitäten:', error);
+                showExampleActivities();
+            }
+        }
+
+        // Beispiel-Aktivitäten anzeigen
+        function showExampleActivities() {
+            const activityList = document.getElementById('activity-list');
+            const now = new Date();
+            
+            const activities = [
+                {
+                    icon: '🎉',
+                    text: 'Account erfolgreich erstellt',
+                    time: userData.createdAt ? userData.createdAt.toDate() : now
+                },
+                {
+                    icon: '🔐',
+                    text: 'Erfolgreich angemeldet',
+                    time: new Date(now.getTime() - 5 * 60 * 1000) // vor 5 Minuten
+                },
+                {
+                    icon: '👤',
+                    text: 'Profil-Informationen aktualisiert',
+                    time: new Date(now.getTime() - 2 * 60 * 60 * 1000) // vor 2 Stunden
+                }
+            ];
+            
+            let activitiesHtml = '';
+            activities.forEach(activity => {
+                const timeStr = activity.time.toLocaleString('de-DE');
+                activitiesHtml += createActivityItem(activity.icon, activity.text, timeStr);
+            });
+            
+            activityList.innerHTML = activitiesHtml;
+        }
+
+        // Aktivitäts-Item HTML erstellen
+        function createActivityItem(icon, text, time) {
+            return `
+                <div class="activity-item">
+                    <span class="activity-icon">${icon}</span>
+                    <div class="activity-content">
+                        <div class="activity-text">${text}</div>
+                        <div class="activity-time">${time}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Dashboard anzeigen
+        function showDashboard() {
+            document.getElementById('loading-dashboard').style.display = 'none';
+            document.getElementById('dashboard-content').style.display = 'block';
+        }
+
+        // Logout Funktionalität
+        function handleLogout() {
+            if (confirm('Möchten Sie sich wirklich abmelden?')) {
+                window.auth.signOut().then(() => {
+                    console.log('Logout erfolgreich');
+                    window.location.href = 'index.html';
+                }).catch((error) => {
+                    console.error('Logout fehlgeschlagen:', error);
+                    alert('Fehler beim Abmelden');
+                });
+            }
+        }
+
+        // Premium-Features anzeigen
+        function showPremiumFeature(featureName) {
+            alert(`🚀 ${featureName}\n\nDieses Feature ist noch in Entwicklung!\n\n⭐ Premium-Features werden in einer zukünftigen Version verfügbar sein.\n\nDazu gehören:\n• Erweiterte Statistiken\n• Profil-Verwaltung\n• Allianz-Tools\n• Battle-Simulator\n• und vieles mehr!`);
+        }
+
+        // Aktivität zu Firestore hinzufügen (Hilfsfunktion)
+        async function addActivity(icon, text) {
+            try {
+                await window.db.collection('userActivities').add({
+                    userId: currentUser.uid,
+                    icon: icon,
+                    text: text,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (error) {
+                console.error('Fehler beim Hinzufügen der Aktivität:', error);
+            }
+        }
+
+        // Benutzer-Statistiken aktualisieren (Hilfsfunktion)
+        async function updateUserStats(statType, increment = 1) {
+            try {
+                const statsRef = window.db.collection('userStats').doc(currentUser.uid);
+                const statsDoc = await statsRef.get();
+                
+                if (statsDoc.exists) {
+                    const currentStats = statsDoc.data();
+                    const updates = {};
+                    updates[statType] = (currentStats[statType] || 0) + increment;
+                    
+                    await statsRef.update(updates);
+                } else {
+                    // Erstelle neuen Stats-Eintrag
+                    const newStats = { battles: 0, raids: 0, winRate: 0 };
+                    newStats[statType] = increment;
+                    await statsRef.set(newStats);
+                }
+                
+                // Dashboard-Daten neu laden
+                await loadUserStats();
+            } catch (error) {
+                console.error('Fehler beim Aktualisieren der Statistiken:', error);
+            }
+        }
+
+        // Initialisierung - entfernt da jetzt in initializeApp() enthalten
+
+        // Beispiel-Funktionen für Tool-Integrationen
+        function onCalculatorUsed() {
+            updateUserStats('battles');
+            addActivity('⚔️', 'AS-Counter verwendet');
+        }
+
+        function onRaidCounterUsed() {
+            updateUserStats('raids');
+            addActivity('🏴‍☠️', 'Raid-Counter verwendet');
+        }
+
+        // Export-Funktionen für andere Seiten
+        window.dashboardAPI = {
+            addActivity: addActivity,
+            updateUserStats: updateUserStats,
+            onCalculatorUsed: onCalculatorUsed,
+            onRaidCounterUsed: onRaidCounterUsed
+        };
+    </script>
+</body>
+</html>
