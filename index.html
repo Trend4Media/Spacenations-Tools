@@ -1,4 +1,13 @@
-<!DOCTYPE html>
+.theme-toggle {
+                position: static;
+                transform: none;
+                margin-bottom: 15px;
+                align-self: flex-start;
+            }
+            
+            .theme-toggle:hover {
+                transform: translateY(-2px);
+            }<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -369,6 +378,72 @@
             box-shadow: 0 8px 25px rgba(255, 140, 66, 0.3);
         }
         
+        .register-link {
+            text-align: center;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .register-link a {
+            color: #4a90e2;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .register-link a:hover {
+            color: #ff8c42;
+            text-shadow: 0 0 5px rgba(255, 140, 66, 0.3);
+            cursor: pointer;
+        }
+        
+        /* Admin Area */
+        .admin {
+            grid-area: admin;
+            background: linear-gradient(135deg, rgba(254, 243, 205, 0.95), rgba(253, 230, 138, 0.95));
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(251, 191, 36, 0.5);
+            height: fit-content;
+            text-align: center;
+        }
+        
+        .admin h4 {
+            color: #92400e;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .admin-text {
+            color: #a16207;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+        
+        .admin-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .admin-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
+        
         /* Footer */
         .footer {
             grid-area: footer;
@@ -379,7 +454,7 @@
         }
         
         /* Responsive */
-        @media (max-width: 1024px) {
+                    @media (max-width: 1024px) {
             body {
                 grid-template-areas: 
                     "header header"
@@ -412,17 +487,6 @@
             .subtitle {
                 font-size: 1.1rem;
             }
-            
-            .theme-toggle {
-                position: static;
-                transform: none;
-                margin-bottom: 15px;
-                align-self: flex-start;
-            }
-            
-            .theme-toggle:hover {
-                transform: translateY(-2px);
-            }
         }
     </style>
 </head>
@@ -452,7 +516,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="raid-counter.html" class="nav-link">
+                <a href="#" class="nav-link coming-soon-link" onclick="showComingSoon('Raid-Counter')">
                     <span class="nav-icon">🏴‍☠️</span>
                     Raid-Counter
                 </a>
@@ -508,6 +572,10 @@
             <div class="form-group">
                 <label class="form-label" for="password">Passwort:</label>
                 <input type="password" id="password" class="form-input" placeholder="Ihr Passwort" required>
+            </div>
+            <div class="register-link">
+                <a onclick="openPasswordReset()">Passwort vergessen</a>
+                <a onclick="openRegistration()">Account anlegen</a>
             </div>
             <button type="submit" class="login-btn">Login</button>
         </form>
@@ -580,6 +648,16 @@
             // window.location.href = 'admin-registration.html';
         }
         
+        function openRegistration() {
+            alert('Account-Registrierung wird geöffnet...\n\n(Navigation zu register.html)');
+            // window.location.href = 'register.html';
+        }
+        
+        function openPasswordReset() {
+            alert('Passwort-Reset wird geöffnet...\n\n(Navigation zu password-reset.html)');
+            // window.location.href = 'password-reset.html';
+        }
+        
         // Event-Listener nur für Coming Soon Links
         document.querySelectorAll('.coming-soon-link').forEach(link => {
             link.addEventListener('click', function(e) {
@@ -591,6 +669,9 @@
                 }, 200);
             });
         });
+    </script>
+</body>
+</html>
     </script>
 </body>
 </html>
