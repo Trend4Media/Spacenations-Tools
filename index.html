@@ -517,16 +517,14 @@
         }
         
         // Smooth scroll for navigation
-        document.querySelectorAll('.nav-link:not(.coming-soon-link)').forEach(link => {
+        document.querySelectorAll('.nav-link.coming-soon-link').forEach(link => {
             link.addEventListener('click', function(e) {
-                // Nur preventDefault für coming-soon links, nicht für funktionierende Tools
-                if (!this.classList.contains('coming-soon-link')) {
-                    // Add visual feedback für funktionierende Links
-                    this.style.transform = 'translateX(8px)';
-                    setTimeout(() => {
-                        this.style.transform = '';
-                    }, 200);
-                }
+                e.preventDefault();
+                // Add visual feedback für coming-soon Links
+                this.style.transform = 'translateX(8px)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 200);
             });
         });
     </script>
