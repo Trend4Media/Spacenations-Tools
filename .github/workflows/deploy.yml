@@ -1,0 +1,46 @@
+name: Deploy Spacenations Tools
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📂 Checkout Repository
+      uses: actions/checkout@v4
+      
+    - name: 🔍 HTML Syntax Check
+      run: |
+        # Prüfe HTML Syntax
+        for file in *.html; do
+          echo "Checking $file..."
+          # Einfache HTML Validierung
+          if ! grep -q "<!DOCTYPE html>" "$file"; then
+            echo "❌ Error: $file missing DOCTYPE"
+            exit 1
+          fi
+          if ! grep -q "</html>" "$file"; then
+            echo "❌ Error: $file missing closing html tag"
+            exit 1
+          fi
+          echo "✅ $file syntax OK"
+        done
+        
+    - name: 🚀 Deploy to GitHub Pages
+      if: github.ref == 'refs/heads/main'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./
+        
+    - name: 📊 Deployment Summary
+      if: success()
+      run: |
+        echo "🎉 Deployment successful!"
+        echo "📱 Website: https://${{ github.repository_owner }}.github.io/Spacenations-tools"
+        echo "⏰ Time: $(date)"
