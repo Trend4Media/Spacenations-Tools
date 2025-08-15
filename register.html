@@ -1,6 +1,359 @@
-<script>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Erstellen - Spacenations Tools</title>
+    <style>
+        /* CSS Variablen für Light/Dark Mode */
+        :root {
+            /* Dark Mode (Standard) */
+            --bg-gradient: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --bg-panel: rgba(0, 0, 0, 0.7);
+            --border-primary: #3a5998;
+            --border-shadow: rgba(58, 89, 152, 0.3);
+            --form-bg: rgba(0, 0, 0, 0.8);
+            --form-border: rgba(58, 89, 152, 0.5);
+            --error-bg: rgba(220, 38, 38, 0.1);
+            --error-border: #dc2626;
+            --success-bg: rgba(34, 197, 94, 0.1);
+            --success-border: #22c55e;
+        }
+        
+        /* Light Mode */
+        :root.light-mode {
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --bg-panel: rgba(255, 255, 255, 0.95);
+            --border-primary: #e2e8f0;
+            --border-shadow: rgba(0, 0, 0, 0.1);
+            --form-bg: #f8fafc;
+            --form-border: #e2e8f0;
+            --error-bg: rgba(254, 242, 242, 0.8);
+            --error-border: #f87171;
+            --success-bg: rgba(240, 253, 244, 0.8);
+            --success-border: #4ade80;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .register-container {
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 0 30px var(--border-shadow);
+            backdrop-filter: blur(10px);
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .theme-toggle {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            background: linear-gradient(45deg, #3a5998, #4a90e2);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+        
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+        }
+        
+        .register-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .register-title {
+            font-size: 2rem;
+            color: #ff8c42;
+            margin-bottom: 8px;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(255, 140, 66, 0.2);
+        }
+        
+        .register-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--form-border);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--form-bg);
+            color: var(--text-primary);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 15px rgba(74, 144, 226, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .form-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+        
+        .register-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #ff8c42, #ff9f5a);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            font-size: 1rem;
+        }
+        
+        .register-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 140, 66, 0.3);
+        }
+        
+        .register-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-link a {
+            color: #4a90e2;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .back-link a:hover {
+            color: #ff8c42;
+            text-shadow: 0 0 5px rgba(255, 140, 66, 0.3);
+        }
+        
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            display: none;
+            text-align: center;
+        }
+        
+        .error-message {
+            background: var(--error-bg);
+            border: 2px solid var(--error-border);
+            color: var(--error-border);
+        }
+        
+        .success-message {
+            background: var(--success-bg);
+            border: 2px solid var(--success-border);
+            color: var(--success-border);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .optional-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            opacity: 0.8;
+        }
+        
+        .required-mark {
+            color: #ff8c42;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .register-container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            
+            .register-title {
+                font-size: 1.6rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .theme-toggle {
+                position: static;
+                margin-bottom: 20px;
+                align-self: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <button class="theme-toggle" onclick="toggleTheme()">
+            <span id="theme-icon">🌙</span>
+            <span id="theme-text">Light</span>
+        </button>
+        
+        <div class="register-header">
+            <h1 class="register-title">🚀 Account Erstellen</h1>
+            <p class="register-subtitle">Werden Sie Teil der Spacenations Community</p>
+        </div>
+        
+        <div id="error-message" class="message error-message"></div>
+        <div id="success-message" class="message success-message"></div>
+        
+        <form id="registration-form">
+            <div class="form-group">
+                <label class="form-label" for="username">
+                    Benutzername <span class="required-mark">*</span>
+                </label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    class="form-input" 
+                    placeholder="IhrBenutzername" 
+                    required
+                    maxlength="20"
+                    pattern="[a-zA-Z0-9_]{3,20}"
+                    title="3-20 Zeichen, nur Buchstaben, Zahlen und Unterstriche"
+                >
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="email">
+                    E-Mail Adresse <span class="required-mark">*</span>
+                </label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    class="form-input" 
+                    placeholder="ihre@email.de" 
+                    required
+                >
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="password">
+                    Passwort <span class="required-mark">*</span>
+                </label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    class="form-input" 
+                    placeholder="Mindestens 6 Zeichen" 
+                    required
+                    minlength="6"
+                >
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="alliance">
+                        Allianz <span class="optional-label">(optional)</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="alliance" 
+                        class="form-input" 
+                        placeholder="Ihre Allianz"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="discord">
+                        Discord Name <span class="optional-label">(optional)</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="discord" 
+                        class="form-input" 
+                        placeholder="IhrDiscord#1234"
+                    >
+                </div>
+            </div>
+            
+            <button type="submit" id="register-btn" class="register-btn">
+                🚀 Account Erstellen
+            </button>
+        </form>
+        
+        <div class="back-link">
+            <a href="index.html">← Zurück zur Startseite</a>
+        </div>
+    </div>
+
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <script>
         // EmailJS initialisieren
-        emailjs.init("O98Tc5LjCIXbmorcG"); // Public Key hinzugefügt
+        emailjs.init("O98Tc5LjCIXbmorcG");
 
         // Welcome E-Mail senden
         async function sendWelcomeEmail(userData) {
@@ -13,8 +366,8 @@
                 };
 
                 const result = await emailjs.send(
-                    'service_a2jtakb',     // Ihre Service ID
-                    'template_u57fsn7',    // Ihre Welcome Template ID
+                    'service_a2jtakb',
+                    'template_u57fsn7',
                     templateParams
                 );
                 
@@ -38,8 +391,8 @@
                 };
 
                 await emailjs.send(
-                    'service_a2jtakb',     // Ihre Service ID
-                    'template_rxmojvb',    // Ihre Admin Template ID
+                    'service_a2jtakb',
+                    'template_rxmojvb',
                     templateParams
                 );
                 
@@ -49,7 +402,7 @@
             }
         }
 
-        // Ihre Firebase-Konfiguration:
+        // Firebase-Konfiguration
         const firebaseConfig = {
             apiKey: "AIzaSyDr4-ap_EubUn0UdP7hkEpS2jkzLIVgvyc",
             authDomain: "spacenations-tools.firebaseapp.com",
@@ -74,12 +427,12 @@
             if (root.classList.contains('light-mode')) {
                 root.classList.remove('light-mode');
                 themeIcon.textContent = '🌙';
-                themeText.textContent = 'Light Mode';
+                themeText.textContent = 'Light';
                 localStorage.setItem('theme', 'dark');
             } else {
                 root.classList.add('light-mode');
                 themeIcon.textContent = '☀️';
-                themeText.textContent = 'Dark Mode';
+                themeText.textContent = 'Dark';
                 localStorage.setItem('theme', 'light');
             }
         }
@@ -93,11 +446,11 @@
             if (savedTheme === 'light') {
                 root.classList.add('light-mode');
                 themeIcon.textContent = '☀️';
-                themeText.textContent = 'Dark Mode';
+                themeText.textContent = 'Dark';
             } else {
                 root.classList.remove('light-mode');
                 themeIcon.textContent = '🌙';
-                themeText.textContent = 'Light Mode';
+                themeText.textContent = 'Light';
             }
         }
         
@@ -223,3 +576,5 @@
             }
         });
     </script>
+</body>
+</html>
