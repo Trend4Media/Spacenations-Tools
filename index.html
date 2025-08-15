@@ -1,13 +1,4 @@
-.theme-toggle {
-                position: static;
-                transform: none;
-                margin-bottom: 15px;
-                align-self: flex-start;
-            }
-            
-            .theme-toggle:hover {
-                transform: translateY(-2px);
-            }<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -378,6 +369,12 @@
             box-shadow: 0 8px 25px rgba(255, 140, 66, 0.3);
         }
         
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
         .register-link {
             text-align: center;
             margin-top: 15px;
@@ -400,48 +397,33 @@
             cursor: pointer;
         }
         
-        /* Admin Area */
-        .admin {
-            grid-area: admin;
-            background: linear-gradient(135deg, rgba(254, 243, 205, 0.95), rgba(253, 230, 138, 0.95));
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            border: 1px solid rgba(251, 191, 36, 0.5);
-            height: fit-content;
+        /* User Info (wenn eingeloggt) */
+        .user-info {
+            display: none;
             text-align: center;
+            padding: 20px;
         }
         
-        .admin h4 {
-            color: #92400e;
+        .user-welcome {
+            color: var(--text-primary);
             margin-bottom: 15px;
-            font-size: 1rem;
             font-weight: 600;
         }
         
-        .admin-text {
-            color: #a16207;
-            font-size: 0.9rem;
-            line-height: 1.4;
-            margin-bottom: 15px;
-        }
-        
-        .admin-btn {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
+        .logout-btn {
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
             color: white;
             border: none;
-            padding: 10px 16px;
+            padding: 10px 20px;
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 0.9rem;
         }
         
-        .admin-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(192, 57, 43, 0.3);
         }
         
         /* Footer */
@@ -454,7 +436,7 @@
         }
         
         /* Responsive */
-                    @media (max-width: 1024px) {
+        @media (max-width: 1024px) {
             body {
                 grid-template-areas: 
                     "header header"
@@ -487,6 +469,17 @@
             .subtitle {
                 font-size: 1.1rem;
             }
+            
+            .theme-toggle {
+                position: static;
+                transform: none;
+                margin-bottom: 15px;
+                align-self: flex-start;
+            }
+            
+            .theme-toggle:hover {
+                transform: translateY(-2px);
+            }
         }
     </style>
 </head>
@@ -516,7 +509,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link coming-soon-link" onclick="showComingSoon('Raid-Counter')">
+                <a href="raid-counter.html" class="nav-link">
                     <span class="nav-icon">🏴‍☠️</span>
                     Raid-Counter
                 </a>
@@ -563,29 +556,59 @@
     </main>
     
     <div class="login">
-        <h3>🔐 Benutzer Login</h3>
-        <form onsubmit="handleLogin(event)">
-            <div class="form-group">
-                <label class="form-label" for="username">Benutzername:</label>
-                <input type="text" id="username" class="form-input" placeholder="Ihr Benutzername" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="password">Passwort:</label>
-                <input type="password" id="password" class="form-input" placeholder="Ihr Passwort" required>
-            </div>
-            <div class="register-link">
-                <a onclick="openPasswordReset()">Passwort vergessen</a>
-                <a onclick="openRegistration()">Account anlegen</a>
-            </div>
-            <button type="submit" class="login-btn">Login</button>
-        </form>
+        <!-- Login Form (wenn nicht eingeloggt) -->
+        <div id="login-form">
+            <h3>🔐 Benutzer Login</h3>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label class="form-label" for="username">E-Mail:</label>
+                    <input type="email" id="username" class="form-input" placeholder="ihre@email.de" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="password">Passwort:</label>
+                    <input type="password" id="password" class="form-input" placeholder="Ihr Passwort" required>
+                </div>
+                <div class="register-link">
+                    <a onclick="openPasswordReset()">Passwort vergessen</a>
+                    <a onclick="openRegistration()">Account anlegen</a>
+                </div>
+                <button type="submit" id="login-btn" class="login-btn">Login</button>
+            </form>
+        </div>
+        
+        <!-- User Info (wenn eingeloggt) -->
+        <div id="user-info" class="user-info">
+            <h3>👋 Willkommen!</h3>
+            <div class="user-welcome" id="user-welcome"></div>
+            <button class="logout-btn" onclick="handleLogout()">Logout</button>
+        </div>
     </div>
     
     <footer class="footer">
         <p>Spacenations Info-Tools © 2025 | Inoffizielle Tools für die Spacenations Community</p>
     </footer>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
     <script>
+        // Ihre echte Firebase-Konfiguration:
+        const firebaseConfig = {
+            apiKey: "AIzaSyDr4-ap_EubUn0UdP7hkEpS2jkzLIVgvyc",
+            authDomain: "spacenations-tools.firebaseapp.com",
+            projectId: "spacenations-tools",
+            storageBucket: "spacenations-tools.firebasestorage.app",
+            messagingSenderId: "651338201276",
+            appId: "1:651338201276:web:89e7d9c19dbd2611d3f8b9",
+            measurementId: "G-SKWJWH2ERX"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
         // Theme Management
         function toggleTheme() {
             const root = document.documentElement;
@@ -593,13 +616,11 @@
             const themeText = document.getElementById('theme-text');
             
             if (root.classList.contains('light-mode')) {
-                // Wechsel zu Dark Mode
                 root.classList.remove('light-mode');
                 themeIcon.textContent = '🌙';
                 themeText.textContent = 'Light Mode';
                 localStorage.setItem('theme', 'dark');
             } else {
-                // Wechsel zu Light Mode
                 root.classList.add('light-mode');
                 themeIcon.textContent = '☀️';
                 themeText.textContent = 'Dark Mode';
@@ -607,7 +628,6 @@
             }
         }
         
-        // Theme beim Laden der Seite setzen
         function initTheme() {
             const savedTheme = localStorage.getItem('theme');
             const root = document.documentElement;
@@ -625,22 +645,105 @@
             }
         }
         
-        // Theme bei Seitenload initialisieren
         document.addEventListener('DOMContentLoaded', initTheme);
-        
-        function showComingSoon(toolName) {
-            alert(`${toolName} ist noch in Entwicklung!\n\n⏳ Coming Soon...\n\nDieses Tool wird in einer zukünftigen Version verfügbar sein.`);
-        }
-        
+
+        // Login Funktionalität
         function handleLogin(event) {
             event.preventDefault();
-            const username = document.getElementById('username').value;
+            const email = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            
-            // Hier würde die echte Login-Logik implementiert werden
-            if (username && password) {
-                alert(`Login-Versuch für: ${username}\n\n(Hier würde die echte Authentifizierung stattfinden)`);
+            const loginBtn = document.getElementById('login-btn');
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = '⏳ Login...';
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    console.log('Login erfolgreich:', user);
+                    loadUserData(user.uid);
+                })
+                .catch((error) => {
+                    console.error('Login fehlgeschlagen:', error);
+                    
+                    let errorMessage = 'Login fehlgeschlagen.';
+                    if (error.code === 'auth/user-not-found') {
+                        errorMessage = 'Kein Account mit dieser E-Mail gefunden.';
+                    } else if (error.code === 'auth/wrong-password') {
+                        errorMessage = 'Falsches Passwort.';
+                    } else if (error.code === 'auth/invalid-email') {
+                        errorMessage = 'Ungültige E-Mail-Adresse.';
+                    } else if (error.code === 'auth/too-many-requests') {
+                        errorMessage = 'Zu viele Fehlversuche. Versuchen Sie es später erneut.';
+                    }
+                    
+                    alert(errorMessage);
+                })
+                .finally(() => {
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Login';
+                });
+        }
+
+        // Logout Funktionalität
+        function handleLogout() {
+            auth.signOut().then(() => {
+                console.log('Logout erfolgreich');
+            }).catch((error) => {
+                console.error('Logout fehlgeschlagen:', error);
+            });
+        }
+
+        // Benutzerdaten laden
+        async function loadUserData(uid) {
+            try {
+                const userDoc = await db.collection('users').doc(uid).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    console.log('Benutzerdaten:', userData);
+                    
+                    // Update lastLogin
+                    await db.collection('users').doc(uid).update({
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            } catch (error) {
+                console.error('Fehler beim Laden der Benutzerdaten:', error);
             }
+        }
+
+        // UI Updates basierend auf Auth State
+        function updateUI(user) {
+            const loginForm = document.getElementById('login-form');
+            const userInfo = document.getElementById('user-info');
+            const userWelcome = document.getElementById('user-welcome');
+
+            if (user) {
+                // User ist eingeloggt
+                loginForm.style.display = 'none';
+                userInfo.style.display = 'block';
+                userWelcome.textContent = `Hallo, ${user.displayName || user.email}!`;
+            } else {
+                // User ist nicht eingeloggt
+                loginForm.style.display = 'block';
+                userInfo.style.display = 'none';
+            }
+        }
+
+        // Auth State Listener
+        auth.onAuthStateChanged((user) => {
+            updateUI(user);
+            if (user) {
+                console.log('User ist eingeloggt:', user.email);
+                loadUserData(user.uid);
+            } else {
+                console.log('User ist nicht eingeloggt');
+            }
+        });
+
+        // Navigation Funktionen
+        function showComingSoon(toolName) {
+            alert(`${toolName} ist noch in Entwicklung!\n\n⏳ Coming Soon...\n\nDieses Tool wird in einer zukünftigen Version verfügbar sein.`);
         }
         
         function openAdminRegistration() {
@@ -649,8 +752,7 @@
         }
         
         function openRegistration() {
-            alert('Account-Registrierung wird geöffnet...\n\n(Navigation zu register.html)');
-            // window.location.href = 'register.html';
+            window.location.href = 'register.html';
         }
         
         function openPasswordReset() {
@@ -662,16 +764,12 @@
         document.querySelectorAll('.coming-soon-link').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
-                // Visual feedback für coming-soon Links
                 this.style.transform = 'translateX(8px)';
                 setTimeout(() => {
                     this.style.transform = '';
                 }, 200);
             });
         });
-    </script>
-</body>
-</html>
     </script>
 </body>
 </html>
