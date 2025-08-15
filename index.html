@@ -407,7 +407,7 @@
         <h3>📊 Counter Tools</h3>
         <ul class="nav-list">
             <li class="nav-item">
-                <a href="#" class="nav-link" onclick="openTool('as-counter')">
+                <a href="calculator.html" class="nav-link">
                     <span class="nav-icon">⚔️</span>
                     AS-Counter
                 </a>
@@ -485,17 +485,6 @@
     </footer>
 
     <script>
-        function openTool(toolName) {
-            switch(toolName) {
-                case 'as-counter':
-                    // Navigation zum Kampfbericht-Rechner
-                    window.location.href = 'calculator.html';
-                    break;
-                default:
-                    alert('Tool nicht gefunden');
-            }
-        }
-        
         function showComingSoon(toolName) {
             alert(`${toolName} ist noch in Entwicklung!\n\n⏳ Coming Soon...\n\nDieses Tool wird in einer zukünftigen Version verfügbar sein.`);
         }
@@ -516,11 +505,11 @@
             // window.location.href = 'admin-registration.html';
         }
         
-        // Smooth scroll for navigation
-        document.querySelectorAll('.nav-link.coming-soon-link').forEach(link => {
+        // Event-Listener nur für Coming Soon Links
+        document.querySelectorAll('.coming-soon-link').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
-                // Add visual feedback für coming-soon Links
+                // Visual feedback für coming-soon Links
                 this.style.transform = 'translateX(8px)';
                 setTimeout(() => {
                     this.style.transform = '';
@@ -528,5 +517,7 @@
             });
         });
     </script>
+</body>
+</html>
 </body>
 </html>
