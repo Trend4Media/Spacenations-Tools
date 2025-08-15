@@ -32,6 +32,31 @@
         .header {
             text-align: center;
             margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .back-button {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(45deg, #3a5998, #4a90e2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-50%) translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
         }
         
         .spacenations {
@@ -220,8 +245,227 @@
         }
         
         @media (max-width: 768px) {
-            .
-</html>
+            .input-sections,
+            .results {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .button-section {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .spacenations {
+                font-size: 2rem;
+            }
+            
+            .back-button {
+                position: static;
+                transform: none;
+                margin-bottom: 15px;
+                align-self: flex-start;
+            }
+            
+            .back-button:hover {
+                transform: translateY(-2px);
+            }
+            
+            .header {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="back-button">
+                <span>←</span>
+                <span>Zurück zur Hauptseite</span>
+            </a>
+            <h1 class="spacenations">SPACENATIONS</h1>
+            <div class="subtitle">Kampfbericht-Rechner</div>
+        </div>
+        
+        <div class="input-sections">
+            <div class="input-box destroyed">
+                <h2>⚔️ Zerstört - Berichte (Funktion A)</h2>
+                <label for="destroyed-reports">Berichte von Angriffen bei denen Sie etwas zerstört haben:</label>
+                <textarea id="destroyed-reports" placeholder="Berichte hier einfügen bei denen Sie etwas ZERSTÖRT haben..."></textarea>
+            </div>
+            
+            <div class="input-box lost">
+                <h2>💀 Verloren - Berichte (Funktion B)</h2>
+                <label for="lost-reports">Berichte von Angriffen bei denen Sie etwas verloren haben:</label>
+                <textarea id="lost-reports" placeholder="Berichte hier einfügen bei denen Sie etwas VERLOREN haben..."></textarea>
+            </div>
+        </div>
+        
+        <div class="button-section">
+            <button class="calculate-btn" onclick="calculateReports()">📊 Berichte Auswerten</button>
+            <button class="clear-btn" onclick="clearAll()">🗑️ Alles Löschen</button>
+        </div>
+        
+        <div class="results">
+            <div class="result-box destroyed">
+                <h2>⚔️ Zerstört - Summen</h2>
+                <div id="destroyed-stats">
+                    <div class="stat-line">
+                        <span class="stat-name">Stabilität:</span>
+                        <span class="stat-value" id="destroyed-stability">0</span>
+                    </div>
+                    <div class="stat-line">
+                        <span class="stat-name">Lagerraum:</span>
+                        <span class="stat-value" id="destroyed-storage">0</span>
+                    </div>
+                    <div class="stat-line">
+                        <span class="stat-name">Panzerung:</span>
+                        <span class="stat-value" id="destroyed-armor">0</span>
+                    </div>
+                    <div class="stat-line">
+                        <span class="stat-name">Angriffsstärke:</span>
+                        <span class="stat-value" id="destroyed-attack">0</span>
+                    </div>
+                    <div class="stat-line total-line">
+                        <span class="stat-name">Anzahl Berichte:</span>
+                        <span class="stat-value" id="destroyed-count">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-box lost">
+                <h2>💀 Verloren - Summen</h2>
+                <div id="lost-stats">
+                    <div class="stat-line">
+                        <span class="stat-name">Stabilität:</span>
+                        <span class="stat-value" id="lost-stability">0</span>
+                    </div>
+                    <div class="stat-line">
+                        <span class="stat-name">Lagerraum:</span>
+                        <span class="stat-value" id="lost-storage">0</span>
+                    </div>
+                    <div class="stat-line">
+                        <span class="stat-name">Panzerung:</span>
+                        <span class="stat-value" id="lost-armor">0</span>
+                    </div>
+                    <div class="stat-line">
+                        <span class="stat-name">Angriffsstärke:</span>
+                        <span class="stat-value" id="lost-attack">0</span>
+                    </div>
+                    <div class="stat-line total-line">
+                        <span class="stat-name">Anzahl Berichte:</span>
+                        <span class="stat-value" id="lost-count">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function parseNumber(str) {
+            // Entfernt Punkte als Tausendertrennzeichen und konvertiert zu Zahl
+            return parseInt(str.replace(/\./g, '')) || 0;
+        }
+
+        function formatNumber(num) {
+            // Formatiert Zahl mit Punkten als Tausendertrennzeichen
+            return num.toLocaleString('de-DE');
+        }
+
+        function parseReports(text, type) {
+            const resources = {
+                stability: 0,
+                storage: 0,
+                armor: 0,
+                attack: 0,
+                count: 0
+            };
+            
+            const lines = text.split('\n');
+            let hasResourceData = false;
+            
+            for (let line of lines) {
+                line = line.trim();
+                
+                // Parse Ressourcen-Zeilen (Zeilen die mit einer Zahl beginnen)
+                if (line.match(/^\d+\.?\d*\s+\w+/)) {
+                    const match = line.match(/^([\d.]+)\s+(.+)/);
+                    if (match) {
+                        const value = parseNumber(match[1]);
+                        const resource = match[2].toLowerCase();
+                        
+                        if (resource.includes('stabilität')) {
+                            resources.stability += value;
+                            hasResourceData = true;
+                        } else if (resource.includes('lagerraum')) {
+                            resources.storage += value;
+                            hasResourceData = true;
+                        } else if (resource.includes('panzerung')) {
+                            resources.armor += value;
+                            hasResourceData = true;
+                        } else if (resource.includes('angriffsstärke')) {
+                            resources.attack += value;
+                            hasResourceData = true;
+                        }
+                    }
+                }
+                
+                // Zähle Berichte basierend auf Zeitstempel-Zeilen
+                if (line.match(/^\d{2}\.\d{2}\.\d{4},\s+\d{2}:\d{2}:\d{2}/)) {
+                    resources.count++;
+                }
+            }
+            
+            return resources;
+        }
+
+        function calculateReports() {
+            // Parse Zerstört-Berichte
+            const destroyedText = document.getElementById('destroyed-reports').value;
+            const destroyed = parseReports(destroyedText, 'destroyed');
+            
+            // Parse Verloren-Berichte
+            const lostText = document.getElementById('lost-reports').value;
+            const lost = parseReports(lostText, 'lost');
+            
+            // Update Zerstört-Anzeige
+            document.getElementById('destroyed-stability').textContent = formatNumber(destroyed.stability);
+            document.getElementById('destroyed-storage').textContent = formatNumber(destroyed.storage);
+            document.getElementById('destroyed-armor').textContent = formatNumber(destroyed.armor);
+            document.getElementById('destroyed-attack').textContent = formatNumber(destroyed.attack);
+            document.getElementById('destroyed-count').textContent = destroyed.count;
+            
+            // Update Verloren-Anzeige
+            document.getElementById('lost-stability').textContent = formatNumber(lost.stability);
+            document.getElementById('lost-storage').textContent = formatNumber(lost.storage);
+            document.getElementById('lost-armor').textContent = formatNumber(lost.armor);
+            document.getElementById('lost-attack').textContent = formatNumber(lost.attack);
+            document.getElementById('lost-count').textContent = lost.count;
+        }
+        
+        function clearAll() {
+            document.getElementById('destroyed-reports').value = '';
+            document.getElementById('lost-reports').value = '';
+            
+            // Reset alle Werte auf 0
+            document.getElementById('destroyed-stability').textContent = '0';
+            document.getElementById('destroyed-storage').textContent = '0';
+            document.getElementById('destroyed-armor').textContent = '0';
+            document.getElementById('destroyed-attack').textContent = '0';
+            document.getElementById('destroyed-count').textContent = '0';
+            
+            document.getElementById('lost-stability').textContent = '0';
+            document.getElementById('lost-storage').textContent = '0';
+            document.getElementById('lost-armor').textContent = '0';
+            document.getElementById('lost-attack').textContent = '0';
+            document.getElementById('lost-count').textContent = '0';
+        }
     </script>
 </body>
 </html>
