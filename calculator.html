@@ -5,6 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Space Nations Kampfbericht Rechner</title>
     <style>
+        /* CSS Variablen für Light/Dark Mode */
+        :root {
+            /* Dark Mode (Standard) */
+            --bg-gradient: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --bg-panel: rgba(0, 0, 0, 0.7);
+            --border-primary: #3a5998;
+            --border-shadow: rgba(58, 89, 152, 0.3);
+            --input-bg: rgba(0, 0, 0, 0.8);
+            --input-border: rgba(58, 89, 152, 0.5);
+            --destroyed-color: #e74c3c;
+            --lost-color: #f39c12;
+        }
+        
+        /* Light Mode */
+        :root.light-mode {
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --bg-panel: rgba(255, 255, 255, 0.95);
+            --border-primary: #e2e8f0;
+            --border-shadow: rgba(0, 0, 0, 0.1);
+            --input-bg: #f8fafc;
+            --input-border: #e2e8f0;
+            --destroyed-color: #dc2626;
+            --lost-color: #d97706;
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -13,20 +42,23 @@
         
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
-            color: #e0e0e0;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
             min-height: 100vh;
             padding: 20px;
+            transition: all 0.3s ease;
         }
         
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background: rgba(0, 0, 0, 0.7);
-            border: 2px solid #3a5998;
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 0 20px rgba(58, 89, 152, 0.3);
+            box-shadow: 0 0 20px var(--border-shadow);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
         }
         
         .header {
@@ -59,6 +91,30 @@
             box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
         }
         
+        .theme-toggle {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(45deg, #3a5998, #4a90e2);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .theme-toggle:hover {
+            transform: translateY(-50%) translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+        }
+        
         .spacenations {
             font-size: 2.5rem;
             font-weight: bold;
@@ -71,7 +127,7 @@
         
         .subtitle {
             font-size: 1.2rem;
-            color: #b0b0b0;
+            color: var(--text-secondary);
             margin: 5px 0 0 0;
             font-weight: normal;
         }
@@ -84,18 +140,19 @@
         }
         
         .input-box {
-            background: rgba(16, 16, 16, 0.9);
-            border: 2px solid #3a5998;
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
             border-radius: 10px;
             padding: 20px;
+            transition: all 0.3s ease;
         }
         
         .input-box.destroyed {
-            border-color: #e74c3c;
+            border-color: var(--destroyed-color);
         }
         
         .input-box.lost {
-            border-color: #f39c12;
+            border-color: var(--lost-color);
         }
         
         .input-box h2 {
@@ -106,33 +163,34 @@
         }
         
         .input-box.destroyed h2 {
-            color: #e74c3c;
+            color: var(--destroyed-color);
             text-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
         }
         
         .input-box.lost h2 {
-            color: #f39c12;
+            color: var(--lost-color);
             text-shadow: 0 0 5px rgba(243, 156, 18, 0.5);
         }
         
         label {
             display: block;
             margin-bottom: 10px;
-            color: #b0b0b0;
+            color: var(--text-secondary);
             font-weight: bold;
         }
         
         textarea {
             width: 100%;
             height: 200px;
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid rgba(58, 89, 152, 0.5);
+            background: var(--input-bg);
+            border: 2px solid var(--input-border);
             border-radius: 5px;
-            color: #e0e0e0;
+            color: var(--text-primary);
             padding: 15px;
             font-family: monospace;
             font-size: 12px;
             resize: vertical;
+            transition: all 0.3s ease;
         }
         
         textarea:focus {
@@ -180,10 +238,11 @@
         }
         
         .result-box {
-            background: rgba(16, 16, 16, 0.9);
-            border: 2px solid #3a5998;
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
             border-radius: 10px;
             padding: 20px;
+            transition: all 0.3s ease;
         }
         
         .result-box h2 {
@@ -194,20 +253,20 @@
         }
         
         .destroyed {
-            border-color: #e74c3c;
+            border-color: var(--destroyed-color);
         }
         
         .destroyed h2 {
-            color: #e74c3c;
+            color: var(--destroyed-color);
             text-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
         }
         
         .lost {
-            border-color: #f39c12;
+            border-color: var(--lost-color);
         }
         
         .lost h2 {
-            color: #f39c12;
+            color: var(--lost-color);
             text-shadow: 0 0 5px rgba(243, 156, 18, 0.5);
         }
         
@@ -223,7 +282,7 @@
         }
         
         .stat-name {
-            color: #b0b0b0;
+            color: var(--text-secondary);
         }
         
         .stat-value {
@@ -232,7 +291,7 @@
         }
         
         .total-line {
-            border-top: 2px solid #3a5998;
+            border-top: 2px solid var(--border-primary);
             margin-top: 10px;
             padding-top: 10px;
             font-weight: bold;
@@ -263,14 +322,15 @@
                 font-size: 2rem;
             }
             
-            .back-button {
+            .back-button,
+            .theme-toggle {
                 position: static;
                 transform: none;
                 margin-bottom: 15px;
-                align-self: flex-start;
             }
             
-            .back-button:hover {
+            .back-button:hover,
+            .theme-toggle:hover {
                 transform: translateY(-2px);
             }
             
@@ -278,6 +338,7 @@
                 display: flex;
                 flex-direction: column;
                 align-items: center;
+                gap: 10px;
             }
         }
     </style>
@@ -289,6 +350,10 @@
                 <span>←</span>
                 <span>Zurück zur Hauptseite</span>
             </a>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <span id="theme-icon">🌙</span>
+                <span id="theme-text">Light Mode</span>
+            </button>
             <h1 class="spacenations">SPACENATIONS</h1>
             <div class="subtitle">Kampfbericht-Rechner</div>
         </div>
@@ -368,13 +433,53 @@
     </div>
 
     <script>
+        // Theme Management
+        function toggleTheme() {
+            const root = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            
+            if (root.classList.contains('light-mode')) {
+                // Wechsel zu Dark Mode
+                root.classList.remove('light-mode');
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Light Mode';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                // Wechsel zu Light Mode
+                root.classList.add('light-mode');
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Dark Mode';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        // Theme beim Laden der Seite setzen
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const root = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            
+            if (savedTheme === 'light') {
+                root.classList.add('light-mode');
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Dark Mode';
+            } else {
+                root.classList.remove('light-mode');
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Light Mode';
+            }
+        }
+        
+        // Theme bei Seitenload initialisieren
+        document.addEventListener('DOMContentLoaded', initTheme);
+
         function parseNumber(str) {
-            // Entfernt Punkte als Tausendertrennzeichen und konvertiert zu Zahl
             return parseInt(str.replace(/\./g, '')) || 0;
         }
 
         function formatNumber(num) {
-            // Formatiert Zahl mit Punkten als Tausendertrennzeichen
             return num.toLocaleString('de-DE');
         }
 
@@ -388,12 +493,10 @@
             };
             
             const lines = text.split('\n');
-            let hasResourceData = false;
             
             for (let line of lines) {
                 line = line.trim();
                 
-                // Parse Ressourcen-Zeilen (Zeilen die mit einer Zahl beginnen)
                 if (line.match(/^\d+\.?\d*\s+\w+/)) {
                     const match = line.match(/^([\d.]+)\s+(.+)/);
                     if (match) {
@@ -402,21 +505,16 @@
                         
                         if (resource.includes('stabilität')) {
                             resources.stability += value;
-                            hasResourceData = true;
                         } else if (resource.includes('lagerraum')) {
                             resources.storage += value;
-                            hasResourceData = true;
                         } else if (resource.includes('panzerung')) {
                             resources.armor += value;
-                            hasResourceData = true;
                         } else if (resource.includes('angriffsstärke')) {
                             resources.attack += value;
-                            hasResourceData = true;
                         }
                     }
                 }
                 
-                // Zähle Berichte basierend auf Zeitstempel-Zeilen
                 if (line.match(/^\d{2}\.\d{2}\.\d{4},\s+\d{2}:\d{2}:\d{2}/)) {
                     resources.count++;
                 }
@@ -426,22 +524,18 @@
         }
 
         function calculateReports() {
-            // Parse Zerstört-Berichte
             const destroyedText = document.getElementById('destroyed-reports').value;
             const destroyed = parseReports(destroyedText, 'destroyed');
             
-            // Parse Verloren-Berichte
             const lostText = document.getElementById('lost-reports').value;
             const lost = parseReports(lostText, 'lost');
             
-            // Update Zerstört-Anzeige
             document.getElementById('destroyed-stability').textContent = formatNumber(destroyed.stability);
             document.getElementById('destroyed-storage').textContent = formatNumber(destroyed.storage);
             document.getElementById('destroyed-armor').textContent = formatNumber(destroyed.armor);
             document.getElementById('destroyed-attack').textContent = formatNumber(destroyed.attack);
             document.getElementById('destroyed-count').textContent = destroyed.count;
             
-            // Update Verloren-Anzeige
             document.getElementById('lost-stability').textContent = formatNumber(lost.stability);
             document.getElementById('lost-storage').textContent = formatNumber(lost.storage);
             document.getElementById('lost-armor').textContent = formatNumber(lost.armor);
@@ -453,7 +547,6 @@
             document.getElementById('destroyed-reports').value = '';
             document.getElementById('lost-reports').value = '';
             
-            // Reset alle Werte auf 0
             document.getElementById('destroyed-stability').textContent = '0';
             document.getElementById('destroyed-storage').textContent = '0';
             document.getElementById('destroyed-armor').textContent = '0';
@@ -466,6 +559,9 @@
             document.getElementById('lost-attack').textContent = '0';
             document.getElementById('lost-count').textContent = '0';
         }
+    </script>
+</body>
+</html>
     </script>
 </body>
 </html>
