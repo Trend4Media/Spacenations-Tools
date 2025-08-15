@@ -1,10 +1,52 @@
-<!DOCTYPE html>
+.theme-toggle {
+                position: static;
+                transform: none;
+                margin-bottom: 15px;
+                align-self: flex-start;
+            }
+            
+            .theme-toggle:hover {
+                transform: translateY(-2px);
+            }<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spacenations Info-Tool</title>
     <style>
+        /* CSS Variablen für Light/Dark Mode */
+        :root {
+            /* Dark Mode (Standard) */
+            --bg-gradient: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --bg-panel: rgba(0, 0, 0, 0.7);
+            --border-primary: #3a5998;
+            --border-shadow: rgba(58, 89, 152, 0.3);
+            --feature-bg: rgba(16, 16, 16, 0.9);
+            --admin-bg: rgba(16, 16, 16, 0.9);
+            --admin-border: #f39c12;
+            --admin-text: #b0b0b0;
+            --form-bg: rgba(0, 0, 0, 0.8);
+            --form-border: rgba(58, 89, 152, 0.5);
+        }
+        
+        /* Light Mode */
+        :root.light-mode {
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --bg-panel: rgba(255, 255, 255, 0.95);
+            --border-primary: #e2e8f0;
+            --border-shadow: rgba(0, 0, 0, 0.1);
+            --feature-bg: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            --admin-bg: linear-gradient(135deg, rgba(254, 243, 205, 0.95), rgba(253, 230, 138, 0.95));
+            --admin-border: #fbbf24;
+            --admin-text: #a16207;
+            --form-bg: #f8fafc;
+            --form-border: #e2e8f0;
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -13,8 +55,8 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
-            color: #e0e0e0;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
             min-height: 100vh;
             display: grid;
             grid-template-areas: 
@@ -25,6 +67,32 @@
             grid-template-rows: auto 1fr auto;
             gap: 20px;
             padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        /* Dark/Light Mode Toggle */
+        .theme-toggle {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(45deg, #3a5998, #4a90e2);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .theme-toggle:hover {
+            transform: translateY(-50%) translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
         }
         
         /* Header */
@@ -32,10 +100,13 @@
             grid-area: header;
             text-align: center;
             padding: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            border: 2px solid #3a5998;
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
             border-radius: 15px;
-            box-shadow: 0 0 20px rgba(58, 89, 152, 0.3);
+            box-shadow: 0 0 20px var(--border-shadow);
+            position: relative;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
         }
         
         .spacenations {
@@ -50,7 +121,7 @@
         
         .subtitle {
             font-size: 1.3rem;
-            color: #b0b0b0;
+            color: var(--text-secondary);
             margin: 10px 0 0 0;
             font-weight: 400;
         }
@@ -58,16 +129,18 @@
         /* Navigation */
         .nav {
             grid-area: nav;
-            background: rgba(0, 0, 0, 0.7);
-            border: 2px solid #3a5998;
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
             border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 0 20px rgba(58, 89, 152, 0.3);
+            box-shadow: 0 0 20px var(--border-shadow);
             height: fit-content;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
         }
         
         .nav h3 {
-            color: #e0e0e0;
+            color: var(--text-primary);
             margin-bottom: 20px;
             font-size: 1.2rem;
             font-weight: 600;
@@ -85,7 +158,7 @@
             display: flex;
             align-items: center;
             padding: 12px 16px;
-            color: #b0b0b0;
+            color: var(--text-secondary);
             text-decoration: none;
             border-radius: 10px;
             transition: all 0.3s ease;
@@ -130,11 +203,13 @@
         /* Main Content */
         .main {
             grid-area: main;
-            background: rgba(0, 0, 0, 0.7);
-            border: 2px solid #3a5998;
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
             border-radius: 15px;
             padding: 30px;
-            box-shadow: 0 0 20px rgba(58, 89, 152, 0.3);
+            box-shadow: 0 0 20px var(--border-shadow);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
         }
         
         .welcome-content {
@@ -144,14 +219,14 @@
         
         .welcome-title {
             font-size: 2rem;
-            color: #e0e0e0;
+            color: var(--text-primary);
             margin-bottom: 20px;
             font-weight: 600;
         }
         
         .welcome-text {
             font-size: 1.1rem;
-            color: #b0b0b0;
+            color: var(--text-secondary);
             line-height: 1.6;
             max-width: 600px;
             margin: 0 auto 30px auto;
@@ -165,11 +240,12 @@
         }
         
         .feature-card {
-            background: rgba(16, 16, 16, 0.9);
+            background: var(--feature-bg);
             padding: 20px;
             border-radius: 12px;
             text-align: center;
-            border: 2px solid #3a5998;
+            border: 2px solid var(--border-primary);
+            transition: all 0.3s ease;
         }
         
         .feature-icon {
@@ -181,28 +257,29 @@
         
         .feature-title {
             font-weight: 600;
-            color: #e0e0e0;
+            color: var(--text-primary);
             margin-bottom: 8px;
         }
         
         .feature-desc {
-            color: #b0b0b0;
+            color: var(--text-secondary);
             font-size: 0.9rem;
         }
         
         /* Admin Embedded */
         .admin-embedded {
-            background: rgba(16, 16, 16, 0.9);
-            border: 2px solid #f39c12;
+            background: var(--admin-bg);
+            border: 2px solid var(--admin-border);
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 30px;
             box-shadow: 0 0 20px rgba(243, 156, 18, 0.3);
             text-align: center;
+            transition: all 0.3s ease;
         }
         
         .admin-embedded h4 {
-            color: #f39c12;
+            color: var(--admin-border);
             margin-bottom: 15px;
             font-size: 1rem;
             font-weight: 600;
@@ -210,7 +287,7 @@
         }
         
         .admin-embedded .admin-text {
-            color: #b0b0b0;
+            color: var(--admin-text);
             font-size: 0.9rem;
             line-height: 1.4;
             margin-bottom: 15px;
@@ -236,16 +313,18 @@
         /* Login */
         .login {
             grid-area: login;
-            background: rgba(0, 0, 0, 0.7);
-            border: 2px solid #3a5998;
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
             border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 0 20px rgba(58, 89, 152, 0.3);
+            box-shadow: 0 0 20px var(--border-shadow);
             height: fit-content;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
         }
         
         .login h3 {
-            color: #e0e0e0;
+            color: var(--text-primary);
             margin-bottom: 20px;
             font-size: 1.2rem;
             font-weight: 600;
@@ -259,7 +338,7 @@
         .form-label {
             display: block;
             margin-bottom: 5px;
-            color: #b0b0b0;
+            color: var(--text-secondary);
             font-weight: 500;
             font-size: 0.9rem;
         }
@@ -267,18 +346,17 @@
         .form-input {
             width: 100%;
             padding: 12px;
-            border: 2px solid rgba(58, 89, 152, 0.5);
+            border: 2px solid var(--form-border);
             border-radius: 8px;
             font-size: 0.9rem;
             transition: all 0.3s ease;
-            background: rgba(0, 0, 0, 0.8);
-            color: #e0e0e0;
+            background: var(--form-bg);
+            color: var(--text-primary);
         }
         
         .form-input:focus {
             outline: none;
             border-color: #4a90e2;
-            background: rgba(0, 0, 0, 0.9);
             box-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
         }
         
@@ -349,7 +427,7 @@
             grid-area: footer;
             text-align: center;
             padding: 20px;
-            color: #b0b0b0;
+            color: var(--text-secondary);
             font-size: 0.9rem;
         }
         
@@ -392,6 +470,10 @@
 </head>
 <body>
     <div class="header">
+        <button class="theme-toggle" onclick="toggleTheme()">
+            <span id="theme-icon">🌙</span>
+            <span id="theme-text">Light Mode</span>
+        </button>
         <h1 class="spacenations">SPACENATIONS</h1>
         <div class="subtitle">Info-Tool Collection</div>
     </div>
@@ -478,6 +560,48 @@
     </footer>
 
     <script>
+        // Theme Management
+        function toggleTheme() {
+            const root = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            
+            if (root.classList.contains('light-mode')) {
+                // Wechsel zu Dark Mode
+                root.classList.remove('light-mode');
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Light Mode';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                // Wechsel zu Light Mode
+                root.classList.add('light-mode');
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Dark Mode';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        // Theme beim Laden der Seite setzen
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const root = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            
+            if (savedTheme === 'light') {
+                root.classList.add('light-mode');
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Dark Mode';
+            } else {
+                root.classList.remove('light-mode');
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Light Mode';
+            }
+        }
+        
+        // Theme bei Seitenload initialisieren
+        document.addEventListener('DOMContentLoaded', initTheme);
+        
         function showComingSoon(toolName) {
             alert(`${toolName} ist noch in Entwicklung!\n\n⏳ Coming Soon...\n\nDieses Tool wird in einer zukünftigen Version verfügbar sein.`);
         }
@@ -510,10 +634,5 @@
             });
         });
     </script>
-</body>
-</html>
-    </script>
-</body>
-</html>
 </body>
 </html>
