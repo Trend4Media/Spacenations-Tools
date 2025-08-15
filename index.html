@@ -1,13 +1,4 @@
-.theme-toggle {
-                position: static;
-                transform: none;
-                margin-bottom: 15px;
-                align-self: flex-start;
-            }
-            
-            .theme-toggle:hover {
-                transform: translateY(-2px);
-            }<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -378,50 +369,6 @@
             box-shadow: 0 8px 25px rgba(255, 140, 66, 0.3);
         }
         
-        /* Admin Area */
-        .admin {
-            grid-area: admin;
-            background: linear-gradient(135deg, rgba(254, 243, 205, 0.95), rgba(253, 230, 138, 0.95));
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            border: 1px solid rgba(251, 191, 36, 0.5);
-            height: fit-content;
-            text-align: center;
-        }
-        
-        .admin h4 {
-            color: #92400e;
-            margin-bottom: 15px;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-        
-        .admin-text {
-            color: #a16207;
-            font-size: 0.9rem;
-            line-height: 1.4;
-            margin-bottom: 15px;
-        }
-        
-        .admin-btn {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-        }
-        
-        .admin-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
-        }
-        
         /* Footer */
         .footer {
             grid-area: footer;
@@ -432,7 +379,7 @@
         }
         
         /* Responsive */
-                    @media (max-width: 1024px) {
+        @media (max-width: 1024px) {
             body {
                 grid-template-areas: 
                     "header header"
@@ -465,6 +412,17 @@
             .subtitle {
                 font-size: 1.1rem;
             }
+            
+            .theme-toggle {
+                position: static;
+                transform: none;
+                margin-bottom: 15px;
+                align-self: flex-start;
+            }
+            
+            .theme-toggle:hover {
+                transform: translateY(-2px);
+            }
         }
     </style>
 </head>
@@ -494,7 +452,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link coming-soon-link" onclick="showComingSoon('Raid-Counter')">
+                <a href="raid-counter.html" class="nav-link">
                     <span class="nav-icon">🏴‍☠️</span>
                     Raid-Counter
                 </a>
