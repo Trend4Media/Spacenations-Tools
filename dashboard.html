@@ -545,6 +545,38 @@
             margin-right: 10px;
         }
         
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+        }
+        
+        .loading-content {
+            text-align: center;
+            color: white;
+            padding: 30px;
+            background: var(--bg-panel);
+            border-radius: 15px;
+            border: 2px solid var(--border-primary);
+        }
+        
+        .loading-overlay .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-primary);
+            border-top: 4px solid var(--accent-primary);
+            margin: 0 auto 15px auto;
+        }
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -598,6 +630,15 @@
     </style>
 </head>
 <body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>Lädt Dashboard...</h3>
+            <p>Bitte warten Sie einen Moment</p>
+        </div>
+    </div>
+
     <div class="header">
         <div class="header-content">
             <div class="header-left">
@@ -750,7 +791,7 @@
                 <button class="profile-btn btn-secondary" onclick="showPremiumFeature('Statistics')">
                     📊 Statistiken
                 </button>
-                <button class="profile-btn btn-danger" onclick="handleLogout()">
+                <button class="profile-btn btn-danger logout-btn">
                     🚪 Abmelden
                 </button>
             </div>
@@ -772,215 +813,102 @@
         <p>Spacenations Dashboard © 2025 | Dein persönlicher Bereich</p>
     </footer>
 
-    <!-- Firebase SDK - MUSS vor dem eigenen JavaScript geladen werden -->
+    <!-- Firebase SDK - MUSS ZUERST geladen werden -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
+    <!-- Modulare JavaScript-Dateien in der richtigen Reihenfolge -->
+    <script src="js/firebase-config.js"></script>        <!-- 1. Firebase-Konfiguration -->
+    <script src="js/theme-manager.js"></script>          <!-- 2. Theme-Management -->
+    <script src="js/auth-manager.js"></script>           <!-- 3. Auth-Management -->
+    <script src="js/firebase-sync.js"></script>          <!-- 4. Dashboard-Sync mit Logout -->
+
     <script>
-        // Warten bis Firebase vollständig geladen ist
-        document.addEventListener('DOMContentLoaded', function() {
-            // Prüfen ob Firebase verfügbar ist
-            if (typeof firebase === 'undefined') {
-                console.error('Firebase ist nicht geladen!');
-                alert('Fehler: Firebase konnte nicht geladen werden. Bitte laden Sie die Seite neu.');
-                return;
-            }
-            
-            console.log('Firebase erfolgreich geladen');
-            initializeApp();
-        });
-
-        function initializeApp() {
-        // Firebase-Konfiguration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDr4-ap_EubUn0UdP7hkEpS2jkzLIVgvyc",
-            authDomain: "spacenations-tools.firebaseapp.com",
-            projectId: "spacenations-tools",
-            storageBucket: "spacenations-tools.firebasestorage.app",
-            messagingSenderId: "651338201276",
-            appId: "1:651338201276:web:89e7d9c19dbd2611d3f8b9",
-            measurementId: "G-SKWJWH2ERX"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
+        // Dashboard-spezifische Funktionen
         let currentUser = null;
         let userData = null;
 
-        // Theme Management
-        function toggleTheme() {
-            const root = document.documentElement;
-            const themeIcon = document.getElementById('theme-icon');
-            const themeText = document.getElementById('theme-text');
-            
-            if (root.classList.contains('light-mode')) {
-                root.classList.remove('light-mode');
-                themeIcon.textContent = '🌙';
-                themeText.textContent = 'Light';
-                localStorage.setItem('theme', 'dark');
-            } else {
-                root.classList.add('light-mode');
-                themeIcon.textContent = '☀️';
-                themeText.textContent = 'Dark';
-                localStorage.setItem('theme', 'light');
-            }
-        }
-        
-        function initTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            const root = document.documentElement;
-            const themeIcon = document.getElementById('theme-icon');
-            const themeText = document.getElementById('theme-text');
-            
-            if (savedTheme === 'light') {
-                root.classList.add('light-mode');
-                themeIcon.textContent = '☀️';
-                themeText.textContent = 'Dark';
-            } else {
-                root.classList.remove('light-mode');
-                themeIcon.textContent = '🌙';
-                themeText.textContent = 'Light';
-            }
-        }
-
-        // Auth State Überwachung
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                currentUser = user;
-                console.log('User ist eingeloggt:', user.email);
-                await loadUserData(user.uid);
-                await loadDashboardData();
-                showDashboard();
-            } else {
-                console.log('User ist nicht eingeloggt - Weiterleitung...');
-                window.location.href = 'index.html';
+        // Warten bis alle Module geladen sind
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Warten bis AuthManager bereit ist
+                await window.AuthAPI.waitForInit();
+                
+                console.log('🏠 Dashboard wird initialisiert');
+                
+                // Auth State überwachen
+                window.AuthAPI.onAuthStateChange(async (user, userDataFromAuth) => {
+                    if (user && userDataFromAuth) {
+                        currentUser = user;
+                        userData = userDataFromAuth;
+                        
+                        console.log('✅ Dashboard für User geladen:', userData.username);
+                        
+                        // Dashboard-Daten laden
+                        await loadDashboardData();
+                        showDashboard();
+                        
+                        // Dashboard-Aktivität hinzufügen
+                        setTimeout(() => {
+                            if (window.AuthAPI.addActivity) {
+                                window.AuthAPI.addActivity('📊', 'Dashboard besucht');
+                            }
+                        }, 2000);
+                        
+                    } else {
+                        console.log('❌ Kein User - Dashboard nicht verfügbar');
+                        // Weiterleitung wird automatisch durch firebase-sync.js gehandelt
+                    }
+                });
+                
+            } catch (error) {
+                console.error('❌ Dashboard-Initialisierung fehlgeschlagen:', error);
+                showDashboardError('Fehler beim Laden des Dashboards');
             }
         });
-
-        // Benutzerdaten laden
-        async function loadUserData(uid) {
-            try {
-                const userDoc = await window.db.collection('users').doc(uid).get();
-                if (userDoc.exists) {
-                    userData = userDoc.data();
-                    console.log('Benutzerdaten geladen:', userData);
-                    
-                    // UI mit Benutzerdaten aktualisieren
-                    updateUserInterface();
-                    
-                    // Last Login aktualisieren
-                    await window.db.collection('users').doc(uid).update({
-                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                } else {
-                    console.error('Benutzerdaten nicht gefunden');
-                    alert('Fehler beim Laden der Benutzerdaten');
-                }
-            } catch (error) {
-                console.error('Fehler beim Laden der Benutzerdaten:', error);
-                alert('Fehler beim Laden der Benutzerdaten');
-            }
-        }
-
-        // UI mit Benutzerdaten aktualisieren
-        function updateUserInterface() {
-            if (!userData) return;
-
-            // Header Username
-            const headerUsername = document.getElementById('header-username');
-            headerUsername.textContent = userData.username || 'User';
-
-            // User Profile Sidebar
-            const userAvatar = document.getElementById('user-avatar');
-            const userName = document.getElementById('user-name');
-            const userEmail = document.getElementById('user-email');
-            const userBadges = document.getElementById('user-badges');
-
-            // Avatar mit erstem Buchstaben des Usernames
-            const firstLetter = (userData.username || userData.email || 'U').charAt(0).toUpperCase();
-            userAvatar.textContent = firstLetter;
-
-            userName.textContent = userData.username || 'Unbekannter Benutzer';
-            userEmail.textContent = userData.email || currentUser.email;
-
-            // Badges aktualisieren
-            userBadges.innerHTML = '<span class="badge badge-user">Benutzer</span>';
-            
-            if (userData.alliance) {
-                userBadges.innerHTML += `<span class="badge badge-alliance">${userData.alliance}</span>`;
-                showAllianceInfo();
-            }
-
-            if (userData.isAllianceAdmin) {
-                userBadges.innerHTML += '<span class="badge" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">Admin</span>';
-            }
-
-            // Account-Erstellungsdatum berechnen
-            if (userData.createdAt) {
-                const createdDate = userData.createdAt.toDate();
-                const now = new Date();
-                const daysDiff = Math.floor((now - createdDate) / (1000 * 60 * 60 * 24));
-                document.getElementById('days-active').textContent = daysDiff;
-            }
-        }
-
-        // Allianz-Informationen anzeigen
-        function showAllianceInfo() {
-            if (!userData.alliance) return;
-
-            const allianceSection = document.getElementById('alliance-section');
-            const allianceName = document.getElementById('alliance-name');
-            const allianceDetails = document.getElementById('alliance-details');
-
-            allianceSection.style.display = 'block';
-            allianceName.textContent = userData.alliance;
-            
-            let details = `Mitglied seit der Registrierung`;
-            if (userData.discord) {
-                details += `\nDiscord: ${userData.discord}`;
-            }
-            if (userData.isAllianceAdmin) {
-                details += `\nStatus: Administrator`;
-            }
-            
-            allianceDetails.textContent = details;
-        }
 
         // Dashboard-Daten laden
         async function loadDashboardData() {
             try {
-                // Benutzer-Statistiken aus der Datenbank laden
+                console.log('📊 Lade Dashboard-Daten...');
+                
+                // Benutzer-Statistiken laden
                 await loadUserStats();
+                
+                // Letzte Aktivitäten laden
                 await loadRecentActivity();
+                
+                console.log('✅ Dashboard-Daten vollständig geladen');
+                
             } catch (error) {
-                console.error('Fehler beim Laden der Dashboard-Daten:', error);
+                console.error('❌ Fehler beim Laden der Dashboard-Daten:', error);
             }
         }
 
         // Benutzer-Statistiken laden
         async function loadUserStats() {
             try {
-                // Hier würden normalerweise echte Statistiken aus der Datenbank geladen
-                // Für jetzt verwenden wir Beispieldaten basierend auf dem Benutzer
+                if (!currentUser) return;
                 
-                // Simulierte Daten basierend auf Registrierungsdatum
+                // Simulierte Werte basierend auf Account-Alter berechnen
                 const createdDate = userData.createdAt ? userData.createdAt.toDate() : new Date();
                 const daysSinceCreation = Math.floor((new Date() - createdDate) / (1000 * 60 * 60 * 24));
                 
-                // Simulierte Werte basierend auf Account-Alter
                 const battlesCount = Math.floor(daysSinceCreation * 0.5) + Math.floor(Math.random() * 10);
                 const raidsCount = Math.floor(daysSinceCreation * 0.2) + Math.floor(Math.random() * 5);
-                const winRate = Math.floor(60 + Math.random() * 30); // 60-90% Erfolgsrate
+                const winRate = Math.floor(60 + Math.random() * 30);
                 
+                // Standard-Werte setzen
                 document.getElementById('battles-count').textContent = battlesCount;
                 document.getElementById('raids-count').textContent = raidsCount;
                 document.getElementById('win-rate').textContent = winRate + '%';
+                document.getElementById('days-active').textContent = daysSinceCreation;
                 
                 // Versuche echte Statistiken aus Firestore zu laden
-                const statsDoc = await window.db.collection('userStats').doc(currentUser.uid).get();
+                const db = window.FirebaseConfig.getDB();
+                const statsDoc = await db.collection('userStats').doc(currentUser.uid).get();
+                
                 if (statsDoc.exists) {
                     const stats = statsDoc.data();
                     document.getElementById('battles-count').textContent = stats.battles || battlesCount;
@@ -988,12 +916,15 @@
                     document.getElementById('win-rate').textContent = (stats.winRate || winRate) + '%';
                 }
                 
+                console.log('📈 Benutzer-Statistiken geladen');
+                
             } catch (error) {
-                console.error('Fehler beim Laden der Statistiken:', error);
+                console.error('❌ Fehler beim Laden der Statistiken:', error);
                 // Fallback-Werte setzen
                 document.getElementById('battles-count').textContent = '0';
                 document.getElementById('raids-count').textContent = '0';
                 document.getElementById('win-rate').textContent = '0%';
+                document.getElementById('days-active').textContent = '0';
             }
         }
 
@@ -1002,8 +933,11 @@
             const activityList = document.getElementById('activity-list');
             
             try {
+                if (!currentUser) return;
+                
                 // Versuche echte Aktivitäten aus Firestore zu laden
-                const activitiesQuery = await window.db.collection('userActivities')
+                const db = window.FirebaseConfig.getDB();
+                const activitiesQuery = await db.collection('userActivities')
                     .where('userId', '==', currentUser.uid)
                     .orderBy('timestamp', 'desc')
                     .limit(5)
@@ -1022,8 +956,10 @@
                     showExampleActivities();
                 }
                 
+                console.log('📝 Letzte Aktivitäten geladen');
+                
             } catch (error) {
-                console.error('Fehler beim Laden der Aktivitäten:', error);
+                console.error('❌ Fehler beim Laden der Aktivitäten:', error);
                 showExampleActivities();
             }
         }
@@ -1045,9 +981,9 @@
                     time: new Date(now.getTime() - 5 * 60 * 1000) // vor 5 Minuten
                 },
                 {
-                    icon: '👤',
-                    text: 'Profil-Informationen aktualisiert',
-                    time: new Date(now.getTime() - 2 * 60 * 60 * 1000) // vor 2 Stunden
+                    icon: '🏠',
+                    text: 'Dashboard besucht',
+                    time: new Date(now.getTime() - 1 * 60 * 1000) // vor 1 Minute
                 }
             ];
             
@@ -1077,19 +1013,28 @@
         function showDashboard() {
             document.getElementById('loading-dashboard').style.display = 'none';
             document.getElementById('dashboard-content').style.display = 'block';
+            console.log('✅ Dashboard angezeigt');
         }
 
-        // Logout Funktionalität
-        function handleLogout() {
-            if (confirm('Möchten Sie sich wirklich abmelden?')) {
-                window.auth.signOut().then(() => {
-                    console.log('Logout erfolgreich');
-                    window.location.href = 'index.html';
-                }).catch((error) => {
-                    console.error('Logout fehlgeschlagen:', error);
-                    alert('Fehler beim Abmelden');
-                });
-            }
+        // Dashboard-Fehler anzeigen
+        function showDashboardError(message) {
+            const loadingDiv = document.getElementById('loading-dashboard');
+            loadingDiv.innerHTML = `
+                <div style="text-align: center; color: var(--error-color);">
+                    <span style="font-size: 2rem;">❌</span>
+                    <br><br>
+                    ${message}
+                    <br><br>
+                    <button onclick="window.location.reload()" style="
+                        background: var(--accent-primary);
+                        color: white;
+                        border: none;
+                        padding: 10px 20px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                    ">Neu laden</button>
+                </div>
+            `;
         }
 
         // Premium-Features anzeigen
@@ -1097,34 +1042,21 @@
             alert(`🚀 ${featureName}\n\nDieses Feature ist noch in Entwicklung!\n\n⭐ Premium-Features werden in einer zukünftigen Version verfügbar sein.\n\nDazu gehören:\n• Erweiterte Statistiken\n• Profil-Verwaltung\n• Allianz-Tools\n• Battle-Simulator\n• und vieles mehr!`);
         }
 
-        // Aktivität zu Firestore hinzufügen (Hilfsfunktion)
-        async function addActivity(icon, text) {
-            try {
-                await window.db.collection('userActivities').add({
-                    userId: currentUser.uid,
-                    icon: icon,
-                    text: text,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            } catch (error) {
-                console.error('Fehler beim Hinzufügen der Aktivität:', error);
-            }
-        }
-
-        // Benutzer-Statistiken aktualisieren (Hilfsfunktion)
+        // Statistiken aktualisieren (Hilfsfunktion für andere Tools)
         async function updateUserStats(statType, increment = 1) {
             try {
-                const statsRef = window.db.collection('userStats').doc(currentUser.uid);
+                if (!currentUser) return;
+                
+                const db = window.FirebaseConfig.getDB();
+                const statsRef = db.collection('userStats').doc(currentUser.uid);
                 const statsDoc = await statsRef.get();
                 
                 if (statsDoc.exists) {
                     const currentStats = statsDoc.data();
                     const updates = {};
                     updates[statType] = (currentStats[statType] || 0) + increment;
-                    
                     await statsRef.update(updates);
                 } else {
-                    // Erstelle neuen Stats-Eintrag
                     const newStats = { battles: 0, raids: 0, winRate: 0 };
                     newStats[statType] = increment;
                     await statsRef.set(newStats);
@@ -1132,14 +1064,38 @@
                 
                 // Dashboard-Daten neu laden
                 await loadUserStats();
+                
+                console.log('📈 Statistik aktualisiert:', statType, '+' + increment);
+                
             } catch (error) {
-                console.error('Fehler beim Aktualisieren der Statistiken:', error);
+                console.error('❌ Fehler beim Aktualisieren der Statistiken:', error);
             }
         }
 
-        // Initialisierung - entfernt da jetzt in initializeApp() enthalten
+        // Aktivität hinzufügen (Hilfsfunktion)
+        async function addActivity(icon, text) {
+            try {
+                if (!currentUser) return;
+                
+                const db = window.FirebaseConfig.getDB();
+                await db.collection('userActivities').add({
+                    userId: currentUser.uid,
+                    icon: icon,
+                    text: text,
+                    timestamp: window.FirebaseConfig.getServerTimestamp()
+                });
+                
+                // Aktivitäten neu laden
+                await loadRecentActivity();
+                
+                console.log('📝 Aktivität hinzugefügt:', text);
+                
+            } catch (error) {
+                console.error('❌ Fehler beim Hinzufügen der Aktivität:', error);
+            }
+        }
 
-        // Beispiel-Funktionen für Tool-Integrationen
+        // Tool-Nutzung tracken (für Integration mit anderen Seiten)
         function onCalculatorUsed() {
             updateUserStats('battles');
             addActivity('⚔️', 'AS-Counter verwendet');
@@ -1150,13 +1106,82 @@
             addActivity('🏴‍☠️', 'Raid-Counter verwendet');
         }
 
-        // Export-Funktionen für andere Seiten
+        // Keyboard-Shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Strg+L = Logout
+            if (e.ctrlKey && e.key === 'l') {
+                e.preventDefault();
+                if (window.SyncAPI && window.SyncAPI.dashboardLogout) {
+                    window.SyncAPI.dashboardLogout();
+                }
+            }
+            
+            // Strg+H = Home (zur Startseite, eingeloggt bleiben)
+            if (e.ctrlKey && e.key === 'h') {
+                e.preventDefault();
+                if (confirm('Zur Startseite zurückkehren? (Sie bleiben eingeloggt)')) {
+                    window.location.href = 'index.html';
+                }
+            }
+            
+            // F5 = Dashboard neu laden
+            if (e.key === 'F5') {
+                e.preventDefault();
+                window.location.reload();
+            }
+        });
+
+        // Session-Inaktivitäts-Timer
+        let sessionTimeout;
+        const SESSION_TIMEOUT_MINUTES = 30;
+
+        function resetSessionTimeout() {
+            clearTimeout(sessionTimeout);
+            sessionTimeout = setTimeout(() => {
+                alert('Ihre Session ist nach 30 Minuten Inaktivität abgelaufen.\n\nSie werden automatisch abgemeldet.');
+                if (window.SyncAPI && window.SyncAPI.quickLogout) {
+                    window.SyncAPI.quickLogout();
+                }
+            }, SESSION_TIMEOUT_MINUTES * 60 * 1000);
+        }
+
+        // Session-Timer bei User-Aktivität zurücksetzen
+        ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'].forEach(event => {
+            document.addEventListener(event, resetSessionTimeout, true);
+        });
+
+        // Session-Timer beim Laden starten
+        document.addEventListener('DOMContentLoaded', resetSessionTimeout);
+
+        // Export-API für andere Seiten
         window.dashboardAPI = {
             addActivity: addActivity,
             updateUserStats: updateUserStats,
             onCalculatorUsed: onCalculatorUsed,
-            onRaidCounterUsed: onRaidCounterUsed
+            onRaidCounterUsed: onRaidCounterUsed,
+            getCurrentUser: () => currentUser,
+            getUserData: () => userData,
+            loadDashboardData: loadDashboardData
         };
+
+        // Debug-Funktionen (können in Produktion entfernt werden)
+        window.dashboardDebug = {
+            getCurrentUser: () => currentUser,
+            getUserData: () => userData,
+            reloadData: loadDashboardData,
+            showStats: () => console.table({
+                user: currentUser?.email,
+                username: userData?.username,
+                alliance: userData?.alliance,
+                isAdmin: userData?.isAllianceAdmin
+            }),
+            testActivity: () => addActivity('🧪', 'Test-Aktivität'),
+            testStats: () => updateUserStats('battles', 1)
+        };
+
+        console.log('🎯 Dashboard vollständig initialisiert');
+        console.log('💡 Keyboard-Shortcuts: Strg+L (Logout), Strg+H (Home), F5 (Reload)');
+        console.log('🔧 Debug-Funktionen verfügbar: window.dashboardDebug');
     </script>
 </body>
 </html>
