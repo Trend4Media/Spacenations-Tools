@@ -1,76 +1,155 @@
 /**
- * Theme Manager - Zentrale Verwaltung für Dark/Light Mode
- * Synchronisiert Themes zwischen allen Seiten
+ * REPARIERTER Theme Manager - Behebt Light/Dark Mode Probleme
+ * Ersetzt Ihre bestehende js/theme-manager.js
  */
 
-class ThemeManager {
+class UniversalThemeManager {
     constructor() {
         this.currentTheme = 'dark'; // Standard
+        this.isInitialized = false;
         this.init();
     }
     
     init() {
+        // Prüfen ob bereits initialisiert
+        if (window.themeManagerInitialized) {
+            console.log('🎨 Theme Manager bereits initialisiert - übersprungen');
+            return;
+        }
+        
+        // Als initialisiert markieren
+        window.themeManagerInitialized = true;
+        
         // Gespeichertes Theme laden
         this.loadSavedTheme();
         
         // Theme sofort anwenden
         this.applyTheme();
         
-        // Theme-Änderungen von anderen Tabs überwachen
+        // DOM Ready Event abwarten
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                this.setupThemeElements();
+            });
+        } else {
+            this.setupThemeElements();
+        }
+        
+        // Storage-Events von anderen Tabs überwachen
         window.addEventListener('storage', (e) => {
-            if (e.key === 'theme') {
+            if (e.key === 'spacenations-theme') {
                 this.currentTheme = e.newValue || 'dark';
                 this.applyTheme();
+                this.updateThemeButtons();
                 console.log('🎨 Theme von anderem Tab synchronisiert:', this.currentTheme);
             }
         });
         
-        console.log('🎨 ThemeManager initialisiert mit Theme:', this.currentTheme);
+        this.isInitialized = true;
+        console.log('🎨 Universal Theme Manager initialisiert mit Theme:', this.currentTheme);
     }
     
-    // Gespeichertes Theme aus localStorage laden
+    // Gespeichertes Theme laden
     loadSavedTheme() {
-        const savedTheme = localStorage.getItem('theme');
+        const savedTheme = localStorage.getItem('spacenations-theme') || localStorage.getItem('theme');
         if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
             this.currentTheme = savedTheme;
         }
+        
+        // Alte theme-keys bereinigen und neuen Standard setzen
+        if (localStorage.getItem('theme') && !localStorage.getItem('spacenations-theme')) {
+            localStorage.setItem('spacenations-theme', localStorage.getItem('theme'));
+            localStorage.removeItem('theme');
+        }
+    }
+    
+    // Theme-Elemente einrichten
+    setupThemeElements() {
+        // Alle Theme-Toggle Buttons finden
+        const themeButtons = document.querySelectorAll('.theme-toggle, #theme-toggle, [onclick*="toggleTheme"]');
+        
+        themeButtons.forEach(button => {
+            // Alte onclick-Handler entfernen
+            button.removeAttribute('onclick');
+            
+            // Neuen Event-Handler hinzufügen
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.toggleTheme();
+            });
+        });
+        
+        // Theme-Buttons initial aktualisieren
+        this.updateThemeButtons();
+        
+        console.log('🔘 Theme-Buttons konfiguriert:', themeButtons.length);
     }
     
     // Theme anwenden
     applyTheme() {
         const root = document.documentElement;
-        const themeIcon = document.getElementById('theme-icon');
-        const themeText = document.getElementById('theme-text');
         
         if (this.currentTheme === 'light') {
             root.classList.add('light-mode');
-            if (themeIcon) themeIcon.textContent = '☀️';
-            if (themeText) themeText.textContent = 'Dark Mode';
         } else {
             root.classList.remove('light-mode');
-            if (themeIcon) themeIcon.textContent = '🌙';
-            if (themeText) themeText.textContent = 'Light Mode';
         }
+        
+        // Theme-Buttons aktualisieren
+        this.updateThemeButtons();
         
         console.log('🎨 Theme angewendet:', this.currentTheme);
     }
     
+    // Theme-Button-Texte und Icons aktualisieren
+    updateThemeButtons() {
+        // Icon und Text Elemente finden
+        const themeIcons = document.querySelectorAll('#theme-icon, .theme-icon');
+        const themeTexts = document.querySelectorAll('#theme-text, .theme-text');
+        
+        if (this.currentTheme === 'light') {
+            // Light Mode aktiv -> zeige Dark Mode Option
+            themeIcons.forEach(icon => icon.textContent = '☀️');
+            themeTexts.forEach(text => text.textContent = 'Dark Mode');
+        } else {
+            // Dark Mode aktiv -> zeige Light Mode Option
+            themeIcons.forEach(icon => icon.textContent = '🌙');
+            themeTexts.forEach(text => text.textContent = 'Light Mode');
+        }
+    }
+    
     // Theme umschalten
     toggleTheme() {
+        const oldTheme = this.currentTheme;
         this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light';
         
         // Theme speichern
-        localStorage.setItem('theme', this.currentTheme);
+        localStorage.setItem('spacenations-theme', this.currentTheme);
         
         // Theme anwenden
         this.applyTheme();
         
-        console.log('🔄 Theme umgeschaltet zu:', this.currentTheme);
+        console.log('🔄 Theme umgeschaltet:', oldTheme, '->', this.currentTheme);
         
         // Event für andere Komponenten
         document.dispatchEvent(new CustomEvent('themeChanged', {
-            detail: { theme: this.currentTheme }
+            detail: { 
+                theme: this.currentTheme,
+                previousTheme: oldTheme
+            }
         }));
+        
+        // Feedback anzeigen
+        this.showThemeChangeNotification();
+    }
+    
+    // Theme-Change Notification
+    showThemeChangeNotification() {
+        // Nur anzeigen wenn Notification-System verfügbar ist
+        if (window.DashboardNav && window.DashboardNav.showNotification) {
+            const themeName = this.currentTheme === 'light' ? 'Light Mode' : 'Dark Mode';
+            window.DashboardNav.showNotification(`${themeName} aktiviert`, 'success', 2000);
+        }
     }
     
     // Aktuelles Theme abrufen
@@ -78,37 +157,95 @@ class ThemeManager {
         return this.currentTheme;
     }
     
-    // Theme setzen
+    // Theme setzen (programmatisch)
     setTheme(theme) {
         if (theme === 'light' || theme === 'dark') {
             this.currentTheme = theme;
-            localStorage.setItem('theme', this.currentTheme);
+            localStorage.setItem('spacenations-theme', this.currentTheme);
             this.applyTheme();
+            
+            console.log('🎨 Theme programmatisch gesetzt:', theme);
         }
     }
     
     // Theme-Change-Listener hinzufügen
     onThemeChange(callback) {
         document.addEventListener('themeChanged', (e) => {
-            callback(e.detail.theme);
+            callback(e.detail.theme, e.detail.previousTheme);
         });
+    }
+    
+    // System-Theme erkennen (falls gewünscht)
+    detectSystemTheme() {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark';
+        }
+        return 'light';
+    }
+    
+    // Auto-Theme basierend auf Systemeinstellung
+    enableAutoTheme() {
+        const systemTheme = this.detectSystemTheme();
+        this.setTheme(systemTheme);
+        
+        // System-Theme-Changes überwachen
+        if (window.matchMedia) {
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            mediaQuery.addEventListener('change', (e) => {
+                const newSystemTheme = e.matches ? 'dark' : 'light';
+                this.setTheme(newSystemTheme);
+                console.log('🎨 System-Theme geändert:', newSystemTheme);
+            });
+        }
+        
+        console.log('🤖 Auto-Theme aktiviert basierend auf System:', systemTheme);
     }
 }
 
-// Globale ThemeManager-Instanz erstellen
-window.themeManager = new ThemeManager();
+// Globale Theme-Manager-Instanz (nur einmal erstellen)
+if (!window.universalThemeManager) {
+    window.universalThemeManager = new UniversalThemeManager();
+}
 
-// Globale Funktionen für Theme-Management
-window.toggleTheme = () => window.themeManager.toggleTheme();
-window.ThemeAPI = {
-    toggle: () => window.themeManager.toggleTheme(),
-    getCurrent: () => window.themeManager.getCurrentTheme(),
-    setTheme: (theme) => window.themeManager.setTheme(theme),
-    onThemeChange: (callback) => window.themeManager.onThemeChange(callback)
+// Alte globale Variablen überschreiben/reparieren
+window.themeManager = window.universalThemeManager;
+
+// Globale Funktionen für Theme-Management (Abwärtskompatibilität)
+window.toggleTheme = () => {
+    window.universalThemeManager.toggleTheme();
 };
 
-// Auto-Initialisierung wenn DOM geladen ist
-document.addEventListener('DOMContentLoaded', () => {
-    // Theme sofort anwenden falls DOM schon geladen war
-    window.themeManager.applyTheme();
-});
+// Erweiterte Theme-API
+window.ThemeAPI = {
+    toggle: () => window.universalThemeManager.toggleTheme(),
+    getCurrent: () => window.universalThemeManager.getCurrentTheme(),
+    setTheme: (theme) => window.universalThemeManager.setTheme(theme),
+    onThemeChange: (callback) => window.universalThemeManager.onThemeChange(callback),
+    enableAutoTheme: () => window.universalThemeManager.enableAutoTheme(),
+    detectSystemTheme: () => window.universalThemeManager.detectSystemTheme()
+};
+
+// Sofortige Anwendung falls DOM bereits geladen
+if (document.readyState !== 'loading') {
+    setTimeout(() => {
+        window.universalThemeManager.setupThemeElements();
+        window.universalThemeManager.applyTheme();
+    }, 100);
+}
+
+// Debug-Funktionen
+window.themeDebug = {
+    getCurrentTheme: () => window.universalThemeManager.getCurrentTheme(),
+    forceLight: () => window.universalThemeManager.setTheme('light'),
+    forceDark: () => window.universalThemeManager.setTheme('dark'),
+    showSystemTheme: () => window.universalThemeManager.detectSystemTheme(),
+    resetTheme: () => {
+        localStorage.removeItem('spacenations-theme');
+        localStorage.removeItem('theme');
+        window.location.reload();
+    }
+};
+
+console.log('🎨 Universal Theme Manager geladen');
+console.log('🔧 Debug verfügbar: window.themeDebug');
+console.log('🎯 Theme-API: window.ThemeAPI');
