@@ -710,3 +710,164 @@ document.addEventListener('DOMContentLoaded', () => {
 console.log('🎯 Dashboard Core geladen');
 console.log('📋 API verfügbar: window.DashboardCoreAPI');
 console.log('⌨️ Shortcuts: Strg+D (Reload), Strg+C (Calculator), Strg+R (Refresh), Esc (Close)');
+
+/**
+ * Navigation Update Script - Ergänzung für dashboard-core.js
+ * Fügen Sie das zu Ihrer js/dashboard-core.js hinzu (am Ende vor dem letzten console.log)
+ */
+
+// Enhanced Navigation zwischen AS-Counter Versionen
+setupEnhancedNavigation() {
+    // Alle Calculator-Links finden und richtig verlinken
+    const calculatorLinks = document.querySelectorAll('a[href="calculator.html"], a[href*="calculator"]');
+    
+    calculatorLinks.forEach(link => {
+        const isInDashboard = window.location.pathname.includes('dashboard');
+        const isLoggedIn = this.currentUser !== null;
+        
+        if (isInDashboard && isLoggedIn) {
+            // Im Dashboard: Immer zum Dashboard-Calculator
+            link.href = 'dashboard-calculator.html';
+            link.title = 'AS-Counter (Dashboard) - Kämpfe werden automatisch gespeichert';
+            
+            // Icon erweitern falls noch nicht geschehen
+            const icon = link.querySelector('.nav-icon, .action-icon');
+            if (icon && !icon.textContent.includes('💾')) {
+                icon.textContent = '⚔️💾';
+            }
+            
+            // Text erweitern falls vorhanden
+            const titleElement = link.querySelector('.action-title, .nav-text');
+            if (titleElement && !titleElement.textContent.includes('Dashboard')) {
+                titleElement.textContent = 'AS-Counter (Dashboard)';
+            }
+            
+            // Beschreibung erweitern
+            const descElement = link.querySelector('.action-desc');
+            if (descElement) {
+                descElement.textContent = 'AS-Counter mit automatischem Speichern aller Kampfergebnisse';
+            }
+        }
+    });
+    
+    // Version-Switcher hinzufügen (falls im Dashboard-Calculator)
+    if (window.location.pathname.includes('dashboard-calculator')) {
+        this.addVersionSwitcher();
+    }
+    
+    // Standard-Calculator Links erweitern für bessere UX
+    this.enhanceStandardCalculatorLinks();
+}
+
+// Version-Switcher für Calculator
+addVersionSwitcher() {
+    const header = document.querySelector('.header');
+    if (!header || document.getElementById('version-switcher')) return;
+    
+    const versionSwitcher = document.createElement('div');
+    versionSwitcher.id = 'version-switcher';
+    versionSwitcher.style.cssText = `
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+        font-size: 0.9rem;
+        z-index: 10;
+    `;
+    
+    versionSwitcher.innerHTML = `
+        <span style="
+            background: linear-gradient(135deg, var(--save-color), #2ecc71);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        ">
+            💾 Dashboard-Version
+        </span>
+        <a href="calculator.html" style="
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            padding: 5px 12px;
+            border-radius: 15px;
+            text-decoration: none;
+            font-weight: 500;
+            border: 1px solid var(--card-border);
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        " onmouseover="this.style.borderColor='var(--accent-secondary)'" onmouseout="this.style.borderColor='var(--card-border)'">
+            ⚔️ Standard-Version
+        </a>
+    `;
+    
+    header.appendChild(versionSwitcher);
+}
+
+// Standard-Calculator Links verbessern
+enhanceStandardCalculatorLinks() {
+    // In calculator.html einen Hinweis auf Dashboard-Version hinzufügen
+    if (window.location.pathname.includes('calculator.html') && !window.location.pathname.includes('dashboard')) {
+        this.addDashboardVersionPromo();
+    }
+}
+
+// Dashboard-Version Promotion in Standard-Calculator
+addDashboardVersionPromo() {
+    const container = document.querySelector('.container');
+    if (!container || document.getElementById('dashboard-promo')) return;
+    
+    const promo = document.createElement('div');
+    promo.id = 'dashboard-promo';
+    promo.style.cssText = `
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    `;
+    
+    promo.innerHTML = `
+        <h4 style="margin-bottom: 10px; font-size: 1.1rem;">💾 Upgrade zum Dashboard-Calculator!</h4>
+        <p style="margin-bottom: 15px; font-size: 0.9rem; opacity: 0.9;">
+            Speichere alle deine Kämpfe automatisch und verfolge deine Statistiken
+        </p>
+        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            <a href="dashboard.html" style="
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                padding: 8px 16px;
+                border-radius: 6px;
+                text-decoration: none;
+                font-weight: 600;
+                font-size: 0.9rem;
+                transition: all 0.3s ease;
+            " onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                🏠 Zum Dashboard
+            </a>
+            <a href="register.html" style="
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                padding: 8px 16px;
+                border-radius: 6px;
+                text-decoration: none;
+                font-weight: 600;
+                font-size: 0.9rem;
+                transition: all 0.3s ease;
+            " onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                🚀 Account erstellen
+            </a>
+        </div>
+    `;
+    
+    // Nach dem ersten input-section einfügen
+    const firstInputSection = container.querySelector('.input-sections');
+    if (firstInputSection) {
+        container.insertBefore(promo, firstInputSection);
+    }
+}
