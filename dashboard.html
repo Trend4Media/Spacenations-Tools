@@ -46,14 +46,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-        <!-- Navigation Fix Script -->
-<script src="js/dashboard-navigation-fix.js"></script>
-
-<!-- Bestehende Scripts -->
-<script src="js/calculator-data.js"></script>
-<script src="js/raid-data-manager.js"></script>
-</body>
-</html>
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: var(--bg-gradient);
@@ -208,6 +201,19 @@
         
         .premium-link:hover {
             background: linear-gradient(135deg, #d97706, #b45309) !important;
+        }
+        
+        .coming-soon-link {
+            position: relative;
+            opacity: 0.7;
+            cursor: not-allowed !important;
+        }
+        
+        .coming-soon-link:hover {
+            background: linear-gradient(135deg, #555, #777) !important;
+            color: white !important;
+            transform: none !important;
+            box-shadow: 0 4px 15px rgba(100, 116, 139, 0.3) !important;
         }
         
         /* Main Dashboard */
@@ -643,7 +649,7 @@
         <div class="loading-content">
             <div class="spinner"></div>
             <h3>Lädt Dashboard...</h3>
-            <p>Bitte warten Sie einen Moment</p>
+            <p>Sie werden automatisch weitergeleitet</p>
         </div>
     </div>
 
@@ -669,16 +675,21 @@
         <h3>🛠️ Meine Tools</h3>
         <ul class="nav-list">
             <li class="nav-item">
-               <a href="dashboard-calculator.html" class="nav-link">
-    <span class="nav-icon">⚔️💾</span>
-    AS-Counter (Dashboard)
-</a>
+                <a href="dashboard-calculator.html" class="nav-link">
+                    <span class="nav-icon">⚔️💾</span>
+                    AS-Counter (Dashboard)
                 </a>
             </li>
             <li class="nav-item">
-                <a href="raid-counter.html" class="nav-link">
-                    <span class="nav-icon">🏴‍☠️</span>
-                    Raid-Counter
+                <a href="dashboard-raid-counter.html" class="nav-link">
+                    <span class="nav-icon">🏴‍☠️💾</span>
+                    Raid-Counter (Dashboard)
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link coming-soon-link" onclick="showPremiumFeature('Sabo-Counter')">
+                    <span class="nav-icon">💥</span>
+                    Sabo-Counter
                 </a>
             </li>
             <li class="nav-item">
@@ -737,20 +748,20 @@
                     Schnellzugriff
                 </h3>
                 <div class="actions-grid">
-              <a href="dashboard-calculator.html" class="action-card">
-    <div class="action-header">
-        <span class="action-icon">⚔️💾</span>
-        <span class="action-title">AS-Counter (Dashboard)</span>
-    </div>
-    <div class="action-desc">AS-Counter mit automatischem Speichern aller Kampfergebnisse</div>
-</a>
-                    <a href="raid-counter.html" class="action-card">
-                        <div class="action-header">
-                            <span class="action-icon">🏴‍☠️</span>
-                            <span class="action-title">Raid planen</span>
-                        </div>
-                        <div class="action-desc">Organisiere erfolgreiche Raids mit präzisen Berechnungen</div>
-                    </a>
+                <a href="dashboard-calculator.html" class="action-card">
+                    <div class="action-header">
+                        <span class="action-icon">⚔️💾</span>
+                        <span class="action-title">AS-Counter (Dashboard)</span>
+                    </div>
+                    <div class="action-desc">AS-Counter mit automatischem Speichern aller Kampfergebnisse</div>
+                </a>
+                <a href="dashboard-raid-counter.html" class="action-card">
+                    <div class="action-header">
+                        <span class="action-icon">🏴‍☠️💾</span>
+                        <span class="action-title">Raid-Counter (Dashboard)</span>
+                    </div>
+                    <div class="action-desc">Raid-Counter mit automatischem Speichern aller Raid-Daten</div>
+                </a>
                     <a href="#" class="action-card" onclick="showPremiumFeature('Profile Manager')">
                         <div class="action-header">
                             <span class="action-icon">👤</span>
@@ -900,13 +911,39 @@
             try {
                 if (!currentUser) return;
                 
-                // Simulierte Werte basierend auf Account-Alter berechnen
+                // Basis-Statistiken
                 const createdDate = userData.createdAt ? userData.createdAt.toDate() : new Date();
                 const daysSinceCreation = Math.floor((new Date() - createdDate) / (1000 * 60 * 60 * 24));
                 
-                const battlesCount = Math.floor(daysSinceCreation * 0.5) + Math.floor(Math.random() * 10);
-                const raidsCount = Math.floor(daysSinceCreation * 0.2) + Math.floor(Math.random() * 5);
-                const winRate = Math.floor(60 + Math.random() * 30);
+                let battlesCount = 0;
+                let raidsCount = 0;
+                let winRate = 0;
+                
+                // Calculator-Statistiken falls verfügbar
+                if (window.CalculatorAPI && window.CalculatorAPI.isLoggedIn()) {
+                    const stats = window.CalculatorAPI.getStats();
+                    battlesCount = stats.totalBattles || 0;
+                    winRate = stats.winRate || 0;
+                    
+                    console.log('📊 Calculator-Statistiken geladen:', stats);
+                }
+                
+                // Raid-Statistiken falls verfügbar
+                if (window.RaidAPI && window.RaidAPI.isLoggedIn()) {
+                    const raidStats = window.RaidAPI.getStats();
+                    raidsCount = raidStats.totalRaids || 0;
+                    
+                    console.log('🏴‍☠️ Raid-Statistiken geladen:', raidStats);
+                } else {
+                    // Simulierte Werte falls kein RaidAPI
+                    raidsCount = Math.floor(daysSinceCreation * 0.3) + Math.floor(Math.random() * 8);
+                }
+                
+                // Fallback für Calculator falls nicht verfügbar
+                if (!window.CalculatorAPI) {
+                    battlesCount = Math.floor(daysSinceCreation * 0.7) + Math.floor(Math.random() * 15);
+                    winRate = Math.floor(65 + Math.random() * 25);
+                }
                 
                 // Standard-Werte setzen
                 document.getElementById('battles-count').textContent = battlesCount;
@@ -1115,6 +1152,16 @@
             addActivity('🏴‍☠️', 'Raid-Counter verwendet');
         }
 
+        function onDashboardCalculatorUsed() {
+            updateUserStats('battles');
+            addActivity('⚔️💾', 'AS-Counter (Dashboard) verwendet');
+        }
+
+        function onDashboardRaidCounterUsed() {
+            updateUserStats('raids');
+            addActivity('🏴‍☠️💾', 'Raid-Counter (Dashboard) verwendet');
+        }
+
         // Keyboard-Shortcuts
         document.addEventListener('keydown', function(e) {
             // Strg+L = Logout
@@ -1168,6 +1215,8 @@
             updateUserStats: updateUserStats,
             onCalculatorUsed: onCalculatorUsed,
             onRaidCounterUsed: onRaidCounterUsed,
+            onDashboardCalculatorUsed: onDashboardCalculatorUsed,
+            onDashboardRaidCounterUsed: onDashboardRaidCounterUsed,
             getCurrentUser: () => currentUser,
             getUserData: () => userData,
             loadDashboardData: loadDashboardData
@@ -1191,40 +1240,93 @@
         console.log('🎯 Dashboard vollständig initialisiert');
         console.log('💡 Keyboard-Shortcuts: Strg+L (Logout), Strg+H (Home), F5 (Reload)');
         console.log('🔧 Debug-Funktionen verfügbar: window.dashboardDebug');
-        // AS-Counter Navigation Setup
-function setupCalculatorNavigation() {
-    // Alle Calculator-Links für Dashboard-Version konfigurieren
-    const calculatorLinks = document.querySelectorAll('a[href="calculator.html"]');
-    
-    calculatorLinks.forEach(link => {
-        link.href = 'dashboard-calculator.html';
-        link.title = 'AS-Counter (Dashboard) - Alle Kämpfe werden automatisch gespeichert';
         
-        // Icon erweitern
-        const icon = link.querySelector('.nav-icon, .action-icon');
-        if (icon && !icon.textContent.includes('💾')) {
-            icon.textContent = '⚔️💾';
+        // Dashboard Navigation Links direkt testen
+        function testDashboardLinks() {
+            const raidLinks = document.querySelectorAll('a[href*="raid"]');
+            console.log('🔍 Gefundene Raid-Links:', raidLinks.length);
+            raidLinks.forEach((link, index) => {
+                console.log(`${index + 1}. ${link.href} - Text: "${link.textContent.trim()}"`);
+            });
         }
         
-        // Text erweitern
-        const text = link.querySelector('.action-title');
-        if (text && !text.textContent.includes('Dashboard')) {
-            text.textContent = 'AS-Counter (Dashboard)';
-        }
+        // Test-Funktion verfügbar machen
+        window.testDashboardLinks = testDashboardLinks;
         
-        // Beschreibung erweitern
-        const desc = link.querySelector('.action-desc');
-        if (desc) {
-            desc.textContent = 'AS-Counter mit automatischem Speichern aller Kampfergebnisse';
-        }
-    });
-}
+        // Automatischer Test nach 3 Sekunden
+        setTimeout(() => {
+            console.log('🧪 Automatischer Link-Test:');
+            testDashboardLinks();
+        }, 3000);
 
-// Calculator-Navigation beim Dashboard-Load ausführen
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(setupCalculatorNavigation, 1000);
-});
+        // AS-Counter Navigation Setup
+        function setupCalculatorNavigation() {
+            // Alle Calculator-Links für Dashboard-Version konfigurieren
+            const calculatorLinks = document.querySelectorAll('a[href="calculator.html"]');
+            
+            calculatorLinks.forEach(link => {
+                link.href = 'dashboard-calculator.html';
+                link.title = 'AS-Counter (Dashboard) - Alle Kämpfe werden automatisch gespeichert';
+                
+                // Icon erweitern
+                const icon = link.querySelector('.nav-icon, .action-icon');
+                if (icon && !icon.textContent.includes('💾')) {
+                    icon.textContent = '⚔️💾';
+                }
+                
+                // Text erweitern
+                const text = link.querySelector('.action-title, .nav-text');
+                if (text && !text.textContent.includes('Dashboard')) {
+                    text.textContent = 'AS-Counter (Dashboard)';
+                }
+                
+                // Beschreibung erweitern
+                const desc = link.querySelector('.action-desc');
+                if (desc) {
+                    desc.textContent = 'AS-Counter mit automatischem Speichern aller Kampfergebnisse';
+                }
+            });
+        }
+
+        // Raid-Counter Navigation Setup
+        function setupRaidCounterNavigation() {
+            // Alle Raid-Counter-Links für Dashboard-Version konfigurieren
+            const raidLinks = document.querySelectorAll('a[href="raid-counter.html"]');
+            
+            raidLinks.forEach(link => {
+                link.href = 'dashboard-raid-counter.html';
+                link.title = 'Raid-Counter (Dashboard) - Alle Raids werden automatisch gespeichert';
+                
+                // Icon erweitern
+                const icon = link.querySelector('.nav-icon, .action-icon');
+                if (icon && !icon.textContent.includes('💾')) {
+                    icon.textContent = '🏴‍☠️💾';
+                }
+                
+                // Text erweitern
+                const text = link.querySelector('.action-title, .nav-text');
+                if (text && !text.textContent.includes('Dashboard')) {
+                    text.textContent = 'Raid-Counter (Dashboard)';
+                }
+                
+                // Beschreibung erweitern
+                const desc = link.querySelector('.action-desc');
+                if (desc) {
+                    desc.textContent = 'Raid-Counter mit automatischem Speichern aller Raid-Daten';
+                }
+            });
+        }
+
+        // Dashboard-Navigation beim Dashboard-Load ausführen
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                setupCalculatorNavigation();
+                setupRaidCounterNavigation();
+                console.log('🔗 Dashboard-Navigation konfiguriert');
+            }, 1000);
+        });
     </script>
     <script src="js/calculator-data.js"></script>
+    <script src="js/raid-data-manager.js"></script>
 </body>
 </html>
