@@ -1,33 +1,96 @@
 /**
- * Global Footer Loader - Lädt automatisch den Footer auf JEDER Seite
- * Einfach diese Datei in jede HTML-Seite einbinden!
+ * REPARIERTER Global Footer Loader - Automatisch auf JEDER Seite
+ * Lädt Footer automatisch ohne manuelle Einbindung in HTML
  */
 
-class GlobalFooterLoader {
+class AutoGlobalFooterLoader {
     constructor() {
         this.footerHTML = null;
         this.isLoaded = false;
-        this.init();
+        this.autoInit();
     }
     
-    async init() {
-        // Footer HTML definieren (einmal hier, überall verfügbar)
+    autoInit() {
+        console.log('🦶 Auto Global Footer Loader gestartet');
+        
+        // Footer HTML definieren
         this.footerHTML = this.getFooterTemplate();
         
-        // Footer automatisch laden wenn DOM bereit ist
+        // Sofortige Initialisierung
+        this.quickLoad();
+        
+        // Backup-Initialisierung für alle DOM-Zustände
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.loadFooter());
+            document.addEventListener('DOMContentLoaded', () => this.safeLoad());
         } else {
-            this.loadFooter();
+            this.safeLoad();
         }
         
-        console.log('🦶 Global Footer Loader initialisiert');
+        // Backup für sehr späte Initialisierung
+        setTimeout(() => this.ensureFooterExists(), 2000);
     }
     
-    // Footer Template (zentraler Ort für Footer-HTML)
+    // Schneller Load-Versuch
+    quickLoad() {
+        try {
+            if (document.body && !this.isFooterPresent()) {
+                this.injectFooter();
+                console.log('⚡ Footer schnell geladen');
+            }
+        } catch (error) {
+            console.log('⚠️ Schneller Load fehlgeschlagen, Backup wird verwendet');
+        }
+    }
+    
+    // Sicherer Load
+    safeLoad() {
+        if (this.isLoaded || this.isFooterPresent()) {
+            console.log('🦶 Footer bereits vorhanden - übersprungen');
+            return;
+        }
+        
+        this.injectFooter();
+    }
+    
+    // Sicherstellen dass Footer existiert
+    ensureFooterExists() {
+        if (!this.isFooterPresent()) {
+            console.log('🔧 Footer fehlt - wird nachgeladen');
+            this.injectFooter();
+        }
+    }
+    
+    // Prüfen ob Footer bereits vorhanden ist
+    isFooterPresent() {
+        return !!document.querySelector('.global-footer');
+    }
+    
+    // Footer in die Seite einfügen
+    injectFooter() {
+        if (!document.body) {
+            console.warn('⚠️ Kein Body-Element gefunden');
+            return;
+        }
+        
+        if (this.isFooterPresent()) {
+            console.log('🦶 Footer bereits vorhanden');
+            return;
+        }
+        
+        // Footer am Ende des Body einfügen
+        document.body.insertAdjacentHTML('beforeend', this.footerHTML);
+        this.isLoaded = true;
+        
+        console.log('✅ Global Footer automatisch eingefügt');
+        
+        // Footer-Features nach kleiner Verzögerung initialisieren
+        setTimeout(() => this.initializeFooterFeatures(), 100);
+    }
+    
+    // Footer HTML Template
     getFooterTemplate() {
         return `
-            <!-- Global Footer -->
+            <!-- AUTOMATISCHER Global Footer -->
             <footer class="global-footer">
                 <div class="footer-content">
                     <!-- Rechtliche Links -->
@@ -46,8 +109,8 @@ class GlobalFooterLoader {
                         <h4>🛠️ Tools & Navigation</h4>
                         <ul class="footer-links">
                             <li><a href="index.html">🏠 Startseite</a></li>
-                            <li><a href="calculator.html" class="tool-link" data-dashboard="dashboard-calculator.html">⚔️ AS-Counter</a></li>
-                            <li><a href="raid-counter.html" class="tool-link" data-dashboard="dashboard-raid-counter.html">🏴‍☠️ Raid-Counter</a></li>
+                            <li><a href="calculator.html" class="auto-tool-link" data-dashboard="dashboard-calculator.html">⚔️ AS-Counter</a></li>
+                            <li><a href="raid-counter.html" class="auto-tool-link" data-dashboard="dashboard-raid-counter.html">🏴‍☠️ Raid-Counter</a></li>
                             <li><a href="register.html">🚀 Account erstellen</a></li>
                         </ul>
                     </div>
@@ -56,8 +119,8 @@ class GlobalFooterLoader {
                     <div class="footer-section">
                         <h4>⚙️ Administration</h4>
                         <ul class="footer-links admin-links">
-                            <li><a href="admin-login.html" id="admin-login-link">🔐 Admin-Login</a></li>
-                            <li><a href="admin-dashboard.html" id="admin-dashboard-link" style="display: none;">🛡️ Admin-Dashboard</a></li>
+                            <li><a href="admin-login.html" id="auto-admin-login-link">🔐 Admin-Login</a></li>
+                            <li><a href="admin-dashboard.html" id="auto-admin-dashboard-link" style="display: none;">🛡️ Admin-Dashboard</a></li>
                         </ul>
                         <ul class="footer-links" style="margin-top: 15px;">
                             <li><a href="hilfe.html">❓ Hilfe & FAQ</a></li>
@@ -71,21 +134,21 @@ class GlobalFooterLoader {
                     <div class="footer-bottom-left">
                         <p>© 2025 Spacenations Tools | Inoffizielle Tools für die Spacenations Community</p>
                         <p style="font-size: 0.8rem; margin-top: 5px; opacity: 0.8;">
-                            Made with ❤️ for Spacenations Players | Version 2.1.0
+                            Made with ❤️ for Spacenations Players | Version 2.1.0 | Auto-Footer ✨
                         </p>
                     </div>
                     
                     <div class="footer-bottom-right">
                         <!-- Status Indicator -->
-                        <div class="status-indicator" id="system-status">
+                        <div class="status-indicator" id="auto-system-status">
                             <span class="status-dot"></span>
                             <span>Online</span>
                         </div>
                         
                         <!-- Quick Tools -->
                         <div class="quick-tools">
-                            <a href="#" class="quick-tool" onclick="window.ThemeAPI?.toggle()">🌙 Theme</a>
-                            <a href="dashboard.html" class="quick-tool" id="quick-dashboard">🏠 Dashboard</a>
+                            <a href="#" class="quick-tool auto-theme-toggle">🌙 Theme</a>
+                            <a href="dashboard.html" class="quick-tool" id="auto-quick-dashboard">🏠 Dashboard</a>
                         </div>
                         
                         <!-- Social Links -->
@@ -100,49 +163,41 @@ class GlobalFooterLoader {
         `;
     }
     
-    // Footer auf der aktuellen Seite laden
-    loadFooter() {
-        if (this.isLoaded) {
-            console.log('🦶 Footer bereits geladen - übersprungen');
-            return;
-        }
-        
-        // Prüfen ob Footer bereits vorhanden ist
-        if (document.querySelector('.global-footer')) {
-            console.log('🦶 Footer bereits im HTML vorhanden');
-            this.isLoaded = true;
-            this.initializeFooterFeatures();
-            return;
-        }
-        
-        // Footer am Ende des Body einfügen
-        document.body.insertAdjacentHTML('beforeend', this.footerHTML);
-        this.isLoaded = true;
-        
-        console.log('✅ Global Footer automatisch geladen');
-        
-        // Footer-Features initialisieren
-        this.initializeFooterFeatures();
-    }
-    
-    // Footer-Features nach dem Laden initialisieren
+    // Footer-Features initialisieren
     initializeFooterFeatures() {
-        this.setupAdminLinks();
-        this.setupDashboardLinks();
-        this.setupSystemStatus();
-        this.setupToolLinks();
+        this.setupAutoThemeToggle();
+        this.setupAutoAdminLinks();
+        this.setupAutoDashboardLinks();
+        this.setupAutoSystemStatus();
+        this.setupAutoToolLinks();
         
-        console.log('⚙️ Footer-Features initialisiert');
+        console.log('⚙️ Auto-Footer-Features initialisiert');
     }
     
-    // Admin-Links basierend auf Login-Status anpassen
-    setupAdminLinks() {
-        // Warten bis AuthAPI verfügbar ist
+    // Auto Theme Toggle
+    setupAutoThemeToggle() {
+        const themeToggle = document.querySelector('.auto-theme-toggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (window.ThemeAPI) {
+                    window.ThemeAPI.toggle();
+                } else if (window.toggleTheme) {
+                    window.toggleTheme();
+                } else {
+                    console.warn('⚠️ Keine Theme-Funktion verfügbar');
+                }
+            });
+        }
+    }
+    
+    // Auto Admin Links
+    setupAutoAdminLinks() {
         const checkAuth = () => {
             if (window.AuthAPI) {
                 window.AuthAPI.onAuthStateChange((user, userData) => {
-                    const adminLoginLink = document.getElementById('admin-login-link');
-                    const adminDashboardLink = document.getElementById('admin-dashboard-link');
+                    const adminLoginLink = document.getElementById('auto-admin-login-link');
+                    const adminDashboardLink = document.getElementById('auto-admin-dashboard-link');
                     
                     if (userData && userData.isAllianceAdmin) {
                         if (adminLoginLink) adminLoginLink.style.display = 'none';
@@ -153,56 +208,51 @@ class GlobalFooterLoader {
                     }
                 });
             } else {
-                setTimeout(checkAuth, 500);
+                setTimeout(checkAuth, 1000);
             }
         };
         
         checkAuth();
     }
     
-    // Dashboard-Links basierend auf Login-Status anpassen
-    setupDashboardLinks() {
+    // Auto Dashboard Links
+    setupAutoDashboardLinks() {
         const checkAuth = () => {
             if (window.AuthAPI) {
                 window.AuthAPI.onAuthStateChange((user, userData) => {
-                    const quickDashboard = document.getElementById('quick-dashboard');
+                    const quickDashboard = document.getElementById('auto-quick-dashboard');
                     
                     if (user) {
                         if (quickDashboard) {
                             quickDashboard.textContent = '🏠 Dashboard';
                             quickDashboard.href = 'dashboard.html';
                         }
-                        
-                        // Tool-Links zu Dashboard-Versionen umleiten
-                        this.updateToolLinksForLoggedInUser();
+                        this.updateAutoToolLinksForLoggedInUser();
                     } else {
                         if (quickDashboard) {
                             quickDashboard.textContent = '🔐 Login';
                             quickDashboard.href = 'index.html';
                         }
-                        
-                        // Tool-Links zu Standard-Versionen zurücksetzen
-                        this.resetToolLinksForLoggedOutUser();
+                        this.resetAutoToolLinksForLoggedOutUser();
                     }
                 });
             } else {
-                setTimeout(checkAuth, 500);
+                setTimeout(checkAuth, 1000);
             }
         };
         
         checkAuth();
     }
     
-    // Tool-Links für eingeloggte User zu Dashboard-Versionen
-    updateToolLinksForLoggedInUser() {
-        const toolLinks = document.querySelectorAll('.tool-link');
+    // Auto Tool Links für eingeloggte User
+    updateAutoToolLinksForLoggedInUser() {
+        const toolLinks = document.querySelectorAll('.auto-tool-link');
         
         toolLinks.forEach(link => {
             const dashboardVersion = link.getAttribute('data-dashboard');
             if (dashboardVersion) {
                 link.href = dashboardVersion;
                 
-                // Text erweitern um zu zeigen dass es Dashboard-Version ist
                 if (link.textContent.includes('AS-Counter') && !link.textContent.includes('💾')) {
                     link.innerHTML = '⚔️💾 AS-Counter (Dashboard)';
                 }
@@ -215,12 +265,11 @@ class GlobalFooterLoader {
         });
     }
     
-    // Tool-Links für ausgeloggte User zurücksetzen
-    resetToolLinksForLoggedOutUser() {
-        const toolLinks = document.querySelectorAll('.tool-link');
+    // Auto Tool Links für ausgeloggte User
+    resetAutoToolLinksForLoggedOutUser() {
+        const toolLinks = document.querySelectorAll('.auto-tool-link');
         
         toolLinks.forEach(link => {
-            // Zurück zu Standard-URLs
             if (link.href.includes('dashboard-calculator')) {
                 link.href = 'calculator.html';
                 link.innerHTML = '⚔️ AS-Counter';
@@ -234,112 +283,91 @@ class GlobalFooterLoader {
         });
     }
     
-    // System-Status prüfen und anzeigen
-    setupSystemStatus() {
-        const statusIndicator = document.getElementById('system-status');
+    // Auto System Status
+    setupAutoSystemStatus() {
+        const statusIndicator = document.getElementById('auto-system-status');
         if (!statusIndicator) return;
         
-        // Einfacher Online-Check
-        if (navigator.onLine) {
-            statusIndicator.className = 'status-indicator';
-            statusIndicator.innerHTML = '<span class="status-dot"></span><span>Online</span>';
-        } else {
-            statusIndicator.className = 'status-indicator offline';
-            statusIndicator.innerHTML = '<span class="status-dot"></span><span>Offline</span>';
-        }
+        // Online-Status prüfen
+        const updateStatus = () => {
+            if (navigator.onLine) {
+                statusIndicator.className = 'status-indicator';
+                statusIndicator.innerHTML = '<span class="status-dot"></span><span>Online</span>';
+            } else {
+                statusIndicator.className = 'status-indicator offline';
+                statusIndicator.innerHTML = '<span class="status-dot"></span><span>Offline</span>';
+            }
+        };
         
-        // Online/Offline Events überwachen
-        window.addEventListener('online', () => {
-            statusIndicator.className = 'status-indicator';
-            statusIndicator.innerHTML = '<span class="status-dot"></span><span>Online</span>';
-        });
+        updateStatus();
         
-        window.addEventListener('offline', () => {
-            statusIndicator.className = 'status-indicator offline';
-            statusIndicator.innerHTML = '<span class="status-dot"></span><span>Offline</span>';
-        });
+        window.addEventListener('online', updateStatus);
+        window.addEventListener('offline', updateStatus);
     }
     
-    // Tool-Links einrichten
-    setupToolLinks() {
-        // Theme-Toggle im Footer
-        const themeTools = document.querySelectorAll('.quick-tool[onclick*="ThemeAPI"]');
-        themeTools.forEach(tool => {
-            tool.addEventListener('click', (e) => {
-                e.preventDefault();
-                if (window.ThemeAPI) {
-                    window.ThemeAPI.toggle();
-                } else if (window.toggleTheme) {
-                    window.toggleTheme();
-                } else {
-                    console.warn('⚠️ Keine Theme-Funktion verfügbar');
-                }
-            });
-        });
+    // Auto Tool Links Setup
+    setupAutoToolLinks() {
+        // Hier können weitere Tool-spezifische Links konfiguriert werden
+        console.log('🔗 Auto Tool Links konfiguriert');
     }
     
-    // Footer manuell neu laden (für dynamische Inhalte)
-    reload() {
+    // Force-Reload für dynamische Inhalte
+    forceReload() {
         const existingFooter = document.querySelector('.global-footer');
         if (existingFooter) {
             existingFooter.remove();
         }
         
         this.isLoaded = false;
-        this.loadFooter();
+        this.safeLoad();
         
-        console.log('🔄 Footer neu geladen');
+        console.log('🔄 Auto-Footer force-reloaded');
     }
     
-    // Footer-Inhalte aktualisieren ohne Neustart
-    updateFooterContent(updates) {
+    // Public API
+    updateContent(updates) {
         if (!this.isLoaded) return;
         
-        // Beispiel: Status-Text aktualisieren
         if (updates.status) {
-            const statusIndicator = document.getElementById('system-status');
+            const statusIndicator = document.getElementById('auto-system-status');
             if (statusIndicator) {
                 statusIndicator.innerHTML = `<span class="status-dot"></span><span>${updates.status}</span>`;
             }
         }
         
-        // Beispiel: Version aktualisieren
         if (updates.version) {
             const versionText = document.querySelector('.footer-bottom-left p:last-child');
             if (versionText) {
-                versionText.innerHTML = `Made with ❤️ for Spacenations Players | Version ${updates.version}`;
+                versionText.innerHTML = `Made with ❤️ for Spacenations Players | Version ${updates.version} | Auto-Footer ✨`;
             }
         }
         
-        console.log('📝 Footer-Inhalte aktualisiert:', updates);
+        console.log('📝 Auto-Footer aktualisiert:', updates);
     }
 }
 
-// Globale Instanz erstellen (automatisch)
-window.globalFooterLoader = new GlobalFooterLoader();
+// SOFORTIGE automatische Initialisierung
+if (!window.autoGlobalFooterLoader) {
+    window.autoGlobalFooterLoader = new AutoGlobalFooterLoader();
+}
 
 // Globale API für Footer-Management
-window.FooterAPI = {
+window.AutoFooterAPI = {
     // Footer neu laden
-    reload: () => window.globalFooterLoader.reload(),
+    reload: () => window.autoGlobalFooterLoader.forceReload(),
     
     // Footer-Inhalte aktualisieren
-    update: (updates) => window.globalFooterLoader.updateFooterContent(updates),
+    update: (updates) => window.autoGlobalFooterLoader.updateContent(updates),
     
     // Prüfen ob Footer geladen ist
-    isLoaded: () => window.globalFooterLoader.isLoaded,
+    isLoaded: () => window.autoGlobalFooterLoader.isLoaded,
     
-    // Footer manuell laden (falls benötigt)
-    load: () => window.globalFooterLoader.loadFooter(),
-    
-    // Tool-Links aktualisieren
-    updateToolLinks: () => {
-        window.globalFooterLoader.updateToolLinksForLoggedInUser();
-    },
+    // Footer manuell laden
+    load: () => window.autoGlobalFooterLoader.safeLoad(),
     
     // Status ändern
     setStatus: (status, type = 'online') => {
-        const statusIndicator = document.getElementById('system-status');
+        const statusIndicator = document.getElementById('auto-system-status');
         if (statusIndicator) {
             statusIndicator.className = `status-indicator ${type}`;
             statusIndicator.innerHTML = `<span class="status-dot"></span><span>${status}</span>`;
@@ -347,6 +375,29 @@ window.FooterAPI = {
     }
 };
 
-console.log('🦶 Global Footer Loader bereit');
-console.log('📋 API verfügbar: window.FooterAPI');
-console.log('✨ Footer wird automatisch auf jeder Seite geladen!');
+// Auto-Load Überwachung für dynamische Seiten
+const autoFooterObserver = new MutationObserver(() => {
+    if (!window.autoGlobalFooterLoader.isFooterPresent()) {
+        console.log('🔍 Footer verschwunden - wird neu geladen');
+        window.autoGlobalFooterLoader.ensureFooterExists();
+    }
+});
+
+// Observer starten wenn DOM bereit
+const startObserver = () => {
+    if (document.body) {
+        autoFooterObserver.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+        console.log('👁️ Auto-Footer Observer gestartet');
+    } else {
+        setTimeout(startObserver, 500);
+    }
+};
+
+startObserver();
+
+console.log('🦶 Auto Global Footer Loader vollständig geladen');
+console.log('📋 API verfügbar: window.AutoFooterAPI');
+console.log('✨ Footer wird AUTOMATISCH auf JEDER Seite geladen!');
