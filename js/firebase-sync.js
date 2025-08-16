@@ -1,6 +1,6 @@
 /**
- * Firebase Sync - Dashboard-Synchronisation zwischen Seiten
- * Abhängigkeiten: firebase-config.js, auth-manager.js
+ * ERWEITERTE firebase-sync.js - Ersetzen Sie Ihre bestehende firebase-sync.js mit dieser Version
+ * Hinzugefügte Features: Dashboard-Logout, Bessere Navigation, Session-Management
  */
 
 class FirebaseSync {
@@ -17,7 +17,6 @@ class FirebaseSync {
     
     async init() {
         try {
-            // Warten bis AuthManager bereit ist
             await window.AuthAPI.waitForInit();
             
             console.log('🔄 FirebaseSync initialisiert für Seite:', this.currentPage);
@@ -27,12 +26,14 @@ class FirebaseSync {
                 this.handleAuthStateChange(user, userData);
             });
             
+            // Logout-Success Message prüfen (von anderen Seiten)
+            this.checkLogoutSuccessMessage();
+            
         } catch (error) {
             console.error('❌ FirebaseSync-Initialisierung fehlgeschlagen:', error);
         }
     }
     
-    // Aktuelle Seite erkennen
     detectCurrentPage() {
         const path = window.location.pathname;
         const filename = path.split('/').pop().split('.')[0] || 'index';
@@ -41,7 +42,6 @@ class FirebaseSync {
         return filename;
     }
     
-    // Auth State Changes verarbeiten
     handleAuthStateChange(user, userData) {
         const isLoggedIn = !!user;
         const pageConfig = this.redirectRules[this.currentPage];
@@ -55,13 +55,13 @@ class FirebaseSync {
         
         // Redirect-Logik
         if (pageConfig.requiresAuth && !isLoggedIn) {
-            // Seite braucht Auth, aber User ist nicht eingeloggt
+            // Dashboard braucht Auth, aber User ist nicht eingeloggt
             console.log('🚫 Zugriff verweigert - Weiterleitung zu:', pageConfig.redirectTo);
             this.redirectAfterDelay(pageConfig.redirectTo, 1000);
             
         } else if (!pageConfig.requiresAuth && isLoggedIn) {
-            // Seite braucht keine Auth, aber User ist eingeloggt
-            if (this.currentPage === 'index' || this.currentPage === 'register') {
+            // Index/Register braucht keine Auth, aber User ist eingeloggt
+            if (this.currentPage === 'index') {
                 console.log('✅ User eingeloggt - Weiterleitung zu Dashboard');
                 this.showWelcomeMessage(userData);
                 this.redirectAfterDelay(pageConfig.redirectTo, 2500);
@@ -70,24 +70,163 @@ class FirebaseSync {
         
         // UI für aktuellen Auth-Status aktualisieren
         this.updateUIForAuthState(isLoggedIn, userData);
+        
+        // Dashboard-spezifische Funktionen
+        if (this.currentPage === 'dashboard' && isLoggedIn) {
+            this.setupDashboardFeatures(userData);
+        }
     }
     
-    // Willkommensnachricht anzeigen
+    // Dashboard-spezifische Features einrichten
+    setupDashboardFeatures(userData) {
+        console.log('🏠 Dashboard-Features werden eingerichtet');
+        
+        // Logout-Buttons konfigurieren
+        this.setupDashboardLogout();
+        
+        // Willkommens-Header aktualisieren
+        this.updateDashboardHeader(userData);
+        
+        // Navigation-Events einrichten
+        this.setupDashboardNavigation();
+    }
+    
+    // Dashboard-Logout konfigurieren
+    setupDashboardLogout() {
+        // Alle Logout-Buttons finden
+        const logoutButtons = document.querySelectorAll('.logout-btn, [onclick*="handleLogout"], [onclick*="logout"]');
+        
+        logoutButtons.forEach(button => {
+            // Alte Event-Handler entfernen
+            button.removeAttribute('onclick');
+            
+            // Neuen Event-Handler hinzufügen
+            button.addEventListener('click', async (e) => {
+                e.preventDefault();
+                await this.handleDashboardLogout();
+            });
+        });
+        
+        console.log('🚪 Dashboard-Logout Buttons konfiguriert:', logoutButtons.length);
+    }
+    
+    // Dashboard-Logout Handler
+    async handleDashboardLogout() {
+        try {
+            console.log('🚪 Dashboard-Logout gestartet');
+            
+            // Bestätigung (optional)
+            const confirmed = confirm('Möchten Sie sich abmelden und zur Startseite zurückkehren?');
+            if (!confirmed) return;
+            
+            // Loading-Overlay anzeigen
+            this.showLogoutLoadingOverlay();
+            
+            // Logout über AuthManager
+            const result = await window.AuthAPI.logout();
+            
+            if (result.success) {
+                console.log('✅ Dashboard-Logout erfolgreich');
+                
+                // Erfolgsmeldung für Index-Seite setzen
+                sessionStorage.setItem('logoutSuccess', 'true');
+                
+                // Weiterleitung zur Startseite
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+                
+            } else {
+                console.error('❌ Dashboard-Logout fehlgeschlagen:', result.error);
+                this.hideLogoutLoadingOverlay();
+                alert('Fehler beim Abmelden: ' + result.error);
+            }
+            
+        } catch (error) {
+            console.error('❌ Dashboard-Logout Fehler:', error);
+            this.hideLogoutLoadingOverlay();
+            alert('Unerwarteter Fehler beim Abmelden');
+        }
+    }
+    
+    // Logout Loading-Overlay anzeigen
+    showLogoutLoadingOverlay() {
+        const loadingOverlay = document.getElementById('loading-overlay');
+        if (loadingOverlay) {
+            const titleElement = loadingOverlay.querySelector('h3');
+            const textElement = loadingOverlay.querySelector('p');
+            
+            if (titleElement) titleElement.textContent = 'Abmeldung...';
+            if (textElement) textElement.textContent = 'Sie werden zur Startseite weitergeleitet';
+            
+            loadingOverlay.style.display = 'flex';
+        }
+    }
+    
+    // Logout Loading-Overlay verstecken
+    hideLogoutLoadingOverlay() {
+        const loadingOverlay = document.getElementById('loading-overlay');
+        if (loadingOverlay) {
+            loadingOverlay.style.display = 'none';
+        }
+    }
+    
+    // Dashboard-Header aktualisieren
+    updateDashboardHeader(userData) {
+        const headerUsername = document.getElementById('header-username');
+        if (headerUsername && userData?.username) {
+            headerUsername.textContent = userData.username;
+        }
+    }
+    
+    // Dashboard-Navigation einrichten
+    setupDashboardNavigation() {
+        // Startseite-Button hinzufügen falls nicht vorhanden
+        const backBtn = document.querySelector('.back-btn');
+        if (backBtn) {
+            backBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (confirm('Möchten Sie zur Startseite zurückkehren? (Sie bleiben eingeloggt)')) {
+                    window.location.href = 'index.html';
+                }
+            });
+        }
+    }
+    
+    // Logout-Success Message prüfen
+    checkLogoutSuccessMessage() {
+        if (this.currentPage === 'index' && sessionStorage.getItem('logoutSuccess')) {
+            // Erfolgsmeldung anzeigen
+            setTimeout(() => {
+                if (typeof showLoginSuccess === 'function') {
+                    showLoginSuccess('Sie wurden erfolgreich abgemeldet.');
+                }
+                
+                // Message nach 5 Sekunden verstecken
+                setTimeout(() => {
+                    if (typeof hideLoginMessages === 'function') {
+                        hideLoginMessages();
+                    }
+                }, 5000);
+            }, 500);
+            
+            // Flag entfernen
+            sessionStorage.removeItem('logoutSuccess');
+        }
+    }
+    
     showWelcomeMessage(userData) {
         const displayName = userData?.username || 'User';
         
-        // Versuche Erfolgsnachricht anzuzeigen
         if (typeof showLoginSuccess === 'function') {
             showLoginSuccess(`Willkommen zurück, ${displayName}! Weiterleitung zum Dashboard...`);
         }
         
-        // Loading-Overlay anzeigen wenn verfügbar
         if (typeof showLoadingOverlay === 'function') {
             setTimeout(() => showLoadingOverlay(), 1500);
         }
     }
     
-    // UI für Auth-Status aktualisieren
     updateUIForAuthState(isLoggedIn, userData) {
         if (isLoggedIn && userData) {
             this.updateUIForLoggedInUser(userData);
@@ -96,11 +235,9 @@ class FirebaseSync {
         }
     }
     
-    // UI für eingeloggten User
     updateUIForLoggedInUser(userData) {
         const displayName = userData.username || userData.email || 'User';
         
-        // Login-Form verstecken, User-Info anzeigen
         const loginForm = document.getElementById('login-form');
         const userInfo = document.getElementById('user-info');
         const userWelcome = document.getElementById('user-welcome');
@@ -109,18 +246,16 @@ class FirebaseSync {
         if (userInfo) userInfo.style.display = 'block';
         if (userWelcome) userWelcome.textContent = `Hallo, ${displayName}!`;
         
-        // Header-Username aktualisieren (für Dashboard)
+        // Dashboard-spezifische UI-Updates
         const headerUsername = document.getElementById('header-username');
         if (headerUsername) headerUsername.textContent = displayName;
         
-        // User-Avatar aktualisieren (für Dashboard)
         const userAvatar = document.getElementById('user-avatar');
         if (userAvatar) {
             const firstLetter = displayName.charAt(0).toUpperCase();
             userAvatar.textContent = firstLetter;
         }
         
-        // User-Name und E-Mail aktualisieren
         const userName = document.getElementById('user-name');
         const userEmail = document.getElementById('user-email');
         if (userName) userName.textContent = displayName;
@@ -129,7 +264,6 @@ class FirebaseSync {
         console.log('✅ UI für eingeloggten User aktualisiert');
     }
     
-    // UI für ausgeloggten User
     updateUIForLoggedOutUser() {
         const loginForm = document.getElementById('login-form');
         const userInfo = document.getElementById('user-info');
@@ -137,7 +271,6 @@ class FirebaseSync {
         if (loginForm) loginForm.style.display = 'block';
         if (userInfo) userInfo.style.display = 'none';
         
-        // Nachrichten verstecken
         if (typeof hideLoginMessages === 'function') {
             hideLoginMessages();
         }
@@ -145,7 +278,6 @@ class FirebaseSync {
         console.log('✅ UI für ausgeloggten User aktualisiert');
     }
     
-    // Verzögerte Weiterleitung
     redirectAfterDelay(url, delay = 2000) {
         console.log(`⏳ Weiterleitung zu ${url} in ${delay}ms`);
         
@@ -154,16 +286,14 @@ class FirebaseSync {
         }, delay);
     }
     
-    // Dashboard-spezifische Daten laden
+    // Dashboard-Daten laden (bestehende Funktion)
     async loadDashboardData(userId) {
         try {
             const db = window.FirebaseConfig.getDB();
             
-            // Benutzer-Statistiken laden
             const statsDoc = await db.collection('userStats').doc(userId).get();
             const stats = statsDoc.exists ? statsDoc.data() : null;
             
-            // Letzte Aktivitäten laden
             const activitiesQuery = await db.collection('userActivities')
                 .where('userId', '==', userId)
                 .orderBy('timestamp', 'desc')
@@ -176,7 +306,6 @@ class FirebaseSync {
             });
             
             console.log('📊 Dashboard-Daten geladen');
-            
             return { stats, activities };
             
         } catch (error) {
@@ -185,7 +314,6 @@ class FirebaseSync {
         }
     }
     
-    // Statistiken aktualisieren
     async updateUserStats(statType, increment = 1) {
         try {
             const user = window.AuthAPI.getCurrentUser();
@@ -214,13 +342,23 @@ class FirebaseSync {
     }
 }
 
-// Globale FirebaseSync-Instanz erstellen
+// Globale FirebaseSync-Instanz
 window.firebaseSync = new FirebaseSync();
 
-// Globale API für andere Seiten
+// Erweiterte API
 window.SyncAPI = {
     loadDashboardData: (userId) => window.firebaseSync.loadDashboardData(userId),
     updateUserStats: (statType, increment) => window.firebaseSync.updateUserStats(statType, increment),
     redirectToDashboard: () => window.firebaseSync.redirectAfterDelay('dashboard.html', 1500),
-    getCurrentPage: () => window.firebaseSync.currentPage
+    redirectToIndex: () => window.firebaseSync.redirectAfterDelay('index.html', 1500),
+    getCurrentPage: () => window.firebaseSync.currentPage,
+    
+    // Neue Dashboard-Funktionen
+    dashboardLogout: () => window.firebaseSync.handleDashboardLogout(),
+    quickLogout: async () => {
+        const result = await window.AuthAPI.logout();
+        if (result.success) {
+            window.location.href = 'index.html';
+        }
+    }
 };
