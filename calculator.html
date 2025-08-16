@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <link rel="stylesheet" href="css/global-footer.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Space Nations Kampfbericht Rechner</title>
@@ -19,6 +18,13 @@
             --input-border: rgba(58, 89, 152, 0.5);
             --destroyed-color: #e74c3c;
             --lost-color: #f39c12;
+            --card-bg: rgba(16, 16, 16, 0.9);
+            --card-border: rgba(58, 89, 152, 0.5);
+            --accent-primary: #ff8c42;
+            --accent-secondary: #4a90e2;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
         }
         
         /* Light Mode */
@@ -33,8 +39,251 @@
             --input-border: #e2e8f0;
             --destroyed-color: #dc2626;
             --lost-color: #d97706;
+            --card-bg: linear-gradient(135deg, #ffffff, #f8fafc);
+            --card-border: #e2e8f0;
         }
         
+        /* Global Footer Styles */
+        .global-footer {
+            background: var(--bg-panel);
+            border-top: 2px solid var(--border-primary);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px 20px 20px;
+            margin-top: 40px;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 25px;
+        }
+        
+        .footer-section {
+            color: var(--text-primary);
+        }
+        
+        .footer-section h4 {
+            color: var(--accent-primary);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .footer-links li {
+            margin-bottom: 8px;
+        }
+        
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent-secondary);
+            transform: translateX(5px);
+        }
+        
+        .admin-links a {
+            color: #f39c12;
+            font-weight: 600;
+            background: rgba(243, 156, 18, 0.1);
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #f39c12;
+            transition: all 0.3s ease;
+        }
+        
+        .admin-links a:hover {
+            background: #f39c12;
+            color: white;
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid var(--card-border);
+            padding-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .footer-bottom-left {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .footer-bottom-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--success-color);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: currentColor;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .quick-tools {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-tool {
+            background: var(--accent-secondary);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-tool:hover {
+            background: var(--accent-primary);
+            transform: translateY(-1px);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .social-link {
+            width: 36px;
+            height: 36px;
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .social-link:hover {
+            border-color: var(--accent-secondary);
+            color: var(--accent-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+        }
+        
+        /* Dashboard Promotion */
+        .dashboard-promo {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .dashboard-promo h4 {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .dashboard-promo p {
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .promo-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .promo-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .promo-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Responsive Footer */
+        @media (max-width: 768px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 25px;
+                text-align: center;
+            }
+            
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .quick-tools,
+            .social-links {
+                justify-content: center;
+            }
+            
+            .promo-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+        
+        /* Original Calculator Styles */
         * {
             margin: 0;
             padding: 0;
@@ -359,6 +608,16 @@
             <div class="subtitle">Kampfbericht-Rechner</div>
         </div>
         
+        <!-- Dashboard Promotion -->
+        <div class="dashboard-promo" id="dashboard-promo">
+            <h4>💾 Upgrade zum Dashboard-Calculator!</h4>
+            <p>Speichere alle deine Kämpfe automatisch und verfolge deine Statistiken</p>
+            <div class="promo-buttons">
+                <a href="dashboard.html" class="promo-btn">🏠 Zum Dashboard</a>
+                <a href="register.html" class="promo-btn">🚀 Account erstellen</a>
+            </div>
+        </div>
+        
         <div class="input-sections">
             <div class="input-box destroyed">
                 <h2>⚔️ Zerstört - Berichte (Funktion A)</h2>
@@ -433,136 +692,86 @@
         </div>
     </div>
 
+    <!-- Global Footer -->
+    <footer class="global-footer">
+        <div class="footer-content">
+            <!-- Rechtliche Links -->
+            <div class="footer-section">
+                <h4>📋 Rechtliches</h4>
+                <ul class="footer-links legal-links">
+                    <li><a href="impressum.html">📄 Impressum</a></li>
+                    <li><a href="datenschutz.html">🔒 Datenschutzerklärung</a></li>
+                    <li><a href="agb.html">📜 AGB & Nutzungsbedingungen</a></li>
+                    <li><a href="kontakt.html">✉️ Kontakt</a></li>
+                </ul>
+            </div>
+            
+            <!-- Tools & Navigation -->
+            <div class="footer-section">
+                <h4>🛠️ Tools & Navigation</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">🏠 Startseite</a></li>
+                    <li><a href="calculator.html">⚔️ AS-Counter</a></li>
+                    <li><a href="raid-counter.html">🏴‍☠️ Raid-Counter</a></li>
+                    <li><a href="register.html">🚀 Account erstellen</a></li>
+                </ul>
+            </div>
+            
+            <!-- Admin & Support -->
+            <div class="footer-section">
+                <h4>⚙️ Administration</h4>
+                <ul class="footer-links admin-links">
+                    <li><a href="admin-login.html" id="admin-login-link">🔐 Admin-Login</a></li>
+                    <li><a href="admin-dashboard.html" id="admin-dashboard-link" style="display: none;">🛡️ Admin-Dashboard</a></li>
+                </ul>
+                <ul class="footer-links" style="margin-top: 15px;">
+                    <li><a href="hilfe.html">❓ Hilfe & FAQ</a></li>
+                    <li><a href="changelog.html">📝 Changelog</a></li>
+                    <li><a href="roadmap.html">🗺️ Roadmap</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="footer-bottom-left">
+                <p>© 2025 Spacenations Tools | Inoffizielle Tools für die Spacenations Community</p>
+                <p style="font-size: 0.8rem; margin-top: 5px; opacity: 0.8;">
+                    Made with ❤️ for Spacenations Players | Version 2.1.0
+                </p>
+            </div>
+            
+            <div class="footer-bottom-right">
+                <!-- Status Indicator -->
+                <div class="status-indicator" id="system-status">
+                    <span class="status-dot"></span>
+                    <span>Online</span>
+                </div>
+                
+                <!-- Quick Tools -->
+                <div class="quick-tools">
+                    <a href="#" class="quick-tool" onclick="window.ThemeAPI?.toggle()">🌙 Theme</a>
+                    <a href="index.html" class="quick-tool" id="quick-dashboard">🏠 Home</a>
+                </div>
+                
+                <!-- Social Links -->
+                <div class="social-links">
+                    <a href="#" class="social-link" title="Discord Server">🎮</a>
+                    <a href="#" class="social-link" title="GitHub Repository">⚡</a>
+                    <a href="mailto:admin@spacenations-tools.de" class="social-link" title="E-Mail">✉️</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/theme-manager.js"></script>
+
     <script>
-        // Theme Management
-        function toggleTheme() {
-            const root = document.documentElement;
-            const themeIcon = document.getElementById('theme-icon');
-            const themeText = document.getElementById('theme-text');
-            
-            if (root.classList.contains('light-mode')) {
-                // Wechsel zu Dark Mode
-                root.classList.remove('light-mode');
-                themeIcon.textContent = '🌙';
-                themeText.textContent = 'Light Mode';
-                localStorage.setItem('theme', 'dark');
-            } else {
-                // Wechsel zu Light Mode
-                root.classList.add('light-mode');
-                themeIcon.textContent = '☀️';
-                themeText.textContent = 'Dark Mode';
-                localStorage.setItem('theme', 'light');
-            }
-        }
-        
-        // Theme beim Laden der Seite setzen
-        function initTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            const root = document.documentElement;
-            const themeIcon = document.getElementById('theme-icon');
-            const themeText = document.getElementById('theme-text');
-            
-            if (savedTheme === 'light') {
-                root.classList.add('light-mode');
-                themeIcon.textContent = '☀️';
-                themeText.textContent = 'Dark Mode';
-            } else {
-                root.classList.remove('light-mode');
-                themeIcon.textContent = '🌙';
-                themeText.textContent = 'Light Mode';
-            }
-        }
-        
-        // Theme bei Seitenload initialisieren
-        document.addEventListener('DOMContentLoaded', initTheme);
-
-        function parseNumber(str) {
-            return parseInt(str.replace(/\./g, '')) || 0;
-        }
-
-        function formatNumber(num) {
-            return num.toLocaleString('de-DE');
-        }
-
-        function parseReports(text, type) {
-            const resources = {
-                stability: 0,
-                storage: 0,
-                armor: 0,
-                attack: 0,
-                count: 0
-            };
-            
-            const lines = text.split('\n');
-            
-            for (let line of lines) {
-                line = line.trim();
-                
-                if (line.match(/^\d+\.?\d*\s+\w+/)) {
-                    const match = line.match(/^([\d.]+)\s+(.+)/);
-                    if (match) {
-                        const value = parseNumber(match[1]);
-                        const resource = match[2].toLowerCase();
-                        
-                        if (resource.includes('stabilität')) {
-                            resources.stability += value;
-                        } else if (resource.includes('lagerraum')) {
-                            resources.storage += value;
-                        } else if (resource.includes('panzerung')) {
-                            resources.armor += value;
-                        } else if (resource.includes('angriffsstärke')) {
-                            resources.attack += value;
-                        }
-                    }
-                }
-                
-                if (line.match(/^\d{2}\.\d{2}\.\d{4},\s+\d{2}:\d{2}:\d{2}/)) {
-                    resources.count++;
-                }
-            }
-            
-            return resources;
-        }
-
-        function calculateReports() {
-            const destroyedText = document.getElementById('destroyed-reports').value;
-            const destroyed = parseReports(destroyedText, 'destroyed');
-            
-            const lostText = document.getElementById('lost-reports').value;
-            const lost = parseReports(lostText, 'lost');
-            
-            document.getElementById('destroyed-stability').textContent = formatNumber(destroyed.stability);
-            document.getElementById('destroyed-storage').textContent = formatNumber(destroyed.storage);
-            document.getElementById('destroyed-armor').textContent = formatNumber(destroyed.armor);
-            document.getElementById('destroyed-attack').textContent = formatNumber(destroyed.attack);
-            document.getElementById('destroyed-count').textContent = destroyed.count;
-            
-            document.getElementById('lost-stability').textContent = formatNumber(lost.stability);
-            document.getElementById('lost-storage').textContent = formatNumber(lost.storage);
-            document.getElementById('lost-armor').textContent = formatNumber(lost.armor);
-            document.getElementById('lost-attack').textContent = formatNumber(lost.attack);
-            document.getElementById('lost-count').textContent = lost.count;
-        }
-        
-        function clearAll() {
-            document.getElementById('destroyed-reports').value = '';
-            document.getElementById('lost-reports').value = '';
-            
-            document.getElementById('destroyed-stability').textContent = '0';
-            document.getElementById('destroyed-storage').textContent = '0';
-            document.getElementById('destroyed-armor').textContent = '0';
-            document.getElementById('destroyed-attack').textContent = '0';
-            document.getElementById('destroyed-count').textContent = '0';
-            
-            document.getElementById('lost-stability').textContent = '0';
-            document.getElementById('lost-storage').textContent = '0';
-            document.getElementById('lost-armor').textContent = '0';
-            document.getElementById('lost-attack').textContent = '0';
-            document.getElementById('lost-count').textContent = '0';
-        }
-    </script>
-</body>
-</html>
+        // Global Footer Functions
+        function initializeGlobalFooter() {
+            updateSystemStatus();
+            console.log('🦶 Global Footer initialisiert');
     </script>
 </body>
 </html>
