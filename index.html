@@ -181,16 +181,6 @@
             box-shadow: 0 4px 15px rgba(100, 116, 139, 0.3) !important;
         }
         
-        .coming-soon-badge {
-            margin-left: auto;
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-weight: 600;
-        }
-        
         /* Main Content */
         .main {
             grid-area: main;
@@ -389,12 +379,12 @@
             transition: all 0.3s ease;
             display: block;
             margin-bottom: 8px;
+            cursor: pointer;
         }
         
         .register-link a:hover {
             color: #ff8c42;
             text-shadow: 0 0 5px rgba(255, 140, 66, 0.3);
-            cursor: pointer;
         }
         
         /* User Info (wenn eingeloggt) */
@@ -410,7 +400,27 @@
             font-weight: 600;
         }
         
+        .dashboard-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #4a90e2, #3a5998);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .dashboard-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+        }
+        
         .logout-btn {
+            width: 100%;
             background: linear-gradient(135deg, #c0392b, #e74c3c);
             color: white;
             border: none;
@@ -419,6 +429,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            font-size: 0.9rem;
         }
         
         .logout-btn:hover {
@@ -433,6 +444,67 @@
             padding: 20px;
             color: var(--text-secondary);
             font-size: 0.9rem;
+        }
+        
+        /* Login Error/Success Messages */
+        .login-message {
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            text-align: center;
+            display: none;
+        }
+        
+        .login-error {
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid #dc2626;
+            color: #dc2626;
+        }
+        
+        .login-success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid #22c55e;
+            color: #22c55e;
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+        }
+        
+        .loading-content {
+            text-align: center;
+            color: white;
+            padding: 30px;
+            background: var(--bg-panel);
+            border-radius: 15px;
+            border: 2px solid var(--border-primary);
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-primary);
+            border-top: 4px solid #ff8c42;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         /* Responsive */
@@ -484,6 +556,15 @@
     </style>
 </head>
 <body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>Lädt Dashboard...</h3>
+            <p>Sie werden automatisch weitergeleitet</p>
+        </div>
+    </div>
+
     <div class="header">
         <button class="theme-toggle" onclick="toggleTheme()">
             <span id="theme-icon">🌙</span>
@@ -559,6 +640,10 @@
         <!-- Login Form (wenn nicht eingeloggt) -->
         <div id="login-form">
             <h3>🔐 Benutzer Login</h3>
+            
+            <div id="login-error" class="login-message login-error"></div>
+            <div id="login-success" class="login-message login-success"></div>
+            
             <form onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label class="form-label" for="username">E-Mail:</label>
@@ -580,6 +665,7 @@
         <div id="user-info" class="user-info">
             <h3>👋 Willkommen!</h3>
             <div class="user-welcome" id="user-welcome"></div>
+            <button class="dashboard-btn" onclick="openDashboard()">🏠 Dashboard</button>
             <button class="logout-btn" onclick="handleLogout()">Logout</button>
         </div>
     </div>
@@ -588,68 +674,51 @@
         <p>Spacenations Info-Tools © 2025 | Inoffizielle Tools für die Spacenations Community</p>
     </footer>
 
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK - MUSS ZUERST geladen werden -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
+    <!-- Modulare JavaScript-Dateien in der richtigen Reihenfolge -->
+    <script src="js/firebase-config.js"></script>        <!-- 1. Firebase-Konfiguration -->
+    <script src="js/theme-manager.js"></script>          <!-- 2. Theme-Management -->
+    <script src="js/auth-manager.js"></script>           <!-- 3. Auth-Management -->
+    <script src="js/firebase-sync.js"></script>          <!-- 4. Dashboard-Sync -->
+
     <script>
-        // Ihre echte Firebase-Konfiguration:
-        const firebaseConfig = {
-            apiKey: "AIzaSyDr4-ap_EubUn0UdP7hkEpS2jkzLIVgvyc",
-            authDomain: "spacenations-tools.firebaseapp.com",
-            projectId: "spacenations-tools",
-            storageBucket: "spacenations-tools.firebasestorage.app",
-            messagingSenderId: "651338201276",
-            appId: "1:651338201276:web:89e7d9c19dbd2611d3f8b9",
-            measurementId: "G-SKWJWH2ERX"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        // Theme Management
-        function toggleTheme() {
-            const root = document.documentElement;
-            const themeIcon = document.getElementById('theme-icon');
-            const themeText = document.getElementById('theme-text');
-            
-            if (root.classList.contains('light-mode')) {
-                root.classList.remove('light-mode');
-                themeIcon.textContent = '🌙';
-                themeText.textContent = 'Light Mode';
-                localStorage.setItem('theme', 'dark');
-            } else {
-                root.classList.add('light-mode');
-                themeIcon.textContent = '☀️';
-                themeText.textContent = 'Dark Mode';
-                localStorage.setItem('theme', 'light');
-            }
-        }
+        // Seiten-spezifische Funktionen für index.html
         
-        function initTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            const root = document.documentElement;
-            const themeIcon = document.getElementById('theme-icon');
-            const themeText = document.getElementById('theme-text');
-            
-            if (savedTheme === 'light') {
-                root.classList.add('light-mode');
-                themeIcon.textContent = '☀️';
-                themeText.textContent = 'Dark Mode';
-            } else {
-                root.classList.remove('light-mode');
-                themeIcon.textContent = '🌙';
-                themeText.textContent = 'Light Mode';
-            }
+        // Message Functions
+        function showLoginError(message) {
+            const errorDiv = document.getElementById('login-error');
+            const successDiv = document.getElementById('login-success');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            successDiv.style.display = 'none';
         }
-        
-        document.addEventListener('DOMContentLoaded', initTheme);
 
-        // Login Funktionalität
-        function handleLogin(event) {
+        function showLoginSuccess(message) {
+            const successDiv = document.getElementById('login-success');
+            const errorDiv = document.getElementById('login-error');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            errorDiv.style.display = 'none';
+        }
+
+        function hideLoginMessages() {
+            document.getElementById('login-error').style.display = 'none';
+            document.getElementById('login-success').style.display = 'none';
+        }
+
+        function showLoadingOverlay() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+        }
+
+        // Login Form Handler
+        async function handleLogin(event) {
             event.preventDefault();
+            hideLoginMessages();
+            
             const email = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             const loginBtn = document.getElementById('login-btn');
@@ -657,117 +726,78 @@
             loginBtn.disabled = true;
             loginBtn.textContent = '⏳ Login...';
 
-            auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    console.log('Login erfolgreich:', user);
-                    loadUserData(user.uid);
-                })
-                .catch((error) => {
-                    console.error('Login fehlgeschlagen:', error);
-                    
-                    let errorMessage = 'Login fehlgeschlagen.';
-                    if (error.code === 'auth/user-not-found') {
-                        errorMessage = 'Kein Account mit dieser E-Mail gefunden.';
-                    } else if (error.code === 'auth/wrong-password') {
-                        errorMessage = 'Falsches Passwort.';
-                    } else if (error.code === 'auth/invalid-email') {
-                        errorMessage = 'Ungültige E-Mail-Adresse.';
-                    } else if (error.code === 'auth/too-many-requests') {
-                        errorMessage = 'Zu viele Fehlversuche. Versuchen Sie es später erneut.';
-                    }
-                    
-                    alert(errorMessage);
-                })
-                .finally(() => {
-                    loginBtn.disabled = false;
-                    loginBtn.textContent = 'Login';
-                });
-        }
-
-        // Logout Funktionalität
-        function handleLogout() {
-            auth.signOut().then(() => {
-                console.log('Logout erfolgreich');
-            }).catch((error) => {
-                console.error('Logout fehlgeschlagen:', error);
-            });
-        }
-
-        // Benutzerdaten laden
-        async function loadUserData(uid) {
             try {
-                const userDoc = await db.collection('users').doc(uid).get();
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    console.log('Benutzerdaten:', userData);
-                    
-                    // Update lastLogin
-                    await db.collection('users').doc(uid).update({
-                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                    });
+                const result = await window.AuthAPI.login(email, password);
+                
+                if (result.success) {
+                    // Erfolg wird durch firebase-sync.js gehandelt
+                    console.log('✅ Login erfolgreich - Sync übernimmt Weiterleitung');
+                } else {
+                    showLoginError(result.error);
                 }
             } catch (error) {
-                console.error('Fehler beim Laden der Benutzerdaten:', error);
+                console.error('❌ Login-Fehler:', error);
+                showLoginError('Unerwarteter Fehler beim Login');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Login';
             }
         }
 
-        // UI Updates basierend auf Auth State
-        function updateUI(user) {
-            const loginForm = document.getElementById('login-form');
-            const userInfo = document.getElementById('user-info');
-            const userWelcome = document.getElementById('user-welcome');
-
-            if (user) {
-                // User ist eingeloggt
-                loginForm.style.display = 'none';
-                userInfo.style.display = 'block';
-                userWelcome.textContent = `Hallo, ${user.displayName || user.email}!`;
-            } else {
-                // User ist nicht eingeloggt
-                loginForm.style.display = 'block';
-                userInfo.style.display = 'none';
+        // Logout Handler
+        async function handleLogout() {
+            if (confirm('Möchten Sie sich wirklich abmelden?')) {
+                const result = await window.AuthAPI.logout();
+                
+                if (result.success) {
+                    showLoginSuccess('Erfolgreich abgemeldet.');
+                    setTimeout(() => hideLoginMessages(), 3000);
+                } else {
+                    showLoginError(result.error);
+                }
             }
         }
 
-        // Auth State Listener
-        auth.onAuthStateChanged((user) => {
-            updateUI(user);
-            if (user) {
-                console.log('User ist eingeloggt:', user.email);
-                loadUserData(user.uid);
-            } else {
-                console.log('User ist nicht eingeloggt');
-            }
-        });
+        // Navigation Functions
+        function openDashboard() {
+            window.SyncAPI.redirectToDashboard();
+        }
 
-        // Navigation Funktionen
         function showComingSoon(toolName) {
             alert(`${toolName} ist noch in Entwicklung!\n\n⏳ Coming Soon...\n\nDieses Tool wird in einer zukünftigen Version verfügbar sein.`);
         }
         
         function openAdminRegistration() {
             alert('Allianz-Registrierung wird geöffnet...\n\n(Navigation zu admin-registration.html)');
-            // window.location.href = 'admin-registration.html';
         }
         
         function openRegistration() {
             window.location.href = 'register.html';
         }
         
-        function openPasswordReset() {
-            alert('Passwort-Reset wird geöffnet...\n\n(Navigation zu password-reset.html)');
-            // window.location.href = 'password-reset.html';
+        async function openPasswordReset() {
+            const email = prompt('Bitte geben Sie Ihre E-Mail-Adresse ein:');
+            if (email) {
+                const result = await window.AuthAPI.resetPassword(email);
+                
+                if (result.success) {
+                    showLoginSuccess(`Passwort-Reset E-Mail wurde an ${email} gesendet.`);
+                } else {
+                    showLoginError(result.error);
+                }
+            }
         }
-        
-        // Event-Listener nur für Coming Soon Links
-        document.querySelectorAll('.coming-soon-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                this.style.transform = 'translateX(8px)';
-                setTimeout(() => {
-                    this.style.transform = '';
-                }, 200);
+
+        // Coming Soon Link Animations
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.coming-soon-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    this.style.transform = 'translateX(8px)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                });
             });
         });
     </script>
