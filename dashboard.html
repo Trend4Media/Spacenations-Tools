@@ -1183,6 +1183,39 @@
         console.log('🎯 Dashboard vollständig initialisiert');
         console.log('💡 Keyboard-Shortcuts: Strg+L (Logout), Strg+H (Home), F5 (Reload)');
         console.log('🔧 Debug-Funktionen verfügbar: window.dashboardDebug');
+        // AS-Counter Navigation Setup
+function setupCalculatorNavigation() {
+    // Alle Calculator-Links für Dashboard-Version konfigurieren
+    const calculatorLinks = document.querySelectorAll('a[href="calculator.html"]');
+    
+    calculatorLinks.forEach(link => {
+        link.href = 'dashboard-calculator.html';
+        link.title = 'AS-Counter (Dashboard) - Alle Kämpfe werden automatisch gespeichert';
+        
+        // Icon erweitern
+        const icon = link.querySelector('.nav-icon, .action-icon');
+        if (icon && !icon.textContent.includes('💾')) {
+            icon.textContent = '⚔️💾';
+        }
+        
+        // Text erweitern
+        const text = link.querySelector('.action-title');
+        if (text && !text.textContent.includes('Dashboard')) {
+            text.textContent = 'AS-Counter (Dashboard)';
+        }
+        
+        // Beschreibung erweitern
+        const desc = link.querySelector('.action-desc');
+        if (desc) {
+            desc.textContent = 'AS-Counter mit automatischem Speichern aller Kampfergebnisse';
+        }
+    });
+}
+
+// Calculator-Navigation beim Dashboard-Load ausführen
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(setupCalculatorNavigation, 1000);
+});
     </script>
     <script src="js/calculator-data.js"></script>
 </body>
