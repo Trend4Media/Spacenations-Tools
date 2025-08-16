@@ -1,54 +1,14 @@
 /**
- * Dashboard Navigation Manager - Modulare Navigation für alle Dashboard-Seiten
- * Abhängigkeiten: firebase-config.js, auth-manager.js, theme-manager.js
+ * Kompatible Dashboard Navigation - Erweitert bestehende Navigation ohne Design zu überschreiben
+ * Funktioniert mit Ihrem bestehenden Dashboard-Design
  */
 
-class DashboardNavigation {
+class CompatibleDashboardNavigation {
     constructor() {
         this.currentPage = this.detectCurrentPage();
         this.currentUser = null;
         this.userData = null;
-        this.breadcrumbs = [];
         this.notifications = [];
-        
-        // Navigation-Konfiguration
-        this.navigationConfig = {
-            'dashboard': {
-                title: 'Dashboard',
-                icon: '🏠',
-                breadcrumb: 'Übersicht'
-            },
-            'dashboard-calculator': {
-                title: 'AS-Counter',
-                icon: '⚔️',
-                breadcrumb: 'AS-Counter',
-                parent: 'dashboard'
-            },
-            'dashboard-raid-counter': {
-                title: 'Raid-Counter',
-                icon: '🏴‍☠️',
-                breadcrumb: 'Raid-Counter',
-                parent: 'dashboard'
-            },
-            'dashboard-profile': {
-                title: 'Profil',
-                icon: '👤',
-                breadcrumb: 'Mein Profil',
-                parent: 'dashboard'
-            },
-            'dashboard-alliance': {
-                title: 'Allianz',
-                icon: '🛡️',
-                breadcrumb: 'Allianz-Verwaltung',
-                parent: 'dashboard'
-            },
-            'dashboard-statistics': {
-                title: 'Statistiken',
-                icon: '📊',
-                breadcrumb: 'Detaillierte Statistiken',
-                parent: 'dashboard'
-            }
-        };
         
         this.init();
     }
@@ -64,15 +24,13 @@ class DashboardNavigation {
                 this.userData = userData;
                 
                 if (user) {
-                    this.renderNavigation();
+                    this.enhanceExistingNavigation();
                     this.updateUserInfo();
-                } else {
-                    // Nicht eingeloggt - Weiterleitung
-                    window.location.href = 'index.html';
+                    this.setupNavigationFeatures();
                 }
             });
             
-            console.log('🧭 Dashboard-Navigation initialisiert für:', this.currentPage);
+            console.log('🧭 Kompatible Dashboard-Navigation initialisiert für:', this.currentPage);
             
         } catch (error) {
             console.error('❌ Dashboard-Navigation Initialisierung fehlgeschlagen:', error);
@@ -86,237 +44,245 @@ class DashboardNavigation {
         return filename;
     }
     
-    // Navigation rendern
-    renderNavigation() {
-        this.renderHeader();
-        this.renderSidebar();
-        this.renderFooter();
-        this.setupEventListeners();
-        this.updateBreadcrumbs();
-        this.setActivePage();
+    // Bestehende Navigation erweitern (ohne zu überschreiben)
+    enhanceExistingNavigation() {
+        this.addBreadcrumbsToHeader();
+        this.enhanceUserDropdown();
+        this.addNotificationSystem();
+        this.updateNavigationLinks();
+        this.setupKeyboardNavigation();
     }
     
-    // Header rendern
-    renderHeader() {
-        const headerHTML = `
-            <div class="dashboard-header">
-                <div class="header-content">
-                    <div class="header-left">
-                        <h1>${this.getPageIcon()} ${this.getPageTitle()}</h1>
-                        <div class="header-subtitle">
-                            <nav class="breadcrumbs" id="breadcrumbs">
-                                <!-- Breadcrumbs werden hier eingefügt -->
-                            </nav>
-                        </div>
-                    </div>
-                    <div class="header-right">
-                        <div class="notifications-container">
-                            <button class="notification-btn" id="notification-btn" onclick="DashboardNav.toggleNotifications()">
-                                🔔
-                                <span class="notification-count" id="notification-count" style="display: none;">0</span>
-                            </button>
-                            <div class="notifications-dropdown" id="notifications-dropdown" style="display: none;">
-                                <!-- Notifications werden hier eingefügt -->
-                            </div>
-                        </div>
-                        <button class="theme-toggle" onclick="toggleTheme()">
-                            <span id="theme-icon">🌙</span>
-                            <span id="theme-text">Light</span>
-                        </button>
-                        <div class="user-dropdown">
-                            <button class="user-dropdown-btn" id="user-dropdown-btn" onclick="DashboardNav.toggleUserDropdown()">
-                                <div class="user-avatar-small" id="user-avatar-small">?</div>
-                                <span id="user-name-header">User</span>
-                                <span class="dropdown-arrow">▼</span>
-                            </button>
-                            <div class="user-dropdown-menu" id="user-dropdown-menu" style="display: none;">
-                                <a href="dashboard.html" class="dropdown-item">
-                                    🏠 Dashboard
-                                </a>
-                                <a href="#" class="dropdown-item" onclick="DashboardNav.openProfile()">
-                                    👤 Profil
-                                </a>
-                                <a href="#" class="dropdown-item" onclick="DashboardNav.openSettings()">
-                                    ⚙️ Einstellungen
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a href="#" class="dropdown-item logout-item" onclick="DashboardNav.logout()">
-                                    🚪 Abmelden
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+    // Breadcrumbs zum bestehenden Header hinzufügen
+    addBreadcrumbsToHeader() {
+        const headerSubtitle = document.querySelector('.header-subtitle');
+        if (headerSubtitle && !document.getElementById('enhanced-breadcrumbs')) {
+            const breadcrumbHTML = `
+                <div id="enhanced-breadcrumbs" style="
+                    margin-top: 8px;
+                    font-size: 0.9rem;
+                    color: var(--text-secondary);
+                ">
+                    <a href="dashboard.html" style="color: var(--accent-secondary); text-decoration: none;">Dashboard</a>
+                    ${this.currentPage !== 'dashboard' ? `
+                        <span style="margin: 0 8px;">></span>
+                        <span style="color: var(--text-primary); font-weight: 600;">${this.getPageTitle()}</span>
+                    ` : ''}
                 </div>
-            </div>
-        `;
-        
-        // Header in DOM einfügen oder ersetzen
-        let headerContainer = document.querySelector('.header, .dashboard-header');
-        if (headerContainer) {
-            headerContainer.outerHTML = headerHTML;
-        } else {
-            // Header am Anfang des Body einfügen
-            document.body.insertAdjacentHTML('afterbegin', headerHTML);
+            `;
+            headerSubtitle.insertAdjacentHTML('afterend', breadcrumbHTML);
         }
     }
     
-    // Sidebar rendern
-    renderSidebar() {
-        const sidebarHTML = `
-            <nav class="dashboard-sidebar">
-                <div class="sidebar-section">
-                    <h3 class="sidebar-title">🛠️ Hauptbereich</h3>
-                    <ul class="sidebar-nav">
-                        <li class="sidebar-item">
-                            <a href="dashboard.html" class="sidebar-link" data-page="dashboard">
-                                <span class="sidebar-icon">🏠</span>
-                                <span class="sidebar-text">Dashboard</span>
+    // User-Dropdown erweitern
+    enhanceUserDropdown() {
+        const userInfo = document.getElementById('user-info');
+        if (userInfo && !document.getElementById('enhanced-user-dropdown')) {
+            const dropdownHTML = `
+                <div id="enhanced-user-dropdown" style="margin-top: 10px;">
+                    <details style="
+                        background: var(--card-bg);
+                        border: 2px solid var(--card-border);
+                        border-radius: 8px;
+                        padding: 8px;
+                        cursor: pointer;
+                    ">
+                        <summary style="
+                            list-style: none;
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            font-weight: 600;
+                            color: var(--text-primary);
+                        ">
+                            Quick Actions
+                            <span style="font-size: 0.8rem;">▼</span>
+                        </summary>
+                        <div style="margin-top: 10px; border-top: 1px solid var(--card-border); padding-top: 10px;">
+                            <a href="dashboard-calculator.html" style="
+                                display: block;
+                                padding: 8px;
+                                color: var(--text-primary);
+                                text-decoration: none;
+                                border-radius: 6px;
+                                margin-bottom: 4px;
+                                transition: all 0.3s ease;
+                                font-size: 0.9rem;
+                            " onmouseover="this.style.background='var(--card-bg)'" onmouseout="this.style.background='transparent'">
+                                ⚔️ AS-Counter (Dashboard)
                             </a>
-                        </li>
-                    </ul>
+                            <a href="#" onclick="DashboardNav.showComingSoon('Profil-Manager')" style="
+                                display: block;
+                                padding: 8px;
+                                color: var(--text-primary);
+                                text-decoration: none;
+                                border-radius: 6px;
+                                margin-bottom: 4px;
+                                transition: all 0.3s ease;
+                                font-size: 0.9rem;
+                            " onmouseover="this.style.background='var(--card-bg)'" onmouseout="this.style.background='transparent'">
+                                👤 Profil bearbeiten
+                            </a>
+                            <a href="#" onclick="DashboardNav.showComingSoon('Einstellungen')" style="
+                                display: block;
+                                padding: 8px;
+                                color: var(--text-primary);
+                                text-decoration: none;
+                                border-radius: 6px;
+                                transition: all 0.3s ease;
+                                font-size: 0.9rem;
+                            " onmouseover="this.style.background='var(--card-bg)'" onmouseout="this.style.background='transparent'">
+                                ⚙️ Einstellungen
+                            </a>
+                        </div>
+                    </details>
                 </div>
-                
-                <div class="sidebar-section">
-                    <h3 class="sidebar-title">⚔️ Battle Tools</h3>
-                    <ul class="sidebar-nav">
-                        <li class="sidebar-item">
-                            <a href="dashboard-calculator.html" class="sidebar-link" data-page="dashboard-calculator">
-                                <span class="sidebar-icon">⚔️</span>
-                                <span class="sidebar-text">AS-Counter</span>
-                                <span class="sidebar-badge new">💾</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a href="#" class="sidebar-link coming-soon" onclick="DashboardNav.showComingSoon('Raid-Counter')">
-                                <span class="sidebar-icon">🏴‍☠️</span>
-                                <span class="sidebar-text">Raid-Counter</span>
-                                <span class="sidebar-badge soon">Soon</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a href="#" class="sidebar-link coming-soon" onclick="DashboardNav.showComingSoon('Battle Simulator')">
-                                <span class="sidebar-icon">🎯</span>
-                                <span class="sidebar-text">Battle Sim</span>
-                                <span class="sidebar-badge premium">Pro</span>
-                            </a>
-                        </li>
-                    </ul>
+            `;
+            userInfo.insertAdjacentHTML('beforeend', dropdownHTML);
+        }
+    }
+    
+    // Notification-System hinzufügen
+    addNotificationSystem() {
+        const headerRight = document.querySelector('.header-right');
+        if (headerRight && !document.getElementById('notification-center')) {
+            const notificationHTML = `
+                <div id="notification-center" style="position: relative; margin-left: 10px;">
+                    <button id="notification-btn" style="
+                        background: var(--card-bg);
+                        border: 2px solid var(--card-border);
+                        border-radius: 50%;
+                        width: 40px;
+                        height: 40px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        font-size: 1.1rem;
+                        position: relative;
+                    " onmouseover="this.style.borderColor='var(--accent-secondary)'" onmouseout="this.style.borderColor='var(--card-border)'">
+                        🔔
+                        <span id="notification-count" style="
+                            position: absolute;
+                            top: -5px;
+                            right: -5px;
+                            background: var(--error-color);
+                            color: white;
+                            border-radius: 50%;
+                            width: 18px;
+                            height: 18px;
+                            display: none;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 0.7rem;
+                            font-weight: 600;
+                        "></span>
+                    </button>
+                    <div id="notification-dropdown" style="
+                        position: absolute;
+                        top: 100%;
+                        right: 0;
+                        background: var(--bg-panel);
+                        border: 2px solid var(--border-primary);
+                        border-radius: 10px;
+                        padding: 16px;
+                        min-width: 280px;
+                        max-height: 300px;
+                        overflow-y: auto;
+                        box-shadow: 0 10px 30px var(--border-shadow);
+                        backdrop-filter: blur(10px);
+                        z-index: 1000;
+                        margin-top: 5px;
+                        display: none;
+                    ">
+                        <div style="text-align: center; color: var(--text-secondary); padding: 20px; font-style: italic;">
+                            Keine neuen Benachrichtigungen
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="sidebar-section">
-                    <h3 class="sidebar-title">📊 Analytics</h3>
-                    <ul class="sidebar-nav">
-                        <li class="sidebar-item">
-                            <a href="#" class="sidebar-link coming-soon" onclick="DashboardNav.showComingSoon('Detaillierte Statistiken')">
-                                <span class="sidebar-icon">📈</span>
-                                <span class="sidebar-text">Statistiken</span>
-                                <span class="sidebar-badge premium">Pro</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a href="#" class="sidebar-link coming-soon" onclick="DashboardNav.showComingSoon('Kampf-Historie')">
-                                <span class="sidebar-icon">📝</span>
-                                <span class="sidebar-text">Kampf-Historie</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                
-                <div class="sidebar-section">
-                    <h3 class="sidebar-title">🛡️ Allianz</h3>
-                    <ul class="sidebar-nav" id="alliance-nav">
-                        <!-- Allianz-Navigation wird dynamisch eingefügt -->
-                    </ul>
-                </div>
-                
-                <div class="sidebar-section">
-                    <h3 class="sidebar-title">🔧 Einstellungen</h3>
-                    <ul class="sidebar-nav">
-                        <li class="sidebar-item">
-                            <a href="#" class="sidebar-link" onclick="DashboardNav.openProfile()">
-                                <span class="sidebar-icon">👤</span>
-                                <span class="sidebar-text">Mein Profil</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a href="#" class="sidebar-link" onclick="DashboardNav.openSettings()">
-                                <span class="sidebar-icon">⚙️</span>
-                                <span class="sidebar-text">Einstellungen</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-        `;
-        
-        // Sidebar in DOM einfügen oder ersetzen
-        let sidebarContainer = document.querySelector('.nav, .dashboard-sidebar');
-        if (sidebarContainer) {
-            sidebarContainer.outerHTML = sidebarHTML;
-        } else {
-            // Sidebar nach Header einfügen
-            const header = document.querySelector('.dashboard-header');
-            if (header) {
-                header.insertAdjacentHTML('afterend', sidebarHTML);
+            `;
+            
+            // Vor dem Theme-Toggle einfügen
+            const themeToggle = headerRight.querySelector('.theme-toggle');
+            if (themeToggle) {
+                themeToggle.insertAdjacentHTML('beforebegin', notificationHTML);
+            } else {
+                headerRight.insertAdjacentHTML('beforeend', notificationHTML);
             }
-        }
-    }
-    
-    // Footer rendern
-    renderFooter() {
-        const footerHTML = `
-            <footer class="dashboard-footer">
-                <div class="footer-content">
-                    <div class="footer-left">
-                        <p>Spacenations Dashboard © 2025</p>
-                        <p class="footer-subtitle">Dein persönlicher Bereich</p>
-                    </div>
-                    <div class="footer-right">
-                        <div class="footer-stats" id="footer-stats">
-                            <!-- Quick-Stats werden hier eingefügt -->
-                        </div>
-                    </div>
-                </div>
-            </footer>
-        `;
-        
-        // Footer in DOM einfügen oder ersetzen
-        let footerContainer = document.querySelector('.footer, .dashboard-footer');
-        if (footerContainer) {
-            footerContainer.outerHTML = footerHTML;
-        } else {
-            // Footer am Ende des Body einfügen
-            document.body.insertAdjacentHTML('beforeend', footerHTML);
-        }
-    }
-    
-    // Event-Listener einrichten
-    setupEventListeners() {
-        // Sidebar-Links
-        document.querySelectorAll('.sidebar-link').forEach(link => {
-            link.addEventListener('click', (e) => {
-                if (!link.classList.contains('coming-soon')) {
-                    this.setActiveLink(link);
-                }
+            
+            // Event-Listener für Notification-Button
+            document.getElementById('notification-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggleNotifications();
             });
-        });
-        
-        // Außerhalb von Dropdowns klicken
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.user-dropdown')) {
-                this.closeUserDropdown();
-            }
-            if (!e.target.closest('.notifications-container')) {
+            
+            // Außerhalb klicken um Dropdown zu schließen
+            document.addEventListener('click', () => {
                 this.closeNotifications();
+            });
+        }
+    }
+    
+    // Navigation-Links aktualisieren
+    updateNavigationLinks() {
+        // AS-Counter Links für eingeloggte User aktualisieren
+        const asCounterLinks = document.querySelectorAll('a[href="calculator.html"]');
+        asCounterLinks.forEach(link => {
+            if (this.currentUser) {
+                link.href = 'dashboard-calculator.html';
+                
+                // Icon aktualisieren um zu zeigen dass Daten gespeichert werden
+                const icon = link.querySelector('.nav-icon, .action-icon');
+                if (icon && !icon.textContent.includes('💾')) {
+                    icon.textContent = '⚔️💾';
+                }
+                
+                // Titel aktualisieren
+                link.title = 'AS-Counter (Dashboard) - Alle Kämpfe werden automatisch gespeichert';
+                
+                // Text aktualisieren falls vorhanden
+                const textElement = link.querySelector('.nav-text, .action-title');
+                if (textElement && !textElement.textContent.includes('Dashboard')) {
+                    textElement.textContent = 'AS-Counter (Dashboard)';
+                }
             }
         });
         
-        // Keyboard-Navigation
+        // Aktuelle Seite markieren
+        this.markActivePage();
+    }
+    
+    // Aktuelle Seite in Navigation markieren
+    markActivePage() {
+        // Alle Nav-Links zurücksetzen
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active-page');
+        });
+        
+        // Aktuellen Link markieren
+        const currentLinks = document.querySelectorAll(`a[href="${this.currentPage}.html"], a[href*="${this.currentPage}"]`);
+        currentLinks.forEach(link => {
+            link.classList.add('active-page');
+            link.style.background = 'linear-gradient(135deg, var(--accent-secondary), #3a5998)';
+            link.style.color = 'white';
+            link.style.fontWeight = '600';
+        });
+    }
+    
+    // Keyboard-Navigation einrichten
+    setupKeyboardNavigation() {
         document.addEventListener('keydown', (e) => {
-            // Strg+1-9 für Quick-Navigation
-            if (e.ctrlKey && e.key >= '1' && e.key <= '9') {
+            // Strg+1-5 für Quick-Navigation
+            if (e.ctrlKey && e.key >= '1' && e.key <= '5') {
                 e.preventDefault();
                 this.navigateByShortcut(parseInt(e.key));
+            }
+            
+            // Alt+N für Notifications
+            if (e.altKey && e.key === 'n') {
+                e.preventDefault();
+                this.toggleNotifications();
             }
             
             // Esc für Dropdowns schließen
@@ -326,47 +292,22 @@ class DashboardNavigation {
         });
     }
     
-    // Aktuelle Seite markieren
-    setActivePage() {
-        const currentLink = document.querySelector(`[data-page="${this.currentPage}"]`);
-        if (currentLink) {
-            this.setActiveLink(currentLink);
+    // Navigation per Shortcut
+    navigateByShortcut(number) {
+        const shortcuts = {
+            1: 'dashboard.html',
+            2: 'dashboard-calculator.html',
+            3: '#', // Raid-Counter (Coming Soon)
+            4: '#', // Profil (Coming Soon)
+            5: '#'  // Einstellungen (Coming Soon)
+        };
+        
+        const url = shortcuts[number];
+        if (url && url !== '#') {
+            window.location.href = url;
+        } else {
+            this.showComingSoon('Feature');
         }
-    }
-    
-    // Aktiven Link setzen
-    setActiveLink(activeLink) {
-        // Alle Links deaktivieren
-        document.querySelectorAll('.sidebar-link').forEach(link => {
-            link.classList.remove('active');
-        });
-        
-        // Aktiven Link markieren
-        activeLink.classList.add('active');
-    }
-    
-    // Breadcrumbs aktualisieren
-    updateBreadcrumbs() {
-        const breadcrumbsContainer = document.getElementById('breadcrumbs');
-        if (!breadcrumbsContainer) return;
-        
-        const config = this.navigationConfig[this.currentPage];
-        if (!config) return;
-        
-        let breadcrumbsHTML = '<a href="dashboard.html" class="breadcrumb-link">Dashboard</a>';
-        
-        if (config.parent && config.parent !== 'dashboard') {
-            const parentConfig = this.navigationConfig[config.parent];
-            if (parentConfig) {
-                breadcrumbsHTML += ` <span class="breadcrumb-separator">></span> <span class="breadcrumb-item">${parentConfig.breadcrumb}</span>`;
-            }
-        }
-        
-        if (this.currentPage !== 'dashboard') {
-            breadcrumbsHTML += ` <span class="breadcrumb-separator">></span> <span class="breadcrumb-current">${config.breadcrumb}</span>`;
-        }
-        
-        breadcrumbsContainer.innerHTML = breadcrumbsHTML;
     }
     
     // User-Info aktualisieren
@@ -374,172 +315,161 @@ class DashboardNavigation {
         if (!this.userData) return;
         
         const displayName = this.userData.username || this.userData.email || 'User';
-        const firstLetter = displayName.charAt(0).toUpperCase();
         
-        // Header User-Info
-        const userNameHeader = document.getElementById('user-name-header');
-        const userAvatarSmall = document.getElementById('user-avatar-small');
+        // Header-Username aktualisieren falls vorhanden
+        const headerUsername = document.getElementById('header-username');
+        if (headerUsername) {
+            headerUsername.textContent = displayName;
+        }
         
-        if (userNameHeader) userNameHeader.textContent = displayName;
-        if (userAvatarSmall) userAvatarSmall.textContent = firstLetter;
+        // Allianz-Badge hinzufügen falls nicht vorhanden
+        this.addAllianceBadge();
         
-        // Allianz-Navigation aktualisieren
-        this.updateAllianceNavigation();
-        
-        // Footer-Stats aktualisieren
+        // Stats im Footer aktualisieren
         this.updateFooterStats();
     }
     
-    // Allianz-Navigation aktualisieren
-    updateAllianceNavigation() {
-        const allianceNav = document.getElementById('alliance-nav');
-        if (!allianceNav) return;
+    // Allianz-Badge hinzufügen
+    addAllianceBadge() {
+        if (!this.userData?.alliance) return;
         
-        if (this.userData?.alliance) {
-            allianceNav.innerHTML = `
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link" onclick="DashboardNav.openAlliance()">
-                        <span class="sidebar-icon">🛡️</span>
-                        <span class="sidebar-text">${this.userData.alliance}</span>
-                        ${this.userData.isAllianceAdmin ? '<span class="sidebar-badge admin">Admin</span>' : ''}
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link coming-soon" onclick="DashboardNav.showComingSoon('Allianz-Chat')">
-                        <span class="sidebar-icon">💬</span>
-                        <span class="sidebar-text">Allianz-Chat</span>
-                        <span class="sidebar-badge soon">Soon</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link coming-soon" onclick="DashboardNav.showComingSoon('Allianz-Statistiken')">
-                        <span class="sidebar-icon">📊</span>
-                        <span class="sidebar-text">Allianz-Stats</span>
-                        <span class="sidebar-badge premium">Pro</span>
-                    </a>
-                </li>
-            `;
-        } else {
-            allianceNav.innerHTML = `
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link" onclick="DashboardNav.joinAlliance()">
-                        <span class="sidebar-icon">➕</span>
-                        <span class="sidebar-text">Allianz beitreten</span>
-                    </a>
-                </li>
-            `;
+        const userBadges = document.getElementById('user-badges');
+        if (userBadges) {
+            const allianceBadge = `<span class="badge" style="
+                background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+                color: white;
+                padding: 4px 10px;
+                border-radius: 12px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                margin-left: 8px;
+            ">${this.userData.alliance}</span>`;
+            
+            if (!userBadges.innerHTML.includes(this.userData.alliance)) {
+                userBadges.insertAdjacentHTML('beforeend', allianceBadge);
+            }
         }
     }
     
     // Footer-Stats aktualisieren
     updateFooterStats() {
-        const footerStats = document.getElementById('footer-stats');
-        if (!footerStats) return;
-        
-        // Stats aus Calculator-API holen falls verfügbar
-        if (window.CalculatorAPI && window.CalculatorAPI.isLoggedIn()) {
-            const stats = window.CalculatorAPI.getStats();
-            footerStats.innerHTML = `
-                <span class="footer-stat">⚔️ ${stats.totalBattles || 0}</span>
-                <span class="footer-stat">🏆 ${stats.winRate || 0}%</span>
-                <span class="footer-stat">💥 ${(stats.totalDamageDealt || 0).toLocaleString()}</span>
+        const footer = document.querySelector('.footer');
+        if (footer && !document.getElementById('enhanced-footer-stats')) {
+            let statsText = '🎮 Online';
+            
+            // Calculator-Stats falls verfügbar
+            if (window.CalculatorAPI && window.CalculatorAPI.isLoggedIn()) {
+                const stats = window.CalculatorAPI.getStats();
+                statsText = `⚔️ ${stats.totalBattles || 0} Kämpfe | 🏆 ${stats.winRate || 0}% Siegesrate`;
+            }
+            
+            const enhancedFooter = `
+                <div id="enhanced-footer-stats" style="
+                    margin-top: 10px;
+                    text-align: center;
+                    font-size: 0.8rem;
+                    color: var(--text-secondary);
+                    padding: 8px;
+                    background: var(--card-bg);
+                    border-radius: 8px;
+                    border: 1px solid var(--card-border);
+                ">
+                    ${statsText}
+                </div>
             `;
-        } else {
-            footerStats.innerHTML = `
-                <span class="footer-stat">🎮 Online</span>
-                <span class="footer-stat">📊 Dashboard</span>
-            `;
+            
+            footer.insertAdjacentHTML('beforeend', enhancedFooter);
         }
     }
     
-    // Hilfs-Methoden
-    getPageTitle() {
-        const config = this.navigationConfig[this.currentPage];
-        return config ? config.title : 'Dashboard';
-    }
-    
-    getPageIcon() {
-        const config = this.navigationConfig[this.currentPage];
-        return config ? config.icon : '🏠';
-    }
-    
-    // Dropdown-Management
-    toggleUserDropdown() {
-        const dropdown = document.getElementById('user-dropdown-menu');
-        if (dropdown) {
-            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-        }
-    }
-    
-    closeUserDropdown() {
-        const dropdown = document.getElementById('user-dropdown-menu');
-        if (dropdown) {
-            dropdown.style.display = 'none';
-        }
-    }
-    
+    // Notifications-Management
     toggleNotifications() {
-        const dropdown = document.getElementById('notifications-dropdown');
+        const dropdown = document.getElementById('notification-dropdown');
         if (dropdown) {
-            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-            this.loadNotifications();
+            const isVisible = dropdown.style.display !== 'none';
+            dropdown.style.display = isVisible ? 'none' : 'block';
+            
+            if (!isVisible) {
+                this.loadNotifications();
+            }
         }
     }
     
     closeNotifications() {
-        const dropdown = document.getElementById('notifications-dropdown');
+        const dropdown = document.getElementById('notification-dropdown');
         if (dropdown) {
             dropdown.style.display = 'none';
         }
     }
     
     closeAllDropdowns() {
-        this.closeUserDropdown();
         this.closeNotifications();
     }
     
-    // Navigation-Funktionen
-    navigateByShortcut(number) {
-        const links = document.querySelectorAll('.sidebar-link:not(.coming-soon)');
-        if (links[number - 1]) {
-            links[number - 1].click();
+    loadNotifications() {
+        const dropdown = document.getElementById('notification-dropdown');
+        if (!dropdown) return;
+        
+        if (this.notifications.length === 0) {
+            dropdown.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px; font-style: italic;">Keine neuen Benachrichtigungen</div>';
+            return;
         }
+        
+        let notificationsHTML = '';
+        this.notifications.slice(0, 5).forEach(notification => {
+            const timeAgo = this.getTimeAgo(notification.timestamp);
+            const bgColor = notification.type === 'success' ? 'rgba(34, 197, 94, 0.1)' : 
+                           notification.type === 'error' ? 'rgba(239, 68, 68, 0.1)' : 
+                           'rgba(74, 144, 226, 0.1)';
+            
+            notificationsHTML += `
+                <div style="
+                    padding: 12px;
+                    border-radius: 8px;
+                    margin-bottom: 8px;
+                    background: ${bgColor};
+                    border-left: 4px solid var(--accent-secondary);
+                ">
+                    <div style="color: var(--text-primary); font-size: 0.9rem; margin-bottom: 4px;">
+                        ${notification.message}
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: 0.8rem;">
+                        ${timeAgo}
+                    </div>
+                </div>
+            `;
+        });
+        
+        dropdown.innerHTML = notificationsHTML;
     }
     
-    // Action-Funktionen
-    async logout() {
-        if (confirm('Möchten Sie sich wirklich abmelden?')) {
-            const result = await window.AuthAPI.logout();
-            if (result.success) {
-                sessionStorage.setItem('logoutSuccess', 'true');
-                window.location.href = 'index.html';
-            } else {
-                this.showNotification('Fehler beim Abmelden', 'error');
-            }
-        }
+    // Hilfsfunktionen
+    getPageTitle() {
+        const titles = {
+            'dashboard': 'Dashboard',
+            'dashboard-calculator': 'AS-Counter',
+            'dashboard-raid-counter': 'Raid-Counter',
+            'dashboard-profile': 'Profil'
+        };
+        return titles[this.currentPage] || 'Dashboard';
     }
     
-    openProfile() {
-        this.showComingSoon('Profil-Verwaltung');
+    getTimeAgo(date) {
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        
+        if (diffMins < 1) return 'Gerade eben';
+        if (diffMins < 60) return `vor ${diffMins} Min`;
+        
+        const diffHours = Math.floor(diffMins / 60);
+        if (diffHours < 24) return `vor ${diffHours} Std`;
+        
+        const diffDays = Math.floor(diffHours / 24);
+        return `vor ${diffDays} Tag${diffDays === 1 ? '' : 'en'}`;
     }
     
-    openSettings() {
-        this.showComingSoon('Einstellungen');
-    }
-    
-    openAlliance() {
-        this.showComingSoon('Allianz-Verwaltung');
-    }
-    
-    joinAlliance() {
-        this.showComingSoon('Allianz beitreten');
-    }
-    
-    showComingSoon(featureName) {
-        alert(`🚀 ${featureName}\n\nDieses Feature ist noch in Entwicklung!\n\n⭐ Wird in einer zukünftigen Version verfügbar sein.`);
-    }
-    
-    // Notifications-System
+    // Public API-Funktionen
     showNotification(message, type = 'info', duration = 5000) {
         const notification = {
             id: Date.now(),
@@ -570,88 +500,31 @@ class DashboardNavigation {
             const count = this.notifications.length;
             if (count > 0) {
                 badge.textContent = count;
-                badge.style.display = 'block';
+                badge.style.display = 'flex';
             } else {
                 badge.style.display = 'none';
             }
         }
     }
     
-    loadNotifications() {
-        const dropdown = document.getElementById('notifications-dropdown');
-        if (!dropdown) return;
-        
-        if (this.notifications.length === 0) {
-            dropdown.innerHTML = '<div class="notification-empty">Keine neuen Benachrichtigungen</div>';
-            return;
-        }
-        
-        let notificationsHTML = '';
-        this.notifications.slice(0, 5).forEach(notification => {
-            const timeAgo = this.getTimeAgo(notification.timestamp);
-            notificationsHTML += `
-                <div class="notification-item ${notification.type}">
-                    <div class="notification-content">${notification.message}</div>
-                    <div class="notification-time">${timeAgo}</div>
-                </div>
-            `;
-        });
-        
-        dropdown.innerHTML = notificationsHTML;
-    }
-    
-    getTimeAgo(date) {
-        const now = new Date();
-        const diffMs = now - date;
-        const diffMins = Math.floor(diffMs / 60000);
-        
-        if (diffMins < 1) return 'Gerade eben';
-        if (diffMins < 60) return `vor ${diffMins} Min`;
-        
-        const diffHours = Math.floor(diffMins / 60);
-        if (diffHours < 24) return `vor ${diffHours} Std`;
-        
-        const diffDays = Math.floor(diffHours / 24);
-        return `vor ${diffDays} Tag${diffDays === 1 ? '' : 'en'}`;
-    }
-    
-    // Public API
-    setActiveItem(page) {
-        const link = document.querySelector(`[data-page="${page}"]`);
-        if (link) {
-            this.setActiveLink(link);
-        }
-    }
-    
-    addBreadcrumb(text, url = null) {
-        this.breadcrumbs.push({ text, url });
-        this.updateBreadcrumbs();
-    }
-    
     updateUserStats(stats) {
-        // Footer-Stats mit neuen Werten aktualisieren
         this.updateFooterStats();
+    }
+    
+    showComingSoon(featureName) {
+        alert(`🚀 ${featureName}\n\nDieses Feature ist noch in Entwicklung!\n\n⭐ Wird in einer zukünftigen Version verfügbar sein.`);
     }
 }
 
 // Globale Instanz erstellen
-window.dashboardNavigation = new DashboardNavigation();
+window.compatibleDashboardNavigation = new CompatibleDashboardNavigation();
 
-// Globale API
+// Globale API (kompatibel mit bestehenden Aufrufen)
 window.DashboardNav = {
-    setActiveItem: (page) => window.dashboardNavigation.setActiveItem(page),
-    addBreadcrumb: (text, url) => window.dashboardNavigation.addBreadcrumb(text, url),
-    showNotification: (message, type, duration) => window.dashboardNavigation.showNotification(message, type, duration),
-    updateUserStats: (stats) => window.dashboardNavigation.updateUserStats(stats),
-    toggleUserDropdown: () => window.dashboardNavigation.toggleUserDropdown(),
-    toggleNotifications: () => window.dashboardNavigation.toggleNotifications(),
-    logout: () => window.dashboardNavigation.logout(),
-    openProfile: () => window.dashboardNavigation.openProfile(),
-    openSettings: () => window.dashboardNavigation.openSettings(),
-    openAlliance: () => window.dashboardNavigation.openAlliance(),
-    joinAlliance: () => window.dashboardNavigation.joinAlliance(),
-    showComingSoon: (feature) => window.dashboardNavigation.showComingSoon(feature)
+    showNotification: (message, type, duration) => window.compatibleDashboardNavigation.showNotification(message, type, duration),
+    updateUserStats: (stats) => window.compatibleDashboardNavigation.updateUserStats(stats),
+    showComingSoon: (feature) => window.compatibleDashboardNavigation.showComingSoon(feature)
 };
 
-console.log('🧭 Dashboard-Navigation geladen');
-console.log('💡 Shortcuts: Strg+1-9 (Quick-Navigation), Esc (Dropdowns schließen)');
+console.log('🧭 Kompatible Dashboard-Navigation geladen');
+console.log('💡 Shortcuts: Strg+1-5 (Navigation), Alt+N (Notifications), Esc (Close)');
