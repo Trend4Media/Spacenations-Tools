@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spacenations Tools - Version auswählen</title>
+    <title>Spacenations Tools - Branch Auswahl</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -101,63 +101,32 @@
         
         .branch-desc {
             font-size: 0.9rem;
-            opacity: 0.9;
-            font-weight: 400;
+            opacity: 0.8;
         }
         
         .description {
-            margin-top: 30px;
-            padding: 20px;
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            font-size: 0.9rem;
-            color: #b0b0b0;
-            line-height: 1.5;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
+            line-height: 1.6;
         }
         
         .description strong {
-            color: #e0e0e0;
+            color: #ff8c42;
         }
         
-        .info-section {
-            margin-top: 25px;
-            padding: 15px;
-            background: rgba(58, 89, 152, 0.1);
-            border-radius: 8px;
-            border: 1px solid rgba(58, 89, 152, 0.3);
-        }
-        
-        .info-title {
-            color: #4a90e2;
-            font-weight: 600;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .feature-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .feature-item {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 10px 15px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .footer-info {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            opacity: 0.7;
         }
         
         @media (max-width: 768px) {
             .container {
-                padding: 25px;
                 margin: 20px;
+                padding: 30px 20px;
             }
             
             h1 {
@@ -172,123 +141,44 @@
             .branch-btn {
                 min-width: 200px;
             }
-            
-            .feature-list {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .loading {
-            display: none;
-            color: #4a90e2;
-            margin-top: 20px;
-        }
-        
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #4a90e2;
-            border-top: 2px solid transparent;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 8px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🚀 Spacenations Tools</h1>
-        <div class="subtitle">Wählen Sie eine Version zum Starten:</div>
+        <div class="subtitle">Wählen Sie eine Version:</div>
         
         <div class="branch-links">
-            <a href="main.html" class="branch-btn main-branch" onclick="showLoading('main')">
+            <a href="main/" class="branch-btn main-branch">
                 <div class="branch-icon">✅</div>
                 <div class="branch-title">Main Branch</div>
                 <div class="branch-desc">Stabile Version</div>
             </a>
-            
-            <a href="#" class="branch-btn test-branch" onclick="goToTestarea()" id="testarea-btn">
+            <a href="testarea/" class="branch-btn test-branch">
                 <div class="branch-icon">🧪</div>
                 <div class="branch-title">Testarea Branch</div>
                 <div class="branch-desc">Neue Features</div>
             </a>
         </div>
         
-        <div class="info-section">
-            <div class="info-title">
-                <span>🛠️</span>
-                <span>Verfügbare Tools</span>
-            </div>
-            <div class="feature-list">
-                <div class="feature-item">
-                    <span>⚔️</span>
-                    <span>AS-Counter (Kampfberichte)</span>
-                </div>
-                <div class="feature-item">
-                    <span>🏴‍☠️</span>
-                    <span>Raid-Counter (Plünderungen)</span>
-                </div>
-                <div class="feature-item">
-                    <span>💥</span>
-                    <span>Sabo-Counter (Sabotagen)</span>
-                </div>
-                <div class="feature-item">
-                    <span>📊</span>
-                    <span>Dashboard (mit Statistiken)</span>
-                </div>
-            </div>
-        </div>
-        
         <div class="description">
-            <strong>Main:</strong> Die stabile, getestete Version für den täglichen Gebrauch<br>
-            <strong>Testarea:</strong> Neue Features, Verbesserungen und experimentelle Funktionen
+            <strong>Main Branch:</strong> Die stabile, produktive Version mit allen bewährten Tools und Features.<br><br>
+            <strong>Testarea Branch:</strong> Experimentelle Version mit neuen Features, Spionage-Tools und Verbesserungen im Test.
         </div>
         
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <span>Version wird geladen...</span>
+        <div class="footer-info">
+            💡 <strong>Tipp:</strong> Tastenkürzel 1/M für Main, 2/T für Testarea
         </div>
     </div>
-
+    
     <script>
-        function showLoading(branch) {
-            document.getElementById('loading').style.display = 'block';
-            console.log(`Lade ${branch} Branch...`);
-        }
-        
-        function goToTestarea() {
-            // Prüfe ob wir auf GitHub Pages sind
-            if (window.location.hostname.includes('github.io')) {
-                // GitHub Pages: Verwende den testarea Ordner
-                window.location.href = window.location.origin + window.location.pathname.replace(/\/$/, '') + '/testarea/main.html';
-            } else {
-                // Lokal: Gehe direkt zur main.html (da beide Versionen gleich sind)
-                showLoading('testarea');
-                setTimeout(() => {
-                    window.location.href = 'main.html?branch=testarea';
-                }, 500);
-            }
-        }
-        
-        // Branch-Info in URL-Parameter für Tracking
-        const urlParams = new URLSearchParams(window.location.search);
-        const branch = urlParams.get('branch');
-        if (branch) {
-            console.log(`Aktuelle Version: ${branch}`);
-        }
-        
-        // Keyboard-Shortcuts
+        // Keyboard Shortcuts
         document.addEventListener('keydown', function(e) {
-            if (e.key === '1' || e.key === 'm') {
-                document.querySelector('.main-branch').click();
-            } else if (e.key === '2' || e.key === 't') {
-                document.querySelector('.test-branch').click();
+            if (e.key === '1' || (e.key.toLowerCase() === 'm' && !e.ctrlKey)) {
+                window.location.href = 'main/';
+            } else if (e.key === '2' || (e.key.toLowerCase() === 't' && !e.ctrlKey)) {
+                window.location.href = 'testarea/';
             }
         });
         
