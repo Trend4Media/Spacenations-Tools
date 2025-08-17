@@ -5,6 +5,7 @@ on:
     branches: [ main, testarea ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch: # Manuell auslösbar
 
 permissions:
   contents: read
