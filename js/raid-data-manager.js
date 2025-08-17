@@ -43,7 +43,7 @@ class RaidDataManager {
             this.db = window.FirebaseConfig.getDB();
             
             // Auth State überwachen
-            window.AuthAPI.onAuthStateChange((user, userData) => {
+            window.AuthAPI.onAuthStateChange((user, _userData) => {
                 this.currentUser = user;
                 if (user) {
                     this.loadUserRaidData();
@@ -485,7 +485,7 @@ class RaidDataManager {
         if (values.length < 2) return { direction: 'stable', percentage: 0 };
         
         const n = values.length;
-        const x = Array.from({length: n}, (_, i) => i);
+        const x = Array.from({ length: n }, (_, i) => i);
         const y = values;
         
         const sumX = x.reduce((a, b) => a + b, 0);
@@ -509,7 +509,6 @@ class RaidDataManager {
     getRaidRecommendations() {
         const efficiency = this.getRaidEfficiency();
         const trends = this.getRaidTrends(14); // 2 Wochen
-        const recentStats = this.getStatisticsForPeriod(7); // 1 Woche
         
         const recommendations = [];
         

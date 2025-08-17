@@ -33,7 +33,7 @@ class CalculatorDataManager {
             this.db = window.FirebaseConfig.getDB();
             
             // Auth State überwachen
-            window.AuthAPI.onAuthStateChange((user, userData) => {
+            window.AuthAPI.onAuthStateChange((user, _userData) => {
                 this.currentUser = user;
                 if (user) {
                     this.loadUserBattleData();

@@ -419,8 +419,8 @@ class CompatibleDashboardNavigation {
         this.notifications.slice(0, 5).forEach(notification => {
             const timeAgo = this.getTimeAgo(notification.timestamp);
             const bgColor = notification.type === 'success' ? 'rgba(34, 197, 94, 0.1)' : 
-                           notification.type === 'error' ? 'rgba(239, 68, 68, 0.1)' : 
-                           'rgba(74, 144, 226, 0.1)';
+                notification.type === 'error' ? 'rgba(239, 68, 68, 0.1)' : 
+                    'rgba(74, 144, 226, 0.1)';
             
             notificationsHTML += `
                 <div style="
@@ -507,7 +507,7 @@ class CompatibleDashboardNavigation {
         }
     }
     
-    updateUserStats(stats) {
+    updateUserStats(_stats) {
         this.updateFooterStats();
     }
     

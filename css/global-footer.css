@@ -1,0 +1,314 @@
+/**
+ * Global Footer CSS - Für alle Spacenations-Tools Seiten
+ * Rechtlich konforme Links + Admin-Zugang
+ */
+
+/* Global Footer */
+.global-footer {
+    background: var(--bg-panel);
+    border-top: 2px solid var(--border-primary);
+    backdrop-filter: blur(10px);
+    padding: 30px 20px 20px 20px;
+    margin-top: 40px;
+    transition: all 0.3s ease;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 25px;
+}
+
+.footer-section {
+    color: var(--text-primary);
+}
+
+.footer-section h4 {
+    color: var(--accent-primary);
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 8px;
+}
+
+.footer-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+}
+
+.footer-links a:hover {
+    color: var(--accent-secondary);
+    transform: translateX(5px);
+}
+
+/* Legal Links (wichtig für Impressum etc.) */
+.legal-links a {
+    font-weight: 500;
+}
+
+.legal-links a[href*="impressum"]:hover {
+    color: var(--warning-color);
+}
+
+.legal-links a[href*="datenschutz"]:hover {
+    color: var(--success-color);
+}
+
+.legal-links a[href*="agb"]:hover {
+    color: var(--accent-primary);
+}
+
+/* Admin Links (spezieller Stil) */
+.admin-links a {
+    color: var(--admin-text, #f39c12);
+    font-weight: 600;
+    background: var(--admin-bg, rgba(243, 156, 18, 0.1));
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--admin-border, #f39c12);
+    transition: all 0.3s ease;
+}
+
+.admin-links a:hover {
+    background: var(--admin-border, #f39c12);
+    color: white;
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+}
+
+/* Footer Bottom */
+.footer-bottom {
+    border-top: 1px solid var(--card-border);
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.footer-bottom-left {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.footer-bottom-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.footer-stats {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.footer-stat {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Social Links */
+.social-links {
+    display: flex;
+    gap: 10px;
+}
+
+.social-link {
+    width: 36px;
+    height: 36px;
+    background: var(--card-bg);
+    border: 2px solid var(--card-border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.social-link:hover {
+    border-color: var(--accent-secondary);
+    color: var(--accent-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+}
+
+/* Quick Access Tools */
+.quick-tools {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.quick-tool {
+    background: var(--accent-secondary);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.quick-tool:hover {
+    background: var(--accent-primary);
+    transform: translateY(-1px);
+}
+
+/* Status Indicators */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--success-color);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-indicator.maintenance {
+    background: var(--warning-color);
+}
+
+.status-indicator.offline {
+    background: var(--error-color);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background: currentColor;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 25px;
+        text-align: center;
+    }
+    
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .footer-stats,
+    .quick-tools,
+    .social-links {
+        justify-content: center;
+    }
+    
+    .global-footer {
+        padding: 25px 15px 15px 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer-section h4 {
+        font-size: 1rem;
+    }
+    
+    .footer-links a {
+        font-size: 0.85rem;
+    }
+    
+    .footer-bottom-left {
+        font-size: 0.8rem;
+    }
+    
+    .social-link {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .global-footer {
+        background: none;
+        border: none;
+        box-shadow: none;
+    }
+    
+    .admin-links,
+    .social-links,
+    .quick-tools {
+        display: none;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .global-footer {
+        border-top: 3px solid var(--border-primary);
+    }
+    
+    .footer-links a {
+        border-bottom: 1px solid transparent;
+    }
+    
+    .footer-links a:hover {
+        border-bottom-color: currentColor;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .footer-links a,
+    .social-link,
+    .quick-tool,
+    .admin-links a {
+        transition: none;
+    }
+    
+    .footer-links a:hover {
+        transform: none;
+    }
+    
+    .status-dot {
+        animation: none;
+    }
+}

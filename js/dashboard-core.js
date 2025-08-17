@@ -530,7 +530,7 @@ class DashboardCore {
             const battleDate = battle.timestamp?.toDate ? battle.timestamp.toDate() : new Date(battle.timestamp);
             const resultEmoji = battle.result === 'win' ? '🏆' : battle.result === 'loss' ? '💀' : '🤝';
             const resultText = battle.result === 'win' ? 'Kampf gewonnen' : 
-                              battle.result === 'loss' ? 'Kampf verloren' : 'Kampf unentschieden';
+                battle.result === 'loss' ? 'Kampf verloren' : 'Kampf unentschieden';
             
             battleActivitiesHtml += this.createEnhancedActivityItem(
                 resultEmoji,
@@ -717,7 +717,8 @@ console.log('⌨️ Shortcuts: Strg+D (Reload), Strg+C (Calculator), Strg+R (Ref
  */
 
 // Enhanced Navigation zwischen AS-Counter Versionen
-setupEnhancedNavigation() {
+// eslint-disable-next-line no-unused-vars
+function setupEnhancedNavigation() {
     // Alle Calculator-Links finden und richtig verlinken
     const calculatorLinks = document.querySelectorAll('a[href="calculator.html"], a[href*="calculator"]');
     
@@ -760,7 +761,8 @@ setupEnhancedNavigation() {
 }
 
 // Version-Switcher für Calculator
-addVersionSwitcher() {
+// eslint-disable-next-line no-unused-vars
+function addVersionSwitcher() {
     const header = document.querySelector('.header');
     if (!header || document.getElementById('version-switcher')) return;
     
@@ -808,15 +810,16 @@ addVersionSwitcher() {
 }
 
 // Standard-Calculator Links verbessern
-enhanceStandardCalculatorLinks() {
+// eslint-disable-next-line no-unused-vars
+function enhanceStandardCalculatorLinks() {
     // In calculator.html einen Hinweis auf Dashboard-Version hinzufügen
     if (window.location.pathname.includes('calculator.html') && !window.location.pathname.includes('dashboard')) {
-        this.addDashboardVersionPromo();
+        addDashboardVersionPromo();
     }
 }
 
 // Dashboard-Version Promotion in Standard-Calculator
-addDashboardVersionPromo() {
+function addDashboardVersionPromo() {
     const container = document.querySelector('.container');
     if (!container || document.getElementById('dashboard-promo')) return;
     
