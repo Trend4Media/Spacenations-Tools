@@ -1,0 +1,161 @@
+name: Deploy Multiple Branches to GitHub Pages
+
+on:
+  push:
+    branches: [ main, testarea ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Create multi-branch structure
+        run: |
+          # Erstelle Verzeichnisstruktur für beide Branches
+          mkdir -p dist/main
+          mkdir -p dist/testarea
+          
+          # Main Branch Dateien kopieren
+          git checkout main
+          cp -r *.html css js dist/main/ 2>/dev/null || true
+          
+          # Testarea Branch Dateien kopieren
+          git checkout testarea
+          cp -r *.html css js dist/testarea/ 2>/dev/null || true
+          
+          # Index-Datei für Branch-Auswahl erstellen
+          cat > dist/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="de">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Spacenations Tools - Branch Auswahl</title>
+              <style>
+                  body {
+                      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                      background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+                      color: #e0e0e0;
+                      margin: 0;
+                      padding: 40px 20px;
+                      min-height: 100vh;
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                  }
+                  .container {
+                      background: rgba(16, 16, 16, 0.9);
+                      border: 2px solid #3a5998;
+                      border-radius: 15px;
+                      padding: 40px;
+                      text-align: center;
+                      box-shadow: 0 10px 30px rgba(58, 89, 152, 0.3);
+                      max-width: 600px;
+                  }
+                  h1 {
+                      color: #ff8c42;
+                      margin-bottom: 10px;
+                      font-size: 2.5rem;
+                  }
+                  .subtitle {
+                      color: #b0b0b0;
+                      margin-bottom: 40px;
+                      font-size: 1.1rem;
+                  }
+                  .branch-links {
+                      display: flex;
+                      gap: 20px;
+                      justify-content: center;
+                      flex-wrap: wrap;
+                  }
+                  .branch-btn {
+                      background: linear-gradient(135deg, #3a5998, #4a90e2);
+                      color: white;
+                      text-decoration: none;
+                      padding: 15px 30px;
+                      border-radius: 10px;
+                      font-weight: 600;
+                      font-size: 1.1rem;
+                      transition: all 0.3s ease;
+                      border: 2px solid transparent;
+                  }
+                  .branch-btn:hover {
+                      transform: translateY(-3px);
+                      box-shadow: 0 8px 25px rgba(74, 144, 226, 0.4);
+                      border-color: #ff8c42;
+                  }
+                  .main-branch {
+                      background: linear-gradient(135deg, #22c55e, #16a34a);
+                  }
+                  .test-branch {
+                      background: linear-gradient(135deg, #f59e0b, #d97706);
+                  }
+                  .description {
+                      margin-top: 30px;
+                      padding: 20px;
+                      background: rgba(0, 0, 0, 0.3);
+                      border-radius: 8px;
+                      font-size: 0.9rem;
+                      color: #b0b0b0;
+                  }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <h1>🚀 Spacenations Tools</h1>
+                  <div class="subtitle">Wählen Sie eine Version:</div>
+                  
+                  <div class="branch-links">
+                      <a href="main/" class="branch-btn main-branch">
+                          ✅ Main Branch<br>
+                          <small>Stabile Version</small>
+                      </a>
+                      <a href="testarea/" class="branch-btn test-branch">
+                          🧪 Testarea Branch<br>
+                          <small>Neue Features</small>
+                      </a>
+                  </div>
+                  
+                  <div class="description">
+                      <strong>Main:</strong> Die stabile, produktive Version<br>
+                      <strong>Testarea:</strong> Neue Features und Verbesserungen im Test
+                  </div>
+              </div>
+          </body>
+          </html>
+          EOF
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
