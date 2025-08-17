@@ -1335,5 +1335,43 @@
     </script>
     <script src="js/calculator-data.js"></script>
     <script src="js/raid-data-manager.js"></script>
+    <script>
+// Sabo-Counter Links automatisch reparieren
+function fixSaboCounterLinks() {
+    const brokenSaboLinks = document.querySelectorAll('a[onclick*="Sabo-Counter"]');
+    
+    brokenSaboLinks.forEach(link => {
+        link.href = 'dashboard-sabo-counter.html';
+        link.removeAttribute('onclick');
+        link.classList.remove('coming-soon-link');
+        
+        const icon = link.querySelector('.nav-icon, .action-icon');
+        if (icon) icon.textContent = '💥💾';
+        
+        console.log('✅ Sabo-Counter Link repariert');
+    });
+}
+
+<script>
+// Sabo-Counter Links automatisch reparieren
+function fixSaboCounterLinks() {
+    const brokenSaboLinks = document.querySelectorAll('a[onclick*="Sabo-Counter"]');
+    
+    brokenSaboLinks.forEach(link => {
+        link.href = 'dashboard-sabo-counter.html';
+        link.removeAttribute('onclick');
+        link.classList.remove('coming-soon-link');
+        
+        const icon = link.querySelector('.nav-icon, .action-icon');
+        if (icon) icon.textContent = '💥💾';
+        
+        console.log('✅ Sabo-Counter Link repariert');
+    });
+}
+
+// Fix beim Laden ausführen
+document.addEventListener('DOMContentLoaded', fixSaboCounterLinks);
+setTimeout(fixSaboCounterLinks, 1000);
+</script>
 </body>
 </html>
