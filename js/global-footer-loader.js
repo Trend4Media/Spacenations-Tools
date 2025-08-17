@@ -395,7 +395,7 @@ const startObserver = () => {
         setTimeout(startObserver, 500);
     }
 };
-
+<li><a href="sabo-counter.html" class="auto-tool-link" data-dashboard="dashboard-sabo-counter.html">💥 Sabo-Counter</a></li>
 startObserver();
 
 console.log('🦶 Auto Global Footer Loader vollständig geladen');
