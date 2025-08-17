@@ -40,17 +40,29 @@ jobs:
           mkdir -p dist/testarea
           
           # Main Branch Dateien kopieren
+          echo "📦 Kopiere Main Branch..."
           git checkout main
-          cp -r *.html css js dist/main/ 2>/dev/null || true
+          cp -r *.html css js build dist/main/ 2>/dev/null || true
           # main.html als index.html im main Ordner
           cp main.html dist/main/index.html 2>/dev/null || true
           
-          # Testarea Branch Dateien kopieren
+          # Testarea Branch Dateien kopieren  
+          echo "📦 Kopiere Testarea Branch..."
           git checkout testarea
-          cp -r *.html css js testarea dist/testarea/ 2>/dev/null || true
-          # Testarea hat bereits eine eigene index.html - nicht überschreiben!
+          cp -r *.html css js build dist/testarea/ 2>/dev/null || true
+          # Kopiere auch das testarea-Verzeichnis falls vorhanden
+          if [ -d "testarea" ]; then
+            echo "📁 Kopiere testarea-Verzeichnis..."
+            cp -r testarea/* dist/testarea/ 2>/dev/null || true
+          fi
+          # Falls keine index.html vorhanden, verwende main.html als Fallback
+          if [ ! -f "dist/testarea/index.html" ]; then
+            echo "🔄 Verwende main.html als Fallback für testarea/index.html"
+            cp main.html dist/testarea/index.html 2>/dev/null || true
+          fi
           
-          # Index-Datei für Branch-Auswahl erstellen
+          # Branch-Auswahl Landingpage erstellen
+          echo "🏠 Erstelle Landingpage..."
           cat > dist/index.html << 'EOF'
           <!DOCTYPE html>
           <html lang="de">
@@ -70,6 +82,7 @@ jobs:
                       justify-content: center;
                       align-items: center;
                   }
+                  
                   .container {
                       background: rgba(16, 16, 16, 0.9);
                       border: 2px solid #3a5998;
@@ -78,52 +91,128 @@ jobs:
                       text-align: center;
                       box-shadow: 0 10px 30px rgba(58, 89, 152, 0.3);
                       max-width: 600px;
+                      width: 100%;
                   }
+                  
                   h1 {
                       color: #ff8c42;
                       margin-bottom: 10px;
                       font-size: 2.5rem;
+                      text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+                      letter-spacing: 2px;
                   }
+                  
                   .subtitle {
                       color: #b0b0b0;
                       margin-bottom: 40px;
                       font-size: 1.1rem;
                   }
+                  
                   .branch-links {
                       display: flex;
                       gap: 20px;
                       justify-content: center;
                       flex-wrap: wrap;
+                      margin-bottom: 30px;
                   }
+                  
                   .branch-btn {
                       background: linear-gradient(135deg, #3a5998, #4a90e2);
                       color: white;
                       text-decoration: none;
-                      padding: 15px 30px;
+                      padding: 20px 30px;
                       border-radius: 10px;
                       font-weight: 600;
                       font-size: 1.1rem;
                       transition: all 0.3s ease;
                       border: 2px solid transparent;
+                      min-width: 180px;
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                      gap: 8px;
                   }
+                  
                   .branch-btn:hover {
-                      transform: translateY(-3px);
-                      box-shadow: 0 8px 25px rgba(74, 144, 226, 0.4);
+                      transform: translateY(-5px);
+                      box-shadow: 0 10px 25px rgba(74, 144, 226, 0.4);
                       border-color: #ff8c42;
                   }
+                  
                   .main-branch {
                       background: linear-gradient(135deg, #22c55e, #16a34a);
                   }
+                  
+                  .main-branch:hover {
+                      box-shadow: 0 10px 25px rgba(34, 197, 94, 0.4);
+                  }
+                  
                   .test-branch {
                       background: linear-gradient(135deg, #f59e0b, #d97706);
                   }
-                  .description {
-                      margin-top: 30px;
-                      padding: 20px;
-                      background: rgba(0, 0, 0, 0.3);
-                      border-radius: 8px;
+                  
+                  .test-branch:hover {
+                      box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);
+                  }
+                  
+                  .branch-icon {
+                      font-size: 2rem;
+                      margin-bottom: 5px;
+                  }
+                  
+                  .branch-title {
+                      font-size: 1.2rem;
+                      font-weight: 700;
+                  }
+                  
+                  .branch-desc {
                       font-size: 0.9rem;
-                      color: #b0b0b0;
+                      opacity: 0.8;
+                  }
+                  
+                  .description {
+                      background: rgba(0, 0, 0, 0.3);
+                      border-radius: 10px;
+                      padding: 20px;
+                      margin-top: 20px;
+                      text-align: left;
+                      line-height: 1.6;
+                  }
+                  
+                  .description strong {
+                      color: #ff8c42;
+                  }
+                  
+                  .footer-info {
+                      margin-top: 30px;
+                      font-size: 0.9rem;
+                      opacity: 0.7;
+                  }
+                  
+                  @media (max-width: 768px) {
+                      .container {
+                          margin: 20px;
+                          padding: 30px 20px;
+                      }
+                      
+                      h1 {
+                          font-size: 2rem;
+                      }
+                      
+                      .branch-links {
+                          flex-direction: column;
+                          align-items: center;
+                      }
+                      
+                      .branch-btn {
+                          min-width: 200px;
+                      }
+                  }
+                  
+                  /* Keyboard Navigation */
+                  .branch-btn:focus {
+                      outline: 2px solid #ff8c42;
+                      outline-offset: 2px;
                   }
               </style>
           </head>
@@ -133,24 +222,60 @@ jobs:
                   <div class="subtitle">Wählen Sie eine Version:</div>
                   
                   <div class="branch-links">
-                      <a href="main/" class="branch-btn main-branch">
-                          ✅ Main Branch<br>
-                          <small>Stabile Version</small>
+                      <a href="main/" class="branch-btn main-branch" tabindex="1">
+                          <div class="branch-icon">✅</div>
+                          <div class="branch-title">Main Branch</div>
+                          <div class="branch-desc">Stabile Version</div>
                       </a>
-                      <a href="testarea/" class="branch-btn test-branch">
-                          🧪 Testarea Branch<br>
-                          <small>Neue Features</small>
+                      <a href="testarea/" class="branch-btn test-branch" tabindex="2">
+                          <div class="branch-icon">🧪</div>
+                          <div class="branch-title">Testarea Branch</div>
+                          <div class="branch-desc">Neue Features</div>
                       </a>
                   </div>
                   
                   <div class="description">
-                      <strong>Main:</strong> Die stabile, produktive Version<br>
-                      <strong>Testarea:</strong> Neue Features und Verbesserungen im Test
+                      <strong>Main Branch:</strong> Die stabile, produktive Version mit allen bewährten Tools und Features.<br><br>
+                      <strong>Testarea Branch:</strong> Experimentelle Version mit neuen Features, Spionage-Tools und Verbesserungen im Test.
+                  </div>
+                  
+                  <div class="footer-info">
+                      💡 <strong>Tipp:</strong> Verwenden Sie die Tastatur-Navigation (Tab + Enter) für schnellen Zugriff
                   </div>
               </div>
+              
+              <script>
+                  // Keyboard Shortcuts
+                  document.addEventListener('keydown', function(e) {
+                      if (e.key === '1' || (e.key.toLowerCase() === 'm' && !e.ctrlKey)) {
+                          window.location.href = 'main/';
+                      } else if (e.key === '2' || (e.key.toLowerCase() === 't' && !e.ctrlKey)) {
+                          window.location.href = 'testarea/';
+                      }
+                  });
+                  
+                  // Analytics/Tracking (optional)
+                  console.log('🚀 Spacenations Tools Branch-Auswahl geladen');
+                  console.log('💡 Shortcuts: 1/M für Main, 2/T für Testarea');
+                  
+                  // Preload für bessere Performance
+                  const preloadMain = document.createElement('link');
+                  preloadMain.rel = 'prefetch';
+                  preloadMain.href = 'main/';
+                  document.head.appendChild(preloadMain);
+                  
+                  const preloadTestarea = document.createElement('link');
+                  preloadTestarea.rel = 'prefetch'; 
+                  preloadTestarea.href = 'testarea/';
+                  document.head.appendChild(preloadTestarea);
+              </script>
           </body>
           </html>
           EOF
+          
+          # Struktur anzeigen
+          echo "📁 Erstellte Struktur:"
+          find dist -type f -name "*.html" | head -10
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
