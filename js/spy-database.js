@@ -4,6 +4,7 @@ class SpyDatabasePage {
 		this.user = null;
 		this.userData = null;
 		this.alliance = null;
+		this.branch = 'main';
 		this.elements = {};
 		this.unsubscribe = null;
 		this.init();
@@ -14,6 +15,9 @@ class SpyDatabasePage {
 		await window.AuthAPI.waitForInit();
 		this.db = window.FirebaseConfig.getDB();
 
+		// Branch erkennen und speichern
+		this.branch = this._detectBranch();
+
 		window.AuthAPI.onAuthStateChange((user, userData) => {
 			this.user = user;
 			this.userData = userData;
@@ -23,6 +27,7 @@ class SpyDatabasePage {
 				return;
 			}
 			this._setupUI();
+			this._renderBranchBadge();
 			this._startListening();
 		});
 	}
@@ -36,10 +41,33 @@ class SpyDatabasePage {
 		this.elements.parseBtn = document.getElementById('parse-and-save-btn');
 		this.elements.status = document.getElementById('status-message');
 		this.elements.tableBody = document.getElementById('reports-tbody');
+		this.elements.branchBadge = document.getElementById('branch-badge');
 
 		if (this.elements.fetchBtn) this.elements.fetchBtn.addEventListener('click', () => this.handleFetchAndSave());
 		if (this.elements.togglePaste) this.elements.togglePaste.addEventListener('click', () => this._togglePaste());
 		if (this.elements.parseBtn) this.elements.parseBtn.addEventListener('click', () => this.handleParseAndSave());
+	}
+
+	_renderBranchBadge() {
+		if (!this.elements.branchBadge) return;
+		const b = (this.branch || 'main').toLowerCase();
+		this.elements.branchBadge.textContent = b.toUpperCase();
+		this.elements.branchBadge.classList.remove('branch-main', 'branch-testarea');
+		this.elements.branchBadge.classList.add(b === 'testarea' ? 'branch-testarea' : 'branch-main');
+	}
+
+	_detectBranch() {
+		const params = new URLSearchParams(window.location.search);
+		let b = params.get('branch') || null;
+		if (!b) {
+			// Erkenne testarea über Pfad (z. B. /testarea/ auf GitHub Pages)
+			if (window.location.pathname.toLowerCase().includes('/testarea/')) {
+				b = 'testarea';
+			}
+		}
+		b = (b || sessionStorage.getItem('branch') || 'main').toLowerCase();
+		sessionStorage.setItem('branch', b);
+		return b;
 	}
 
 	_togglePaste() {
@@ -88,6 +116,7 @@ class SpyDatabasePage {
 			reporterUid: this.user.uid,
 			reporterUsername: this.userData?.username || null,
 			alliance: this.alliance || null,
+			branch: this.branch || 'main',
 			rawHtml: html,
 			parsed: parseResult.data
 		};
@@ -108,16 +137,16 @@ class SpyDatabasePage {
 			? this.db.collection('spyReports').where('alliance', '==', this.alliance)
 			: this.db.collection('spyReports').where('reporterUid', '==', this.user.uid);
 
-		this.unsubscribe = baseQuery
-			.orderBy('reportedAt', 'desc')
-			.limit(100)
-			.onSnapshot(snapshot => {
-				const rows = [];
-				snapshot.forEach(doc => {
-					rows.push(this._renderRow(doc.id, doc.data()));
-				});
-				this.elements.tableBody.innerHTML = rows.join('');
+		let query = baseQuery.where('branch', '==', this.branch || 'main');
+		query = query.orderBy('reportedAt', 'desc').limit(100);
+
+		this.unsubscribe = query.onSnapshot(snapshot => {
+			const rows = [];
+			snapshot.forEach(doc => {
+				rows.push(this._renderRow(doc.id, doc.data()));
 			});
+			this.elements.tableBody.innerHTML = rows.join('');
+		});
 	}
 
 	_renderRow(id, data) {
@@ -135,7 +164,7 @@ class SpyDatabasePage {
 				`<td>${this._fmtNum(r.invasion)}</td>` +
 				`<td>${this._fmtNum(r.pluender)}</td>` +
 				`<td>${this._fmtNum(r.sabotage)}</td>` +
-				`<td><a class="report-link" href="spy-report.html?id=${encodeURIComponent(id)}">Bericht</a></td>` +
+				`<td><a class="report-link" href="spy-report.html?id=${encodeURIComponent(id)}&branch=${encodeURIComponent(this.branch)}">Bericht</a></td>` +
 			`</tr>`
 		);
 	}

@@ -14,17 +14,20 @@
 		.meta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 		.meta div { color: var(--text-secondary); }
 		iframe { width: 100%; min-height: 800px; border: 1px solid var(--card-border); border-radius: 8px; background: white; }
-		.actions { display: flex; gap: 10px; margin-bottom: 10px; }
+		.actions { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
 		.button { background: linear-gradient(135deg, #3a5998, #4a90e2); color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none; }
+		.branch-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.5px; }
+		.branch-main { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.5); }
+		.branch-testarea { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.5); }
 	</style>
 </head>
 <body>
 	<div class="container">
 		<div class="card">
-			<h2>🔎 Spionagebericht</h2>
+			<h2>🔎 Spionagebericht <span id="branch-badge" class="branch-badge branch-main">MAIN</span></h2>
 			<div class="actions">
 				<a id="original-link" class="button" href="#" target="_blank">Original öffnen</a>
-				<a class="button" href="spy-database.html">Zurück zur Datenbank</a>
+				<a id="back-to-db" class="button" href="spy-database.html">Zurück zur Datenbank</a>
 			</div>
 			<div class="meta" id="report-meta"></div>
 		</div>

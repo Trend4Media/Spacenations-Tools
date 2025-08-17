@@ -3,6 +3,7 @@ class SpyReportPage {
 		this.db = null;
 		this.user = null;
 		this.userData = null;
+		this.branch = 'main';
 		this.init();
 	}
 
@@ -10,6 +11,9 @@ class SpyReportPage {
 		await window.FirebaseConfig.waitForReady();
 		await window.AuthAPI.waitForInit();
 		this.db = window.FirebaseConfig.getDB();
+
+		// Branch erkennen
+		this.branch = this._detectBranch();
 
 		window.AuthAPI.onAuthStateChange(async (user) => {
 			this.user = user;
@@ -22,8 +26,24 @@ class SpyReportPage {
 				alert('Keine Bericht-ID angegeben');
 				return;
 			}
+			this._renderBranchBadge();
+			this._setBackLink();
 			await this._loadReport(id);
 		});
+	}
+
+	_detectBranch() {
+		const params = new URLSearchParams(window.location.search);
+		let b = params.get('branch') || null;
+		if (!b) {
+			// Erkenne testarea über Pfad (z. B. /testarea/ auf GitHub Pages)
+			if (window.location.pathname.toLowerCase().includes('/testarea/')) {
+				b = 'testarea';
+			}
+		}
+		b = (b || sessionStorage.getItem('branch') || 'main').toLowerCase();
+		sessionStorage.setItem('branch', b);
+		return b;
 	}
 
 	async _loadReport(id) {
@@ -64,6 +84,24 @@ class SpyReportPage {
 		const frame = document.getElementById('snapshot-frame');
 		const safeHtml = this._sanitizeForSrcDoc(data.rawHtml || '<p>Kein Snapshot verfügbar</p>');
 		frame.srcdoc = safeHtml;
+	}
+
+	_renderBranchBadge() {
+		const b = (this.branch || 'main').toLowerCase();
+		const badge = document.getElementById('branch-badge');
+		if (!badge) return;
+		badge.textContent = b.toUpperCase();
+		badge.classList.remove('branch-main', 'branch-testarea');
+		badge.classList.add(b === 'testarea' ? 'branch-testarea' : 'branch-main');
+	}
+
+	_setBackLink() {
+		const link = document.getElementById('back-to-db');
+		if (link) {
+			const params = new URLSearchParams(window.location.search);
+			const b = params.get('branch') || this.branch || 'main';
+			link.href = `spy-database.html?branch=${encodeURIComponent(b)}`;
+		}
 	}
 
 	_sanitizeForSrcDoc(html) {
