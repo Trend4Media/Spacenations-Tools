@@ -7,6 +7,7 @@
     <!-- Gemeinsame Theme-Variablen -->
     <link rel="stylesheet" href="css/theme-variables.css">
     <link rel="stylesheet" href="css/global-footer.css">
+    <link rel="stylesheet" href="css/enhanced-navigation.css">
     <style>
         
         * {
@@ -137,13 +138,6 @@
         .nav-item {
             margin-bottom: 12px;
         }
-        <!-- FÜGEN SIE DIESE NAVIGATION HINZU: -->
-<li class="nav-item">
-    <a href="dashboard-sabo-counter.html" class="nav-link">
-        <span class="nav-icon">💥💾</span>
-        Sabo-Counter (Dashboard)
-    </a>
-</li>
         
         .nav-link {
             display: flex;
@@ -662,21 +656,9 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="dashboard-sabo-counter.html" class="nav-link">     <span class="nav-icon">💥💾</span>     Sabo-Counter (Dashboard) </a>
-                    <span class="nav-icon">💥</span>
-                    Sabo-Counter
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link premium-link" onclick="showPremiumFeature('Advanced Analytics')">
-                    <span class="nav-icon">📊</span>
-                    Analytics Pro
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link premium-link" onclick="showPremiumFeature('Battle Simulator')">
-                    <span class="nav-icon">🎯</span>
-                    Battle Sim
+                <a href="dashboard-sabo-counter.html" class="nav-link">
+                    <span class="nav-icon">💥💾</span>
+                    Sabo-Counter (Dashboard)
                 </a>
             </li>
         </ul>
@@ -818,6 +800,7 @@
     <script src="js/theme-manager.js"></script>          <!-- 2. Theme-Management -->
     <script src="js/auth-manager.js"></script>           <!-- 3. Auth-Management -->
     <script src="js/firebase-sync.js"></script>          <!-- 4. Dashboard-Sync mit Logout -->
+    <script src="js/enhanced-navigation.js"></script>    <!-- 5. Enhanced Navigation -->
 
     <script>
         // Dashboard-spezifische Funktionen

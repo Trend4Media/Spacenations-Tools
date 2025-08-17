@@ -387,7 +387,7 @@ class DashboardCore {
             }
             
             const text = link.textContent.trim();
-            if (text.includes('Analytics') || text.includes('Battle Sim') || text.includes('Profil') || text.includes('Allianz')) {
+            if (text.includes('Profil') || text.includes('Allianz')) {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
                     this.showComingSoon(text);
