@@ -926,12 +926,12 @@
         }
 
         function checkAdminStatus() {
-            if (window.AuthAPI && window.AuthAPI.isLoggedIn()) {
+            if (window.AuthAPI) {
                 window.AuthAPI.onAuthStateChange((user, userData) => {
                     const adminLoginLink = document.getElementById('admin-login-link');
                     const adminDashboardLink = document.getElementById('admin-dashboard-link');
                     
-                    if (userData && userData.isAllianceAdmin) {
+                    if (user && userData && userData.isAllianceAdmin) {
                         if (adminLoginLink) adminLoginLink.style.display = 'none';
                         if (adminDashboardLink) adminDashboardLink.style.display = 'block';
                     } else {
@@ -1005,20 +1005,47 @@
             const password = document.getElementById('password').value;
             const loginBtn = document.getElementById('login-btn');
 
+            // Validierung
+            if (!email || !password) {
+                showLoginError('Bitte füllen Sie alle Felder aus.');
+                return;
+            }
+
             loginBtn.disabled = true;
             loginBtn.textContent = '⏳ Login...';
 
             try {
+                // Prüfen ob AuthAPI verfügbar ist
+                if (!window.AuthAPI) {
+                    throw new Error('AuthAPI ist noch nicht geladen. Bitte warten Sie einen Moment und versuchen Sie es erneut.');
+                }
+
+                // Warten bis AuthAPI initialisiert ist
+                if (window.AuthAPI.waitForInit) {
+                    await window.AuthAPI.waitForInit();
+                }
+
+                console.log('🔐 Starte Login für:', email);
                 const result = await window.AuthAPI.login(email, password);
                 
                 if (result.success) {
                     console.log('✅ Login erfolgreich - Sync übernimmt Weiterleitung');
+                    showLoginSuccess('Login erfolgreich! Weiterleitung...');
+                    
+                    // Kurz warten für bessere UX
+                    setTimeout(() => {
+                        if (window.SyncAPI && window.SyncAPI.redirectToDashboard) {
+                            window.SyncAPI.redirectToDashboard();
+                        } else {
+                            window.location.href = 'dashboard.html';
+                        }
+                    }, 1500);
                 } else {
-                    showLoginError(result.error);
+                    showLoginError(result.error || 'Login fehlgeschlagen');
                 }
             } catch (error) {
                 console.error('❌ Login-Fehler:', error);
-                showLoginError('Unerwarteter Fehler beim Login');
+                showLoginError(error.message || 'Unerwarteter Fehler beim Login. Bitte versuchen Sie es erneut.');
             } finally {
                 loginBtn.disabled = false;
                 loginBtn.textContent = 'Login';
