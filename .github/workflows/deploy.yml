@@ -1,8 +1,9 @@
 name: Deploy Spacenations Tools
 
 on:
-  push:
-    branches: [ main ]
+  # Disabled to avoid conflicts with advanced-deploy.yml
+  # push:
+  #   branches: [ main ]
   pull_request:
     branches: [ main ]
 

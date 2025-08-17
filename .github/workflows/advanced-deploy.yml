@@ -29,10 +29,12 @@ jobs:
         
         # Check file sizes
         for file in *.html; do
-          size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file")
-          echo "📄 $file: ${size} bytes"
-          if [ $size -gt 100000 ]; then
-            echo "⚠️ Warning: $file is quite large (${size} bytes)"
+          if [ -f "$file" ]; then
+            size=$(stat -c%s "$file" 2>/dev/null || wc -c < "$file")
+            echo "📄 $file: ${size} bytes"
+            if [ $size -gt 100000 ]; then
+              echo "⚠️ Warning: $file is quite large (${size} bytes)"
+            fi
           fi
         done
 
@@ -42,24 +44,16 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: 🚀 Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./
-        commit_message: 🚀 Deploy ${{ github.sha }}
-        
-    - name: 🌐 Test Deployment
+    - name: 🚀 Skip Deploy (handled by deploy-branches.yml)
       run: |
-        echo "⏳ Waiting for deployment..."
-        sleep 30
+        echo "🔄 Deployment is handled by deploy-branches.yml workflow"
+        echo "✅ This workflow focuses on quality checks only"
         
-        # Test if site is accessible
-        if curl -f -s "$SITE_URL" > /dev/null; then
-          echo "✅ Site is live and accessible!"
-        else
-          echo "❌ Site might not be accessible yet"
-        fi
+    - name: 🌐 Deployment Info
+      run: |
+        echo "📊 Quality checks completed successfully"
+        echo "🔗 Site will be available at: $SITE_URL"
+        echo "📝 Commit: ${{ github.sha }}"
 
   notify:
     needs: [quality-checks, deploy]
