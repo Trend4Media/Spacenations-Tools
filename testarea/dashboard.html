@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Spacenations Tools</title>
+    <!-- Gemeinsame Theme-Variablen -->
+    <link rel="stylesheet" href="../css/theme-variables.css">
+    <link rel="stylesheet" href="../css/global-footer.css">
+    <link rel="stylesheet" href="../css/enhanced-navigation.css">
+    <style>
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: grid;
+            grid-template-areas: 
+                "header header header"
+                "nav main sidebar"
+                "footer footer footer";
+            grid-template-columns: 250px 1fr 300px;
+            grid-template-rows: auto 1fr auto;
+            gap: 20px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        /* Header */
+        .header {
+            grid-area: header;
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px var(--border-shadow);
+            backdrop-filter: blur(10px);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-left h1 {
+            color: var(--accent-primary);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .header-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .branch-badge {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 10px rgba(255, 107, 53, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .theme-toggle {
+            background: linear-gradient(45deg, #3a5998, #4a90e2);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, #64748b, #475569);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(100, 116, 139, 0.3);
+        }
+        
+        /* Navigation */
+        .nav {
+            grid-area: nav;
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 0 20px var(--border-shadow);
+            height: fit-content;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .nav h3 {
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .nav-list {
+            list-style: none;
+        }
+        
+        .nav-item {
+            margin-bottom: 12px;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav-link:hover {
+            background: linear-gradient(135deg, var(--accent-primary), #ff9f5a);
+            color: white;
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(255, 140, 66, 0.3);
+        }
+        
+        .nav-icon {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .premium-link {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white !important;
+            font-weight: 600;
+        }
+        
+        .premium-link:hover {
+            background: linear-gradient(135deg, #d97706, #b45309) !important;
+        }
+        
+        .coming-soon-link {
+            position: relative;
+            opacity: 0.7;
+            cursor: not-allowed !important;
+        }
+        
+        .coming-soon-link:hover {
+            background: linear-gradient(135deg, #555, #777) !important;
+            color: white !important;
+            transform: none !important;
+            box-shadow: 0 4px 15px rgba(100, 116, 139, 0.3) !important;
+        }
+        
+        /* Main Dashboard */
+        .main {
+            grid-area: main;
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 20px var(--border-shadow);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            overflow-y: auto;
+        }
+        
+        .dashboard-title {
+            font-size: 1.8rem;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .dashboard-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px var(--border-shadow);
+        }
+        
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .action-card {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+        
+        .action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--border-shadow);
+            border-color: var(--accent-secondary);
+        }
+        
+        .action-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .action-icon {
+            font-size: 1.5rem;
+            margin-right: 12px;
+            color: var(--accent-secondary);
+        }
+        
+        .action-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .action-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        /* Recent Activity */
+        .recent-activity {
+            margin-bottom: 30px;
+        }
+        
+        .activity-list {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--card-border);
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            font-size: 1.2rem;
+            margin-right: 15px;
+            width: 30px;
+            text-align: center;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-text {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+        
+        .activity-time {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            grid-area: sidebar;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .user-profile {
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 0 20px var(--border-shadow);
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+        
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--accent-primary), #ff9f5a);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            margin: 0 auto 15px auto;
+            font-weight: 700;
+        }
+        
+        .user-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        
+        .user-email {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        
+        .user-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-user {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+        
+        .badge-alliance {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+        }
+        
+        .profile-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .profile-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-secondary), #3a5998);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border: 2px solid var(--card-border);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        .profile-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Alliance Info */
+        .alliance-info {
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px var(--border-shadow);
+            backdrop-filter: blur(10px);
+        }
+        
+        .alliance-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .alliance-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+            color: var(--warning-color);
+        }
+        
+        .alliance-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .alliance-details {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        /* Stats Overview Styles */
+        .stats-overview {
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px var(--border-shadow);
+            backdrop-filter: blur(10px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .stats-card {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .stats-card.as-stats {
+            border-left: 4px solid #ef4444;
+        }
+
+        .stats-card.raid-stats {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .stats-card.sabo-stats {
+            border-left: 4px solid #8b5cf6;
+        }
+
+        .stats-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .stats-header h4 {
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-icon {
+            font-size: 1.5rem;
+        }
+
+        .stats-link {
+            color: var(--accent-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .stats-link:hover {
+            color: var(--accent-primary);
+        }
+
+        .main-stat {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .sub-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 15px;
+        }
+
+        .sub-stat {
+            text-align: center;
+            padding: 12px 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .sub-stat:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .sub-stat-icon {
+            display: block;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .sub-stat-value {
+            display: block;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 3px;
+        }
+
+        .sub-stat-label {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .resource-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .resource-stat {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            gap: 10px;
+        }
+
+        .resource-icon {
+            font-size: 1.2rem;
+        }
+
+        .resource-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .resource-label {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .building-stats {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .building-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .building-name {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .building-count {
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        .loading-buildings {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 20px;
+        }
+
+        .mini-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--text-secondary);
+            border-top: 2px solid var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        /* Kompakte Action Buttons */
+        .actions-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-btn.as-btn:hover {
+            border-color: #ef4444;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+        }
+
+        .action-btn.raid-btn:hover {
+            border-color: #f59e0b;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.1));
+        }
+
+        .action-btn.sabo-btn:hover {
+            border-color: #8b5cf6;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(124, 58, 237, 0.1));
+        }
+
+        .action-btn.tools-btn:hover {
+            border-color: var(--accent-secondary);
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.1), rgba(58, 89, 152, 0.1));
+        }
+
+        .btn-icon {
+            font-size: 1.2rem;
+        }
+        
+        /* Footer */
+        .footer {
+            grid-area: footer;
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        /* Loading States */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+        
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--card-border);
+            border-top: 2px solid var(--accent-secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+        }
+        
+        .loading-content {
+            text-align: center;
+            color: white;
+            padding: 30px;
+            background: var(--bg-panel);
+            border-radius: 15px;
+            border: 2px solid var(--border-primary);
+        }
+        
+        .loading-overlay .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-primary);
+            border-top: 4px solid var(--accent-primary);
+            margin: 0 auto 15px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            body {
+                grid-template-areas: 
+                    "header header"
+                    "nav sidebar"
+                    "main main"
+                    "footer footer";
+                grid-template-columns: 1fr 300px;
+                grid-template-rows: auto auto 1fr auto;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                grid-template-areas: 
+                    "header"
+                    "main"
+                    "sidebar"
+                    "nav"
+                    "footer";
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto auto auto;
+                padding: 10px;
+                gap: 15px;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .header-right {
+                flex-direction: row;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sabotage Buildings Table */
+        .sabotage-buildings-table {
+            margin-top: 15px;
+        }
+
+        .building-stats-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 8px 15px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+        }
+
+        .building-header {
+            font-weight: bold;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-primary);
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+        }
+
+        .building-name {
+            color: var(--text-secondary);
+            padding: 3px 0;
+        }
+
+        .building-count {
+            color: var(--text-primary);
+            font-weight: 500;
+            text-align: right;
+            padding: 3px 0;
+        }
+
+        .sabotage-totals {
+            border-top: 1px solid var(--border-primary);
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+
+        .total-stat {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .total-stat .highlight {
+            color: var(--accent-primary);
+            font-weight: bold;
+        }
+
+        .loading-buildings {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            padding: 20px 0;
+        }
+
+        .mini-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border-primary);
+            border-top: 2px solid var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .error-message {
+            color: var(--error-color, #ff6b6b);
+            font-size: 0.85rem;
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>Lädt Dashboard...</h3>
+            <p>Sie werden automatisch weitergeleitet</p>
+        </div>
+    </div>
+
+    <div class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1>🏠 Dashboard</h1>
+                <div class="header-subtitle">Willkommen zurück, <span id="header-username">User</span>!</div>
+            </div>
+            <div class="header-right">
+                <span class="branch-badge">TESTAREA</span>
+                <button class="theme-toggle" id="theme-toggle">
+                    <span id="theme-icon">🌙</span>
+                    <span id="theme-text">Light</span>
+                </button>
+                <a href="../index.html" class="back-btn">
+                    ← Startseite
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <nav class="nav">
+        <h3>🛠️ Meine Tools</h3>
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="dashboard-as-counter.html" class="nav-link">
+                    <span class="nav-icon">⚔️💾</span>
+                    AS-Counter (Dashboard)
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="dashboard-raid-counter.html" class="nav-link">
+                    <span class="nav-icon">🏴‍☠️💾</span>
+                    Raid-Counter (Dashboard)
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="dashboard-sabo-counter.html" class="nav-link">
+                    <span class="nav-icon">💥💾</span>
+                    Sabo-Counter (Dashboard)
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="spy-database.html" class="nav-link">
+                    <span class="nav-icon">📡</span>
+                    Spionage-Datenbank
+                </a>
+            </li>
+        </ul>
+    </nav>
+    
+    <main class="main">
+        <div id="loading-dashboard" class="loading">
+            <div class="spinner"></div>
+            Dashboard wird geladen...
+        </div>
+        
+        <div id="dashboard-content" style="display: none;">
+            <h2 class="dashboard-title">Dein persönliches Dashboard</h2>
+            <p class="dashboard-subtitle">Hier findest du eine Übersicht über deine Aktivitäten und Statistiken</p>
+            
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-icon">⚔️</span>
+                    <div class="stat-value" id="battles-count">-</div>
+                    <div class="stat-label">Schlachten</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">🏴‍☠️</span>
+                    <div class="stat-value" id="raids-count">-</div>
+                    <div class="stat-label">Raids</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">🎯</span>
+                    <div class="stat-value" id="win-rate">-</div>
+                    <div class="stat-label">Erfolgsrate</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">📅</span>
+                    <div class="stat-value" id="days-active">-</div>
+                    <div class="stat-label">Tage aktiv</div>
+                </div>
+            </div>
+            
+            <!-- Counter Statistics Overview -->
+            <div class="stats-overview">
+                <h3 class="section-title">
+                    <span>📊</span>
+                    Deine Kampf-Statistiken
+                </h3>
+                <div class="stats-grid">
+                    <!-- AS-Counter Statistiken -->
+                    <div class="stats-card as-stats">
+                        <div class="stats-header">
+                            <span class="stats-icon">⚔️</span>
+                            <h4>Gesamt Abschuss</h4>
+                            <a href="dashboard-as-counter.html" class="stats-link">→ AS-Counter</a>
+                        </div>
+                        <div class="stats-content">
+                            <div class="main-stat">
+                                <span class="stat-value" id="total-kills">0</span>
+                                <span class="stat-label">Berichte verarbeitet</span>
+                            </div>
+                            <div class="sub-stats">
+                                <div class="sub-stat">
+                                    <span class="sub-stat-icon">🛡️</span>
+                                    <span class="sub-stat-value" id="stability-destroyed">0</span>
+                                    <span class="sub-stat-label">Stabilität</span>
+                                </div>
+                                <div class="sub-stat">
+                                    <span class="sub-stat-icon">🚗</span>
+                                    <span class="sub-stat-value" id="tanks-destroyed">0</span>
+                                    <span class="sub-stat-label">Panzer</span>
+                                </div>
+                                <div class="sub-stat">
+                                    <span class="sub-stat-icon">⚔️</span>
+                                    <span class="sub-stat-value" id="as-destroyed">0</span>
+                                    <span class="sub-stat-label">AS zerstört</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Raid-Counter Statistiken -->
+                    <div class="stats-card raid-stats">
+                        <div class="stats-header">
+                            <span class="stats-icon">🏴‍☠️</span>
+                            <h4>Raid Zusammenfassung</h4>
+                            <a href="dashboard-raid-counter.html" class="stats-link">→ Raid-Counter</a>
+                        </div>
+                        <div class="stats-content">
+                            <div class="main-stat">
+                                <span class="stat-value" id="total-raids">0</span>
+                                <span class="stat-label">Raids durchgeführt</span>
+                            </div>
+                            <div class="resource-stats">
+                                <div class="resource-stat">
+                                    <span class="resource-icon">⚡</span>
+                                    <span class="resource-value" id="energy-looted">0</span>
+                                    <span class="resource-label">Energie</span>
+                                </div>
+                                <div class="resource-stat">
+                                    <span class="resource-icon">🛢️</span>
+                                    <span class="resource-value" id="oil-looted">0</span>
+                                    <span class="resource-label">Öl</span>
+                                </div>
+                                <div class="resource-stat">
+                                    <span class="resource-icon">⚒️</span>
+                                    <span class="resource-value" id="metal-looted">0</span>
+                                    <span class="resource-label">Metall</span>
+                                </div>
+                                <div class="resource-stat">
+                                    <span class="resource-icon">💎</span>
+                                    <span class="resource-value" id="crystal-looted">0</span>
+                                    <span class="resource-label">Kristall</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sabo-Counter Statistiken -->
+                    <div class="stats-card sabo-stats">
+                        <div class="stats-header">
+                            <span class="stats-icon">💥</span>
+                            <h4>Sabotage Übersicht</h4>
+                            <a href="dashboard-sabo-counter.html" class="stats-link">→ Sabo-Counter</a>
+                        </div>
+                        <div class="stats-content">
+                            <div class="main-stat">
+                                <span class="stat-value" id="total-sabotages">0</span>
+                                <span class="stat-label">Sabotagen durchgeführt</span>
+                            </div>
+                            <div class="building-stats" id="building-stats">
+                                <!-- Wird dynamisch mit JavaScript gefüllt -->
+                                <div class="loading-buildings">
+                                    <div class="mini-spinner"></div>
+                                    Gebäude-Statistiken laden...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions (kompakt) -->
+            <div class="quick-actions">
+                <h3 class="section-title">
+                    <span>⚡</span>
+                    Schnellzugriff
+                </h3>
+                <div class="actions-row">
+                    <a href="dashboard-as-counter.html" class="action-btn as-btn">
+                        <span class="btn-icon">⚔️</span>
+                        AS-Counter
+                    </a>
+                    <a href="dashboard-raid-counter.html" class="action-btn raid-btn">
+                        <span class="btn-icon">🏴‍☠️</span>
+                        Raid-Counter
+                    </a>
+                    <a href="dashboard-sabo-counter.html" class="action-btn sabo-btn">
+                        <span class="btn-icon">💥</span>
+                        Sabo-Counter
+                    </a>
+                    <a href="index.html" class="action-btn tools-btn">
+                        <span class="btn-icon">🛠️</span>
+                        Alle Tools
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <div class="sidebar">
+        <!-- User Profile -->
+        <div class="user-profile">
+            <div class="user-avatar" id="user-avatar">?</div>
+            <div class="user-name" id="user-name">Lädt...</div>
+            <div class="user-email" id="user-email">Lädt...</div>
+            <div class="user-badges" id="user-badges">
+                <span class="badge badge-user">Benutzer</span>
+            </div>
+            <div class="profile-actions">
+                <button class="profile-btn btn-primary" onclick="showPremiumFeature('Profile Settings')">
+                    ⚙️ Einstellungen
+                </button>
+                <button class="profile-btn btn-secondary" onclick="showPremiumFeature('Statistics')">
+                    📊 Statistiken
+                </button>
+                <button class="profile-btn btn-danger logout-btn">
+                    🚪 Abmelden
+                </button>
+            </div>
+        </div>
+        
+        <!-- Alliance Info -->
+        <div class="alliance-info" id="alliance-section" style="display: none;">
+            <div class="alliance-header">
+                <span class="alliance-icon">🛡️</span>
+                <span class="alliance-name" id="alliance-name">Keine Allianz</span>
+            </div>
+            <div class="alliance-details" id="alliance-details">
+                Du bist derzeit keiner Allianz beigetreten.
+            </div>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <p>Spacenations Dashboard © 2025 | Dein persönlicher Bereich</p>
+    </footer>
+
+    <!-- Firebase SDK - MUSS ZUERST geladen werden -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <!-- Modulare JavaScript-Dateien in der richtigen Reihenfolge -->
+    <script src="../js/firebase-config.js"></script>        <!-- 1. Firebase-Konfiguration -->
+    <script src="../js/theme-manager.js"></script>          <!-- 2. Theme-Management -->
+    <script src="../js/auth-manager.js"></script>           <!-- 3. Auth-Management -->
+    <script src="../js/firebase-sync.js"></script>          <!-- 4. Dashboard-Sync mit Logout -->
+    <script src="../js/dashboard-stats.js"></script>        <!-- 5. Dashboard-Statistiken -->
+    <script src="../js/enhanced-navigation.js"></script>    <!-- 6. Enhanced Navigation -->
+
+    <script>
+        // Dashboard-spezifische Funktionen
+        let currentUser = null;
+        let userData = null;
+
+        // Warten bis alle Module geladen sind
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Warten bis AuthManager bereit ist
+                await window.AuthAPI.waitForInit();
+                
+                console.log('🏠 Dashboard wird initialisiert');
+                
+                // Auth State überwachen
+                window.AuthAPI.onAuthStateChange(async (user, userDataFromAuth) => {
+                    if (user && userDataFromAuth) {
+                        currentUser = user;
+                        userData = userDataFromAuth;
+                        
+                        console.log('✅ Dashboard für User geladen:', userData.username);
+                        
+                        // Dashboard-Daten laden
+                        await loadDashboardData();
+                        showDashboard();
+                        
+                        // Dashboard-Aktivität hinzufügen
+                        setTimeout(() => {
+                            if (window.AuthAPI.addActivity) {
+                                window.AuthAPI.addActivity('📊', 'Dashboard besucht');
+                            }
+                        }, 2000);
+                        
+                    } else {
+                        console.log('❌ Kein User - Dashboard nicht verfügbar');
+                        // Weiterleitung wird automatisch durch firebase-sync.js gehandelt
+                    }
+                });
+                
+            } catch (error) {
+                console.error('❌ Dashboard-Initialisierung fehlgeschlagen:', error);
+                showDashboardError('Fehler beim Laden des Dashboards');
+            }
+        });
+
+        // Dashboard-Daten laden
+        async function loadDashboardData() {
+            try {
+                console.log('📊 Lade Dashboard-Daten...');
+                
+                // Benutzer-Statistiken laden
+                await loadUserStats();
+                
+                // Letzte Aktivitäten laden
+                await loadRecentActivity();
+                
+                console.log('✅ Dashboard-Daten vollständig geladen');
+                
+            } catch (error) {
+                console.error('❌ Fehler beim Laden der Dashboard-Daten:', error);
+            }
+        }
+
+        // Benutzer-Statistiken laden
+        async function loadUserStats() {
+            try {
+                if (!currentUser) return;
+                
+                // Basis-Statistiken
+                const createdDate = userData.createdAt ? userData.createdAt.toDate() : new Date();
+                const daysSinceCreation = Math.floor((new Date() - createdDate) / (1000 * 60 * 60 * 24));
+                
+                let battlesCount = 0;
+                let raidsCount = 0;
+                let winRate = 0;
+                
+                // Calculator-Statistiken falls verfügbar
+                if (window.CalculatorAPI && window.CalculatorAPI.isLoggedIn()) {
+                    const stats = window.CalculatorAPI.getStats();
+                    battlesCount = stats.totalBattles || 0;
+                    winRate = stats.winRate || 0;
+                    
+                    console.log('📊 Calculator-Statistiken geladen:', stats);
+                }
+                
+                // Raid-Statistiken falls verfügbar
+                if (window.RaidAPI && window.RaidAPI.isLoggedIn()) {
+                    const raidStats = window.RaidAPI.getStats();
+                    raidsCount = raidStats.totalRaids || 0;
+                    
+                    console.log('🏴‍☠️ Raid-Statistiken geladen:', raidStats);
+                } else {
+                    // Simulierte Werte falls kein RaidAPI
+                    raidsCount = Math.floor(daysSinceCreation * 0.3) + Math.floor(Math.random() * 8);
+                }
+                
+                // Fallback für Calculator falls nicht verfügbar
+                if (!window.CalculatorAPI) {
+                    battlesCount = Math.floor(daysSinceCreation * 0.7) + Math.floor(Math.random() * 15);
+                    winRate = Math.floor(65 + Math.random() * 25);
+                }
+                
+                // Standard-Werte setzen
+                document.getElementById('battles-count').textContent = battlesCount;
+                document.getElementById('raids-count').textContent = raidsCount;
+                document.getElementById('win-rate').textContent = winRate + '%';
+                document.getElementById('days-active').textContent = daysSinceCreation;
+                
+                // Versuche echte Statistiken aus Firestore zu laden
+                const db = window.FirebaseConfig.getDB();
+                const statsDoc = await db.collection('userStats').doc(currentUser.uid).get();
+                
+                if (statsDoc.exists) {
+                    const stats = statsDoc.data();
+                    document.getElementById('battles-count').textContent = stats.battles || battlesCount;
+                    document.getElementById('raids-count').textContent = stats.raids || raidsCount;
+                    document.getElementById('win-rate').textContent = (stats.winRate || winRate) + '%';
+                }
+                
+                console.log('📈 Benutzer-Statistiken geladen');
+                
+            } catch (error) {
+                console.error('❌ Fehler beim Laden der Statistiken:', error);
+                // Fallback-Werte setzen
+                document.getElementById('battles-count').textContent = '0';
+                document.getElementById('raids-count').textContent = '0';
+                document.getElementById('win-rate').textContent = '0%';
+                document.getElementById('days-active').textContent = '0';
+            }
+        }
+
+        // Letzte Aktivitäten laden
+        async function loadRecentActivity() {
+            const activityList = document.getElementById('activity-list');
+            
+            try {
+                if (!currentUser) return;
+                
+                // Versuche echte Aktivitäten aus Firestore zu laden
+                const db = window.FirebaseConfig.getDB();
+                const activitiesQuery = await db.collection('userActivities')
+                    .where('userId', '==', currentUser.uid)
+                    .orderBy('timestamp', 'desc')
+                    .limit(5)
+                    .get();
+                
+                if (!activitiesQuery.empty) {
+                    let activitiesHtml = '';
+                    activitiesQuery.forEach(doc => {
+                        const activity = doc.data();
+                        const time = activity.timestamp.toDate().toLocaleString('de-DE');
+                        activitiesHtml += createActivityItem(activity.icon, activity.text, time);
+                    });
+                    activityList.innerHTML = activitiesHtml;
+                } else {
+                    // Fallback: Beispiel-Aktivitäten generieren
+                    showExampleActivities();
+                }
+                
+                console.log('📝 Letzte Aktivitäten geladen');
+                
+            } catch (error) {
+                console.error('❌ Fehler beim Laden der Aktivitäten:', error);
+                showExampleActivities();
+            }
+        }
+
+        // Beispiel-Aktivitäten anzeigen
+        function showExampleActivities() {
+            const activityList = document.getElementById('activity-list');
+            const now = new Date();
+            
+            const activities = [
+                {
+                    icon: '🎉',
+                    text: 'Account erfolgreich erstellt',
+                    time: userData.createdAt ? userData.createdAt.toDate() : now
+                },
+                {
+                    icon: '🔐',
+                    text: 'Erfolgreich angemeldet',
+                    time: new Date(now.getTime() - 5 * 60 * 1000) // vor 5 Minuten
+                },
+                {
+                    icon: '🏠',
+                    text: 'Dashboard besucht',
+                    time: new Date(now.getTime() - 1 * 60 * 1000) // vor 1 Minute
+                }
+            ];
+            
+            let activitiesHtml = '';
+            activities.forEach(activity => {
+                const timeStr = activity.time.toLocaleString('de-DE');
+                activitiesHtml += createActivityItem(activity.icon, activity.text, timeStr);
+            });
+            
+            activityList.innerHTML = activitiesHtml;
+        }
+
+        // Aktivitäts-Item HTML erstellen
+        function createActivityItem(icon, text, time) {
+            return `
+                <div class="activity-item">
+                    <span class="activity-icon">${icon}</span>
+                    <div class="activity-content">
+                        <div class="activity-text">${text}</div>
+                        <div class="activity-time">${time}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Dashboard anzeigen
+        function showDashboard() {
+            document.getElementById('loading-dashboard').style.display = 'none';
+            document.getElementById('dashboard-content').style.display = 'block';
+            console.log('✅ Dashboard angezeigt');
+        }
+
+        // Dashboard-Fehler anzeigen
+        function showDashboardError(message) {
+            const loadingDiv = document.getElementById('loading-dashboard');
+            loadingDiv.innerHTML = `
+                <div style="text-align: center; color: var(--error-color);">
+                    <span style="font-size: 2rem;">❌</span>
+                    <br><br>
+                    ${message}
+                    <br><br>
+                    <button onclick="window.location.reload()" style="
+                        background: var(--accent-primary);
+                        color: white;
+                        border: none;
+                        padding: 10px 20px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                    ">Neu laden</button>
+                </div>
+            `;
+        }
+
+        // Premium-Features anzeigen
+        function showPremiumFeature(featureName) {
+            alert(`🚀 ${featureName}\n\nDieses Feature ist noch in Entwicklung!\n\n⭐ Premium-Features werden in einer zukünftigen Version verfügbar sein.\n\nDazu gehören:\n• Erweiterte Statistiken\n• Profil-Verwaltung\n• Allianz-Tools\n• Battle-Simulator\n• und vieles mehr!`);
+        }
+
+        // Statistiken aktualisieren (Hilfsfunktion für andere Tools)
+        async function updateUserStats(statType, increment = 1) {
+            try {
+                if (!currentUser) return;
+                
+                const db = window.FirebaseConfig.getDB();
+                const statsRef = db.collection('userStats').doc(currentUser.uid);
+                const statsDoc = await statsRef.get();
+                
+                if (statsDoc.exists) {
+                    const currentStats = statsDoc.data();
+                    const updates = {};
+                    updates[statType] = (currentStats[statType] || 0) + increment;
+                    await statsRef.update(updates);
+                } else {
+                    const newStats = { battles: 0, raids: 0, winRate: 0 };
+                    newStats[statType] = increment;
+                    await statsRef.set(newStats);
+                }
+                
+                // Dashboard-Daten neu laden
+                await loadUserStats();
+                
+                console.log('📈 Statistik aktualisiert:', statType, '+' + increment);
+                
+            } catch (error) {
+                console.error('❌ Fehler beim Aktualisieren der Statistiken:', error);
+            }
+        }
+
+        // Aktivität hinzufügen (Hilfsfunktion)
+        async function addActivity(icon, text) {
+            try {
+                if (!currentUser) return;
+                
+                const db = window.FirebaseConfig.getDB();
+                await db.collection('userActivities').add({
+                    userId: currentUser.uid,
+                    icon: icon,
+                    text: text,
+                    timestamp: window.FirebaseConfig.getServerTimestamp()
+                });
+                
+                // Aktivitäten neu laden
+                await loadRecentActivity();
+                
+                console.log('📝 Aktivität hinzugefügt:', text);
+                
+            } catch (error) {
+                console.error('❌ Fehler beim Hinzufügen der Aktivität:', error);
+            }
+        }
+
+        // Tool-Nutzung tracken (für Integration mit anderen Seiten)
+        function onCalculatorUsed() {
+            updateUserStats('battles');
+            addActivity('⚔️', 'AS-Counter verwendet');
+        }
+
+        function onRaidCounterUsed() {
+            updateUserStats('raids');
+            addActivity('🏴‍☠️', 'Raid-Counter verwendet');
+        }
+
+        function onDashboardCalculatorUsed() {
+            updateUserStats('battles');
+            addActivity('⚔️💾', 'AS-Counter (Dashboard) verwendet');
+        }
+
+        function onDashboardRaidCounterUsed() {
+            updateUserStats('raids');
+            addActivity('🏴‍☠️💾', 'Raid-Counter (Dashboard) verwendet');
+        }
+
+        // Keyboard-Shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Strg+L = Logout
+            if (e.ctrlKey && e.key === 'l') {
+                e.preventDefault();
+                if (window.SyncAPI && window.SyncAPI.dashboardLogout) {
+                    window.SyncAPI.dashboardLogout();
+                }
+            }
+            
+            // Strg+H = Home (zur Startseite, eingeloggt bleiben)
+            if (e.ctrlKey && e.key === 'h') {
+                e.preventDefault();
+                if (confirm('Zur Startseite zurückkehren? (Sie bleiben eingeloggt)')) {
+                    window.location.href = 'index.html';
+                }
+            }
+            
+            // F5 = Dashboard neu laden
+            if (e.key === 'F5') {
+                e.preventDefault();
+                window.location.reload();
+            }
+        });
+
+        // Session-Inaktivitäts-Timer
+        let sessionTimeout;
+        const SESSION_TIMEOUT_MINUTES = 30;
+
+        function resetSessionTimeout() {
+            clearTimeout(sessionTimeout);
+            sessionTimeout = setTimeout(() => {
+                alert('Ihre Session ist nach 30 Minuten Inaktivität abgelaufen.\n\nSie werden automatisch abgemeldet.');
+                if (window.SyncAPI && window.SyncAPI.quickLogout) {
+                    window.SyncAPI.quickLogout();
+                }
+            }, SESSION_TIMEOUT_MINUTES * 60 * 1000);
+        }
+
+        // Session-Timer bei User-Aktivität zurücksetzen
+        ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'].forEach(event => {
+            document.addEventListener(event, resetSessionTimeout, true);
+        });
+
+        // Session-Timer beim Laden starten
+        document.addEventListener('DOMContentLoaded', resetSessionTimeout);
+
+        // Export-API für andere Seiten
+        window.dashboardAPI = {
+            addActivity: addActivity,
+            updateUserStats: updateUserStats,
+            onCalculatorUsed: onCalculatorUsed,
+            onRaidCounterUsed: onRaidCounterUsed,
+            onDashboardCalculatorUsed: onDashboardCalculatorUsed,
+            onDashboardRaidCounterUsed: onDashboardRaidCounterUsed,
+            getCurrentUser: () => currentUser,
+            getUserData: () => userData,
+            loadDashboardData: loadDashboardData
+        };
+
+        // Debug-Funktionen (können in Produktion entfernt werden)
+        window.dashboardDebug = {
+            getCurrentUser: () => currentUser,
+            getUserData: () => userData,
+            reloadData: loadDashboardData,
+            showStats: () => console.table({
+                user: currentUser?.email,
+                username: userData?.username,
+                alliance: userData?.alliance,
+                isAdmin: userData?.isAllianceAdmin
+            }),
+            testActivity: () => addActivity('🧪', 'Test-Aktivität'),
+            testStats: () => updateUserStats('battles', 1)
+        };
+
+        console.log('🎯 Dashboard vollständig initialisiert');
+        console.log('💡 Keyboard-Shortcuts: Strg+L (Logout), Strg+H (Home), F5 (Reload)');
+        console.log('🔧 Debug-Funktionen verfügbar: window.dashboardDebug');
+        
+        // Dashboard Navigation Links direkt testen
+        function testDashboardLinks() {
+            const raidLinks = document.querySelectorAll('a[href*="raid"]');
+            console.log('🔍 Gefundene Raid-Links:', raidLinks.length);
+            raidLinks.forEach((link, index) => {
+                console.log(`${index + 1}. ${link.href} - Text: "${link.textContent.trim()}"`);
+            });
+        }
+        
+        // Test-Funktion verfügbar machen
+        window.testDashboardLinks = testDashboardLinks;
+        
+        // Automatischer Test nach 3 Sekunden
+        setTimeout(() => {
+            console.log('🧪 Automatischer Link-Test:');
+            testDashboardLinks();
+        }, 3000);
+
+        // AS-Counter Navigation Setup
+        function setupCalculatorNavigation() {
+            // Alle AS-Counter-Links für Dashboard-Version konfigurieren
+            const calculatorLinks = document.querySelectorAll('a[href="as-counter.html"]');
+            
+            calculatorLinks.forEach(link => {
+                link.href = 'dashboard-as-counter.html';
+                link.title = 'AS-Counter (Dashboard) - Alle Kämpfe werden automatisch gespeichert';
+                
+                // Icon erweitern
+                const icon = link.querySelector('.nav-icon, .action-icon');
+                if (icon && !icon.textContent.includes('💾')) {
+                    icon.textContent = '⚔️💾';
+                }
+                
+                // Text erweitern
+                const text = link.querySelector('.action-title, .nav-text');
+                if (text && !text.textContent.includes('Dashboard')) {
+                    text.textContent = 'AS-Counter (Dashboard)';
+                }
+                
+                // Beschreibung erweitern
+                const desc = link.querySelector('.action-desc');
+                if (desc) {
+                    desc.textContent = 'AS-Counter mit automatischem Speichern aller Kampfergebnisse';
+                }
+            });
+        }
+
+        // Raid-Counter Navigation Setup
+        function setupRaidCounterNavigation() {
+            // Alle Raid-Counter-Links für Dashboard-Version konfigurieren
+            const raidLinks = document.querySelectorAll('a[href="raid-counter.html"]');
+            
+            raidLinks.forEach(link => {
+                link.href = 'dashboard-raid-counter.html';
+                link.title = 'Raid-Counter (Dashboard) - Alle Raids werden automatisch gespeichert';
+                
+                // Icon erweitern
+                const icon = link.querySelector('.nav-icon, .action-icon');
+                if (icon && !icon.textContent.includes('💾')) {
+                    icon.textContent = '🏴‍☠️💾';
+                }
+                
+                // Text erweitern
+                const text = link.querySelector('.action-title, .nav-text');
+                if (text && !text.textContent.includes('Dashboard')) {
+                    text.textContent = 'Raid-Counter (Dashboard)';
+                }
+                
+                // Beschreibung erweitern
+                const desc = link.querySelector('.action-desc');
+                if (desc) {
+                    desc.textContent = 'Raid-Counter mit automatischem Speichern aller Raid-Daten';
+                }
+            });
+        }
+
+        // Dashboard-Navigation beim Dashboard-Load ausführen
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                setupCalculatorNavigation();
+                setupRaidCounterNavigation();
+                console.log('🔗 Dashboard-Navigation konfiguriert');
+            }, 1000);
+        });
+    </script>
+    <script src="../js/calculator-data.js"></script>
+    <script src="../js/raid-data-manager.js"></script>
+    <script>
+// Sabo-Counter Links automatisch reparieren
+function fixSaboCounterLinks() {
+    const brokenSaboLinks = document.querySelectorAll('a[onclick*="Sabo-Counter"]');
+    
+    brokenSaboLinks.forEach(link => {
+        link.href = 'dashboard-sabo-counter.html';
+        link.removeAttribute('onclick');
+        link.classList.remove('coming-soon-link');
+        
+        const icon = link.querySelector('.nav-icon, .action-icon');
+        if (icon) icon.textContent = '💥💾';
+        
+        console.log('✅ Sabo-Counter Link repariert');
+    });
+}
+
+<script>
+// Sabo-Counter Links automatisch reparieren
+function fixSaboCounterLinks() {
+    const brokenSaboLinks = document.querySelectorAll('a[onclick*="Sabo-Counter"]');
+    
+    brokenSaboLinks.forEach(link => {
+        link.href = 'dashboard-sabo-counter.html';
+        link.removeAttribute('onclick');
+        link.classList.remove('coming-soon-link');
+        
+        const icon = link.querySelector('.nav-icon, .action-icon');
+        if (icon) icon.textContent = '💥💾';
+        
+        console.log('✅ Sabo-Counter Link repariert');
+    });
+}
+
+// Fix beim Laden ausführen
+document.addEventListener('DOMContentLoaded', fixSaboCounterLinks);
+setTimeout(fixSaboCounterLinks, 1000);
+</script>
+    <script>
+// NOTFALL-REPARATUR für Sabo-Counter Button
+function emergencyFixSaboButton() {
+    console.log('🚨 EMERGENCY: Repariere Sabo-Counter Button...');
+    
+    // Alle defekten Sabo-Links finden und reparieren
+    document.querySelectorAll('a').forEach(link => {
+        const text = link.textContent || '';
+        const onclick = link.getAttribute('onclick') || '';
+        
+        if ((text.includes('Sabo') || text.includes('💥')) && 
+            (onclick.includes('showPremiumFeature') || link.href.includes('#'))) {
+            
+            console.log('🔧 Repariere Sabo-Link:', link);
+            
+            // Link komplett überschreiben
+            link.href = 'dashboard-sabo-counter.html';
+            link.removeAttribute('onclick');
+            link.onclick = null;
+            
+            // Neuen Click-Handler setzen
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('🚀 Navigiere zu Sabo-Counter Dashboard');
+                window.location.href = 'dashboard-sabo-counter.html';
+            });
+            
+            // Icon aktualisieren
+            const icon = link.querySelector('.nav-icon, .action-icon');
+            if (icon) icon.textContent = '💥💾';
+            
+            console.log('✅ Sabo-Link repariert!');
+        }
+    });
+}
+
+// Sofort ausführen
+emergencyFixSaboButton();
+setTimeout(emergencyFixSaboButton, 1000);
+setTimeout(emergencyFixSaboButton, 3000);
+</script>
+</body>
+</html>

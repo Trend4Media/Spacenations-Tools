@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spionage-Report - Spacenations Tools</title>
+    <!-- Gemeinsame Theme-Variablen -->
+    <link rel="stylesheet" href="../css/theme-variables.css">
+    <link rel="stylesheet" href="../css/global-footer.css">
+    <link rel="stylesheet" href="../css/enhanced-navigation.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: grid;
+            grid-template-areas: 
+                "header header header"
+                "nav main sidebar"
+                "footer footer footer";
+            grid-template-columns: 250px 1fr 300px;
+            grid-template-rows: auto 1fr auto;
+            gap: 20px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        /* Header */
+        .header {
+            grid-area: header;
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px var(--border-shadow);
+            backdrop-filter: blur(10px);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            color: var(--accent-primary);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .header-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .branch-badge {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 10px rgba(255, 107, 53, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .theme-toggle {
+            background: linear-gradient(45deg, #3a5998, #4a90e2);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #64748b, #475569);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(100, 116, 139, 0.4);
+        }
+
+        /* Navigation */
+        .nav {
+            grid-area: nav;
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px var(--border-shadow);
+            backdrop-filter: blur(10px);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .nav h3 {
+            color: var(--accent-primary);
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-list {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: var(--accent-primary);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: var(--accent-primary);
+            color: white;
+            box-shadow: 0 0 15px var(--accent-shadow);
+        }
+
+        .nav-icon {
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main {
+            grid-area: main;
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 20px var(--border-shadow);
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+        }
+
+        .main h2 {
+            color: var(--accent-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Report Input Section */
+        .report-input {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-secondary);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .input-group textarea {
+            padding: 15px;
+            border: 1px solid var(--border-secondary);
+            border-radius: 8px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            min-height: 200px;
+        }
+
+        .input-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px var(--accent-shadow);
+        }
+
+        .input-group input {
+            padding: 10px;
+            border: 1px solid var(--border-secondary);
+            border-radius: 8px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px var(--accent-shadow);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), #4a90e2);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #64748b, #475569);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Parsed Data Display */
+        .parsed-data {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-secondary);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .parsed-data.visible {
+            display: block;
+        }
+
+        .data-section {
+            margin-bottom: 20px;
+        }
+
+        .data-section h3 {
+            color: var(--accent-primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .data-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-tertiary);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .data-label {
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .data-value {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* Fleet Display */
+        .fleet-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .fleet-table th,
+        .fleet-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-secondary);
+        }
+
+        .fleet-table th {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            grid-area: sidebar;
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px var(--border-shadow);
+            backdrop-filter: blur(10px);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .sidebar h3 {
+            color: var(--accent-primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-secondary);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-card h4 {
+            color: var(--accent-primary);
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .info-card p {
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        /* Loading States */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-secondary);
+            border-top: 4px solid var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Status Messages */
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid #22c55e;
+            color: #22c55e;
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+
+        .status-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid #f59e0b;
+            color: #f59e0b;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            body {
+                grid-template-columns: 200px 1fr 250px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                grid-template-areas: 
+                    "header"
+                    "main"
+                    "nav"
+                    "sidebar"
+                    "footer";
+                grid-template-columns: 1fr;
+                padding: 10px;
+                gap: 10px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1>📊 Spionage-Report</h1>
+                <p class="header-subtitle">Analyse und Auswertung von Spionage-Berichten</p>
+            </div>
+            <div class="header-right">
+                <span class="branch-badge">TESTAREA</span>
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <span id="theme-icon">🌙</span>
+                    <span id="theme-text">Dark Mode</span>
+                </button>
+                <a href="dashboard.html" class="back-btn">
+                    <span>←</span>
+                    Dashboard
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav" id="navigation">
+        <h3>🧭 Navigation</h3>
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <span class="nav-icon">🏠</span>
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="spy-database.html" class="nav-link">
+                    <span class="nav-icon">📡</span>
+                    Spionage-Datenbank
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="spy-report.html" class="nav-link active">
+                    <span class="nav-icon">📊</span>
+                    Spionage-Report
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+        <h2>
+            <span>📊</span>
+            Spionage-Report Analyzer
+        </h2>
+
+        <!-- Status Messages -->
+        <div id="status-messages"></div>
+
+        <!-- Report Input Section -->
+        <div class="report-input">
+            <div class="input-group">
+                <label for="report-text">Spionage-Report einfügen:</label>
+                <textarea id="report-text" placeholder="Füge hier deinen Spionage-Report aus Spacenations ein...
+
+Beispiel:
+Spionage von Spieler123 [1:234:5]
+Allianz: [ABC] Test Alliance
+Flotte:
+- Jäger: 1.250
+- Bomber: 850
+- Kreuzer: 450
+..."></textarea>
+            </div>
+            
+            <div class="input-group">
+                <label for="target-name">Zielname (optional):</label>
+                <input type="text" id="target-name" placeholder="Name des Ziels">
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="parseReport()">
+                <span>🔍</span>
+                Report analysieren
+            </button>
+            <button class="btn btn-secondary" onclick="clearReport()">
+                <span>🗑️</span>
+                Zurücksetzen
+            </button>
+            <button class="btn btn-success" onclick="saveToDatabase()" id="save-btn" style="display: none;">
+                <span>💾</span>
+                In Datenbank speichern
+            </button>
+            <button class="btn btn-warning" onclick="exportReport()" id="export-btn" style="display: none;">
+                <span>📤</span>
+                Report exportieren
+            </button>
+        </div>
+
+        <!-- Parsed Data Display -->
+        <div class="parsed-data" id="parsed-data">
+            <div class="data-section">
+                <h3>
+                    <span>ℹ️</span>
+                    Ziel-Informationen
+                </h3>
+                <div class="data-grid">
+                    <div class="data-card">
+                        <div class="data-label">Spielername</div>
+                        <div class="data-value" id="player-name">-</div>
+                    </div>
+                    <div class="data-card">
+                        <div class="data-label">Allianz</div>
+                        <div class="data-value" id="player-alliance">-</div>
+                    </div>
+                    <div class="data-card">
+                        <div class="data-label">Koordinaten</div>
+                        <div class="data-value" id="player-coords">-</div>
+                    </div>
+                    <div class="data-card">
+                        <div class="data-label">Spionage-Zeit</div>
+                        <div class="data-value" id="spy-time">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-section">
+                <h3>
+                    <span>🚀</span>
+                    Flotten-Analyse
+                </h3>
+                <table class="fleet-table">
+                    <thead>
+                        <tr>
+                            <th>Schiffstyp</th>
+                            <th>Anzahl</th>
+                            <th>Kampfwert</th>
+                            <th>Anteil</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fleet-tbody">
+                        <tr>
+                            <td colspan="4" class="loading">
+                                <div class="spinner"></div>
+                                Warte auf Report-Analyse...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="data-section">
+                <h3>
+                    <span>💰</span>
+                    Ressourcen
+                </h3>
+                <div class="data-grid">
+                    <div class="data-card">
+                        <div class="data-label">Metall</div>
+                        <div class="data-value" id="metal">-</div>
+                    </div>
+                    <div class="data-card">
+                        <div class="data-label">Kristall</div>
+                        <div class="data-value" id="crystal">-</div>
+                    </div>
+                    <div class="data-card">
+                        <div class="data-label">Deuterium</div>
+                        <div class="data-value" id="deuterium">-</div>
+                    </div>
+                    <div class="data-card">
+                        <div class="data-label">Gesamt</div>
+                        <div class="data-value" id="total-resources">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h3>ℹ️ Hilfe & Tipps</h3>
+        
+        <div class="info-card">
+            <h4>Report-Format</h4>
+            <p>Kopiere den kompletten Spionage-Report aus Spacenations und füge ihn in das Textfeld ein. Der Parser erkennt automatisch die wichtigsten Daten.</p>
+        </div>
+        
+        <div class="info-card">
+            <h4>Unterstützte Daten</h4>
+            <p>• Spielername & Allianz<br>
+               • Koordinaten<br>
+               • Flottenzusammensetzung<br>
+               • Ressourcen<br>
+               • Verteidigungsanlagen</p>
+        </div>
+        
+        <div class="info-card">
+            <h4>Automatische Speicherung</h4>
+            <p>Analysierte Reports können direkt in der Spionage-Datenbank gespeichert werden für spätere Auswertungen.</p>
+        </div>
+        
+        <div class="info-card">
+            <h4>Export-Optionen</h4>
+            <p>Exportiere die analysierten Daten als JSON oder CSV für externe Tools und Statistiken.</p>
+        </div>
+    </aside>
+
+    <!-- Footer wird durch global-footer-loader.js geladen -->
+    <footer id="global-footer"></footer>
+
+    <!-- Scripts -->
+    <script src="../js/config.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/firebase-sync.js"></script>
+    <script src="../js/theme-manager.js"></script>
+    <script src="../js/enhanced-navigation.js"></script>
+    <script src="../js/global-footer-loader.js"></script>
+    <script src="../js/spy-parser.js"></script>
+    <script src="../js/spy-report.js"></script>
+
+    <script>
+        // Globale Variablen
+        let currentParsedData = null;
+
+        // Initialisierung
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme Manager initialisieren
+            initializeTheme();
+            
+            // Enhanced Navigation initialisieren
+            initializeEnhancedNavigation();
+            
+            // Global Footer laden
+            loadGlobalFooter();
+            
+            // Spy Report initialisieren
+            if (typeof initializeSpyReport === 'function') {
+                initializeSpyReport();
+            }
+            
+            // Branch-spezifische Konfiguration
+            if (window.location.pathname.includes('/testarea/')) {
+                document.body.setAttribute('data-branch', 'testarea');
+                console.log('🔧 TESTAREA Modus aktiviert');
+            }
+        });
+
+        // Theme Toggle Funktion
+        function toggleTheme() {
+            if (typeof window.toggleTheme === 'function') {
+                window.toggleTheme();
+            }
+        }
+
+        // Report-Analyse Funktion
+        function parseReport() {
+            const reportText = document.getElementById('report-text').value.trim();
+            const targetName = document.getElementById('target-name').value.trim();
+            
+            if (!reportText) {
+                showStatusMessage('Bitte füge einen Spionage-Report ein.', 'error');
+                return;
+            }
+
+            showStatusMessage('Analysiere Report...', 'info');
+            
+            // Hier würde die echte Parser-Logik stehen
+            setTimeout(() => {
+                // Dummy-Daten für Demo
+                const dummyData = {
+                    playerName: targetName || 'Spieler123',
+                    alliance: '[ABC] Test Alliance',
+                    coordinates: '1:234:5',
+                    spyTime: new Date().toLocaleString('de-DE'),
+                    fleet: [
+                        { type: 'Jäger', count: 1250, power: 125000, percentage: 35 },
+                        { type: 'Bomber', count: 850, power: 85000, percentage: 24 },
+                        { type: 'Kreuzer', count: 450, power: 90000, percentage: 25 },
+                        { type: 'Schlachtschiff', count: 120, power: 60000, percentage: 16 }
+                    ],
+                    resources: {
+                        metal: 1250000,
+                        crystal: 850000,
+                        deuterium: 450000,
+                        total: 2550000
+                    }
+                };
+                
+                displayParsedData(dummyData);
+                currentParsedData = dummyData;
+                showStatusMessage('Report erfolgreich analysiert!', 'success');
+                
+                // Buttons anzeigen
+                document.getElementById('save-btn').style.display = 'flex';
+                document.getElementById('export-btn').style.display = 'flex';
+            }, 1500);
+        }
+
+        // Parsed Data anzeigen
+        function displayParsedData(data) {
+            // Ziel-Informationen
+            document.getElementById('player-name').textContent = data.playerName;
+            document.getElementById('player-alliance').textContent = data.alliance;
+            document.getElementById('player-coords').textContent = data.coordinates;
+            document.getElementById('spy-time').textContent = data.spyTime;
+            
+            // Flotten-Tabelle
+            const fleetTbody = document.getElementById('fleet-tbody');
+            fleetTbody.innerHTML = '';
+            
+            data.fleet.forEach(ship => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${ship.type}</td>
+                    <td>${ship.count.toLocaleString('de-DE')}</td>
+                    <td>${ship.power.toLocaleString('de-DE')}</td>
+                    <td>${ship.percentage}%</td>
+                `;
+                fleetTbody.appendChild(row);
+            });
+            
+            // Ressourcen
+            document.getElementById('metal').textContent = data.resources.metal.toLocaleString('de-DE');
+            document.getElementById('crystal').textContent = data.resources.crystal.toLocaleString('de-DE');
+            document.getElementById('deuterium').textContent = data.resources.deuterium.toLocaleString('de-DE');
+            document.getElementById('total-resources').textContent = data.resources.total.toLocaleString('de-DE');
+            
+            // Parsed Data Section anzeigen
+            document.getElementById('parsed-data').classList.add('visible');
+        }
+
+        // Report zurücksetzen
+        function clearReport() {
+            document.getElementById('report-text').value = '';
+            document.getElementById('target-name').value = '';
+            document.getElementById('parsed-data').classList.remove('visible');
+            document.getElementById('save-btn').style.display = 'none';
+            document.getElementById('export-btn').style.display = 'none';
+            document.getElementById('status-messages').innerHTML = '';
+            currentParsedData = null;
+        }
+
+        // In Datenbank speichern
+        function saveToDatabase() {
+            if (!currentParsedData) {
+                showStatusMessage('Keine Daten zum Speichern vorhanden.', 'error');
+                return;
+            }
+            
+            showStatusMessage('Speichere in Datenbank...', 'info');
+            
+            // Hier würde die echte Speicher-Logik stehen
+            setTimeout(() => {
+                showStatusMessage('Daten erfolgreich in der Spionage-Datenbank gespeichert!', 'success');
+            }, 1000);
+        }
+
+        // Report exportieren
+        function exportReport() {
+            if (!currentParsedData) {
+                showStatusMessage('Keine Daten zum Exportieren vorhanden.', 'error');
+                return;
+            }
+            
+            const dataStr = JSON.stringify(currentParsedData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `spy-report-${currentParsedData.playerName}-${Date.now()}.json`;
+            link.click();
+            
+            showStatusMessage('Report erfolgreich exportiert!', 'success');
+        }
+
+        // Status-Nachricht anzeigen
+        function showStatusMessage(message, type) {
+            const container = document.getElementById('status-messages');
+            container.innerHTML = `
+                <div class="status-message status-${type}">
+                    <span>${getStatusIcon(type)}</span>
+                    ${message}
+                </div>
+            `;
+            
+            // Nach 5 Sekunden ausblenden (außer bei Fehlern)
+            if (type !== 'error') {
+                setTimeout(() => {
+                    container.innerHTML = '';
+                }, 5000);
+            }
+        }
+
+        // Status-Icon ermitteln
+        function getStatusIcon(type) {
+            switch (type) {
+                case 'success': return '✅';
+                case 'error': return '❌';
+                case 'warning': return '⚠️';
+                case 'info': return 'ℹ️';
+                default: return 'ℹ️';
+            }
+        }
+    </script>
+</body>
+</html>
