@@ -9,7 +9,9 @@ class FirebaseSync {
         this.redirectRules = {
             'index': { requiresAuth: false, redirectTo: 'dashboard.html' },
             'dashboard': { requiresAuth: true, redirectTo: 'index.html' },
-            'register': { requiresAuth: false, redirectTo: 'dashboard.html' }
+            'register': { requiresAuth: false, redirectTo: 'dashboard.html' },
+            'spy-database': { requiresAuth: true, redirectTo: 'index.html' },
+            'spy-report': { requiresAuth: true, redirectTo: 'index.html' }
         };
         
         this.init();
@@ -280,10 +282,18 @@ class FirebaseSync {
     
     redirectAfterDelay(url, delay = 2000) {
         console.log(`⏳ Weiterleitung zu ${url} in ${delay}ms`);
-        
+        const base = this.getBasePath();
         setTimeout(() => {
-            window.location.href = url;
+            window.location.href = base + url;
         }, delay);
+    }
+    
+    getBasePath() {
+        const p = window.location.pathname;
+        if (p.includes('/testarea/')) {
+            return p.split('/testarea/')[0] + '/';
+        }
+        return p.replace(/[^/]*$/, '');
     }
     
     // Dashboard-Daten laden (bestehende Funktion)
