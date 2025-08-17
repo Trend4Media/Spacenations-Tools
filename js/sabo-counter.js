@@ -610,9 +610,19 @@ async function updateDashboardSabotageStats() {
         const statsRef = db.collection('userStats').doc(currentUser.uid);
         const statsDoc = await statsRef.get();
         
-        let currentStats = { sabotages: 0, totalSabotagePoints: 0, totalLevelsDestroyed: 0 };
+        let currentStats = { 
+            sabotages: 0, 
+            totalSabotagePoints: 0, 
+            totalLevelsDestroyed: 0,
+            destroyedBuildings: {}
+        };
         if (statsDoc.exists) {
             currentStats = { ...currentStats, ...statsDoc.data() };
+        }
+        
+        // Stelle sicher, dass destroyedBuildings existiert
+        if (!currentStats.destroyedBuildings) {
+            currentStats.destroyedBuildings = {};
         }
         
         // Neue Sabotage-Stats hinzufügen
@@ -622,6 +632,26 @@ async function updateDashboardSabotageStats() {
             totalLevelsDestroyed: (currentStats.totalLevelsDestroyed || 0) + currentSabotageData.totalLevels,
             lastSabotageUpdate: window.FirebaseConfig.getServerTimestamp()
         };
+
+        // Gebäude-spezifische Statistiken aktualisieren
+        if (!updatedStats.destroyedBuildings) {
+            updatedStats.destroyedBuildings = {};
+        }
+        
+        // Initialisiere alle Gebäude-Typen mit 0 falls sie nicht existieren
+        for (const building of Object.keys(BUILDING_POINTS)) {
+            if (!updatedStats.destroyedBuildings[building]) {
+                updatedStats.destroyedBuildings[building] = 0;
+            }
+        }
+        
+        // Füge die neuen zerstörten Gebäude hinzu
+        for (const [building, count] of Object.entries(currentSabotageData.buildings)) {
+            if (BUILDING_POINTS[building]) {
+                updatedStats.destroyedBuildings[building] = 
+                    (updatedStats.destroyedBuildings[building] || 0) + count;
+            }
+        }
         
         await statsRef.set(updatedStats, { merge: true });
         

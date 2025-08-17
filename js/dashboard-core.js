@@ -159,6 +159,9 @@ class DashboardCore {
             // Firestore-Statistiken laden und überschreiben falls vorhanden
             await this.loadFirestoreStats(battlesCount, raidsCount, winRate, daysSinceCreation);
             
+            // Sabotage-Gebäude-Statistiken laden
+            await this.loadSabotageBuildingStats();
+            
             // Animierte Zähler starten
             this.animateStatCounters();
             
@@ -195,6 +198,98 @@ class DashboardCore {
             console.error('❌ Fehler beim Laden der Firestore-Statistiken:', error);
             this.setFallbackStats();
         }
+    }
+    
+    // Sabotage-Gebäude-Statistiken laden und anzeigen
+    async loadSabotageBuildingStats() {
+        try {
+            const db = window.FirebaseConfig.getDB();
+            const statsDoc = await db.collection('userStats').doc(this.currentUser.uid).get();
+            
+            const buildingStatsContainer = document.getElementById('building-stats');
+            if (!buildingStatsContainer) return;
+            
+            // Gebäude-Punkte-System (gleich wie im Sabo-Counter)
+            const BUILDING_POINTS = {
+                'Planetenzentrale': 3,
+                'Raumhafen': 1,
+                'Wohngebäude': 1,
+                'Solarpark': 1,
+                'Eisenmine': 1,
+                'Siliziumraffinerie': 1,
+                'Kohlenstoffgewinnungsanlage': 1,
+                'Bohrturm': 1,
+                'Chemiefabrik': 2,
+                'Recyclinganlage': 2,
+                'Rohstofflager': 2,
+                'Schiffsfabrik': 3,
+                'Waffenfabrik': 3,
+                'Forschungszentrum': 3
+            };
+            
+            let destroyedBuildings = {};
+            let totalSabotages = 0;
+            let totalPoints = 0;
+            let totalBuildings = 0;
+            
+            if (statsDoc.exists) {
+                const stats = statsDoc.data();
+                destroyedBuildings = stats.destroyedBuildings || {};
+                totalSabotages = stats.sabotages || 0;
+                totalPoints = stats.totalSabotagePoints || 0;
+                
+                // Aktualisiere die Sabotage-Anzahl im Dashboard
+                const totalSabotagesElement = document.getElementById('total-sabotages');
+                if (totalSabotagesElement) {
+                    totalSabotagesElement.textContent = totalSabotages;
+                }
+            }
+            
+            // Erstelle die Gebäude-Tabelle
+            let buildingStatsHTML = '<div class="sabotage-buildings-table">';
+            buildingStatsHTML += '<h5 style="margin-bottom: 15px; color: var(--text-primary); font-size: 0.9rem;">🏗️ Zerstörte Gebäude</h5>';
+            buildingStatsHTML += '<div class="building-stats-grid">';
+            
+            // Header
+            buildingStatsHTML += '<div class="building-header">Gebäude</div>';
+            buildingStatsHTML += '<div class="building-header">Anzahl</div>';
+            
+            // Gebäude-Zeilen
+            for (const building of Object.keys(BUILDING_POINTS)) {
+                const count = destroyedBuildings[building] || 0;
+                totalBuildings += count;
+                
+                buildingStatsHTML += `<div class="building-name">${building}</div>`;
+                buildingStatsHTML += `<div class="building-count">${count}</div>`;
+            }
+            
+            buildingStatsHTML += '</div>'; // building-stats-grid
+            
+            // Gesamt-Statistiken
+            buildingStatsHTML += '<div class="sabotage-totals">';
+            buildingStatsHTML += `<div class="total-stat"><strong>Gesamt zerstörte Gebäude:</strong> <span class="highlight">${totalBuildings}</span></div>`;
+            buildingStatsHTML += `<div class="total-stat"><strong>Gesamt Sabotierte Punktzahl:</strong> <span class="highlight">${this.formatNumber(totalPoints)}</span></div>`;
+            buildingStatsHTML += '</div>';
+            
+            buildingStatsHTML += '</div>'; // sabotage-buildings-table
+            
+            buildingStatsContainer.innerHTML = buildingStatsHTML;
+            
+            console.log('🏗️ Sabotage-Gebäude-Statistiken geladen');
+            
+        } catch (error) {
+            console.error('❌ Fehler beim Laden der Sabotage-Gebäude-Statistiken:', error);
+            const buildingStatsContainer = document.getElementById('building-stats');
+            if (buildingStatsContainer) {
+                buildingStatsContainer.innerHTML = '<div class="error-message">Fehler beim Laden der Gebäude-Statistiken</div>';
+            }
+        }
+    }
+    
+    // Zahlen formatieren
+    formatNumber(num) {
+        if (!num || num === 0) return '0';
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     }
     
     // Fallback-Statistiken setzen
@@ -462,6 +557,13 @@ class DashboardCore {
         document.addEventListener('calculatorDataUpdated', async () => {
             console.log('🔄 AS-Counter-Daten aktualisiert - Dashboard wird refreshed');
             await this.loadEnhancedStats();
+            await this.loadEnhancedActivities();
+        });
+        
+        // Sabotage-Counter-Updates überwachen
+        document.addEventListener('sabotageDataUpdated', async () => {
+            console.log('🔄 Sabotage-Daten aktualisiert - Dashboard wird refreshed');
+            await this.loadSabotageBuildingStats();
             await this.loadEnhancedActivities();
         });
         

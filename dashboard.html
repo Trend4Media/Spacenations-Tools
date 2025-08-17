@@ -876,6 +876,82 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Sabotage Buildings Table */
+        .sabotage-buildings-table {
+            margin-top: 15px;
+        }
+
+        .building-stats-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 8px 15px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+        }
+
+        .building-header {
+            font-weight: bold;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-primary);
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+        }
+
+        .building-name {
+            color: var(--text-secondary);
+            padding: 3px 0;
+        }
+
+        .building-count {
+            color: var(--text-primary);
+            font-weight: 500;
+            text-align: right;
+            padding: 3px 0;
+        }
+
+        .sabotage-totals {
+            border-top: 1px solid var(--border-primary);
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+
+        .total-stat {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .total-stat .highlight {
+            color: var(--accent-primary);
+            font-weight: bold;
+        }
+
+        .loading-buildings {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            padding: 20px 0;
+        }
+
+        .mini-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border-primary);
+            border-top: 2px solid var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .error-message {
+            color: var(--error-color, #ff6b6b);
+            font-size: 0.85rem;
+            padding: 10px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
