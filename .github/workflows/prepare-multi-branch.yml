@@ -1,0 +1,257 @@
+name: Prepare Multi-Branch Structure
+
+on:
+  push:
+    branches: [ main, testarea ]
+  workflow_dispatch:
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Create multi-branch structure
+        run: |
+          # Backup current branch
+          CURRENT_BRANCH=$(git branch --show-current)
+          echo "Current branch: $CURRENT_BRANCH"
+          
+          # Create directories for multi-branch structure
+          mkdir -p main testarea
+          
+          # Copy main branch files
+          echo "📦 Preparing main branch structure..."
+          git checkout main
+          cp -r *.html css js main/ 2>/dev/null || true
+          if [ -d "build" ]; then
+            cp -r build main/ 2>/dev/null || true
+          fi
+          # Use main.html as index for main branch
+          cp main.html main/index.html 2>/dev/null || true
+          
+          # Copy testarea branch files
+          echo "📦 Preparing testarea branch structure..."
+          git checkout testarea
+          cp -r *.html css js testarea/ 2>/dev/null || true
+          if [ -d "build" ]; then
+            cp -r build testarea/ 2>/dev/null || true
+          fi
+          # Copy testarea subdirectory if exists
+          if [ -d "testarea" ]; then
+            echo "📁 Copying testarea subdirectory..."
+            cp -r testarea/* testarea/ 2>/dev/null || true
+          fi
+          
+          # Create landing page
+          echo "🏠 Creating landing page..."
+          cat > index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="de">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Spacenations Tools - Branch Auswahl</title>
+              <style>
+                  body {
+                      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                      background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+                      color: #e0e0e0;
+                      margin: 0;
+                      padding: 40px 20px;
+                      min-height: 100vh;
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                  }
+                  
+                  .container {
+                      background: rgba(16, 16, 16, 0.9);
+                      border: 2px solid #3a5998;
+                      border-radius: 15px;
+                      padding: 40px;
+                      text-align: center;
+                      box-shadow: 0 10px 30px rgba(58, 89, 152, 0.3);
+                      max-width: 600px;
+                      width: 100%;
+                  }
+                  
+                  h1 {
+                      color: #ff8c42;
+                      margin-bottom: 10px;
+                      font-size: 2.5rem;
+                      text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+                      letter-spacing: 2px;
+                  }
+                  
+                  .subtitle {
+                      color: #b0b0b0;
+                      margin-bottom: 40px;
+                      font-size: 1.1rem;
+                  }
+                  
+                  .branch-links {
+                      display: flex;
+                      gap: 20px;
+                      justify-content: center;
+                      flex-wrap: wrap;
+                      margin-bottom: 30px;
+                  }
+                  
+                  .branch-btn {
+                      background: linear-gradient(135deg, #3a5998, #4a90e2);
+                      color: white;
+                      text-decoration: none;
+                      padding: 20px 30px;
+                      border-radius: 10px;
+                      font-weight: 600;
+                      font-size: 1.1rem;
+                      transition: all 0.3s ease;
+                      border: 2px solid transparent;
+                      min-width: 180px;
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                      gap: 8px;
+                  }
+                  
+                  .branch-btn:hover {
+                      transform: translateY(-5px);
+                      box-shadow: 0 10px 25px rgba(74, 144, 226, 0.4);
+                      border-color: #ff8c42;
+                  }
+                  
+                  .main-branch {
+                      background: linear-gradient(135deg, #22c55e, #16a34a);
+                  }
+                  
+                  .main-branch:hover {
+                      box-shadow: 0 10px 25px rgba(34, 197, 94, 0.4);
+                  }
+                  
+                  .test-branch {
+                      background: linear-gradient(135deg, #f59e0b, #d97706);
+                  }
+                  
+                  .test-branch:hover {
+                      box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);
+                  }
+                  
+                  .branch-icon {
+                      font-size: 2rem;
+                      margin-bottom: 5px;
+                  }
+                  
+                  .branch-title {
+                      font-size: 1.2rem;
+                      font-weight: 700;
+                  }
+                  
+                  .branch-desc {
+                      font-size: 0.9rem;
+                      opacity: 0.8;
+                  }
+                  
+                  .description {
+                      background: rgba(0, 0, 0, 0.3);
+                      border-radius: 10px;
+                      padding: 20px;
+                      margin-top: 20px;
+                      text-align: left;
+                      line-height: 1.6;
+                  }
+                  
+                  .description strong {
+                      color: #ff8c42;
+                  }
+                  
+                  @media (max-width: 768px) {
+                      .container {
+                          margin: 20px;
+                          padding: 30px 20px;
+                      }
+                      
+                      h1 {
+                          font-size: 2rem;
+                      }
+                      
+                      .branch-links {
+                          flex-direction: column;
+                          align-items: center;
+                      }
+                      
+                      .branch-btn {
+                          min-width: 200px;
+                      }
+                  }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <h1>🚀 Spacenations Tools</h1>
+                  <div class="subtitle">Wählen Sie eine Version:</div>
+                  
+                  <div class="branch-links">
+                      <a href="main/" class="branch-btn main-branch">
+                          <div class="branch-icon">✅</div>
+                          <div class="branch-title">Main Branch</div>
+                          <div class="branch-desc">Stabile Version</div>
+                      </a>
+                      <a href="testarea/" class="branch-btn test-branch">
+                          <div class="branch-icon">🧪</div>
+                          <div class="branch-title">Testarea Branch</div>
+                          <div class="branch-desc">Neue Features</div>
+                      </a>
+                  </div>
+                  
+                  <div class="description">
+                      <strong>Main Branch:</strong> Die stabile, produktive Version mit allen bewährten Tools und Features.<br><br>
+                      <strong>Testarea Branch:</strong> Experimentelle Version mit neuen Features, Spionage-Tools und Verbesserungen im Test.
+                  </div>
+              </div>
+              
+              <script>
+                  // Keyboard Shortcuts
+                  document.addEventListener('keydown', function(e) {
+                      if (e.key === '1' || (e.key.toLowerCase() === 'm' && !e.ctrlKey)) {
+                          window.location.href = 'main/';
+                      } else if (e.key === '2' || (e.key.toLowerCase() === 't' && !e.ctrlKey)) {
+                          window.location.href = 'testarea/';
+                      }
+                  });
+                  
+                  console.log('🚀 Spacenations Tools Branch-Auswahl geladen');
+                  console.log('💡 Shortcuts: 1/M für Main, 2/T für Testarea');
+              </script>
+          </body>
+          </html>
+          EOF
+          
+          # Show structure
+          echo "📁 Created structure:"
+          ls -la main/ testarea/ 2>/dev/null || true
+          
+          # Commit changes if on main branch
+          if [ "$CURRENT_BRANCH" = "main" ]; then
+            git add .
+            if git diff --staged --quiet; then
+              echo "No changes to commit"
+            else
+              git commit -m "🔄 Auto-update multi-branch structure
+
+              - Updated main/ directory with latest main branch files
+              - Updated testarea/ directory with latest testarea branch files  
+              - Refreshed landing page for branch selection
+              - Auto-generated by GitHub Actions"
+              git push origin main
+            fi
+          fi
