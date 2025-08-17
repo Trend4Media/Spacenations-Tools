@@ -8,6 +8,52 @@
     
     <!-- Existing Calculator CSS with Dashboard enhancements -->
     <style>
+        /* Intelligenter Parser Styles */
+        .input-sections {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .input-box.smart-parser {
+            border-color: #4a90e2;
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.05), rgba(58, 89, 152, 0.05));
+        }
+        
+        .parser-info {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            background: rgba(74, 144, 226, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(74, 144, 226, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .info-item:hover {
+            background: rgba(74, 144, 226, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .info-icon {
+            font-size: 1.2rem;
+        }
+        
+        .info-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
         /* Alle bestehenden Calculator-Styles from calculator.html */
         :root {
             /* Dark Mode (Standard) */
@@ -417,16 +463,33 @@
         </div>
         
         <div class="input-sections">
-            <div class="input-box destroyed">
-                <h2>⚔️ Zerstört - Berichte (Funktion A)</h2>
-                <label for="destroyed-reports">Berichte von Angriffen bei denen Sie etwas zerstört haben:</label>
-                <textarea id="destroyed-reports" placeholder="Berichte hier einfügen bei denen Sie etwas ZERSTÖRT haben..."></textarea>
-            </div>
-            
-            <div class="input-box lost">
-                <h2>💀 Verloren - Berichte (Funktion B)</h2>
-                <label for="lost-reports">Berichte von Angriffen bei denen Sie etwas verloren haben:</label>
-                <textarea id="lost-reports" placeholder="Berichte hier einfügen bei denen Sie etwas VERLOREN haben..."></textarea>
+            <div class="input-box smart-parser">
+                <h2>🧠 Intelligenter Kampfbericht-Parser (Dashboard)</h2>
+                <label for="all-reports">Alle Kampfberichte hier einfügen (automatische Erkennung):</label>
+                <textarea id="all-reports" placeholder="Fügen Sie alle Ihre Kampfberichte hier ein - der Rechner erkennt automatisch:
+
+ZERSTÖRT-Berichte (Ihre Erfolge):
+'Die Flotte XYZ zerstörte auf dem Planeten...'
+
+VERLOREN-Berichte (Ihre Verluste):  
+'In der Flotte XYZ wurde zerstört auf dem Planeten...'
+
+💾 Dashboard-Version: Alle Berichte werden automatisch gespeichert!"></textarea>
+                
+                <div class="parser-info">
+                    <div class="info-item">
+                        <span class="info-icon">⚔️</span>
+                        <span class="info-text">Automatische Erkennung von Zerstört-Berichten</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">💀</span>
+                        <span class="info-text">Automatische Erkennung von Verloren-Berichten</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">💾</span>
+                        <span class="info-text">Automatische Firebase-Speicherung</span>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -681,31 +744,159 @@
         }
     }
     
-    // AS-Counter Berechnungslogik
+    // Intelligente Dashboard AS-Counter Berechnungslogik
     function calculateReports() {
-        const destroyedReports = document.getElementById('destroyed-reports').value;
-        const lostReports = document.getElementById('lost-reports').value;
+        const allReports = document.getElementById('all-reports').value;
         
-        // Zerstört-Statistiken berechnen
-        const destroyedStats = parseReports(destroyedReports);
+        if (!allReports.trim()) {
+            alert('Bitte fügen Sie mindestens einen Kampfbericht ein.');
+            return;
+        }
+        
+        // Berichte intelligent trennen
+        const { destroyedReports, lostReports, parseInfo } = intelligentReportParser(allReports);
+        
+        // Statistiken berechnen
+        const destroyedStats = parseReportsData(destroyedReports, 'destroyed');
+        const lostStats = parseReportsData(lostReports, 'lost');
+        
+        // Ergebnisse anzeigen
         updateDestroyedDisplay(destroyedStats);
-        
-        // Verloren-Statistiken berechnen
-        const lostStats = parseReports(lostReports);
         updateLostDisplay(lostStats);
+        
+        // Parse-Info anzeigen
+        showParseInfo(parseInfo);
         
         // Dashboard-spezifisch: Daten auch in Firebase speichern
         if (window.firebase && firebase.auth().currentUser) {
-            saveCalculationToFirebase(destroyedStats, lostStats);
+            saveCalculationToFirebase(destroyedStats, lostStats, parseInfo);
         }
         
-        Logger.info('Dashboard AS-Counter Berechnung durchgeführt', {
+        Logger.info('Intelligenter Dashboard AS-Counter Berechnung durchgeführt', {
+            parseInfo: parseInfo,
             destroyed: destroyedStats,
             lost: lostStats
         });
     }
     
-    function parseReports(reportsText) {
+    // Intelligenter Parser für gemischte Berichte (Dashboard-Version)
+    function intelligentReportParser(allReportsText) {
+        if (!allReportsText.trim()) {
+            return {
+                destroyedReports: [],
+                lostReports: [],
+                parseInfo: {
+                    totalReports: 0,
+                    destroyedCount: 0,
+                    lostCount: 0,
+                    unrecognizedCount: 0
+                }
+            };
+        }
+        
+        const destroyedReports = [];
+        const lostReports = [];
+        const unrecognizedReports = [];
+        
+        // Berichte nach Leerzeilen oder typischen Trennern aufteilen
+        const reportBlocks = allReportsText
+            .split(/\n\s*\n|\n(?=Die Flotte)|(?=In der Flotte)/)
+            .filter(block => block.trim().length > 50); // Nur sinnvolle Blöcke
+        
+        reportBlocks.forEach((block, index) => {
+            const trimmedBlock = block.trim();
+            
+            // ZERSTÖRT-Muster erkennen
+            if (isDestroyedReport(trimmedBlock)) {
+                destroyedReports.push(trimmedBlock);
+            }
+            // VERLOREN-Muster erkennen
+            else if (isLostReport(trimmedBlock)) {
+                lostReports.push(trimmedBlock);
+            }
+            // Unerkannt
+            else if (trimmedBlock.length > 20) {
+                unrecognizedReports.push(trimmedBlock);
+            }
+        });
+        
+        const parseInfo = {
+            totalReports: reportBlocks.length,
+            destroyedCount: destroyedReports.length,
+            lostCount: lostReports.length,
+            unrecognizedCount: unrecognizedReports.length,
+            unrecognizedReports: unrecognizedReports
+        };
+        
+        return {
+            destroyedReports,
+            lostReports,
+            parseInfo
+        };
+    }
+    
+    // Erkennt "Zerstört"-Berichte (Ihre Erfolge)
+    function isDestroyedReport(reportText) {
+        const destroyedPatterns = [
+            /Die Flotte.*?zerstörte auf dem Planeten/i,
+            /zerstörte.*?auf dem Planeten.*?in einer.*?Flotte/i,
+            /Die Flotte wurde zerstört\./i  // Am Ende des Berichts
+        ];
+        
+        return destroyedPatterns.some(pattern => pattern.test(reportText));
+    }
+    
+    // Erkennt "Verloren"-Berichte (Ihre Verluste)
+    function isLostReport(reportText) {
+        const lostPatterns = [
+            /In der Flotte.*?wurde zerstört auf dem Planeten/i,
+            /wurde zerstört auf dem Planeten/i,
+            /Schiffstyp.*?Anzahl/i  // Typisch für Verlust-Berichte
+        ];
+        
+        return lostPatterns.some(pattern => pattern.test(reportText));
+    }
+    
+    // Parse-Info für Dashboard-Benutzer anzeigen
+    function showParseInfo(parseInfo) {
+        const message = `
+🧠 Dashboard: Intelligente Analyse abgeschlossen:
+
+📊 Berichte analysiert: ${parseInfo.totalReports}
+⚔️ Zerstört-Berichte: ${parseInfo.destroyedCount}
+💀 Verloren-Berichte: ${parseInfo.lostCount}
+❓ Unerkannt: ${parseInfo.unrecognizedCount}
+
+${parseInfo.unrecognizedCount > 0 ? 
+  '⚠️ Hinweis: Einige Berichte wurden nicht erkannt. Prüfen Sie das Format.' : 
+  '✅ Alle Berichte erfolgreich kategorisiert und werden gespeichert!'}
+        `;
+        
+        console.log(message);
+        
+        // Dashboard-spezifische Benachrichtigung
+        if (parseInfo.unrecognizedCount > 0) {
+            setTimeout(() => {
+                alert(`Dashboard Parser: ${parseInfo.destroyedCount} Zerstört, ${parseInfo.lostCount} Verloren, ${parseInfo.unrecognizedCount} unerkannt.\n\nAlle erkannten Berichte werden automatisch gespeichert.`);
+            }, 500);
+        }
+    }
+
+    function parseReportsData(reportsArray, type) {
+        if (!reportsArray || reportsArray.length === 0) {
+            return {
+                stability: 0,
+                storage: 0,
+                armor: 0,
+                attack: 0,
+                count: 0
+            };
+        }
+        
+        // Array zu Text für bestehende Parsing-Logik
+        const reportsText = reportsArray.join('\n\n');
+        
+        function parseReports(reportsText) {
         if (!reportsText.trim()) {
             return {
                 stability: 0,
@@ -772,22 +963,21 @@
     }
     
     function clearAll() {
-        // Textareas leeren
-        document.getElementById('destroyed-reports').value = '';
-        document.getElementById('lost-reports').value = '';
+        // Textarea leeren
+        document.getElementById('all-reports').value = '';
         
         // Ergebnisse zurücksetzen
-        const destroyedStats = { stability: 0, storage: 0, armor: 0, attack: 0, count: 0 };
-        const lostStats = { stability: 0, storage: 0, armor: 0, attack: 0, count: 0 };
+        const emptyStats = { stability: 0, storage: 0, armor: 0, attack: 0, count: 0 };
         
-        updateDestroyedDisplay(destroyedStats);
-        updateLostDisplay(lostStats);
+        updateDestroyedDisplay(emptyStats);
+        updateLostDisplay(emptyStats);
         
-        Logger.info('Dashboard AS-Counter zurückgesetzt');
+        console.log('🧠 Intelligenter Dashboard AS-Counter zurückgesetzt');
+        Logger.info('Intelligenter Dashboard AS-Counter zurückgesetzt');
     }
     
-    // Firebase-Speicherung für Dashboard
-    async function saveCalculationToFirebase(destroyedStats, lostStats) {
+    // Firebase-Speicherung für Dashboard (mit Parse-Info)
+    async function saveCalculationToFirebase(destroyedStats, lostStats, parseInfo) {
         try {
             const user = firebase.auth().currentUser;
             if (!user) return;
@@ -799,8 +989,10 @@
                 timestamp: timestamp,
                 destroyed: destroyedStats,
                 lost: lostStats,
+                parseInfo: parseInfo,
                 userId: user.uid,
-                type: 'as-counter'
+                type: 'intelligent-as-counter',
+                version: '2.0'
             };
             
             await db.collection('users')
