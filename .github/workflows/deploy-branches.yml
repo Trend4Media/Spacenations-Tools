@@ -47,9 +47,8 @@ jobs:
           
           # Testarea Branch Dateien kopieren
           git checkout testarea
-          cp -r *.html css js dist/testarea/ 2>/dev/null || true
-          # main.html als index.html im testarea Ordner
-          cp main.html dist/testarea/index.html 2>/dev/null || true
+          cp -r *.html css js testarea dist/testarea/ 2>/dev/null || true
+          # Testarea hat bereits eine eigene index.html - nicht überschreiben!
           
           # Index-Datei für Branch-Auswahl erstellen
           cat > dist/index.html << 'EOF'
