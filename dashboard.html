@@ -499,6 +499,272 @@
             font-size: 0.9rem;
             line-height: 1.4;
         }
+
+        /* Stats Overview Styles */
+        .stats-overview {
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px var(--border-shadow);
+            backdrop-filter: blur(10px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .stats-card {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .stats-card.as-stats {
+            border-left: 4px solid #ef4444;
+        }
+
+        .stats-card.raid-stats {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .stats-card.sabo-stats {
+            border-left: 4px solid #8b5cf6;
+        }
+
+        .stats-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .stats-header h4 {
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-icon {
+            font-size: 1.5rem;
+        }
+
+        .stats-link {
+            color: var(--accent-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .stats-link:hover {
+            color: var(--accent-primary);
+        }
+
+        .main-stat {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .sub-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 15px;
+        }
+
+        .sub-stat {
+            text-align: center;
+            padding: 12px 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .sub-stat:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .sub-stat-icon {
+            display: block;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .sub-stat-value {
+            display: block;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 3px;
+        }
+
+        .sub-stat-label {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .resource-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .resource-stat {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            gap: 10px;
+        }
+
+        .resource-icon {
+            font-size: 1.2rem;
+        }
+
+        .resource-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .resource-label {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .building-stats {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .building-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .building-name {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .building-count {
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        .loading-buildings {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 20px;
+        }
+
+        .mini-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--text-secondary);
+            border-top: 2px solid var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        /* Kompakte Action Buttons */
+        .actions-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-btn.as-btn:hover {
+            border-color: #ef4444;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+        }
+
+        .action-btn.raid-btn:hover {
+            border-color: #f59e0b;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.1));
+        }
+
+        .action-btn.sabo-btn:hover {
+            border-color: #8b5cf6;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(124, 58, 237, 0.1));
+        }
+
+        .action-btn.tools-btn:hover {
+            border-color: var(--accent-secondary);
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.1), rgba(58, 89, 152, 0.1));
+        }
+
+        .btn-icon {
+            font-size: 1.2rem;
+        }
         
         /* Footer */
         .footer {
@@ -698,55 +964,129 @@
                 </div>
             </div>
             
-            <!-- Quick Actions -->
+            <!-- Counter Statistics Overview -->
+            <div class="stats-overview">
+                <h3 class="section-title">
+                    <span>📊</span>
+                    Deine Kampf-Statistiken
+                </h3>
+                <div class="stats-grid">
+                    <!-- AS-Counter Statistiken -->
+                    <div class="stats-card as-stats">
+                        <div class="stats-header">
+                            <span class="stats-icon">⚔️</span>
+                            <h4>Gesamt Abschuss</h4>
+                            <a href="dashboard-calculator.html" class="stats-link">→ AS-Counter</a>
+                        </div>
+                        <div class="stats-content">
+                            <div class="main-stat">
+                                <span class="stat-value" id="total-kills">0</span>
+                                <span class="stat-label">Berichte verarbeitet</span>
+                            </div>
+                            <div class="sub-stats">
+                                <div class="sub-stat">
+                                    <span class="sub-stat-icon">🛡️</span>
+                                    <span class="sub-stat-value" id="stability-destroyed">0</span>
+                                    <span class="sub-stat-label">Stabilität</span>
+                                </div>
+                                <div class="sub-stat">
+                                    <span class="sub-stat-icon">🚗</span>
+                                    <span class="sub-stat-value" id="tanks-destroyed">0</span>
+                                    <span class="sub-stat-label">Panzer</span>
+                                </div>
+                                <div class="sub-stat">
+                                    <span class="sub-stat-icon">⚔️</span>
+                                    <span class="sub-stat-value" id="as-destroyed">0</span>
+                                    <span class="sub-stat-label">AS zerstört</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Raid-Counter Statistiken -->
+                    <div class="stats-card raid-stats">
+                        <div class="stats-header">
+                            <span class="stats-icon">🏴‍☠️</span>
+                            <h4>Raid Zusammenfassung</h4>
+                            <a href="dashboard-raid-counter.html" class="stats-link">→ Raid-Counter</a>
+                        </div>
+                        <div class="stats-content">
+                            <div class="main-stat">
+                                <span class="stat-value" id="total-raids">0</span>
+                                <span class="stat-label">Raids durchgeführt</span>
+                            </div>
+                            <div class="resource-stats">
+                                <div class="resource-stat">
+                                    <span class="resource-icon">⚡</span>
+                                    <span class="resource-value" id="energy-looted">0</span>
+                                    <span class="resource-label">Energie</span>
+                                </div>
+                                <div class="resource-stat">
+                                    <span class="resource-icon">🛢️</span>
+                                    <span class="resource-value" id="oil-looted">0</span>
+                                    <span class="resource-label">Öl</span>
+                                </div>
+                                <div class="resource-stat">
+                                    <span class="resource-icon">⚒️</span>
+                                    <span class="resource-value" id="metal-looted">0</span>
+                                    <span class="resource-label">Metall</span>
+                                </div>
+                                <div class="resource-stat">
+                                    <span class="resource-icon">💎</span>
+                                    <span class="resource-value" id="crystal-looted">0</span>
+                                    <span class="resource-label">Kristall</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sabo-Counter Statistiken -->
+                    <div class="stats-card sabo-stats">
+                        <div class="stats-header">
+                            <span class="stats-icon">💥</span>
+                            <h4>Sabotage Übersicht</h4>
+                            <a href="dashboard-sabo-counter.html" class="stats-link">→ Sabo-Counter</a>
+                        </div>
+                        <div class="stats-content">
+                            <div class="main-stat">
+                                <span class="stat-value" id="total-sabotages">0</span>
+                                <span class="stat-label">Sabotagen durchgeführt</span>
+                            </div>
+                            <div class="building-stats" id="building-stats">
+                                <!-- Wird dynamisch mit JavaScript gefüllt -->
+                                <div class="loading-buildings">
+                                    <div class="mini-spinner"></div>
+                                    Gebäude-Statistiken laden...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions (kompakt) -->
             <div class="quick-actions">
                 <h3 class="section-title">
                     <span>⚡</span>
                     Schnellzugriff
                 </h3>
-                <div class="actions-grid">
-                <a href="dashboard-calculator.html" class="action-card">
-                    <div class="action-header">
-                        <span class="action-icon">⚔️💾</span>
-                        <span class="action-title">AS-Counter (Dashboard)</span>
-                    </div>
-                    <div class="action-desc">AS-Counter mit automatischem Speichern aller Kampfergebnisse</div>
-                </a>
-                <a href="dashboard-raid-counter.html" class="action-card">
-                    <div class="action-header">
-                        <span class="action-icon">🏴‍☠️💾</span>
-                        <span class="action-title">Raid-Counter (Dashboard)</span>
-                    </div>
-                    <div class="action-desc">Raid-Counter mit automatischem Speichern aller Raid-Daten</div>
-                </a>
-                    <a href="#" class="action-card" onclick="showPremiumFeature('Profile Manager')">
-                        <div class="action-header">
-                            <span class="action-icon">👤</span>
-                            <span class="action-title">Profil bearbeiten</span>
-                        </div>
-                        <div class="action-desc">Aktualisiere deine Informationen und Einstellungen</div>
+                <div class="actions-row">
+                    <a href="dashboard-calculator.html" class="action-btn as-btn">
+                        <span class="btn-icon">⚔️</span>
+                        AS-Counter
                     </a>
-                    <a href="#" class="action-card" onclick="showPremiumFeature('Alliance Tools')">
-                        <div class="action-header">
-                            <span class="action-icon">🛡️</span>
-                            <span class="action-title">Allianz-Tools</span>
-                        </div>
-                        <div class="action-desc">Verwalte deine Allianz und koordiniere Aktivitäten</div>
+                    <a href="dashboard-raid-counter.html" class="action-btn raid-btn">
+                        <span class="btn-icon">🏴‍☠️</span>
+                        Raid-Counter
                     </a>
-                </div>
-            </div>
-            
-            <!-- Recent Activity -->
-            <div class="recent-activity">
-                <h3 class="section-title">
-                    <span>📝</span>
-                    Letzte Aktivitäten
-                </h3>
-                <div class="activity-list" id="activity-list">
-                    <div class="loading">
-                        <div class="spinner"></div>
-                        Aktivitäten werden geladen...
-                    </div>
+                    <a href="dashboard-sabo-counter.html" class="action-btn sabo-btn">
+                        <span class="btn-icon">💥</span>
+                        Sabo-Counter
+                    </a>
+                    <a href="index.html" class="action-btn tools-btn">
+                        <span class="btn-icon">🛠️</span>
+                        Alle Tools
+                    </a>
                 </div>
             </div>
         </div>
@@ -800,7 +1140,8 @@
     <script src="js/theme-manager.js"></script>          <!-- 2. Theme-Management -->
     <script src="js/auth-manager.js"></script>           <!-- 3. Auth-Management -->
     <script src="js/firebase-sync.js"></script>          <!-- 4. Dashboard-Sync mit Logout -->
-    <script src="js/enhanced-navigation.js"></script>    <!-- 5. Enhanced Navigation -->
+    <script src="js/dashboard-stats.js"></script>        <!-- 5. Dashboard-Statistiken -->
+    <script src="js/enhanced-navigation.js"></script>    <!-- 6. Enhanced Navigation -->
 
     <script>
         // Dashboard-spezifische Funktionen
