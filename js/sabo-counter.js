@@ -23,14 +23,14 @@ const BUILDING_POINTS = {
 };
 
 // Alle möglichen Gebäudenamen (erweiterte Liste für bessere Erkennung)
-const ALL_BUILDING_NAMES = [
-    'Planetenzentrale', 'Raumhafen', 'Wohngebäude', 'Solarpark',
-    'Eisenmine', 'Siliziumraffinerie', 'Kohlenstoffgewinnungsanlage',
-    'Bohrturm', 'Chemiefabrik', 'Recyclinganlage', 'Rohstofflager',
-    'Schiffsfabrik', 'Waffenfabrik', 'Forschungszentrum',
-    // Zusätzliche mögliche Varianten
-    'Eismine', 'Solaranlage', 'Forschungslabor', 'Militärfabrik'
-];
+// const ALL_BUILDING_NAMES = [
+//     'Planetenzentrale', 'Raumhafen', 'Wohngebäude', 'Solarpark',
+//     'Eisenmine', 'Siliziumraffinerie', 'Kohlenstoffgewinnungsanlage',
+//     'Bohrturm', 'Chemiefabrik', 'Recyclinganlage', 'Rohstofflager',
+//     'Schiffsfabrik', 'Waffenfabrik', 'Forschungszentrum',
+//     // Zusätzliche mögliche Varianten
+//     'Eismine', 'Solaranlage', 'Forschungslabor', 'Militärfabrik'
+// ];
 
 // Globale Variablen
 let currentSabotageData = null;
@@ -185,11 +185,11 @@ function enableStandardFeatures() {
 }
 
 // Zahlen-Hilfsfunktionen
-function parseNumber(str) {
-    if (!str) return 0;
-    // Entferne alle Punkte und Leerzeichen, aber behalte Kommas
-    return parseInt(str.toString().replace(/[.\s]/g, '').replace(/,/g, '')) || 0;
-}
+// function parseNumber(str) {
+//     if (!str) return 0;
+//     // Entferne alle Punkte und Leerzeichen, aber behalte Kommas
+//     return parseInt(str.toString().replace(/[.\s]/g, '').replace(/,/g, '')) || 0;
+// }
 
 function formatNumber(num) {
     if (!num || num === 0) return '0';
@@ -201,7 +201,7 @@ function normalizeBuilding(buildingName) {
     const name = buildingName.trim();
     
     // Exakte Matches zuerst
-    if (BUILDING_POINTS.hasOwnProperty(name)) {
+    if (Object.prototype.hasOwnProperty.call(BUILDING_POINTS, name)) {
         return name;
     }
     
@@ -221,7 +221,7 @@ function normalizeBuilding(buildingName) {
     }
     
     // Partial matching
-    for (const [key, building] of Object.entries(BUILDING_POINTS)) {
+    for (const key of Object.keys(BUILDING_POINTS)) {
         if (key.toLowerCase().includes(lowerName) || lowerName.includes(key.toLowerCase())) {
             return key;
         }
@@ -255,7 +255,7 @@ function calculateSabotage() {
     console.log('📋 Verarbeite', lines.length, 'Zeilen...');
     
     for (let i = 0; i < lines.length; i++) {
-        let line = lines[i].trim();
+        const line = lines[i].trim();
         if (!line) continue;
         
         // Erkenne Sabotage-Start (verschiedene Varianten)
@@ -294,7 +294,7 @@ function calculateSabotage() {
             if (buildingData.name && buildingData.levels > 0) {
                 const normalizedName = normalizeBuilding(buildingData.name);
                 
-                if (BUILDING_POINTS.hasOwnProperty(normalizedName)) {
+                if (Object.prototype.hasOwnProperty.call(BUILDING_POINTS, normalizedName)) {
                     // Gültiges Gebäude gefunden
                     if (!buildings[normalizedName]) {
                         buildings[normalizedName] = 0;
@@ -368,7 +368,7 @@ function calculateSabotage() {
 // Gebäude-Zeile parsen (robuste Variante)
 function parseBuildingLine(line) {
     // Entferne führende Symbole und Leerzeichen
-    line = line.replace(/^[•\-\*\+\s]+/, '').trim();
+    line = line.replace(/^[•\-*+\s]+/, '').trim();
     
     // Verschiedene Formate versuchen:
     // Format 1: "Gebäudename 5" oder "Gebäudename: 5"
@@ -390,7 +390,7 @@ function parseBuildingLine(line) {
     }
     
     // Format 3: "Gebäudename (5)" oder "Gebäudename [5]"
-    match = line.match(/^(.+?)\s*[\(\[]\s*(\d+)\s*[\)\]]$/);
+    match = line.match(/^(.+?)\s*[([]]\s*(\d+)\s*[)\]]$/);
     if (match) {
         return {
             name: match[1].trim(),
@@ -610,9 +610,19 @@ async function updateDashboardSabotageStats() {
         const statsRef = db.collection('userStats').doc(currentUser.uid);
         const statsDoc = await statsRef.get();
         
-        let currentStats = { sabotages: 0, totalSabotagePoints: 0, totalLevelsDestroyed: 0 };
+        let currentStats = { 
+            sabotages: 0, 
+            totalSabotagePoints: 0, 
+            totalLevelsDestroyed: 0,
+            destroyedBuildings: {}
+        };
         if (statsDoc.exists) {
             currentStats = { ...currentStats, ...statsDoc.data() };
+        }
+        
+        // Stelle sicher, dass destroyedBuildings existiert
+        if (!currentStats.destroyedBuildings) {
+            currentStats.destroyedBuildings = {};
         }
         
         // Neue Sabotage-Stats hinzufügen
@@ -622,6 +632,26 @@ async function updateDashboardSabotageStats() {
             totalLevelsDestroyed: (currentStats.totalLevelsDestroyed || 0) + currentSabotageData.totalLevels,
             lastSabotageUpdate: window.FirebaseConfig.getServerTimestamp()
         };
+
+        // Gebäude-spezifische Statistiken aktualisieren
+        if (!updatedStats.destroyedBuildings) {
+            updatedStats.destroyedBuildings = {};
+        }
+        
+        // Initialisiere alle Gebäude-Typen mit 0 falls sie nicht existieren
+        for (const building of Object.keys(BUILDING_POINTS)) {
+            if (!updatedStats.destroyedBuildings[building]) {
+                updatedStats.destroyedBuildings[building] = 0;
+            }
+        }
+        
+        // Füge die neuen zerstörten Gebäude hinzu
+        for (const [building, count] of Object.entries(currentSabotageData.buildings)) {
+            if (BUILDING_POINTS[building]) {
+                updatedStats.destroyedBuildings[building] = 
+                    (updatedStats.destroyedBuildings[building] || 0) + count;
+            }
+        }
         
         await statsRef.set(updatedStats, { merge: true });
         
@@ -854,7 +884,7 @@ function parseAdvancedSabotageReport(text) {
             if (buildingData.name && buildingData.levels > 0) {
                 const normalizedName = normalizeBuilding(buildingData.name);
                 
-                if (BUILDING_POINTS.hasOwnProperty(normalizedName)) {
+                if (Object.prototype.hasOwnProperty.call(BUILDING_POINTS, normalizedName)) {
                     if (!currentSabotage.buildings[normalizedName]) {
                         currentSabotage.buildings[normalizedName] = 0;
                     }
@@ -887,7 +917,7 @@ function parseBuildingLineAdvanced(line) {
     line = line.replace(/<[^>]*>/g, '');
     
     // Entferne führende Symbole
-    line = line.replace(/^[•\-\*\+\s\|→>]+/, '').trim();
+    line = line.replace(/^[•\-*+\s|→>]+/, '').trim();
     
     // Skip leere Zeilen und Header
     if (!line || 
@@ -906,7 +936,7 @@ function parseBuildingLineAdvanced(line) {
         // "5 Planetenzentrale"
         /^(\d+)\s+(.+)$/,
         // "Planetenzentrale (5)"
-        /^(.+?)\s*[\(\[]\s*(\d+)\s*[\)\]]$/,
+        /^(.+?)\s*[([]]\s*(\d+)\s*[)\]]$/,
         // "Planetenzentrale - 5"
         /^(.+?)\s*[-–]\s*(\d+)$/,
         // "Planetenzentrale 5 Stufen"
@@ -937,7 +967,7 @@ function parseBuildingLineAdvanced(line) {
     if (line.length > 2 && !/\d/.test(line)) {
         // Prüfe ob es ein bekanntes Gebäude ist
         const normalizedName = normalizeBuilding(line);
-        if (BUILDING_POINTS.hasOwnProperty(normalizedName)) {
+        if (Object.prototype.hasOwnProperty.call(BUILDING_POINTS, normalizedName)) {
             return { name: line, levels: 0 };
         }
     }

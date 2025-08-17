@@ -99,7 +99,7 @@ class CompatibleDashboardNavigation {
                             <span style="font-size: 0.8rem;">▼</span>
                         </summary>
                         <div style="margin-top: 10px; border-top: 1px solid var(--card-border); padding-top: 10px;">
-                            <a href="dashboard-calculator.html" style="
+                            <a href="dashboard-as-counter.html" style="
                                 display: block;
                                 padding: 8px;
                                 color: var(--text-primary);
@@ -227,10 +227,10 @@ class CompatibleDashboardNavigation {
     // Navigation-Links aktualisieren
     updateNavigationLinks() {
         // AS-Counter Links für eingeloggte User aktualisieren
-        const asCounterLinks = document.querySelectorAll('a[href="calculator.html"]');
+        const asCounterLinks = document.querySelectorAll('a[href="as-counter.html"]');
         asCounterLinks.forEach(link => {
             if (this.currentUser) {
-                link.href = 'dashboard-calculator.html';
+                link.href = 'dashboard-as-counter.html';
                 
                 // Icon aktualisieren um zu zeigen dass Daten gespeichert werden
                 const icon = link.querySelector('.nav-icon, .action-icon');
@@ -296,7 +296,7 @@ class CompatibleDashboardNavigation {
     navigateByShortcut(number) {
         const shortcuts = {
             1: 'dashboard.html',
-            2: 'dashboard-calculator.html',
+            2: 'dashboard-as-counter.html',
             3: '#', // Raid-Counter (Coming Soon)
             4: '#', // Profil (Coming Soon)
             5: '#'  // Einstellungen (Coming Soon)
@@ -419,8 +419,8 @@ class CompatibleDashboardNavigation {
         this.notifications.slice(0, 5).forEach(notification => {
             const timeAgo = this.getTimeAgo(notification.timestamp);
             const bgColor = notification.type === 'success' ? 'rgba(34, 197, 94, 0.1)' : 
-                           notification.type === 'error' ? 'rgba(239, 68, 68, 0.1)' : 
-                           'rgba(74, 144, 226, 0.1)';
+                notification.type === 'error' ? 'rgba(239, 68, 68, 0.1)' : 
+                    'rgba(74, 144, 226, 0.1)';
             
             notificationsHTML += `
                 <div style="
@@ -507,7 +507,7 @@ class CompatibleDashboardNavigation {
         }
     }
     
-    updateUserStats(stats) {
+    updateUserStats(_stats) {
         this.updateFooterStats();
     }
     

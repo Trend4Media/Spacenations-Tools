@@ -159,6 +159,9 @@ class DashboardCore {
             // Firestore-Statistiken laden und überschreiben falls vorhanden
             await this.loadFirestoreStats(battlesCount, raidsCount, winRate, daysSinceCreation);
             
+            // Sabotage-Gebäude-Statistiken laden
+            await this.loadSabotageBuildingStats();
+            
             // Animierte Zähler starten
             this.animateStatCounters();
             
@@ -195,6 +198,98 @@ class DashboardCore {
             console.error('❌ Fehler beim Laden der Firestore-Statistiken:', error);
             this.setFallbackStats();
         }
+    }
+    
+    // Sabotage-Gebäude-Statistiken laden und anzeigen
+    async loadSabotageBuildingStats() {
+        try {
+            const db = window.FirebaseConfig.getDB();
+            const statsDoc = await db.collection('userStats').doc(this.currentUser.uid).get();
+            
+            const buildingStatsContainer = document.getElementById('building-stats');
+            if (!buildingStatsContainer) return;
+            
+            // Gebäude-Punkte-System (gleich wie im Sabo-Counter)
+            const BUILDING_POINTS = {
+                'Planetenzentrale': 3,
+                'Raumhafen': 1,
+                'Wohngebäude': 1,
+                'Solarpark': 1,
+                'Eisenmine': 1,
+                'Siliziumraffinerie': 1,
+                'Kohlenstoffgewinnungsanlage': 1,
+                'Bohrturm': 1,
+                'Chemiefabrik': 2,
+                'Recyclinganlage': 2,
+                'Rohstofflager': 2,
+                'Schiffsfabrik': 3,
+                'Waffenfabrik': 3,
+                'Forschungszentrum': 3
+            };
+            
+            let destroyedBuildings = {};
+            let totalSabotages = 0;
+            let totalPoints = 0;
+            let totalBuildings = 0;
+            
+            if (statsDoc.exists) {
+                const stats = statsDoc.data();
+                destroyedBuildings = stats.destroyedBuildings || {};
+                totalSabotages = stats.sabotages || 0;
+                totalPoints = stats.totalSabotagePoints || 0;
+                
+                // Aktualisiere die Sabotage-Anzahl im Dashboard
+                const totalSabotagesElement = document.getElementById('total-sabotages');
+                if (totalSabotagesElement) {
+                    totalSabotagesElement.textContent = totalSabotages;
+                }
+            }
+            
+            // Erstelle die Gebäude-Tabelle
+            let buildingStatsHTML = '<div class="sabotage-buildings-table">';
+            buildingStatsHTML += '<h5 style="margin-bottom: 15px; color: var(--text-primary); font-size: 0.9rem;">🏗️ Zerstörte Gebäude</h5>';
+            buildingStatsHTML += '<div class="building-stats-grid">';
+            
+            // Header
+            buildingStatsHTML += '<div class="building-header">Gebäude</div>';
+            buildingStatsHTML += '<div class="building-header">Anzahl</div>';
+            
+            // Gebäude-Zeilen
+            for (const building of Object.keys(BUILDING_POINTS)) {
+                const count = destroyedBuildings[building] || 0;
+                totalBuildings += count;
+                
+                buildingStatsHTML += `<div class="building-name">${building}</div>`;
+                buildingStatsHTML += `<div class="building-count">${count}</div>`;
+            }
+            
+            buildingStatsHTML += '</div>'; // building-stats-grid
+            
+            // Gesamt-Statistiken
+            buildingStatsHTML += '<div class="sabotage-totals">';
+            buildingStatsHTML += `<div class="total-stat"><strong>Gesamt zerstörte Gebäude:</strong> <span class="highlight">${totalBuildings}</span></div>`;
+            buildingStatsHTML += `<div class="total-stat"><strong>Gesamt Sabotierte Punktzahl:</strong> <span class="highlight">${this.formatNumber(totalPoints)}</span></div>`;
+            buildingStatsHTML += '</div>';
+            
+            buildingStatsHTML += '</div>'; // sabotage-buildings-table
+            
+            buildingStatsContainer.innerHTML = buildingStatsHTML;
+            
+            console.log('🏗️ Sabotage-Gebäude-Statistiken geladen');
+            
+        } catch (error) {
+            console.error('❌ Fehler beim Laden der Sabotage-Gebäude-Statistiken:', error);
+            const buildingStatsContainer = document.getElementById('building-stats');
+            if (buildingStatsContainer) {
+                buildingStatsContainer.innerHTML = '<div class="error-message">Fehler beim Laden der Gebäude-Statistiken</div>';
+            }
+        }
+    }
+    
+    // Zahlen formatieren
+    formatNumber(num) {
+        if (!num || num === 0) return '0';
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     }
     
     // Fallback-Statistiken setzen
@@ -366,9 +461,9 @@ class DashboardCore {
     // Enhanced Navigation
     setupEnhancedNavigation() {
         // AS-Counter Links für eingeloggte User erweitern
-        const calculatorLinks = document.querySelectorAll('a[href="calculator.html"]');
+        const calculatorLinks = document.querySelectorAll('a[href="as-counter.html"]');
         calculatorLinks.forEach(link => {
-            link.href = 'dashboard-calculator.html';
+            link.href = 'dashboard-as-counter.html';
             link.title = 'AS-Counter (Dashboard) - Alle Kämpfe werden automatisch gespeichert';
             
             // Icon erweitern
@@ -408,7 +503,7 @@ class DashboardCore {
             // Strg+C = Calculator
             if (e.ctrlKey && e.key === 'c') {
                 e.preventDefault();
-                window.location.href = 'dashboard-calculator.html';
+                window.location.href = 'dashboard-as-counter.html';
             }
             
             // Strg+R = Refresh Stats
@@ -458,10 +553,17 @@ class DashboardCore {
             return;
         }
         
-        // Calculator-Updates überwachen
+        // AS-Counter-Updates überwachen
         document.addEventListener('calculatorDataUpdated', async () => {
-            console.log('🔄 Calculator-Daten aktualisiert - Dashboard wird refreshed');
+            console.log('🔄 AS-Counter-Daten aktualisiert - Dashboard wird refreshed');
             await this.loadEnhancedStats();
+            await this.loadEnhancedActivities();
+        });
+        
+        // Sabotage-Counter-Updates überwachen
+        document.addEventListener('sabotageDataUpdated', async () => {
+            console.log('🔄 Sabotage-Daten aktualisiert - Dashboard wird refreshed');
+            await this.loadSabotageBuildingStats();
             await this.loadEnhancedActivities();
         });
         
@@ -530,7 +632,7 @@ class DashboardCore {
             const battleDate = battle.timestamp?.toDate ? battle.timestamp.toDate() : new Date(battle.timestamp);
             const resultEmoji = battle.result === 'win' ? '🏆' : battle.result === 'loss' ? '💀' : '🤝';
             const resultText = battle.result === 'win' ? 'Kampf gewonnen' : 
-                              battle.result === 'loss' ? 'Kampf verloren' : 'Kampf unentschieden';
+                battle.result === 'loss' ? 'Kampf verloren' : 'Kampf unentschieden';
             
             battleActivitiesHtml += this.createEnhancedActivityItem(
                 resultEmoji,
@@ -717,17 +819,18 @@ console.log('⌨️ Shortcuts: Strg+D (Reload), Strg+C (Calculator), Strg+R (Ref
  */
 
 // Enhanced Navigation zwischen AS-Counter Versionen
-setupEnhancedNavigation() {
-    // Alle Calculator-Links finden und richtig verlinken
-    const calculatorLinks = document.querySelectorAll('a[href="calculator.html"], a[href*="calculator"]');
+// eslint-disable-next-line no-unused-vars
+function setupEnhancedNavigation() {
+    // Alle AS-Counter-Links finden und richtig verlinken
+    const calculatorLinks = document.querySelectorAll('a[href="as-counter.html"], a[href*="as-counter"]');
     
     calculatorLinks.forEach(link => {
         const isInDashboard = window.location.pathname.includes('dashboard');
         const isLoggedIn = this.currentUser !== null;
         
         if (isInDashboard && isLoggedIn) {
-            // Im Dashboard: Immer zum Dashboard-Calculator
-            link.href = 'dashboard-calculator.html';
+            // Im Dashboard: Immer zum Dashboard-AS-Counter
+            link.href = 'dashboard-as-counter.html';
             link.title = 'AS-Counter (Dashboard) - Kämpfe werden automatisch gespeichert';
             
             // Icon erweitern falls noch nicht geschehen
@@ -750,8 +853,8 @@ setupEnhancedNavigation() {
         }
     });
     
-    // Version-Switcher hinzufügen (falls im Dashboard-Calculator)
-    if (window.location.pathname.includes('dashboard-calculator')) {
+    // Version-Switcher hinzufügen (falls im Dashboard-AS-Counter)
+    if (window.location.pathname.includes('dashboard-as-counter')) {
         this.addVersionSwitcher();
     }
     
@@ -760,7 +863,8 @@ setupEnhancedNavigation() {
 }
 
 // Version-Switcher für Calculator
-addVersionSwitcher() {
+// eslint-disable-next-line no-unused-vars
+function addVersionSwitcher() {
     const header = document.querySelector('.header');
     if (!header || document.getElementById('version-switcher')) return;
     
@@ -789,7 +893,7 @@ addVersionSwitcher() {
         ">
             💾 Dashboard-Version
         </span>
-        <a href="calculator.html" style="
+        <a href="as-counter.html" style="
             background: var(--card-bg);
             color: var(--text-secondary);
             padding: 5px 12px;
@@ -808,15 +912,16 @@ addVersionSwitcher() {
 }
 
 // Standard-Calculator Links verbessern
-enhanceStandardCalculatorLinks() {
-    // In calculator.html einen Hinweis auf Dashboard-Version hinzufügen
-    if (window.location.pathname.includes('calculator.html') && !window.location.pathname.includes('dashboard')) {
-        this.addDashboardVersionPromo();
+// eslint-disable-next-line no-unused-vars
+function enhanceStandardCalculatorLinks() {
+    // In as-counter.html einen Hinweis auf Dashboard-Version hinzufügen
+    if (window.location.pathname.includes('as-counter.html') && !window.location.pathname.includes('dashboard')) {
+        addDashboardVersionPromo();
     }
 }
 
 // Dashboard-Version Promotion in Standard-Calculator
-addDashboardVersionPromo() {
+function addDashboardVersionPromo() {
     const container = document.querySelector('.container');
     if (!container || document.getElementById('dashboard-promo')) return;
     

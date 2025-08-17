@@ -64,17 +64,17 @@ class EnhancedNavigation {
             element.addEventListener('click', this.createRippleEffect.bind(this));
             
             // Add visual feedback for better UX
-            element.addEventListener('mousedown', (e) => {
+            element.addEventListener('mousedown', (_e) => {
                 element.style.transform = 'scale(0.98)';
             });
             
-            element.addEventListener('mouseup', (e) => {
+            element.addEventListener('mouseup', (_e) => {
                 setTimeout(() => {
                     element.style.transform = '';
                 }, 100);
             });
             
-            element.addEventListener('mouseleave', (e) => {
+            element.addEventListener('mouseleave', (_e) => {
                 element.style.transform = '';
             });
         });
@@ -145,7 +145,7 @@ class EnhancedNavigation {
                         break;
                     case '1':
                         e.preventDefault();
-                        window.location.href = 'dashboard-calculator.html';
+                        window.location.href = 'dashboard-as-counter.html';
                         break;
                     case '2':
                         e.preventDefault();
@@ -187,7 +187,7 @@ class EnhancedNavigation {
         
         // Add tabindex to navigation elements for keyboard accessibility
         const navElements = document.querySelectorAll('.nav-link, .action-card');
-        navElements.forEach((element, index) => {
+        navElements.forEach((element, _index) => {
             if (!element.hasAttribute('tabindex')) {
                 element.setAttribute('tabindex', '0');
             }
@@ -199,7 +199,7 @@ class EnhancedNavigation {
         const navLinks = document.querySelectorAll('.nav-link, .action-card');
         
         navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
+            link.addEventListener('click', (_e) => {
                 // Don't add loading state for same page or hash links
                 const href = link.getAttribute('href');
                 if (!href || href === '#' || href.startsWith('#')) return;
@@ -223,17 +223,17 @@ class EnhancedNavigation {
             const touchElements = document.querySelectorAll('.nav-link, .action-card, button');
             
             touchElements.forEach(element => {
-                element.addEventListener('touchstart', (e) => {
+                element.addEventListener('touchstart', (_e) => {
                     element.classList.add('touch-active');
                 }, { passive: true });
                 
-                element.addEventListener('touchend', (e) => {
+                element.addEventListener('touchend', (_e) => {
                     setTimeout(() => {
                         element.classList.remove('touch-active');
                     }, 150);
                 }, { passive: true });
                 
-                element.addEventListener('touchcancel', (e) => {
+                element.addEventListener('touchcancel', (_e) => {
                     element.classList.remove('touch-active');
                 }, { passive: true });
             });
@@ -333,7 +333,7 @@ class EnhancedNavigation {
         this.addCurrentPageIndicators();
     }
 
-    addCustomRipple(element, color = 'rgba(255, 255, 255, 0.3)') {
+    addCustomRipple(element, _color = 'rgba(255, 255, 255, 0.3)') {
         element.addEventListener('click', (e) => {
             this.createRippleEffect.call(this, e);
         });
