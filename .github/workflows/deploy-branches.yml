@@ -32,6 +32,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+          cache: 'npm'
 
       - name: Create multi-branch structure
         run: |
@@ -42,14 +43,22 @@ jobs:
           # Main Branch Dateien kopieren
           echo "📦 Kopiere Main Branch..."
           git checkout main
-          cp -r *.html css js build dist/main/ 2>/dev/null || true
+          cp -r *.html css js dist/main/ 2>/dev/null || true
+          # Kopiere build falls vorhanden
+          if [ -d "build" ]; then
+            cp -r build dist/main/ 2>/dev/null || true
+          fi
           # main.html als index.html im main Ordner
           cp main.html dist/main/index.html 2>/dev/null || true
           
           # Testarea Branch Dateien kopieren  
           echo "📦 Kopiere Testarea Branch..."
           git checkout testarea
-          cp -r *.html css js build dist/testarea/ 2>/dev/null || true
+          cp -r *.html css js dist/testarea/ 2>/dev/null || true
+          # Kopiere build falls vorhanden
+          if [ -d "build" ]; then
+            cp -r build dist/testarea/ 2>/dev/null || true
+          fi
           # Kopiere auch das testarea-Verzeichnis falls vorhanden
           if [ -d "testarea" ]; then
             echo "📁 Kopiere testarea-Verzeichnis..."
@@ -273,9 +282,17 @@ jobs:
           </html>
           EOF
           
-          # Struktur anzeigen
+          # Struktur anzeigen und validieren
           echo "📁 Erstellte Struktur:"
           find dist -type f -name "*.html" | head -10
+          echo "📊 Gesamte Dateianzahl:"
+          find dist -type f | wc -l
+          echo "📁 Verzeichnisstruktur:"
+          ls -la dist/
+          echo "📁 Main Branch Inhalt:"
+          ls -la dist/main/ | head -5
+          echo "📁 Testarea Branch Inhalt:"
+          ls -la dist/testarea/ | head -5
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
