@@ -4,53 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spacenations Info-Tool</title>
+    <!-- Gemeinsame Theme-Variablen -->
+    <link rel="stylesheet" href="css/theme-variables.css">
+    <!-- Zentrale Konfiguration -->
+    <script src="js/config.js"></script>
     <style>
-        /* CSS Variablen für Light/Dark Mode */
-        :root {
-            /* Dark Mode (Standard) */
-            --bg-gradient: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
-            --text-primary: #e0e0e0;
-            --text-secondary: #b0b0b0;
-            --bg-panel: rgba(0, 0, 0, 0.7);
-            --border-primary: #3a5998;
-            --border-shadow: rgba(58, 89, 152, 0.3);
-            --feature-bg: rgba(16, 16, 16, 0.9);
-            --admin-bg: rgba(16, 16, 16, 0.9);
-            --admin-border: #f39c12;
-            --admin-text: #b0b0b0;
-            --form-bg: rgba(0, 0, 0, 0.8);
-            --form-border: rgba(58, 89, 152, 0.5);
-            --card-bg: rgba(16, 16, 16, 0.9);
-            --card-border: rgba(58, 89, 152, 0.5);
-            --accent-primary: #ff8c42;
-            --accent-secondary: #4a90e2;
-            --success-color: #22c55e;
-            --warning-color: #f59e0b;
-            --error-color: #ef4444;
-        }
-        
-        /* Light Mode */
-        :root.light-mode {
-            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --bg-panel: rgba(255, 255, 255, 0.95);
-            --border-primary: #e2e8f0;
-            --border-shadow: rgba(0, 0, 0, 0.1);
-            --feature-bg: linear-gradient(135deg, #f1f5f9, #e2e8f0);
-            --admin-bg: linear-gradient(135deg, rgba(254, 243, 205, 0.95), rgba(253, 230, 138, 0.95));
-            --admin-border: #fbbf24;
-            --admin-text: #a16207;
-            --form-bg: #f8fafc;
-            --form-border: #e2e8f0;
-            --card-bg: linear-gradient(135deg, #ffffff, #f8fafc);
-            --card-border: #e2e8f0;
-            --accent-primary: #ff8c42;
-            --accent-secondary: #4a90e2;
-            --success-color: #059669;
-            --warning-color: #d97706;
-            --error-color: #dc2626;
-        }
         
         /* Global Footer Styles */
         .global-footer {

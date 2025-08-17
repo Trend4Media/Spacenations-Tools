@@ -4,43 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Space Nations Kampfbericht Rechner</title>
+    <!-- Gemeinsame Theme-Variablen -->
+    <link rel="stylesheet" href="css/theme-variables.css">
     <style>
-        /* CSS Variablen für Light/Dark Mode */
+        /* Calculator-spezifische Variablen */
         :root {
-            /* Dark Mode (Standard) */
-            --bg-gradient: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
-            --text-primary: #e0e0e0;
-            --text-secondary: #b0b0b0;
-            --bg-panel: rgba(0, 0, 0, 0.7);
-            --border-primary: #3a5998;
-            --border-shadow: rgba(58, 89, 152, 0.3);
             --input-bg: rgba(0, 0, 0, 0.8);
             --input-border: rgba(58, 89, 152, 0.5);
             --destroyed-color: #e74c3c;
             --lost-color: #f39c12;
-            --card-bg: rgba(16, 16, 16, 0.9);
-            --card-border: rgba(58, 89, 152, 0.5);
-            --accent-primary: #ff8c42;
-            --accent-secondary: #4a90e2;
-            --success-color: #22c55e;
-            --warning-color: #f59e0b;
-            --error-color: #ef4444;
         }
         
-        /* Light Mode */
         :root.light-mode {
-            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --bg-panel: rgba(255, 255, 255, 0.95);
-            --border-primary: #e2e8f0;
-            --border-shadow: rgba(0, 0, 0, 0.1);
             --input-bg: #f8fafc;
             --input-border: #e2e8f0;
             --destroyed-color: #dc2626;
             --lost-color: #d97706;
-            --card-bg: linear-gradient(135deg, #ffffff, #f8fafc);
-            --card-border: #e2e8f0;
         }
         
         /* Global Footer Styles */

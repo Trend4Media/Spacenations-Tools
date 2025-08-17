@@ -1,0 +1,44 @@
+{
+  "name": "spacenations-tools",
+  "version": "1.0.0",
+  "description": "Spacenations-Helferlein - Tools und Utilities für Space Nations",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python -m http.server 8000",
+    "build": "node build/build.js",
+    "build:prod": "NODE_ENV=production node build/build.js",
+    "clean": "rm -rf dist/",
+    "lint": "eslint js/ --ext .js",
+    "lint:fix": "eslint js/ --ext .js --fix",
+    "serve": "python -m http.server 8000",
+    "test": "echo \"Tests noch nicht implementiert\" && exit 0"
+  },
+  "keywords": [
+    "spacenations",
+    "tools",
+    "calculator",
+    "raid-counter",
+    "dashboard"
+  ],
+  "author": "Spacenations Team",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "html-minifier": "^4.0.0",
+    "terser": "^5.0.0",
+    "clean-css": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spacenations/tools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/spacenations/tools/issues"
+  },
+  "homepage": "https://github.com/spacenations/tools#readme",
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
