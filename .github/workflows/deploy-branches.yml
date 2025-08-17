@@ -42,10 +42,14 @@ jobs:
           # Main Branch Dateien kopieren
           git checkout main
           cp -r *.html css js dist/main/ 2>/dev/null || true
+          # main.html als index.html im main Ordner
+          cp main.html dist/main/index.html 2>/dev/null || true
           
           # Testarea Branch Dateien kopieren
           git checkout testarea
           cp -r *.html css js dist/testarea/ 2>/dev/null || true
+          # main.html als index.html im testarea Ordner
+          cp main.html dist/testarea/index.html 2>/dev/null || true
           
           # Index-Datei für Branch-Auswahl erstellen
           cat > dist/index.html << 'EOF'
