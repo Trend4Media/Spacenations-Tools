@@ -1,0 +1,1080 @@
+name: Deploy Testarea Files
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_type:
+        description: 'Deploy type'
+        required: true
+        default: 'testarea'
+        type: choice
+        options:
+        - testarea
+        - full
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Create testarea directory
+      run: mkdir -p testarea
+
+    - name: Create spy-database.html
+      run: |
+        cat > testarea/spy-database.html << 'EOF'
+        <!DOCTYPE html>
+        <html lang="de">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Spionage-Datenbank - Spacenations Tools</title>
+            <!-- Gemeinsame Theme-Variablen -->
+            <link rel="stylesheet" href="../css/theme-variables.css">
+            <link rel="stylesheet" href="../css/global-footer.css">
+            <link rel="stylesheet" href="../css/enhanced-navigation.css">
+            <style>
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+
+                body {
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    background: var(--bg-gradient);
+                    color: var(--text-primary);
+                    min-height: 100vh;
+                    display: grid;
+                    grid-template-areas: 
+                        "header header header"
+                        "nav main sidebar"
+                        "footer footer footer";
+                    grid-template-columns: 250px 1fr 300px;
+                    grid-template-rows: auto 1fr auto;
+                    gap: 20px;
+                    padding: 20px;
+                    transition: all 0.3s ease;
+                }
+
+                /* Header */
+                .header {
+                    grid-area: header;
+                    background: var(--bg-panel);
+                    border: 2px solid var(--border-primary);
+                    border-radius: 15px;
+                    padding: 20px;
+                    box-shadow: 0 0 20px var(--border-shadow);
+                    backdrop-filter: blur(10px);
+                    position: relative;
+                    transition: all 0.3s ease;
+                }
+
+                .header-content {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                .header-left h1 {
+                    color: var(--accent-primary);
+                    font-size: 2rem;
+                    font-weight: 700;
+                    margin-bottom: 5px;
+                }
+
+                .header-subtitle {
+                    color: var(--text-secondary);
+                    font-size: 1rem;
+                }
+
+                .header-right {
+                    display: flex;
+                    align-items: center;
+                    gap: 15px;
+                }
+
+                .branch-badge {
+                    background: linear-gradient(135deg, #ff6b35, #f7931e);
+                    color: white;
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    font-weight: bold;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    box-shadow: 0 2px 10px rgba(255, 107, 53, 0.3);
+                    animation: pulse 2s infinite;
+                }
+
+                @keyframes pulse {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.05); }
+                }
+
+                .theme-toggle {
+                    background: linear-gradient(45deg, #3a5998, #4a90e2);
+                    color: white;
+                    border: none;
+                    padding: 10px 15px;
+                    border-radius: 8px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-size: 14px;
+                }
+
+                .theme-toggle:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+                }
+
+                .back-btn {
+                    background: linear-gradient(135deg, #64748b, #475569);
+                    color: white;
+                    border: none;
+                    padding: 10px 15px;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    text-decoration: none;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+
+                .back-btn:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 5px 15px rgba(100, 116, 139, 0.4);
+                }
+
+                /* Navigation */
+                .nav {
+                    grid-area: nav;
+                    background: var(--bg-panel);
+                    border: 2px solid var(--border-primary);
+                    border-radius: 15px;
+                    padding: 20px;
+                    box-shadow: 0 0 20px var(--border-shadow);
+                    backdrop-filter: blur(10px);
+                    height: fit-content;
+                    position: sticky;
+                    top: 20px;
+                }
+
+                .nav h3 {
+                    color: var(--accent-primary);
+                    margin-bottom: 20px;
+                    font-size: 1.2rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+
+                .nav-list {
+                    list-style: none;
+                }
+
+                .nav-item {
+                    margin-bottom: 10px;
+                }
+
+                .nav-link {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    padding: 12px 15px;
+                    color: var(--text-primary);
+                    text-decoration: none;
+                    border-radius: 10px;
+                    transition: all 0.3s ease;
+                    font-weight: 500;
+                }
+
+                .nav-link:hover {
+                    background: var(--accent-primary);
+                    color: white;
+                    transform: translateX(5px);
+                }
+
+                .nav-link.active {
+                    background: var(--accent-primary);
+                    color: white;
+                    box-shadow: 0 0 15px var(--accent-shadow);
+                }
+
+                .nav-icon {
+                    font-size: 1.2rem;
+                    width: 20px;
+                    text-align: center;
+                }
+
+                /* Main Content */
+                .main {
+                    grid-area: main;
+                    background: var(--bg-panel);
+                    border: 2px solid var(--border-primary);
+                    border-radius: 15px;
+                    padding: 30px;
+                    box-shadow: 0 0 20px var(--border-shadow);
+                    backdrop-filter: blur(10px);
+                    overflow-y: auto;
+                }
+
+                .main h2 {
+                    color: var(--accent-primary);
+                    margin-bottom: 20px;
+                    display: flex;
+                    align-items: center;
+                    gap: 15px;
+                }
+
+                /* Responsive Design */
+                @media (max-width: 768px) {
+                    body {
+                        grid-template-areas: 
+                            "header"
+                            "main"
+                            "nav"
+                            "sidebar"
+                            "footer";
+                        grid-template-columns: 1fr;
+                        padding: 10px;
+                        gap: 10px;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <!-- Header -->
+            <header class="header">
+                <div class="header-content">
+                    <div class="header-left">
+                        <h1>📡 Spionage-Datenbank</h1>
+                        <p class="header-subtitle">Verwaltung und Analyse von Spionage-Berichten</p>
+                    </div>
+                    <div class="header-right">
+                        <span class="branch-badge">TESTAREA</span>
+                        <button class="theme-toggle" onclick="toggleTheme()">
+                            <span id="theme-icon">🌙</span>
+                            <span id="theme-text">Dark Mode</span>
+                        </button>
+                        <a href="dashboard.html" class="back-btn">
+                            <span>←</span>
+                            Dashboard
+                        </a>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Navigation -->
+            <nav class="nav" id="navigation">
+                <h3>🧭 Navigation</h3>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="dashboard.html" class="nav-link">
+                            <span class="nav-icon">🏠</span>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="spy-database.html" class="nav-link active">
+                            <span class="nav-icon">📡</span>
+                            Spionage-Datenbank
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="spy-report.html" class="nav-link">
+                            <span class="nav-icon">📊</span>
+                            Spionage-Report
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="main">
+                <h2>
+                    <span>📡</span>
+                    Spionage-Datenbank
+                </h2>
+                
+                <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                    <h3>🚧 In Entwicklung</h3>
+                    <p>Die Spionage-Datenbank wird gerade implementiert...</p>
+                    <br>
+                    <p><strong>Geplante Features:</strong></p>
+                    <ul style="text-align: left; display: inline-block; margin-top: 10px;">
+                        <li>Spionage-Reports verwalten</li>
+                        <li>Ziele suchen und filtern</li>
+                        <li>Flottenstärke analysieren</li>
+                        <li>Statistiken anzeigen</li>
+                    </ul>
+                </div>
+            </main>
+
+            <!-- Sidebar -->
+            <aside class="sidebar" style="grid-area: sidebar; background: var(--bg-panel); border: 2px solid var(--border-primary); border-radius: 15px; padding: 20px; box-shadow: 0 0 20px var(--border-shadow); backdrop-filter: blur(10px); height: fit-content; position: sticky; top: 20px;">
+                <h3 style="color: var(--accent-primary); margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">📊 Status</h3>
+                
+                <div style="background: var(--bg-secondary); border: 1px solid var(--border-secondary); border-radius: 10px; padding: 15px; margin-bottom: 15px; text-align: center;">
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--accent-primary); margin-bottom: 5px;">TESTAREA</div>
+                    <div style="color: var(--text-secondary); font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Branch</div>
+                </div>
+            </aside>
+
+            <!-- Footer wird durch global-footer-loader.js geladen -->
+            <footer id="global-footer"></footer>
+
+            <!-- Scripts -->
+            <script src="../js/config.js"></script>
+            <script src="../js/theme-manager.js"></script>
+            <script src="../js/enhanced-navigation.js"></script>
+            <script src="../js/global-footer-loader.js"></script>
+
+            <script>
+                // Initialisierung
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Theme Manager initialisieren
+                    if (typeof initializeTheme === 'function') {
+                        initializeTheme();
+                    }
+                    
+                    // Enhanced Navigation initialisieren
+                    if (typeof initializeEnhancedNavigation === 'function') {
+                        initializeEnhancedNavigation();
+                    }
+                    
+                    // Global Footer laden
+                    if (typeof loadGlobalFooter === 'function') {
+                        loadGlobalFooter();
+                    }
+                    
+                    // Branch-spezifische Konfiguration
+                    if (window.location.pathname.includes('/testarea/')) {
+                        document.body.setAttribute('data-branch', 'testarea');
+                        console.log('🔧 TESTAREA Modus aktiviert');
+                    }
+                });
+
+                // Theme Toggle Funktion
+                function toggleTheme() {
+                    if (typeof window.toggleTheme === 'function') {
+                        window.toggleTheme();
+                    }
+                }
+            </script>
+        </body>
+        </html>
+        EOF
+
+    - name: Create spy-report.html
+      run: |
+        cat > testarea/spy-report.html << 'EOF'
+        <!DOCTYPE html>
+        <html lang="de">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Spionage-Report - Spacenations Tools</title>
+            <!-- Gemeinsame Theme-Variablen -->
+            <link rel="stylesheet" href="../css/theme-variables.css">
+            <link rel="stylesheet" href="../css/global-footer.css">
+            <link rel="stylesheet" href="../css/enhanced-navigation.css">
+            <style>
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+
+                body {
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    background: var(--bg-gradient);
+                    color: var(--text-primary);
+                    min-height: 100vh;
+                    display: grid;
+                    grid-template-areas: 
+                        "header header header"
+                        "nav main sidebar"
+                        "footer footer footer";
+                    grid-template-columns: 250px 1fr 300px;
+                    grid-template-rows: auto 1fr auto;
+                    gap: 20px;
+                    padding: 20px;
+                    transition: all 0.3s ease;
+                }
+
+                /* Header */
+                .header {
+                    grid-area: header;
+                    background: var(--bg-panel);
+                    border: 2px solid var(--border-primary);
+                    border-radius: 15px;
+                    padding: 20px;
+                    box-shadow: 0 0 20px var(--border-shadow);
+                    backdrop-filter: blur(10px);
+                    position: relative;
+                    transition: all 0.3s ease;
+                }
+
+                .header-content {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                .header-left h1 {
+                    color: var(--accent-primary);
+                    font-size: 2rem;
+                    font-weight: 700;
+                    margin-bottom: 5px;
+                }
+
+                .header-subtitle {
+                    color: var(--text-secondary);
+                    font-size: 1rem;
+                }
+
+                .header-right {
+                    display: flex;
+                    align-items: center;
+                    gap: 15px;
+                }
+
+                .branch-badge {
+                    background: linear-gradient(135deg, #ff6b35, #f7931e);
+                    color: white;
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    font-weight: bold;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    box-shadow: 0 2px 10px rgba(255, 107, 53, 0.3);
+                    animation: pulse 2s infinite;
+                }
+
+                @keyframes pulse {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.05); }
+                }
+
+                .theme-toggle {
+                    background: linear-gradient(45deg, #3a5998, #4a90e2);
+                    color: white;
+                    border: none;
+                    padding: 10px 15px;
+                    border-radius: 8px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-size: 14px;
+                }
+
+                .theme-toggle:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+                }
+
+                .back-btn {
+                    background: linear-gradient(135deg, #64748b, #475569);
+                    color: white;
+                    border: none;
+                    padding: 10px 15px;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    text-decoration: none;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+
+                .back-btn:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 5px 15px rgba(100, 116, 139, 0.4);
+                }
+
+                /* Navigation */
+                .nav {
+                    grid-area: nav;
+                    background: var(--bg-panel);
+                    border: 2px solid var(--border-primary);
+                    border-radius: 15px;
+                    padding: 20px;
+                    box-shadow: 0 0 20px var(--border-shadow);
+                    backdrop-filter: blur(10px);
+                    height: fit-content;
+                    position: sticky;
+                    top: 20px;
+                }
+
+                .nav h3 {
+                    color: var(--accent-primary);
+                    margin-bottom: 20px;
+                    font-size: 1.2rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+
+                .nav-list {
+                    list-style: none;
+                }
+
+                .nav-item {
+                    margin-bottom: 10px;
+                }
+
+                .nav-link {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    padding: 12px 15px;
+                    color: var(--text-primary);
+                    text-decoration: none;
+                    border-radius: 10px;
+                    transition: all 0.3s ease;
+                    font-weight: 500;
+                }
+
+                .nav-link:hover {
+                    background: var(--accent-primary);
+                    color: white;
+                    transform: translateX(5px);
+                }
+
+                .nav-link.active {
+                    background: var(--accent-primary);
+                    color: white;
+                    box-shadow: 0 0 15px var(--accent-shadow);
+                }
+
+                .nav-icon {
+                    font-size: 1.2rem;
+                    width: 20px;
+                    text-align: center;
+                }
+
+                /* Main Content */
+                .main {
+                    grid-area: main;
+                    background: var(--bg-panel);
+                    border: 2px solid var(--border-primary);
+                    border-radius: 15px;
+                    padding: 30px;
+                    box-shadow: 0 0 20px var(--border-shadow);
+                    backdrop-filter: blur(10px);
+                    overflow-y: auto;
+                }
+
+                .main h2 {
+                    color: var(--accent-primary);
+                    margin-bottom: 20px;
+                    display: flex;
+                    align-items: center;
+                    gap: 15px;
+                }
+
+                /* Responsive Design */
+                @media (max-width: 768px) {
+                    body {
+                        grid-template-areas: 
+                            "header"
+                            "main"
+                            "nav"
+                            "sidebar"
+                            "footer";
+                        grid-template-columns: 1fr;
+                        padding: 10px;
+                        gap: 10px;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <!-- Header -->
+            <header class="header">
+                <div class="header-content">
+                    <div class="header-left">
+                        <h1>📊 Spionage-Report</h1>
+                        <p class="header-subtitle">Analyse und Auswertung von Spionage-Berichten</p>
+                    </div>
+                    <div class="header-right">
+                        <span class="branch-badge">TESTAREA</span>
+                        <button class="theme-toggle" onclick="toggleTheme()">
+                            <span id="theme-icon">🌙</span>
+                            <span id="theme-text">Dark Mode</span>
+                        </button>
+                        <a href="dashboard.html" class="back-btn">
+                            <span>←</span>
+                            Dashboard
+                        </a>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Navigation -->
+            <nav class="nav" id="navigation">
+                <h3>🧭 Navigation</h3>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="dashboard.html" class="nav-link">
+                            <span class="nav-icon">🏠</span>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="spy-database.html" class="nav-link">
+                            <span class="nav-icon">📡</span>
+                            Spionage-Datenbank
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="spy-report.html" class="nav-link active">
+                            <span class="nav-icon">📊</span>
+                            Spionage-Report
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="main">
+                <h2>
+                    <span>📊</span>
+                    Spionage-Report Analyzer
+                </h2>
+                
+                <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                    <h3>🚧 In Entwicklung</h3>
+                    <p>Der Spionage-Report Analyzer wird gerade implementiert...</p>
+                    <br>
+                    <p><strong>Geplante Features:</strong></p>
+                    <ul style="text-align: left; display: inline-block; margin-top: 10px;">
+                        <li>Reports automatisch parsen</li>
+                        <li>Flotten-Analyse</li>
+                        <li>Ressourcen-Übersicht</li>
+                        <li>Export-Funktionen</li>
+                    </ul>
+                </div>
+            </main>
+
+            <!-- Sidebar -->
+            <aside class="sidebar" style="grid-area: sidebar; background: var(--bg-panel); border: 2px solid var(--border-primary); border-radius: 15px; padding: 20px; box-shadow: 0 0 20px var(--border-shadow); backdrop-filter: blur(10px); height: fit-content; position: sticky; top: 20px;">
+                <h3 style="color: var(--accent-primary); margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">ℹ️ Hilfe</h3>
+                
+                <div style="background: var(--bg-secondary); border: 1px solid var(--border-secondary); border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                    <h4 style="color: var(--accent-primary); margin-bottom: 10px; font-size: 14px;">Testbereich</h4>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">Diese Seite befindet sich in der TESTAREA und wird kontinuierlich weiterentwickelt.</p>
+                </div>
+            </aside>
+
+            <!-- Footer wird durch global-footer-loader.js geladen -->
+            <footer id="global-footer"></footer>
+
+            <!-- Scripts -->
+            <script src="../js/config.js"></script>
+            <script src="../js/theme-manager.js"></script>
+            <script src="../js/enhanced-navigation.js"></script>
+            <script src="../js/global-footer-loader.js"></script>
+
+            <script>
+                // Initialisierung
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Theme Manager initialisieren
+                    if (typeof initializeTheme === 'function') {
+                        initializeTheme();
+                    }
+                    
+                    // Enhanced Navigation initialisieren
+                    if (typeof initializeEnhancedNavigation === 'function') {
+                        initializeEnhancedNavigation();
+                    }
+                    
+                    // Global Footer laden
+                    if (typeof loadGlobalFooter === 'function') {
+                        loadGlobalFooter();
+                    }
+                    
+                    // Branch-spezifische Konfiguration
+                    if (window.location.pathname.includes('/testarea/')) {
+                        document.body.setAttribute('data-branch', 'testarea');
+                        console.log('🔧 TESTAREA Modus aktiviert');
+                    }
+                });
+
+                // Theme Toggle Funktion
+                function toggleTheme() {
+                    if (typeof window.toggleTheme === 'function') {
+                        window.toggleTheme();
+                    }
+                }
+            </script>
+        </body>
+        </html>
+        EOF
+
+    - name: Update dashboard.html with TESTAREA badge and spy-database link
+      run: |
+        # Backup original dashboard
+        cp testarea/dashboard.html testarea/dashboard.html.bak 2>/dev/null || true
+        
+        # Create updated dashboard with TESTAREA badge and spy-database link
+        cat > testarea/dashboard.html << 'EOF'
+        <!DOCTYPE html>
+        <html lang="de">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Dashboard - Spacenations Tools</title>
+            <!-- Gemeinsame Theme-Variablen -->
+            <link rel="stylesheet" href="../css/theme-variables.css">
+            <link rel="stylesheet" href="../css/global-footer.css">
+            <link rel="stylesheet" href="../css/enhanced-navigation.css">
+            <style>
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+
+                body {
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    background: var(--bg-gradient);
+                    color: var(--text-primary);
+                    min-height: 100vh;
+                    display: grid;
+                    grid-template-areas: 
+                        "header header header"
+                        "nav main sidebar"
+                        "footer footer footer";
+                    grid-template-columns: 250px 1fr 300px;
+                    grid-template-rows: auto 1fr auto;
+                    gap: 20px;
+                    padding: 20px;
+                    transition: all 0.3s ease;
+                }
+
+                /* Header */
+                .header {
+                    grid-area: header;
+                    background: var(--bg-panel);
+                    border: 2px solid var(--border-primary);
+                    border-radius: 15px;
+                    padding: 20px;
+                    box-shadow: 0 0 20px var(--border-shadow);
+                    backdrop-filter: blur(10px);
+                    position: relative;
+                    transition: all 0.3s ease;
+                }
+
+                .header-content {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                .header-left h1 {
+                    color: var(--accent-primary);
+                    font-size: 2rem;
+                    font-weight: 700;
+                    margin-bottom: 5px;
+                }
+
+                .header-subtitle {
+                    color: var(--text-secondary);
+                    font-size: 1rem;
+                }
+
+                .header-right {
+                    display: flex;
+                    align-items: center;
+                    gap: 15px;
+                }
+
+                .branch-badge {
+                    background: linear-gradient(135deg, #ff6b35, #f7931e);
+                    color: white;
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    font-weight: bold;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    box-shadow: 0 2px 10px rgba(255, 107, 53, 0.3);
+                    animation: pulse 2s infinite;
+                }
+
+                @keyframes pulse {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.05); }
+                }
+
+                .theme-toggle {
+                    background: linear-gradient(45deg, #3a5998, #4a90e2);
+                    color: white;
+                    border: none;
+                    padding: 10px 15px;
+                    border-radius: 8px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-size: 14px;
+                }
+
+                .theme-toggle:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+                }
+
+                .back-btn {
+                    background: linear-gradient(135deg, #64748b, #475569);
+                    color: white;
+                    border: none;
+                    padding: 10px 15px;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    text-decoration: none;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+
+                .back-btn:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 5px 15px rgba(100, 116, 139, 0.4);
+                }
+
+                /* Navigation */
+                .nav {
+                    grid-area: nav;
+                    background: var(--bg-panel);
+                    border: 2px solid var(--border-primary);
+                    border-radius: 15px;
+                    padding: 20px;
+                    box-shadow: 0 0 20px var(--border-shadow);
+                    backdrop-filter: blur(10px);
+                    height: fit-content;
+                    position: sticky;
+                    top: 20px;
+                }
+
+                .nav h3 {
+                    color: var(--accent-primary);
+                    margin-bottom: 20px;
+                    font-size: 1.2rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+
+                .nav-list {
+                    list-style: none;
+                }
+
+                .nav-item {
+                    margin-bottom: 10px;
+                }
+
+                .nav-link {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    padding: 12px 15px;
+                    color: var(--text-primary);
+                    text-decoration: none;
+                    border-radius: 10px;
+                    transition: all 0.3s ease;
+                    font-weight: 500;
+                }
+
+                .nav-link:hover {
+                    background: var(--accent-primary);
+                    color: white;
+                    transform: translateX(5px);
+                }
+
+                .nav-icon {
+                    font-size: 1.2rem;
+                    width: 20px;
+                    text-align: center;
+                }
+
+                /* Main Content */
+                .main {
+                    grid-area: main;
+                    background: var(--bg-panel);
+                    border: 2px solid var(--border-primary);
+                    border-radius: 15px;
+                    padding: 30px;
+                    box-shadow: 0 0 20px var(--border-shadow);
+                    backdrop-filter: blur(10px);
+                    overflow-y: auto;
+                }
+
+                .main h2 {
+                    color: var(--accent-primary);
+                    margin-bottom: 20px;
+                    display: flex;
+                    align-items: center;
+                    gap: 15px;
+                }
+
+                /* Responsive Design */
+                @media (max-width: 768px) {
+                    body {
+                        grid-template-areas: 
+                            "header"
+                            "main"
+                            "nav"
+                            "sidebar"
+                            "footer";
+                        grid-template-columns: 1fr;
+                        padding: 10px;
+                        gap: 10px;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <!-- Header -->
+            <header class="header">
+                <div class="header-content">
+                    <div class="header-left">
+                        <h1>🏠 Dashboard</h1>
+                        <div class="header-subtitle">Willkommen in der TESTAREA!</div>
+                    </div>
+                    <div class="header-right">
+                        <span class="branch-badge">TESTAREA</span>
+                        <button class="theme-toggle" id="theme-toggle">
+                            <span id="theme-icon">🌙</span>
+                            <span id="theme-text">Light</span>
+                        </button>
+                        <a href="../index.html" class="back-btn">
+                            ← Startseite
+                        </a>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Navigation -->
+            <nav class="nav">
+                <h3>🛠️ Meine Tools</h3>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="spy-database.html" class="nav-link">
+                            <span class="nav-icon">📡</span>
+                            Spionage-Datenbank
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="spy-report.html" class="nav-link">
+                            <span class="nav-icon">📊</span>
+                            Spionage-Report
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="main">
+                <h2>
+                    <span>🏠</span>
+                    TESTAREA Dashboard
+                </h2>
+                
+                <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                    <h3>🚧 Testbereich</h3>
+                    <p>Willkommen in der TESTAREA! Hier werden neue Features getestet, bevor sie in die Hauptversion übernommen werden.</p>
+                    <br>
+                    <p><strong>Verfügbare Tools:</strong></p>
+                    <ul style="text-align: left; display: inline-block; margin-top: 10px;">
+                        <li><a href="spy-database.html" style="color: var(--accent-primary);">📡 Spionage-Datenbank</a> - Verwaltung von Spionage-Reports</li>
+                        <li><a href="spy-report.html" style="color: var(--accent-primary);">📊 Spionage-Report Analyzer</a> - Report-Analyse Tool</li>
+                    </ul>
+                </div>
+            </main>
+
+            <!-- Sidebar -->
+            <aside class="sidebar" style="grid-area: sidebar; background: var(--bg-panel); border: 2px solid var(--border-primary); border-radius: 15px; padding: 20px; box-shadow: 0 0 20px var(--border-shadow); backdrop-filter: blur(10px); height: fit-content; position: sticky; top: 20px;">
+                <h3 style="color: var(--accent-primary); margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">⚠️ Hinweis</h3>
+                
+                <div style="background: var(--bg-secondary); border: 1px solid var(--border-secondary); border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                    <h4 style="color: var(--accent-primary); margin-bottom: 10px; font-size: 14px;">TESTAREA</h4>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">Dies ist ein Testbereich für neue Features. Funktionen können unvollständig oder instabil sein.</p>
+                </div>
+            </aside>
+
+            <!-- Footer wird durch global-footer-loader.js geladen -->
+            <footer id="global-footer"></footer>
+
+            <!-- Scripts -->
+            <script src="../js/theme-manager.js"></script>
+            <script src="../js/enhanced-navigation.js"></script>
+            <script src="../js/global-footer-loader.js"></script>
+
+            <script>
+                // Initialisierung
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Theme Manager initialisieren
+                    if (typeof initializeTheme === 'function') {
+                        initializeTheme();
+                    }
+                    
+                    // Enhanced Navigation initialisieren
+                    if (typeof initializeEnhancedNavigation === 'function') {
+                        initializeEnhancedNavigation();
+                    }
+                    
+                    // Global Footer laden
+                    if (typeof loadGlobalFooter === 'function') {
+                        loadGlobalFooter();
+                    }
+                    
+                    // Branch-spezifische Konfiguration
+                    document.body.setAttribute('data-branch', 'testarea');
+                    console.log('🔧 TESTAREA Dashboard aktiviert');
+                });
+
+                // Theme Toggle Funktion
+                function toggleTheme() {
+                    if (typeof window.toggleTheme === 'function') {
+                        window.toggleTheme();
+                    }
+                }
+            </script>
+        </body>
+        </html>
+        EOF
+
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add testarea/
+        git commit -m "🚀 Add TESTAREA with Spionage-Datenbank and Spionage-Report
+
+        - Added testarea/spy-database.html with TESTAREA branch badge
+        - Added testarea/spy-report.html with TESTAREA branch badge  
+        - Updated testarea/dashboard.html with TESTAREA badge and navigation
+        - All files use relative paths (../css/, ../js/)
+        - Ready for GitHub Pages deployment"
+        git push

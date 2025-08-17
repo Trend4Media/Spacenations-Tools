@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Spacenations Tools</title>
     <!-- Gemeinsame Theme-Variablen -->
-    <link rel="stylesheet" href="css/theme-variables.css">
-    <link rel="stylesheet" href="css/global-footer.css">
-    <link rel="stylesheet" href="css/enhanced-navigation.css">
+    <link rel="stylesheet" href="../css/theme-variables.css">
+    <link rel="stylesheet" href="../css/global-footer.css">
+    <link rel="stylesheet" href="../css/enhanced-navigation.css">
     <style>
         
         * {
@@ -70,6 +70,24 @@
             gap: 15px;
         }
         
+        .branch-badge {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 10px rgba(255, 107, 53, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
         .theme-toggle {
             background: linear-gradient(45deg, #3a5998, #4a90e2);
             color: white;
@@ -971,11 +989,12 @@
                 <div class="header-subtitle">Willkommen zurück, <span id="header-username">User</span>!</div>
             </div>
             <div class="header-right">
+                <span class="branch-badge">TESTAREA</span>
                 <button class="theme-toggle" id="theme-toggle">
                     <span id="theme-icon">🌙</span>
                     <span id="theme-text">Light</span>
                 </button>
-                <a href="index.html" class="back-btn">
+                <a href="../index.html" class="back-btn">
                     ← Startseite
                 </a>
             </div>
@@ -1007,12 +1026,6 @@
                 <a href="spy-database.html" class="nav-link">
                     <span class="nav-icon">📡</span>
                     Spionage-Datenbank
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="testarea/spy-database.html" class="nav-link">
-                    <span class="nav-icon">📡</span>
-                    Spionage-Datenbank (Testarea)
                 </a>
             </li>
         </ul>
@@ -1224,12 +1237,12 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
     <!-- Modulare JavaScript-Dateien in der richtigen Reihenfolge -->
-    <script src="js/firebase-config.js"></script>        <!-- 1. Firebase-Konfiguration -->
-    <script src="js/theme-manager.js"></script>          <!-- 2. Theme-Management -->
-    <script src="js/auth-manager.js"></script>           <!-- 3. Auth-Management -->
-    <script src="js/firebase-sync.js"></script>          <!-- 4. Dashboard-Sync mit Logout -->
-    <script src="js/dashboard-stats.js"></script>        <!-- 5. Dashboard-Statistiken -->
-    <script src="js/enhanced-navigation.js"></script>    <!-- 6. Enhanced Navigation -->
+    <script src="../js/firebase-config.js"></script>        <!-- 1. Firebase-Konfiguration -->
+    <script src="../js/theme-manager.js"></script>          <!-- 2. Theme-Management -->
+    <script src="../js/auth-manager.js"></script>           <!-- 3. Auth-Management -->
+    <script src="../js/firebase-sync.js"></script>          <!-- 4. Dashboard-Sync mit Logout -->
+    <script src="../js/dashboard-stats.js"></script>        <!-- 5. Dashboard-Statistiken -->
+    <script src="../js/enhanced-navigation.js"></script>    <!-- 6. Enhanced Navigation -->
 
     <script>
         // Dashboard-spezifische Funktionen
@@ -1713,8 +1726,8 @@
             }, 1000);
         });
     </script>
-    <script src="js/calculator-data.js"></script>
-    <script src="js/raid-data-manager.js"></script>
+    <script src="../js/calculator-data.js"></script>
+    <script src="../js/raid-data-manager.js"></script>
     <script>
 // Sabo-Counter Links automatisch reparieren
 function fixSaboCounterLinks() {

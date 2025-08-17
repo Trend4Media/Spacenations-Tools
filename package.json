@@ -23,10 +23,10 @@
   "author": "Spacenations Team",
   "license": "MIT",
   "devDependencies": {
-    "eslint": "^8.0.0",
+    "clean-css": "^5.0.0",
+    "eslint": "^8.57.1",
     "html-minifier-terser": "^7.2.0",
-    "terser": "^5.0.0",
-    "clean-css": "^5.0.0"
+    "terser": "^5.0.0"
   },
   "repository": {
     "type": "git",
