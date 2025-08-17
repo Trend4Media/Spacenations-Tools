@@ -9,7 +9,9 @@ class FirebaseSync {
         this.redirectRules = {
             'index': { requiresAuth: false, redirectTo: 'dashboard.html' },
             'dashboard': { requiresAuth: true, redirectTo: 'index.html' },
-            'register': { requiresAuth: false, redirectTo: 'dashboard.html' }
+            'register': { requiresAuth: false, redirectTo: 'dashboard.html' },
+            'spy-database': { requiresAuth: true, redirectTo: 'index.html' },
+            'spy-report': { requiresAuth: true, redirectTo: 'index.html' }
         };
         
         this.init();
