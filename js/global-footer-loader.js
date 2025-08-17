@@ -109,7 +109,7 @@ class AutoGlobalFooterLoader {
                         <h4>🛠️ Tools & Navigation</h4>
                         <ul class="footer-links">
                             <li><a href="index.html">🏠 Startseite</a></li>
-                            <li><a href="calculator.html" class="auto-tool-link" data-dashboard="dashboard-calculator.html">⚔️ AS-Counter</a></li>
+                            <li><a href="as-counter.html" class="auto-tool-link" data-dashboard="dashboard-as-counter.html">⚔️ AS-Counter</a></li>
                             <li><a href="raid-counter.html" class="auto-tool-link" data-dashboard="dashboard-raid-counter.html">🏴‍☠️ Raid-Counter</a></li>
                             <li><a href="register.html">🚀 Account erstellen</a></li>
                         </ul>
@@ -271,7 +271,7 @@ class AutoGlobalFooterLoader {
         
         toolLinks.forEach(link => {
             if (link.href.includes('dashboard-calculator')) {
-                link.href = 'calculator.html';
+                link.href = 'as-counter.html';
                 link.innerHTML = '⚔️ AS-Counter';
                 link.title = 'AS-Counter (Standard-Version)';
             }

@@ -145,7 +145,7 @@ class EnhancedNavigation {
                         break;
                     case '1':
                         e.preventDefault();
-                        window.location.href = 'dashboard-calculator.html';
+                        window.location.href = 'dashboard-as-counter.html';
                         break;
                     case '2':
                         e.preventDefault();

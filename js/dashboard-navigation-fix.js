@@ -7,9 +7,9 @@ function fixDashboardNavigation() {
     console.log('🔧 Dashboard-Navigation wird repariert...');
     
     // 1. Calculator-Links reparieren
-    const calculatorLinks = document.querySelectorAll('a[href="calculator.html"]');
+    const calculatorLinks = document.querySelectorAll('a[href="as-counter.html"]');
     calculatorLinks.forEach(link => {
-        link.href = 'dashboard-calculator.html';
+        link.href = 'dashboard-as-counter.html';
         link.title = 'AS-Counter (Dashboard) - Kämpfe werden automatisch gespeichert';
         
         // Icon aktualisieren
@@ -81,8 +81,8 @@ function fixDashboardNavigation() {
     // 4. Navigation-spezifische Links in der Sidebar
     const navLinks = document.querySelectorAll('.nav-link');
     navLinks.forEach(link => {
-        if (link.href.includes('calculator.html')) {
-            link.href = 'dashboard-calculator.html';
+        if (link.href.includes('as-counter.html')) {
+            link.href = 'dashboard-as-counter.html';
             const textElement = link.querySelector('.nav-text, span:not(.nav-icon)');
             if (textElement && !textElement.textContent.includes('Dashboard')) {
                 textElement.textContent = 'AS-Counter (Dashboard)';
@@ -122,7 +122,7 @@ const navigationObserver = new MutationObserver(function(mutations) {
             mutation.addedNodes.forEach(function(node) {
                 if (node.nodeType === 1) { // Element node
                     // Prüfe ob neue Links hinzugefügt wurden
-                    const newCalculatorLinks = node.querySelectorAll ? node.querySelectorAll('a[href="calculator.html"]') : [];
+                    const newCalculatorLinks = node.querySelectorAll ? node.querySelectorAll('a[href="as-counter.html"]') : [];
                     const newRaidLinks = node.querySelectorAll ? node.querySelectorAll('a[href="raid-counter.html"]') : [];
                     
                     if (newCalculatorLinks.length > 0 || newRaidLinks.length > 0) {

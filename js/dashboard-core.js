@@ -366,9 +366,9 @@ class DashboardCore {
     // Enhanced Navigation
     setupEnhancedNavigation() {
         // AS-Counter Links für eingeloggte User erweitern
-        const calculatorLinks = document.querySelectorAll('a[href="calculator.html"]');
+        const calculatorLinks = document.querySelectorAll('a[href="as-counter.html"]');
         calculatorLinks.forEach(link => {
-            link.href = 'dashboard-calculator.html';
+            link.href = 'dashboard-as-counter.html';
             link.title = 'AS-Counter (Dashboard) - Alle Kämpfe werden automatisch gespeichert';
             
             // Icon erweitern
@@ -408,7 +408,7 @@ class DashboardCore {
             // Strg+C = Calculator
             if (e.ctrlKey && e.key === 'c') {
                 e.preventDefault();
-                window.location.href = 'dashboard-calculator.html';
+                window.location.href = 'dashboard-as-counter.html';
             }
             
             // Strg+R = Refresh Stats
@@ -458,9 +458,9 @@ class DashboardCore {
             return;
         }
         
-        // Calculator-Updates überwachen
+        // AS-Counter-Updates überwachen
         document.addEventListener('calculatorDataUpdated', async () => {
-            console.log('🔄 Calculator-Daten aktualisiert - Dashboard wird refreshed');
+            console.log('🔄 AS-Counter-Daten aktualisiert - Dashboard wird refreshed');
             await this.loadEnhancedStats();
             await this.loadEnhancedActivities();
         });
@@ -719,16 +719,16 @@ console.log('⌨️ Shortcuts: Strg+D (Reload), Strg+C (Calculator), Strg+R (Ref
 // Enhanced Navigation zwischen AS-Counter Versionen
 // eslint-disable-next-line no-unused-vars
 function setupEnhancedNavigation() {
-    // Alle Calculator-Links finden und richtig verlinken
-    const calculatorLinks = document.querySelectorAll('a[href="calculator.html"], a[href*="calculator"]');
+    // Alle AS-Counter-Links finden und richtig verlinken
+    const calculatorLinks = document.querySelectorAll('a[href="as-counter.html"], a[href*="as-counter"]');
     
     calculatorLinks.forEach(link => {
         const isInDashboard = window.location.pathname.includes('dashboard');
         const isLoggedIn = this.currentUser !== null;
         
         if (isInDashboard && isLoggedIn) {
-            // Im Dashboard: Immer zum Dashboard-Calculator
-            link.href = 'dashboard-calculator.html';
+            // Im Dashboard: Immer zum Dashboard-AS-Counter
+            link.href = 'dashboard-as-counter.html';
             link.title = 'AS-Counter (Dashboard) - Kämpfe werden automatisch gespeichert';
             
             // Icon erweitern falls noch nicht geschehen
@@ -751,8 +751,8 @@ function setupEnhancedNavigation() {
         }
     });
     
-    // Version-Switcher hinzufügen (falls im Dashboard-Calculator)
-    if (window.location.pathname.includes('dashboard-calculator')) {
+    // Version-Switcher hinzufügen (falls im Dashboard-AS-Counter)
+    if (window.location.pathname.includes('dashboard-as-counter')) {
         this.addVersionSwitcher();
     }
     
@@ -791,7 +791,7 @@ function addVersionSwitcher() {
         ">
             💾 Dashboard-Version
         </span>
-        <a href="calculator.html" style="
+        <a href="as-counter.html" style="
             background: var(--card-bg);
             color: var(--text-secondary);
             padding: 5px 12px;
@@ -812,8 +812,8 @@ function addVersionSwitcher() {
 // Standard-Calculator Links verbessern
 // eslint-disable-next-line no-unused-vars
 function enhanceStandardCalculatorLinks() {
-    // In calculator.html einen Hinweis auf Dashboard-Version hinzufügen
-    if (window.location.pathname.includes('calculator.html') && !window.location.pathname.includes('dashboard')) {
+    // In as-counter.html einen Hinweis auf Dashboard-Version hinzufügen
+    if (window.location.pathname.includes('as-counter.html') && !window.location.pathname.includes('dashboard')) {
         addDashboardVersionPromo();
     }
 }
