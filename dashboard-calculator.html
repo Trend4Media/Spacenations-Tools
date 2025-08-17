@@ -479,7 +479,19 @@
                         <span class="stat-value" id="lost-armor">0</span>
                     </div>
                     <div class="stat-line">
-                        <span class="
+                        <span class="stat-name">Angriffsstärke:</span>
+                        <span class="stat-value" id="lost-attack">0</span>
+                    </div>
+                    <div class="stat-line total-line">
+                        <span class="stat-name">Anzahl Berichte:</span>
+                        <span class="stat-value" id="lost-count">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Footer wird automatisch geladen -->
 
                             <!-- Auto-Loading Scripts - Immer als LETZTES vor </body> -->
 <script>
@@ -669,6 +681,144 @@
         }
     }
     
+    // AS-Counter Berechnungslogik
+    function calculateReports() {
+        const destroyedReports = document.getElementById('destroyed-reports').value;
+        const lostReports = document.getElementById('lost-reports').value;
+        
+        // Zerstört-Statistiken berechnen
+        const destroyedStats = parseReports(destroyedReports);
+        updateDestroyedDisplay(destroyedStats);
+        
+        // Verloren-Statistiken berechnen
+        const lostStats = parseReports(lostReports);
+        updateLostDisplay(lostStats);
+        
+        // Dashboard-spezifisch: Daten auch in Firebase speichern
+        if (window.firebase && firebase.auth().currentUser) {
+            saveCalculationToFirebase(destroyedStats, lostStats);
+        }
+        
+        Logger.info('Dashboard AS-Counter Berechnung durchgeführt', {
+            destroyed: destroyedStats,
+            lost: lostStats
+        });
+    }
+    
+    function parseReports(reportsText) {
+        if (!reportsText.trim()) {
+            return {
+                stability: 0,
+                storage: 0,
+                armor: 0,
+                attack: 0,
+                count: 0
+            };
+        }
+        
+        const stats = {
+            stability: 0,
+            storage: 0,
+            armor: 0,
+            attack: 0,
+            count: 0
+        };
+        
+        // Regex-Patterns für die verschiedenen Werte
+        const patterns = {
+            stability: /(\d+(?:[.,]\d+)?)\s*Stabilität/gi,
+            storage: /(\d+(?:[.,]\d+)?)\s*Lagerraum/gi,
+            armor: /(\d+(?:[.,]\d+)?)\s*Panzerung/gi,
+            attack: /(\d+(?:[.,]\d+)?)\s*Angriffsstärke/gi
+        };
+        
+        // Durch den gesamten Text suchen
+        Object.entries(patterns).forEach(([key, pattern]) => {
+            const matches = reportsText.matchAll(pattern);
+            for (const match of matches) {
+                // Zahlen normalisieren (Punkt und Komma als Tausendertrennzeichen behandeln)
+                const valueStr = match[1].replace(/[.,]/g, '');
+                const value = parseFloat(valueStr) || 0;
+                stats[key] += value;
+            }
+        });
+        
+        // Berichte zählen (anhand von "Die Flotte" oder "zerstörte")
+        const reportCount = (reportsText.match(/Die Flotte.*?zerstörte/gi) || []).length;
+        stats.count = Math.max(reportCount, (reportsText.match(/(\d+(?:[.,]\d+)?)\s*Stabilität/gi) || []).length);
+        
+        return stats;
+    }
+    
+    function updateDestroyedDisplay(stats) {
+        document.getElementById('destroyed-stability').textContent = formatNumber(stats.stability);
+        document.getElementById('destroyed-storage').textContent = formatNumber(stats.storage);
+        document.getElementById('destroyed-armor').textContent = formatNumber(stats.armor);
+        document.getElementById('destroyed-attack').textContent = formatNumber(stats.attack);
+        document.getElementById('destroyed-count').textContent = stats.count;
+    }
+    
+    function updateLostDisplay(stats) {
+        document.getElementById('lost-stability').textContent = formatNumber(stats.stability);
+        document.getElementById('lost-storage').textContent = formatNumber(stats.storage);
+        document.getElementById('lost-armor').textContent = formatNumber(stats.armor);
+        document.getElementById('lost-attack').textContent = formatNumber(stats.attack);
+        document.getElementById('lost-count').textContent = stats.count;
+    }
+    
+    function formatNumber(num) {
+        if (num >= 1000000) {
+            return (num / 1000000).toFixed(1) + 'M';
+        } else if (num >= 1000) {
+            return (num / 1000).toFixed(1) + 'K';
+        }
+        return num.toLocaleString('de-DE');
+    }
+    
+    function clearAll() {
+        // Textareas leeren
+        document.getElementById('destroyed-reports').value = '';
+        document.getElementById('lost-reports').value = '';
+        
+        // Ergebnisse zurücksetzen
+        const destroyedStats = { stability: 0, storage: 0, armor: 0, attack: 0, count: 0 };
+        const lostStats = { stability: 0, storage: 0, armor: 0, attack: 0, count: 0 };
+        
+        updateDestroyedDisplay(destroyedStats);
+        updateLostDisplay(lostStats);
+        
+        Logger.info('Dashboard AS-Counter zurückgesetzt');
+    }
+    
+    // Firebase-Speicherung für Dashboard
+    async function saveCalculationToFirebase(destroyedStats, lostStats) {
+        try {
+            const user = firebase.auth().currentUser;
+            if (!user) return;
+            
+            const db = firebase.firestore();
+            const timestamp = new Date();
+            
+            const calculationData = {
+                timestamp: timestamp,
+                destroyed: destroyedStats,
+                lost: lostStats,
+                userId: user.uid,
+                type: 'as-counter'
+            };
+            
+            await db.collection('users')
+                .doc(user.uid)
+                .collection('calculator_data')
+                .add(calculationData);
+                
+            console.log('✅ Berechnung in Firebase gespeichert');
+            
+        } catch (error) {
+            console.error('❌ Fehler beim Speichern in Firebase:', error);
+        }
+    }
+
     // 6. SOFORTIGER Start des Auto-Loaders
     function startAutoLoader() {
         console.log('🤖 Auto-Loader gestartet für:', window.location.pathname);

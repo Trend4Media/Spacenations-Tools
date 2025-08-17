@@ -693,10 +693,159 @@
     <script src="js/theme-manager.js"></script>
 
     <script>
+        // Berechnungslogik für AS-Counter
+        function calculateReports() {
+            const destroyedReports = document.getElementById('destroyed-reports').value;
+            const lostReports = document.getElementById('lost-reports').value;
+            
+            // Zerstört-Statistiken berechnen
+            const destroyedStats = parseReports(destroyedReports);
+            updateDestroyedDisplay(destroyedStats);
+            
+            // Verloren-Statistiken berechnen
+            const lostStats = parseReports(lostReports);
+            updateLostDisplay(lostStats);
+            
+            Logger.info('AS-Counter Berechnung durchgeführt', {
+                destroyed: destroyedStats,
+                lost: lostStats
+            });
+        }
+        
+        function parseReports(reportsText) {
+            if (!reportsText.trim()) {
+                return {
+                    stability: 0,
+                    storage: 0,
+                    armor: 0,
+                    attack: 0,
+                    count: 0
+                };
+            }
+            
+            const stats = {
+                stability: 0,
+                storage: 0,
+                armor: 0,
+                attack: 0,
+                count: 0
+            };
+            
+            // Berichte nach "Die Flotte" aufteilen
+            const reports = reportsText.split(/Die Flotte.*?zerstörte/g).filter(report => report.trim());
+            stats.count = reports.length;
+            
+            // Regex-Patterns für die verschiedenen Werte
+            const patterns = {
+                stability: /(\d+(?:\.\d+)?)\s*Stabilität/gi,
+                storage: /(\d+(?:\.\d+)?)\s*Lagerraum/gi,
+                armor: /(\d+(?:\.\d+)?)\s*Panzerung/gi,
+                attack: /(\d+(?:\.\d+)?)\s*Angriffsstärke/gi
+            };
+            
+            // Jeden Bericht durchgehen
+            reports.forEach(report => {
+                Object.entries(patterns).forEach(([key, pattern]) => {
+                    const matches = report.matchAll(pattern);
+                    for (const match of matches) {
+                        const value = parseFloat(match[1].replace(/\./g, '')) || 0;
+                        stats[key] += value;
+                    }
+                });
+            });
+            
+            // Auch den gesamten Text durchsuchen (für Fälle wo Split nicht perfekt funktioniert)
+            Object.entries(patterns).forEach(([key, pattern]) => {
+                const matches = reportsText.matchAll(pattern);
+                let totalFromText = 0;
+                for (const match of matches) {
+                    const value = parseFloat(match[1].replace(/\./g, '')) || 0;
+                    totalFromText += value;
+                }
+                // Nehme den höheren Wert (aus Reports oder aus Gesamttext)
+                if (totalFromText > stats[key]) {
+                    stats[key] = totalFromText;
+                    // Berichte-Anzahl korrigieren
+                    if (key === 'stability') {
+                        stats.count = (reportsText.match(/(\d+(?:\.\d+)?)\s*Stabilität/gi) || []).length;
+                    }
+                }
+            });
+            
+            return stats;
+        }
+        
+        function updateDestroyedDisplay(stats) {
+            document.getElementById('destroyed-stability').textContent = formatNumber(stats.stability);
+            document.getElementById('destroyed-storage').textContent = formatNumber(stats.storage);
+            document.getElementById('destroyed-armor').textContent = formatNumber(stats.armor);
+            document.getElementById('destroyed-attack').textContent = formatNumber(stats.attack);
+            document.getElementById('destroyed-count').textContent = stats.count;
+        }
+        
+        function updateLostDisplay(stats) {
+            document.getElementById('lost-stability').textContent = formatNumber(stats.stability);
+            document.getElementById('lost-storage').textContent = formatNumber(stats.storage);
+            document.getElementById('lost-armor').textContent = formatNumber(stats.armor);
+            document.getElementById('lost-attack').textContent = formatNumber(stats.attack);
+            document.getElementById('lost-count').textContent = stats.count;
+        }
+        
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toLocaleString('de-DE');
+        }
+        
+        function clearAll() {
+            // Textareas leeren
+            document.getElementById('destroyed-reports').value = '';
+            document.getElementById('lost-reports').value = '';
+            
+            // Ergebnisse zurücksetzen
+            const destroyedStats = { stability: 0, storage: 0, armor: 0, attack: 0, count: 0 };
+            const lostStats = { stability: 0, storage: 0, armor: 0, attack: 0, count: 0 };
+            
+            updateDestroyedDisplay(destroyedStats);
+            updateLostDisplay(lostStats);
+            
+            Logger.info('AS-Counter zurückgesetzt');
+        }
+        
         // Global Footer Functions
         function initializeGlobalFooter() {
             updateSystemStatus();
             console.log('🦶 Global Footer initialisiert');
+        }
+        
+        // Test mit Ihren Beispiel-Berichten
+        function testWithExampleReports() {
+            const exampleReports = `Die Flotte a-s 5k zerstörte auf dem Planeten 555:817:2 in einer getarnten Flotte :
+2.265 Stabilität
+3.845 Lagerraum
+95 Panzerung
+1.120 Angriffsstärke
+Die Flotte wurde zerstört.
+
+Die Flotte ***_ST:3.0K_AS:864_PZ:96 zerstörte auf dem Planeten Proxima 3-6 (555:626:9) in einer Flotte des Spielers :
+128 Stabilität
+385 Lagerraum
+0 Panzerung
+0 Angriffsstärke
+Die Flotte wurde zerstört.`;
+            
+            document.getElementById('destroyed-reports').value = exampleReports;
+            calculateReports();
+            
+            console.log('Test mit Beispiel-Berichten durchgeführt');
+            console.log('Erwartete Summen: Stabilität: 2393, Lagerraum: 4230, Panzerung: 95, Angriffsstärke: 1120');
+        }
+        
+        // Test-Funktion global verfügbar machen
+        window.testASCounter = testWithExampleReports;
     </script>
     <!-- Auto-Loading Scripts - Immer als LETZTES vor </body> -->
 <script>
