@@ -3,297 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spacenations Tools - Version auswählen</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
-            color: #e0e0e0;
-            margin: 0;
-            padding: 40px 20px;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .container {
-            background: rgba(16, 16, 16, 0.9);
-            border: 2px solid #3a5998;
-            border-radius: 15px;
-            padding: 40px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(58, 89, 152, 0.3);
-            max-width: 600px;
-            width: 100%;
-        }
-        
-        h1 {
-            color: #ff8c42;
-            margin-bottom: 10px;
-            font-size: 2.5rem;
-            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
-            letter-spacing: 2px;
-        }
-        
-        .subtitle {
-            color: #b0b0b0;
-            margin-bottom: 40px;
-            font-size: 1.1rem;
-        }
-        
-        .branch-links {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 30px;
-        }
-        
-        .branch-btn {
-            background: linear-gradient(135deg, #3a5998, #4a90e2);
-            color: white;
-            text-decoration: none;
-            padding: 20px 30px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-            min-width: 180px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .branch-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(74, 144, 226, 0.4);
-            border-color: #ff8c42;
-        }
-        
-        .main-branch {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-        }
-        
-        .main-branch:hover {
-            box-shadow: 0 10px 25px rgba(34, 197, 94, 0.4);
-        }
-        
-        .test-branch {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-        }
-        
-        .test-branch:hover {
-            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);
-        }
-        
-        .branch-icon {
-            font-size: 2rem;
-            margin-bottom: 5px;
-        }
-        
-        .branch-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-        }
-        
-        .branch-desc {
-            font-size: 0.9rem;
-            opacity: 0.9;
-            font-weight: 400;
-        }
-        
-        .description {
-            margin-top: 30px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            font-size: 0.9rem;
-            color: #b0b0b0;
-            line-height: 1.5;
-        }
-        
-        .description strong {
-            color: #e0e0e0;
-        }
-        
-        .info-section {
-            margin-top: 25px;
-            padding: 15px;
-            background: rgba(58, 89, 152, 0.1);
-            border-radius: 8px;
-            border: 1px solid rgba(58, 89, 152, 0.3);
-        }
-        
-        .info-title {
-            color: #4a90e2;
-            font-weight: 600;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .feature-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .feature-item {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 10px 15px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 25px;
-                margin: 20px;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .branch-links {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .branch-btn {
-                min-width: 200px;
-            }
-            
-            .feature-list {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .loading {
-            display: none;
-            color: #4a90e2;
-            margin-top: 20px;
-        }
-        
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #4a90e2;
-            border-top: 2px solid transparent;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 8px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+    <title>Space Nations - Weltraum Simulation</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>🚀 Spacenations Tools</h1>
-        <div class="subtitle">Wählen Sie eine Version zum Starten:</div>
-        
-        <div class="branch-links">
-            <a href="main.html" class="branch-btn main-branch" onclick="showLoading('main')">
-                <div class="branch-icon">✅</div>
-                <div class="branch-title">Main Branch</div>
-                <div class="branch-desc">Stabile Version</div>
-            </a>
-            
-            <a href="#" class="branch-btn test-branch" onclick="goToTestarea()" id="testarea-btn">
-                <div class="branch-icon">🧪</div>
-                <div class="branch-title">Testarea Branch</div>
-                <div class="branch-desc">Neue Features</div>
-            </a>
-        </div>
-        
-        <div class="info-section">
-            <div class="info-title">
-                <span>🛠️</span>
-                <span>Verfügbare Tools</span>
+    <div class="game-container">
+        <!-- Header -->
+        <header class="game-header">
+            <div class="logo">
+                <h1>🚀 SPACE NATIONS</h1>
             </div>
-            <div class="feature-list">
-                <div class="feature-item">
-                    <span>⚔️</span>
-                    <span>AS-Counter (Kampfberichte)</span>
-                </div>
-                <div class="feature-item">
-                    <span>🏴‍☠️</span>
-                    <span>Raid-Counter (Plünderungen)</span>
-                </div>
-                <div class="feature-item">
-                    <span>💥</span>
-                    <span>Sabo-Counter (Sabotagen)</span>
-                </div>
-                <div class="feature-item">
-                    <span>📊</span>
-                    <span>Dashboard (mit Statistiken)</span>
+            <div class="player-info">
+                <div class="resource-bar">
+                    <span class="resource">⚡ <span id="energy">1000</span></span>
+                    <span class="resource">⛏️ <span id="minerals">500</span></span>
+                    <span class="resource">🛡️ <span id="credits">2500</span></span>
                 </div>
             </div>
-        </div>
-        
-        <div class="description">
-            <strong>Main:</strong> Die stabile, getestete Version für den täglichen Gebrauch<br>
-            <strong>Testarea:</strong> Neue Features, Verbesserungen und experimentelle Funktionen
-        </div>
-        
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <span>Version wird geladen...</span>
-        </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="main-nav">
+            <button class="nav-btn active" data-tab="overview">Übersicht</button>
+            <button class="nav-btn" data-tab="exploration">Erkundung</button>
+            <button class="nav-btn" data-tab="fleet">Flotte</button>
+            <button class="nav-btn" data-tab="crew">Crew</button>
+            <button class="nav-btn" data-tab="combat">Kampf</button>
+            <button class="nav-btn" data-tab="research">Forschung</button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="game-content">
+            <!-- Overview Tab -->
+            <div class="tab-content active" id="overview">
+                <div class="overview-grid">
+                    <div class="status-panel">
+                        <h2>🏠 Heimatbasis Status</h2>
+                        <div class="status-item">
+                            <span>Bevölkerung:</span>
+                            <span id="population">10,000</span>
+                        </div>
+                        <div class="status-item">
+                            <span>Verteidigung:</span>
+                            <span id="defense">85%</span>
+                        </div>
+                        <div class="status-item">
+                            <span>Produktionsrate:</span>
+                            <span id="production">120/h</span>
+                        </div>
+                    </div>
+
+                    <div class="recent-events">
+                        <h2>📡 Neueste Ereignisse</h2>
+                        <div class="event-log" id="eventLog">
+                            <div class="event">🛸 Neue Spezies in Sektor 7 entdeckt</div>
+                            <div class="event">⚡ Energieproduktion um 15% gesteigert</div>
+                            <div class="event">🔬 Forschung "Hyperantrieb" abgeschlossen</div>
+                        </div>
+                    </div>
+
+                    <div class="quick-actions">
+                        <h2>⚡ Schnellaktionen</h2>
+                        <button class="action-btn" onclick="quickMine()">Schnell-Bergbau</button>
+                        <button class="action-btn" onclick="quickExplore()">Erkundung starten</button>
+                        <button class="action-btn" onclick="quickTrade()">Handel</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exploration Tab -->
+            <div class="tab-content" id="exploration">
+                <div class="exploration-container">
+                    <div class="sector-map">
+                        <h2>🗺️ Galaktische Karte</h2>
+                        <div class="map-grid" id="mapGrid"></div>
+                    </div>
+                    <div class="exploration-info">
+                        <h2>🔍 Erkundungsdetails</h2>
+                        <div id="sectorInfo">
+                            <p>Wählen Sie einen Sektor zur Erkundung aus.</p>
+                        </div>
+                        <button class="explore-btn" id="exploreBtn" disabled>Erkunden (Kosten: 50⚡)</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fleet Tab -->
+            <div class="tab-content" id="fleet">
+                <div class="fleet-container">
+                    <div class="fleet-overview">
+                        <h2>🚀 Flotten Übersicht</h2>
+                        <div class="ship-grid" id="shipGrid"></div>
+                        <button class="build-btn" onclick="showShipBuilder()">Neues Schiff bauen</button>
+                    </div>
+                    <div class="ship-builder" id="shipBuilder" style="display: none;">
+                        <h3>⚙️ Schiffsbau</h3>
+                        <div class="ship-types">
+                            <div class="ship-type" data-type="scout">
+                                <h4>🛸 Aufklärer</h4>
+                                <p>Kosten: 200⚡, 100⛏️</p>
+                                <button onclick="buildShip('scout')">Bauen</button>
+                            </div>
+                            <div class="ship-type" data-type="fighter">
+                                <h4>⚔️ Jäger</h4>
+                                <p>Kosten: 500⚡, 300⛏️</p>
+                                <button onclick="buildShip('fighter')">Bauen</button>
+                            </div>
+                            <div class="ship-type" data-type="cruiser">
+                                <h4>🛡️ Kreuzer</h4>
+                                <p>Kosten: 1000⚡, 600⛏️</p>
+                                <button onclick="buildShip('cruiser')">Bauen</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Crew Tab -->
+            <div class="tab-content" id="crew">
+                <div class="crew-container">
+                    <h2>👥 Crew Management</h2>
+                    <div class="crew-grid" id="crewGrid"></div>
+                    <button class="recruit-btn" onclick="recruitCrew()">Neue Crew rekrutieren (100🛡️)</button>
+                </div>
+            </div>
+
+            <!-- Combat Tab -->
+            <div class="tab-content" id="combat">
+                <div class="combat-container">
+                    <h2>⚔️ Kampf Arena</h2>
+                    <div class="combat-status">
+                        <div class="player-fleet">
+                            <h3>Deine Flotte</h3>
+                            <div id="playerFleet"></div>
+                        </div>
+                        <div class="combat-controls">
+                            <button class="combat-btn" onclick="findBattle()">Gegner suchen</button>
+                            <button class="combat-btn" onclick="startBattle()" id="battleBtn" disabled>Schlacht beginnen</button>
+                        </div>
+                        <div class="enemy-fleet">
+                            <h3>Feindliche Flotte</h3>
+                            <div id="enemyFleet"></div>
+                        </div>
+                    </div>
+                    <div class="battle-log" id="battleLog"></div>
+                </div>
+            </div>
+
+            <!-- Research Tab -->
+            <div class="tab-content" id="research">
+                <div class="research-container">
+                    <h2>🔬 Forschungslabor</h2>
+                    <div class="research-tree" id="researchTree"></div>
+                </div>
+            </div>
+        </main>
     </div>
 
-    <script>
-        function showLoading(branch) {
-            document.getElementById('loading').style.display = 'block';
-            console.log(`Lade ${branch} Branch...`);
-        }
-        
-        function goToTestarea() {
-            // Prüfe ob wir auf GitHub Pages sind
-            if (window.location.hostname.includes('github.io')) {
-                // GitHub Pages: Verwende den testarea Ordner
-                window.location.href = window.location.origin + window.location.pathname.replace(/\/$/, '') + '/testarea/main.html';
-            } else {
-                // Lokal: Gehe direkt zur main.html (da beide Versionen gleich sind)
-                showLoading('testarea');
-                setTimeout(() => {
-                    window.location.href = 'main.html?branch=testarea';
-                }, 500);
-            }
-        }
-        
-        // Branch-Info in URL-Parameter für Tracking
-        const urlParams = new URLSearchParams(window.location.search);
-        const branch = urlParams.get('branch');
-        if (branch) {
-            console.log(`Aktuelle Version: ${branch}`);
-        }
-        
-        // Keyboard-Shortcuts
-        document.addEventListener('keydown', function(e) {
-            if (e.key === '1' || e.key === 'm') {
-                document.querySelector('.main-branch').click();
-            } else if (e.key === '2' || e.key === 't') {
-                document.querySelector('.test-branch').click();
-            }
-        });
-        
-        console.log('🚀 Spacenations Tools Branch-Auswahl geladen');
-        console.log('💡 Shortcuts: 1/M für Main, 2/T für Testarea');
-    </script>
+    <script src="game.js"></script>
 </body>
 </html>
