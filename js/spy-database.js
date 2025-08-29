@@ -89,8 +89,8 @@ class SpyDatabasePage {
         }
 
         // URL-Validierung
-        if (!window.SpyCrawler._isValidSpyReportUrl(url)) {
-            this._setStatus('Ungültige URL. Bitte eine gültige spacenations.eu Spionagebericht-URL eingeben.', true);
+        if (!window.EnhancedSpyCrawler._isValidSpyReportUrl(url)) {
+            this._setStatus('❌ Ungültige URL. Bitte eine gültige spacenations.eu Spionagebericht-URL eingeben (z.B. https://beta1.game.spacenations.eu/spy-report/...)', true);
             return;
         }
 
@@ -156,26 +156,58 @@ class SpyDatabasePage {
     }
 
     async _fetchReportHTML(url) {
-        // Verwende den erweiterten Crawler für bessere Erfolgsrate
+        // Verwende den garantierten Enhanced Crawler
         try {
-            this._setStatus('Versuche verschiedene Crawling-Methoden...', false);
-            const result = await window.SpyCrawler.crawlWithAlternatives(url);
+            this._setStatus('🚀 Starte garantiertes Crawling mit 6 Methoden...', false);
+            const result = await window.EnhancedSpyCrawler.guaranteedCrawl(url);
             
-            if (result.usedUrl !== url) {
-                this._setStatus(`Erfolgreich mit alternativer URL geladen`, false);
-            }
+            this._setStatus(`✅ Erfolgreich mit ${result.method} in ${result.duration}ms geladen`, false);
             
             return result.html;
         } catch (error) {
-            // Fallback: Zeige detaillierte Fehlermeldung
-            if (error.message === 'CORS_BLOCKED') {
-                throw new Error('CORS-Blockierung erkannt. Nutze "HTML einfügen" und kopiere den Seiteninhalt manuell.');
-            } else if (error.message.includes('Alle')) {
-                throw new Error('Automatisches Laden fehlgeschlagen. Mögliche Gründe: Server nicht erreichbar, CORS-Blockierung oder ungültige URL. Nutze "HTML einfügen" als Alternative.');
-            } else {
-                throw error;
+            console.error('Enhanced Crawler fehlgeschlagen:', error);
+            
+            // Fallback zum normalen Crawler
+            try {
+                this._setStatus('⚠️ Fallback zu Standard-Crawler...', false);
+                const fallbackResult = await window.SpyCrawler.crawlWithAlternatives(url);
+                
+                this._setStatus('✅ Erfolgreich mit Fallback-Methode geladen', false);
+                return fallbackResult.html;
+            } catch (fallbackError) {
+                // Detaillierte Fehlermeldung mit Lösungsvorschlägen
+                const errorMsg = this._generateUserFriendlyError(error.message, url);
+                throw new Error(errorMsg);
             }
         }
+    }
+
+    _generateUserFriendlyError(errorMessage, url) {
+        let userMsg = '❌ Automatisches Crawling fehlgeschlagen.\n\n';
+        
+        if (errorMessage.includes('CORS')) {
+            userMsg += '🔒 Problem: CORS-Blockierung durch den Server\n';
+            userMsg += '💡 Lösung: Nutze "HTML einfügen" und kopiere den Seiteninhalt manuell\n\n';
+        } else if (errorMessage.includes('timeout') || errorMessage.includes('Timeout')) {
+            userMsg += '⏱️ Problem: Server antwortet nicht rechtzeitig\n';
+            userMsg += '💡 Lösung: Versuche es später erneut oder nutze "HTML einfügen"\n\n';
+        } else if (errorMessage.includes('404') || errorMessage.includes('not found')) {
+            userMsg += '🔍 Problem: Spionagebericht nicht gefunden\n';
+            userMsg += '💡 Lösung: Prüfe die URL oder verwende einen aktuelleren Link\n\n';
+        } else {
+            userMsg += '🌐 Problem: Netzwerk- oder Server-Fehler\n';
+            userMsg += '💡 Lösung: Prüfe deine Internetverbindung oder nutze "HTML einfügen"\n\n';
+        }
+        
+        userMsg += '📋 So gehst du vor:\n';
+        userMsg += '1. Klicke auf "HTML einfügen"\n';
+        userMsg += '2. Öffne den Spionagebericht in einem neuen Tab\n';
+        userMsg += '3. Markiere alles (Strg+A) und kopiere es (Strg+C)\n';
+        userMsg += '4. Füge den Inhalt hier ein (Strg+V)\n';
+        userMsg += '5. Klicke auf "Parsen & Speichern"\n\n';
+        userMsg += `🔗 URL: ${url}`;
+        
+        return userMsg;
     }
 
     _startListening() {
