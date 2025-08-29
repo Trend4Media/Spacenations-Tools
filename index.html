@@ -150,12 +150,12 @@
         <div class="subtitle">Wählen Sie eine Version:</div>
         
         <div class="branch-links">
-            <a href="main/" class="branch-btn main-branch">
+            <a href="main/" class="branch-btn main-branch" onclick="navigateToMain(event)">
                 <div class="branch-icon">✅</div>
                 <div class="branch-title">Main Branch</div>
                 <div class="branch-desc">Stabile Version</div>
             </a>
-            <a href="testarea/" class="branch-btn test-branch">
+            <a href="#" class="branch-btn test-branch" onclick="navigateToTestarea(event)">
                 <div class="branch-icon">🧪</div>
                 <div class="branch-title">Testarea Branch</div>
                 <div class="branch-desc">Neue Features</div>
@@ -173,17 +173,82 @@
     </div>
     
     <script>
+        // Navigation functions
+        function navigateToMain(event) {
+            event.preventDefault();
+            console.log('🚀 Navigiere zu Main Branch');
+            showLoading('main');
+            
+            // Check if main directory exists, fallback to main.html
+            fetch('main/')
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = 'main/';
+                    } else {
+                        window.location.href = 'main.html';
+                    }
+                })
+                .catch(() => {
+                    // Fallback if fetch fails
+                    window.location.href = 'main.html';
+                });
+        }
+        
+        function navigateToTestarea(event) {
+            event.preventDefault();
+            console.log('🧪 Navigiere zu Testarea Branch');
+            showLoading('testarea');
+            
+            // Check if testarea directory exists, fallback to testarea/index.html
+            fetch('testarea/')
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = 'testarea/';
+                    } else {
+                        // Check if we're in a git environment and can switch branches
+                        window.location.href = 'testarea/index.html';
+                    }
+                })
+                .catch(() => {
+                    // Final fallback - try to access testarea content
+                    window.location.href = 'testarea/index.html';
+                });
+        }
+        
+        function showLoading(branch) {
+            const container = document.querySelector('.container');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: rgba(16,16,16,0.9); padding: 30px; border-radius: 15px; text-align: center; border: 2px solid #3a5998;">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">${branch === 'main' ? '✅' : '🧪'}</div>
+                        <h3 style="color: #ff8c42; margin-bottom: 10px;">Lade ${branch === 'main' ? 'Main Branch' : 'Testarea Branch'}...</h3>
+                        <div style="color: #b0b0b0;">Bitte warten...</div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(loadingDiv);
+            
+            // Remove loading after timeout as fallback
+            setTimeout(() => {
+                if (loadingDiv.parentElement) {
+                    loadingDiv.remove();
+                }
+            }, 5000);
+        }
+        
         // Keyboard Shortcuts
         document.addEventListener('keydown', function(e) {
             if (e.key === '1' || (e.key.toLowerCase() === 'm' && !e.ctrlKey)) {
-                window.location.href = 'main/';
+                navigateToMain(e);
             } else if (e.key === '2' || (e.key.toLowerCase() === 't' && !e.ctrlKey)) {
-                window.location.href = 'testarea/';
+                navigateToTestarea(e);
             }
         });
         
         console.log('🚀 Spacenations Tools Branch-Auswahl geladen');
         console.log('💡 Shortcuts: 1/M für Main, 2/T für Testarea');
+        console.log('🔧 Navigation mit Fehlerbehandlung aktiviert');
     </script>
 </body>
 </html>

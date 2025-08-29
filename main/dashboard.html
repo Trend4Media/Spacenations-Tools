@@ -1219,9 +1219,36 @@
     </footer>
 
     <!-- Firebase SDK - MUSS ZUERST geladen werden -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" onerror="handleFirebaseError('app')"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js" onerror="handleFirebaseError('auth')"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js" onerror="handleFirebaseError('firestore')"></script>
+    
+    <script>
+        // Firebase Error Handling
+        let firebaseErrors = [];
+        function handleFirebaseError(module) {
+            console.error(`❌ Firebase ${module} konnte nicht geladen werden`);
+            firebaseErrors.push(module);
+            
+            // Fallback für lokale Entwicklung
+            if (firebaseErrors.length >= 3) {
+                console.warn('🔄 Firebase CDN nicht verfügbar - Fallback-Modus aktiviert');
+                showFirebaseErrorMessage();
+            }
+        }
+        
+        function showFirebaseErrorMessage() {
+            const errorDiv = document.createElement('div');
+            errorDiv.innerHTML = `
+                <div style="position: fixed; top: 20px; left: 20px; right: 20px; background: rgba(255, 0, 0, 0.9); color: white; padding: 15px; border-radius: 8px; z-index: 10000; text-align: center;">
+                    <h3>⚠️ Verbindungsproblem</h3>
+                    <p>Firebase-Dienste sind nicht verfügbar. Login-Funktionen sind eingeschränkt.</p>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background: white; color: red; border: none; padding: 5px 15px; border-radius: 4px; cursor: pointer;">OK</button>
+                </div>
+            `;
+            document.body.appendChild(errorDiv);
+        }
+    </script>
 
     <!-- Modulare JavaScript-Dateien in der richtigen Reihenfolge -->
     <script src="js/firebase-config.js"></script>        <!-- 1. Firebase-Konfiguration -->

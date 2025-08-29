@@ -89,12 +89,53 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (error) {
         console.error('❌ Firebase-Setup fehlgeschlagen:', error);
         
+        // Erweiterte Fehlerbehandlung
+        handleFirebaseInitError(error);
+        
         // Fehler-Event für andere Module
         document.dispatchEvent(new CustomEvent('firebaseError', { 
             detail: { error: error.message } 
         }));
     }
 });
+
+// Erweiterte Firebase-Fehlerbehandlung
+function handleFirebaseInitError(error) {
+    console.warn('🔄 Starte Firebase-Fallback-Modus');
+    
+    // Mock Firebase Services für Offline-Entwicklung
+    window.firebaseServices = {
+        auth: {
+            signInWithEmailAndPassword: () => Promise.reject(new Error('Firebase nicht verfügbar')),
+            signOut: () => Promise.resolve(),
+            onAuthStateChanged: (callback) => {
+                // Simuliere keinen eingeloggten User
+                setTimeout(() => callback(null), 100);
+                return () => {}; // Unsubscribe function
+            }
+        },
+        db: {
+            collection: () => ({
+                doc: () => ({
+                    get: () => Promise.resolve({ exists: false }),
+                    update: () => Promise.resolve(),
+                    set: () => Promise.resolve()
+                }),
+                add: () => Promise.resolve(),
+                where: () => ({
+                    orderBy: () => ({
+                        get: () => Promise.resolve({ docs: [] })
+                    })
+                })
+            })
+        },
+        serverTimestamp: () => new Date(),
+        initialized: true,
+        offline: true
+    };
+    
+    console.log('🔧 Firebase-Fallback-Services aktiviert');
+}
 
 // Hilfsfunktionen für andere Module
 window.FirebaseConfig = {
