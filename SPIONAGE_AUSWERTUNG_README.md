@@ -1,31 +1,57 @@
-# 🔍 Automatische Spionage-Auswertung
+# 🔍 Detaillierte Spionage-Auswertung & Spieler-Übersicht
 
 ## Überblick
 
-Die Spionage-Datenbank wurde erfolgreich um eine **automatische Auswertungsfunktion** erweitert. Nach dem Hinzufügen eines Spionageberichts-Links wird nun automatisch eine detaillierte Analyse durchgeführt.
+Die Spionage-Datenbank wurde vollständig überarbeitet und um **detaillierte automatische Auswertung** und **spielerzentrierte Übersicht** erweitert. Nach dem Hinzufügen eines Spionageberichts-Links wird nun automatisch eine umfassende Analyse durchgeführt, die Spielername, Gebäude, Forschung und Schiffstypen erfasst.
 
 ## ✨ Neue Features
 
-### 1. Automatische Auswertung
-- **Sofortige Analyse**: Nach dem Speichern eines Berichts wird automatisch eine Auswertung durchgeführt
-- **Intelligente Bewertung**: Forschungsstufen werden analysiert und bewertet
-- **Bedrohungsanalyse**: Automatische Einschätzung der Bedrohungsstufe (Sehr Niedrig bis Sehr Hoch)
-- **Strategische Empfehlungen**: Konkrete Handlungsempfehlungen basierend auf der Analyse
+### 1. Detaillierte Automatische Auswertung
+- **Umfassende Datenextraktion**: Spielername, Gebäude, Forschung, Schiffstypen und Ressourcen
+- **Intelligente Kategorisierung**: Militär-, Zivil- und Erweiterte Forschung
+- **Gebäudebewertung**: Wirtschaft, Infrastruktur und Verteidigung
+- **Flottenstärke-Berechnung**: Gewichtete Bedrohungsanalyse basierend auf Schiffstypen
+- **Strategische Empfehlungen**: Konkrete Handlungsempfehlungen für jeden Bereich
 
-### 2. Erweiterte UI
+### 2. Spielerzentrierte Übersicht
+- **Neue Spieler-Übersicht**: Zentrale Ansicht aller erfassten Spieler
+- **Spielerauswahl**: Klickbare Spielerkarten mit Bedrohungsstufe
+- **Berichtsverlauf**: Chronologische Auflistung aller Berichte pro Spieler
+- **Aktuellster Bericht**: Automatische Anzeige des neuesten Berichts
+- **Suchfunktion**: Schnelle Spielersuche
+- **Statistiken**: Übersicht über Gesamtzahlen und Aktivität
+
+### 3. Erweiterte UI
 - **Neue Spalte "Auswertung"** in der Übersichtstabelle
 - **Farbkodierte Bedrohungsanzeige** für schnelle Erkennung
 - **Detaillierte Auswertung** in der Einzelansicht des Berichts
-- **Status-Feedback** während der Verarbeitung
+- **Spieler-Übersicht-Link** in der Hauptnavigation
+- **Responsive Design** für verschiedene Bildschirmgrößen
 
-### 3. Bewertungssystem
+### 4. Detailliertes Bewertungssystem
 
-#### Forschungsstufen-Bewertung:
-- **Spionageeinheit**: 0-4 (Niedrig), 5-9 (Mittel), 10-14 (Hoch), 15+ (Exzellent)
-- **Tarneinheit**: 0-2 (Niedrig), 3-7 (Mittel), 8-11 (Hoch), 12+ (Exzellent)
-- **Invasionseinheit**: 0-3 (Niedrig), 4-8 (Mittel), 9-13 (Hoch), 14+ (Exzellent)
-- **Plündereinheit**: 0-2 (Niedrig), 3-6 (Mittel), 7-10 (Hoch), 11+ (Exzellent)
-- **Sabotageeinheit**: 0-1 (Niedrig), 2-5 (Mittel), 6-9 (Hoch), 10+ (Exzellent)
+#### Datenextraktion:
+- **Spielername**: Automatische Erkennung des Zielspielers
+- **Planetendaten**: Name und Koordinaten
+- **Forschung**: 15 verschiedene Forschungsfelder in 3 Kategorien
+- **Gebäude**: 18 verschiedene Gebäudetypen in 3 Kategorien  
+- **Schiffe**: 16 verschiedene Schiffstypen in 3 Kategorien
+- **Ressourcen**: Metall, Kristall, Deuterium und Energie
+
+#### Forschungskategorien:
+- **Militärforschung** (40% Gewichtung): Spionage, Tarn, Invasion, Plünder, Sabotage
+- **Zivile Forschung** (30% Gewichtung): Bergbau, Energie, Schiffbau, Verteidigung, Antrieb, Computer
+- **Erweiterte Forschung** (30% Gewichtung): Waffen, Schilde, Panzerung, Hyperraum
+
+#### Gebäudekategorien:
+- **Wirtschaftsgebäude** (30% Gewichtung): Minen, Kraftwerke
+- **Infrastruktur** (40% Gewichtung): Roboterfabrik, Werft, Forschungslabor, Speicher
+- **Verteidigung** (30% Gewichtung): Alle Verteidigungsanlagen
+
+#### Schiffskategorien:
+- **Kampfschiffe** (60% Gewichtung): Jäger bis Todesstern mit Flottenstärke-Berechnung
+- **Unterstützungsschiffe** (30% Gewichtung): Transporter, Recycler, Spionagesonden
+- **Spezialschiffe** (10% Gewichtung): Solarsatelliten
 
 #### Bedrohungsstufen:
 - 🟢 **Sehr Niedrig** (0-15%): Ideales Angriffsziel
@@ -37,41 +63,65 @@ Die Spionage-Datenbank wurde erfolgreich um eine **automatische Auswertungsfunkt
 ## 🛠️ Technische Implementierung
 
 ### Neue Dateien:
-- `js/spy-evaluator.js` - Haupt-Auswertungslogik
-- `test-spy-evaluator.html` - Test-Interface für die Auswertung
+- `js/spy-evaluator.js` - Detaillierte Auswertungslogik für alle Kategorien
+- `player-overview.html` - Spielerzentrierte Übersichtsseite
+- `js/player-overview.js` - Logik für Spielerauswahl und -details
+- `test-spy-evaluator.html` - Erweitertes Test-Interface
 
-### Geänderte Dateien:
-- `spy-database.html` - UI-Erweiterungen und neue Spalte
-- `spy-database.js` - Integration der automatischen Auswertung
-- `spy-report.html` - Anzeige der Auswertungsergebnisse
-- `spy-report.js` - Rendering der Auswertung
+### Erweiterte Dateien:
+- `js/spy-parser.js` - Umfassende Datenextraktion (Gebäude, Schiffe, Ressourcen)
+- `spy-database.html` - Spieler-Übersicht-Link und erweiterte UI
+- `spy-database.js` - Integration der detaillierten Auswertung
+- `spy-report.html` - Detaillierte Auswertungsanzeige
+- `spy-report.js` - Erweiterte Auswertungsdarstellung
 
 ## 🚀 Verwendung
 
-### Automatische Auswertung
+### Spionageberichte hinzufügen
 1. **Link eingeben**: Spionageberichts-URL in das Eingabefeld einfügen
 2. **"Kopieren & Speichern" klicken**: System lädt und analysiert automatisch
-3. **Auswertung anzeigen**: Ergebnis wird sofort in der Übersicht angezeigt
-4. **Details ansehen**: Klick auf "Bericht" zeigt detaillierte Analyse
+3. **Auswertung anzeigen**: Detaillierte Analyse wird sofort durchgeführt
+4. **Automatische Kategorisierung**: Alle Daten werden intelligent extrahiert und bewertet
 
-### Manuelle HTML-Eingabe
-1. **"HTML einfügen" klicken**: Für CORS-geschützte Seiten
-2. **HTML kopieren**: Seiteninhalt des Berichts einfügen
-3. **"Parsen & Speichern" klicken**: Automatische Auswertung wird durchgeführt
+### Manuelle HTML-Eingabe (bei CORS-Problemen)
+1. **"HTML einfügen" klicken**: Alternative für geschützte Seiten
+2. **HTML kopieren**: Kompletten Seiteninhalt des Berichts einfügen
+3. **"Parsen & Speichern" klicken**: Vollständige Auswertung wird durchgeführt
 
-## 📊 Auswertungsdetails
+### Spieler-Übersicht verwenden
+1. **"Spieler-Übersicht" klicken**: Zur zentralen Spieleransicht wechseln
+2. **Spieler auswählen**: Auf Spielerkarte klicken für Details
+3. **Berichtsverlauf ansehen**: Alle Berichte eines Spielers chronologisch
+4. **Aktuellste Auswertung**: Neueste detaillierte Analyse des Spielers
+5. **Suchfunktion nutzen**: Schnell bestimmte Spieler finden
 
-### Angezeigt werden:
-- **Zusammenfassung**: Kurze Einschätzung des Ziels
-- **Bedrohungsanalyse**: Farbkodierte Bewertung mit Prozentangabe
-- **Empfehlungen**: Konkrete Handlungsvorschläge
-- **Strategische Einschätzung**: Stärken, Schwächen und Gelegenheiten
+## 📊 Detaillierte Auswertungsanzeige
+
+### In der Übersicht:
+- **Spielername** mit Bedrohungsstufe (farbkodiert)
+- **Planetenanzahl** und Gesamtberichte pro Spieler
+- **Letzter Bericht** mit Zeitangabe
+- **Schnellzugriff** auf Spieler-Details
+
+### In der Spieler-Übersicht:
+- **Statistiken**: Gesamtanzahl Spieler, Berichte, letzte 7 Tage
+- **Spielerkarten**: Sortiert nach letztem Bericht
+- **Suchfunktion**: Echtzeit-Filterung
+- **Berichtsverlauf**: Chronologische Auflistung pro Spieler
+
+### In der Einzelauswertung:
+- **Zusammenfassung**: Wirtschaft, Militär, Flottenstärke
+- **Kategorisierte Forschung**: Militär, Zivil, Erweitert mit Prozentangaben
+- **Gebäudebewertung**: Wirtschaft, Infrastruktur, Verteidigung
+- **Flottenstärke**: Kampfschiffe, Support, Spezialschiffe mit Gewichtung
+- **Konkrete Empfehlungen**: Basierend auf allen Faktoren
+- **Bedrohungsaufschlüsselung**: Anteil von Forschung, Gebäuden, Schiffen
 
 ### Beispiel-Empfehlungen:
-- ⚔️ "Ideales Angriffsziel. Schwache Verteidigung erwartet."
-- ⚠️ "Angriff nicht empfohlen. Sehr starke Verteidigung erwartet."
-- 🛡️ "Sabotage-Gefahr! Produktionsanlagen schützen."
-- 📋 "Hohe Spionage-Forschung erkannt. Eigene Tarn-Einheiten verstärken."
+- ⚔️ "Ideales Angriffsziel. Schwache Entwicklung in allen Bereichen."
+- 🚀 "Massive Flotte erkannt (Stärke: 25000). Extrem gefährlich!"
+- ⚠️ "Massive Verteidigungsanlagen (2500 Einheiten). Angriff aussichtslos."
+- 🛡️ "Starke Verteidigungsforschung. Angriff wird schwierig."
 
 ## 🧪 Testen
 
@@ -88,14 +138,27 @@ Die Bewertungskriterien können in `js/spy-evaluator.js` angepasst werden:
 - Bedrohungsstufen-Farben anpassen
 - Zusätzliche Analysefaktoren einführen
 
-## ✅ Status
+## ✅ Status - Vollständig Implementiert
 
-**Alle Funktionen implementiert und getestet:**
-- ✅ Automatische Auswertung nach Link-Eingabe
-- ✅ Bedrohungsanalyse mit Farbkodierung
-- ✅ Strategische Empfehlungen
-- ✅ UI-Integration in Datenbank und Einzelansicht
-- ✅ Fehlerbehandlung und Status-Feedback
-- ✅ Test-Interface für Entwicklung
+**Alle erweiterten Funktionen implementiert und getestet:**
+- ✅ **Detaillierte Datenextraktion**: Spielername, Gebäude, Forschung, Schiffe, Ressourcen
+- ✅ **Automatische Auswertung**: Umfassende Analyse nach Link-Eingabe
+- ✅ **Spielerzentrierte Übersicht**: Zentrale Spielerauswahl mit Berichtsverlauf
+- ✅ **Kategorisierte Bewertung**: Militär, Zivil, Erweitert mit Gewichtung
+- ✅ **Flottenstärke-Berechnung**: Intelligente Schiffsbewertung
+- ✅ **Erweiterte Empfehlungen**: Basierend auf allen Datenkategorien
+- ✅ **Bedrohungsaufschlüsselung**: Anteil von Forschung, Gebäuden, Schiffen
+- ✅ **Responsive UI**: Optimiert für verschiedene Bildschirmgrößen
+- ✅ **Suchfunktion**: Echtzeit-Spielerfilterung
+- ✅ **Statistik-Dashboard**: Übersicht über Aktivität und Trends
+- ✅ **Erweiterte Navigation**: Nahtlose Integration zwischen allen Ansichten
 
-Die Spionage-Datenbank ist jetzt vollständig automatisiert und bietet sofortige, intelligente Auswertungen aller hinzugefügten Berichte!
+## 🎯 Hauptverbesserungen
+
+1. **Von einfacher zu detaillierter Auswertung**: Statt nur 5 Forschungsfelder werden jetzt 15+ Felder in 3 Kategorien erfasst
+2. **Von berichtszentriert zu spielerzentriert**: Neue Übersicht ermöglicht Spielerauswahl und Verlaufsbetrachtung
+3. **Von statisch zu dynamisch**: Echtzeitsuche, Statistiken und intelligente Sortierung
+4. **Von oberflächlich zu tiefgreifend**: Gebäude, Schiffe, Ressourcen und Flottenstärke-Berechnung
+5. **Von allgemein zu spezifisch**: Detaillierte Empfehlungen basierend auf allen verfügbaren Daten
+
+Die Spionage-Datenbank ist jetzt ein **vollständiges Intelligence-System** mit spielerzentrierter Übersicht und detaillierter automatischer Auswertung aller relevanten Bereiche!

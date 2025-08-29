@@ -93,11 +93,61 @@
                         tarn: 8,
                         invasion: 15,
                         pluender: 10,
-                        sabotage: 9
+                        sabotage: 9,
+                        bergbau: 8,
+                        energie: 7,
+                        schiffbau: 10,
+                        verteidigung: 12,
+                        antrieb: 9,
+                        computer: 6,
+                        waffen: 11,
+                        schilde: 9,
+                        panzerung: 7,
+                        hyperraum: 5
+                    },
+                    buildings: {
+                        metallmine: 25,
+                        kristallmine: 23,
+                        deuteriumraffinerie: 20,
+                        sonnenkraftwerk: 28,
+                        fusionskraftwerk: 15,
+                        roboterfabrik: 12,
+                        werft: 10,
+                        forschungslabor: 8,
+                        raketenwerfer: 500,
+                        leichteslaser: 200,
+                        schwerelaser: 100,
+                        ionenkanone: 50,
+                        gausskanone: 25,
+                        plasmawerfer: 10,
+                        kleineschilde: 1,
+                        grosseschilde: 1
+                    },
+                    ships: {
+                        leichterjäger: 2000,
+                        schwererjäger: 1500,
+                        kreuzer: 800,
+                        schlachtschiff: 400,
+                        schlachtkreuzer: 200,
+                        bomber: 300,
+                        zerstörer: 50,
+                        todesstern: 2,
+                        kleinerTransporter: 500,
+                        grosserTransporter: 200,
+                        kolonischiff: 10,
+                        recycler: 100,
+                        spionagesonde: 50,
+                        solarsatellit: 1000
+                    },
+                    resources: {
+                        metall: 2500000,
+                        kristall: 1200000,
+                        deuterium: 800000,
+                        energie: 15000
                     }
                 }
             };
-            runEvaluation(testData, "Starkes Ziel");
+            runEvaluation(testData, "Starkes Ziel (Detailliert)");
         }
         
         function testCustom() {
@@ -139,7 +189,12 @@
                 </div>`;
             
             if (result.success) {
-                html += window.SpyEvaluator.formatEvaluationForUI(result.evaluation);
+                // Verwende detaillierte Formatierung falls verfügbar
+                if (result.evaluation.buildings || result.evaluation.ships) {
+                    html += window.SpyEvaluator.formatDetailedEvaluationForUI(result.evaluation);
+                } else {
+                    html += window.SpyEvaluator.formatEvaluationForUI(result.evaluation);
+                }
             } else {
                 html += `<div style="color: red;">Fehler: ${result.error}</div>`;
             }

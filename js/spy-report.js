@@ -87,7 +87,12 @@ class SpyReportPage {
         
         if (data.evaluation) {
             evaluationContainer.style.display = 'block';
-            evaluationContent.innerHTML = window.SpyEvaluator.formatEvaluationForUI(data.evaluation);
+            // Verwende die detaillierte Formatierung falls verfügbar
+            if (data.evaluation.buildings || data.evaluation.ships) {
+                evaluationContent.innerHTML = window.SpyEvaluator.formatDetailedEvaluationForUI(data.evaluation);
+            } else {
+                evaluationContent.innerHTML = window.SpyEvaluator.formatEvaluationForUI(data.evaluation);
+            }
         } else if (data.evaluationError) {
             evaluationContainer.style.display = 'block';
             evaluationContent.innerHTML = `<div class="evaluation-result">

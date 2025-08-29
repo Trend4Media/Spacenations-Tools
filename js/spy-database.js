@@ -42,6 +42,7 @@ class SpyDatabasePage {
         this.elements.status = document.getElementById('status-message');
         this.elements.tableBody = document.getElementById('reports-tbody');
         this.elements.branchBadge = document.getElementById('branch-badge');
+        this.elements.playerOverviewLink = document.getElementById('player-overview-link');
 
         if (this.elements.fetchBtn) this.elements.fetchBtn.addEventListener('click', () => this.handleFetchAndSave());
         if (this.elements.togglePaste) this.elements.togglePaste.addEventListener('click', () => this._togglePaste());
@@ -54,6 +55,11 @@ class SpyDatabasePage {
         this.elements.branchBadge.textContent = b.toUpperCase();
         this.elements.branchBadge.classList.remove('branch-main', 'branch-testarea');
         this.elements.branchBadge.classList.add(b === 'testarea' ? 'branch-testarea' : 'branch-main');
+        
+        // Update player overview link
+        if (this.elements.playerOverviewLink) {
+            this.elements.playerOverviewLink.href = `player-overview.html?branch=${encodeURIComponent(this.branch)}`;
+        }
     }
 
     _detectBranch() {
