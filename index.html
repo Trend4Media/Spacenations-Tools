@@ -199,20 +199,43 @@
             console.log('🧪 Navigiere zu Testarea Branch');
             showLoading('testarea');
             
-            // Check if testarea directory exists, fallback to testarea/index.html
-            fetch('testarea/')
-                .then(response => {
-                    if (response.ok) {
-                        window.location.href = 'testarea/';
-                    } else {
-                        // Check if we're in a git environment and can switch branches
-                        window.location.href = 'testarea/index.html';
-                    }
-                })
-                .catch(() => {
-                    // Final fallback - try to access testarea content
-                    window.location.href = 'testarea/index.html';
-                });
+            // Direkt zur testarea/index.html navigieren
+            // Wenn das fehlschlägt, wird der Browser automatisch einen 404 zeigen
+            setTimeout(() => {
+                window.location.href = 'testarea/index.html';
+            }, 1000);
+        }
+        
+        function showTestareaInfo() {
+            const infoDiv = document.createElement('div');
+            infoDiv.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: rgba(16,16,16,0.95); padding: 40px; border-radius: 15px; text-align: center; border: 2px solid #f59e0b; max-width: 500px;">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">🧪</div>
+                        <h3 style="color: #f59e0b; margin-bottom: 20px;">Testarea Branch</h3>
+                        <p style="color: #e0e0e0; margin-bottom: 25px; line-height: 1.6;">
+                            Der Testarea Branch ist als separater Git-Branch verfügbar.<br>
+                            Entwickler können ihn über Git auschecken:
+                        </p>
+                        <div style="background: #000; padding: 15px; border-radius: 8px; margin: 20px 0; font-family: monospace; color: #22c55e;">
+                            git checkout testarea
+                        </div>
+                        <div style="display: flex; gap: 15px; justify-content: center; margin-top: 25px;">
+                            <button onclick="window.location.href='testarea/index.html'" style="background: #f59e0b; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                                Lokale Testarea öffnen
+                            </button>
+                            <button onclick="this.closest('div').parentElement.parentElement.remove()" style="background: #64748b; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                                Schließen
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(infoDiv);
+            
+            // Auto-remove loading
+            const loadingEl = document.querySelector('[style*="position: fixed"][style*="rgba(0,0,0,0.8)"]');
+            if (loadingEl) loadingEl.remove();
         }
         
         function showLoading(branch) {
