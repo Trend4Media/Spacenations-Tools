@@ -85,7 +85,7 @@ class SpyDatabasePage {
             this._setStatus('Bericht wird geladen...', false);
             const html = await this._fetchReportHTML(url);
             await this._parseAndStore(html, url);
-            this._setStatus('Bericht gespeichert', false);
+            // Status wird in _parseAndStore gesetzt
             this.elements.urlInput.value = '';
         } catch (error) {
             this._setStatus('Fehler beim Laden. Nutze ggf. "HTML einfügen". (' + (error?.message || error) + ')', true);
@@ -100,7 +100,7 @@ class SpyDatabasePage {
         }
         this._parseAndStore(html, (this.elements.urlInput?.value || '').trim() || null)
             .then(() => {
-                this._setStatus('Bericht gespeichert', false);
+                // Status wird in _parseAndStore gesetzt
                 this.elements.rawTextarea.value = '';
             })
             .catch(err => this._setStatus('Fehler beim Speichern: ' + (err?.message || err), true));
@@ -110,6 +110,10 @@ class SpyDatabasePage {
         const parseResult = window.SpyParser.parse(html);
         if (!parseResult.success) throw new Error(parseResult.error || 'Parser fehlgeschlagen');
 
+        // Automatische Auswertung durchführen
+        this._setStatus('Bericht wird ausgewertet...', false);
+        const evaluationResult = window.SpyEvaluator.evaluate({ parsed: parseResult.data });
+        
         const payload = {
             sourceUrl: sourceUrl || null,
             reportedAt: window.FirebaseConfig.getServerTimestamp(),
@@ -118,10 +122,19 @@ class SpyDatabasePage {
             alliance: this.alliance || null,
             branch: this.branch || 'main',
             rawHtml: html,
-            parsed: parseResult.data
+            parsed: parseResult.data,
+            evaluation: evaluationResult.success ? evaluationResult.evaluation : null,
+            evaluationError: evaluationResult.success ? null : evaluationResult.error
         };
 
         await this.db.collection('spyReports').add(payload);
+        
+        // Status mit Auswertungsinfo aktualisieren
+        if (evaluationResult.success) {
+            this._setStatus('Bericht gespeichert und ausgewertet ✅', false);
+        } else {
+            this._setStatus('Bericht gespeichert (Auswertung fehlgeschlagen: ' + evaluationResult.error + ')', true);
+        }
     }
 
     async _fetchReportHTML(url) {
@@ -155,6 +168,19 @@ class SpyDatabasePage {
         const player = parsed.targetPlayer || '';
         const planet = parsed.planetName || '';
         const r = parsed.research || {};
+        const evaluation = data.evaluation;
+        
+        // Auswertungs-Zelle erstellen
+        let evaluationCell = '-';
+        if (evaluation && evaluation.threat) {
+            const threat = evaluation.threat;
+            evaluationCell = `<div class="threat-badge" style="background-color: ${threat.color}20; color: ${threat.color}; border: 1px solid ${threat.color}; font-size: 0.8rem; padding: 2px 6px;">
+                ${threat.label} (${threat.percentage}%)
+            </div>`;
+        } else if (data.evaluationError) {
+            evaluationCell = '<span style="color: var(--danger-color, #ef4444); font-size: 0.8rem;">Fehler</span>';
+        }
+        
         return (
             `<tr>` +
 				`<td>${this._escape(player)}</td>` +
@@ -164,6 +190,7 @@ class SpyDatabasePage {
 				`<td>${this._fmtNum(r.invasion)}</td>` +
 				`<td>${this._fmtNum(r.pluender)}</td>` +
 				`<td>${this._fmtNum(r.sabotage)}</td>` +
+				`<td>${evaluationCell}</td>` +
 				`<td><a class="report-link" href="spy-report.html?id=${encodeURIComponent(id)}&branch=${encodeURIComponent(this.branch)}">Bericht</a></td>` +
 			`</tr>`
         );

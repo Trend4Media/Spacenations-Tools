@@ -54,6 +54,7 @@ class SpyReportPage {
         }
         const data = doc.data();
         this._renderMeta(data);
+        this._renderEvaluation(data);
         this._renderSnapshot(data);
     }
 
@@ -78,6 +79,23 @@ class SpyReportPage {
 			<div><strong>Sabotageeinheit:</strong> ${this._fmt(research.sabotage)}</div>
 			<div><strong>Reporter:</strong> ${this._esc(data.reporterUsername || '')}</div>
 		`;
+    }
+
+    _renderEvaluation(data) {
+        const evaluationContainer = document.getElementById('evaluation-container');
+        const evaluationContent = document.getElementById('evaluation-content');
+        
+        if (data.evaluation) {
+            evaluationContainer.style.display = 'block';
+            evaluationContent.innerHTML = window.SpyEvaluator.formatEvaluationForUI(data.evaluation);
+        } else if (data.evaluationError) {
+            evaluationContainer.style.display = 'block';
+            evaluationContent.innerHTML = `<div class="evaluation-result">
+                <p style="color: var(--danger-color, #ef4444);">⚠️ Auswertung fehlgeschlagen: ${this._esc(data.evaluationError)}</p>
+            </div>`;
+        } else {
+            evaluationContainer.style.display = 'none';
+        }
     }
 
     _renderSnapshot(data) {
