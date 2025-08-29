@@ -87,14 +87,26 @@ class SpyDatabasePage {
             this._setStatus('Bitte eine Bericht-URL eingeben', true);
             return;
         }
+
+        // URL-Validierung
+        if (!window.SpyCrawler._isValidSpyReportUrl(url)) {
+            this._setStatus('Ungültige URL. Bitte eine gültige spacenations.eu Spionagebericht-URL eingeben.', true);
+            return;
+        }
+
         try {
-            this._setStatus('Bericht wird geladen...', false);
+            this._setStatus('🔍 Crawling Spionagebericht...', false);
             const html = await this._fetchReportHTML(url);
             await this._parseAndStore(html, url);
             // Status wird in _parseAndStore gesetzt
             this.elements.urlInput.value = '';
         } catch (error) {
-            this._setStatus('Fehler beim Laden. Nutze ggf. "HTML einfügen". (' + (error?.message || error) + ')', true);
+            const errorMsg = error?.message || error;
+            if (errorMsg.includes('CORS') || errorMsg.includes('Alle')) {
+                this._setStatus(`❌ ${errorMsg}`, true);
+            } else {
+                this._setStatus(`❌ Crawling fehlgeschlagen: ${errorMsg}`, true);
+            }
         }
     }
 
@@ -144,10 +156,26 @@ class SpyDatabasePage {
     }
 
     async _fetchReportHTML(url) {
-        // Direkter Fetch kann an CORS scheitern; wir versuchen es und lassen sonst den manuellen Weg zu
-        const response = await fetch(url, { method: 'GET', mode: 'cors' });
-        if (!response.ok) throw new Error('HTTP ' + response.status);
-        return await response.text();
+        // Verwende den erweiterten Crawler für bessere Erfolgsrate
+        try {
+            this._setStatus('Versuche verschiedene Crawling-Methoden...', false);
+            const result = await window.SpyCrawler.crawlWithAlternatives(url);
+            
+            if (result.usedUrl !== url) {
+                this._setStatus(`Erfolgreich mit alternativer URL geladen`, false);
+            }
+            
+            return result.html;
+        } catch (error) {
+            // Fallback: Zeige detaillierte Fehlermeldung
+            if (error.message === 'CORS_BLOCKED') {
+                throw new Error('CORS-Blockierung erkannt. Nutze "HTML einfügen" und kopiere den Seiteninhalt manuell.');
+            } else if (error.message.includes('Alle')) {
+                throw new Error('Automatisches Laden fehlgeschlagen. Mögliche Gründe: Server nicht erreichbar, CORS-Blockierung oder ungültige URL. Nutze "HTML einfügen" als Alternative.');
+            } else {
+                throw error;
+            }
+        }
     }
 
     _startListening() {

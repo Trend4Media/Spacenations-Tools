@@ -73,9 +73,10 @@
 	<div class="container">
 		<div class="card">
 			<h2>📡 Spionage-Datenbank <span id="branch-badge" class="branch-badge branch-main">MAIN</span></h2>
-			<p>Füge die URL eines Spionageberichts ein. Falls das Laden wegen CORS fehlschlägt, nutze "HTML einfügen" und kopiere den Seiteninhalt.</p>
+			<p>Füge die URL eines Spionageberichts ein. Das System versucht automatisch verschiedene Crawling-Methoden. Falls alle fehlschlagen, nutze "HTML einfügen".</p>
 			<div style="margin-bottom: 15px;">
 				<a id="player-overview-link" class="button secondary" href="player-overview.html">👥 Spieler-Übersicht</a>
+				<a href="test-crawler.html" class="button secondary" target="_blank">🕷️ Crawler testen</a>
 			</div>
 			<div class="input-row">
 				<input id="report-url" type="url" placeholder="https://beta1.game.spacenations.eu/spy-report/...">
@@ -124,6 +125,7 @@
 	<script src="js/firebase-sync.js"></script>
 	<script src="js/spy-parser.js"></script>
 	<script src="js/spy-evaluator.js"></script>
+	<script src="js/spy-crawler.js"></script>
 	<script src="js/spy-database.js"></script>
 </body>
 </html>
