@@ -4,6 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spacenations Info-Tool</title>
+    <!-- Sofort-Weiterleitung auf neues Toolkit-Design -->
+    <meta http-equiv="refresh" content="0; url=../toolkit/">
+    <script>
+        (function() {
+            var target = '../toolkit/';
+            try {
+                if (location.pathname.indexOf('/Spacenations-Tools/') !== -1) {
+                    target = '/Spacenations-Tools/toolkit/';
+                }
+                window.location.replace(target);
+            } catch (e) {
+                window.location.href = target;
+            }
+        })();
+    </script>
     <!-- Gemeinsame Theme-Variablen -->
     <link rel="stylesheet" href="css/theme-variables.css">
     <link rel="stylesheet" href="css/enhanced-navigation.css">
