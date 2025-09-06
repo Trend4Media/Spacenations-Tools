@@ -160,6 +160,11 @@
                 <div class="branch-title">Testarea Branch</div>
                 <div class="branch-desc">Neue Features</div>
             </a>
+            <a href="#" class="branch-btn" style="background: linear-gradient(135deg, #06b6d4, #22d3ee);" onclick="navigateToToolkit(event)">
+                <div class="branch-icon">✨</div>
+                <div class="branch-title">Neues Toolkit-Design</div>
+                <div class="branch-desc">Modernes UI (Beta)</div>
+            </a>
         </div>
         
         <div class="description">
@@ -204,6 +209,24 @@
             setTimeout(() => {
                 window.location.href = 'testarea/index.html';
             }, 1000);
+        }
+
+        function navigateToToolkit(event) {
+            event.preventDefault();
+            console.log('✨ Navigiere zum neuen Toolkit-Design');
+            showLoading('toolkit');
+            // Prüfe Ordner, fallback auf Datei
+            fetch('toolkit/')
+                .then(r => {
+                    if (r.ok) {
+                        window.location.href = 'toolkit/';
+                    } else {
+                        window.location.href = 'toolkit/index.html';
+                    }
+                })
+                .catch(() => {
+                    window.location.href = 'toolkit/index.html';
+                });
         }
         
         function showTestareaInfo() {
