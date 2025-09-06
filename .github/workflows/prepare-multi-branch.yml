@@ -39,17 +39,25 @@ jobs:
           # Use main.html as index for main branch
           cp main.html main/index.html 2>/dev/null || true
           
-          # Copy testarea branch files
+          # Copy testarea branch files (only if branch exists)
           echo "📦 Preparing testarea branch structure..."
-          git checkout testarea
-          cp -r *.html css js testarea/ 2>/dev/null || true
-          if [ -d "build" ]; then
-            cp -r build testarea/ 2>/dev/null || true
-          fi
-          # Copy testarea subdirectory if exists
-          if [ -d "testarea" ]; then
-            echo "📁 Copying testarea subdirectory..."
-            cp -r testarea/* testarea/ 2>/dev/null || true
+          if git ls-remote --exit-code --heads origin testarea >/dev/null 2>&1; then
+            echo "✔ Found remote branch 'testarea'"
+            git fetch origin testarea:testarea
+            git checkout testarea
+            cp -r *.html css js testarea/ 2>/dev/null || true
+            if [ -d "build" ]; then
+              cp -r build testarea/ 2>/dev/null || true
+            fi
+            # Copy testarea subdirectory if exists
+            if [ -d "testarea" ]; then
+              echo "📁 Copying testarea subdirectory..."
+              cp -r testarea/* testarea/ 2>/dev/null || true
+            fi
+            # Return to main
+            git checkout main
+          else
+            echo "⚠️ Branch 'testarea' not found. Skipping testarea structure."
           fi
           
           # Create landing page
