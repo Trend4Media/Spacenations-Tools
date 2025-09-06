@@ -149,6 +149,7 @@ class AutoGlobalFooterLoader {
                         <div class="quick-tools">
                             <a href="#" class="quick-tool auto-theme-toggle">🌙 Theme</a>
                             <a href="dashboard.html" class="quick-tool" id="auto-quick-dashboard">🏠 Dashboard</a>
+                            <a href="admin-login.html" class="quick-tool" id="auto-quick-admin">🔐 Admin-Login</a>
                         </div>
                         
                         <!-- Social Links -->
@@ -199,12 +200,16 @@ class AutoGlobalFooterLoader {
                     const adminLoginLink = document.getElementById('auto-admin-login-link');
                     const adminDashboardLink = document.getElementById('auto-admin-dashboard-link');
                     
-                    if (userData && userData.isAllianceAdmin) {
+                    if (userData && userData.isSuperAdmin === true) {
                         if (adminLoginLink) adminLoginLink.style.display = 'none';
                         if (adminDashboardLink) adminDashboardLink.style.display = 'block';
+                        const quickAdmin = document.getElementById('auto-quick-admin');
+                        if (quickAdmin) { quickAdmin.textContent = '🛡️ Admin-Dashboard'; quickAdmin.href = 'admin-dashboard.html'; quickAdmin.style.display = 'inline-block'; }
                     } else {
                         if (adminLoginLink) adminLoginLink.style.display = 'block';
                         if (adminDashboardLink) adminDashboardLink.style.display = 'none';
+                        const quickAdmin = document.getElementById('auto-quick-admin');
+                        if (quickAdmin) { quickAdmin.textContent = '🔐 Admin-Login'; quickAdmin.href = 'admin-login.html'; quickAdmin.style.display = 'inline-block'; }
                     }
                 });
             } else {

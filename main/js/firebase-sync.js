@@ -11,7 +11,9 @@ class FirebaseSync {
             'dashboard': { requiresAuth: true, redirectTo: 'index.html' },
             'register': { requiresAuth: false, redirectTo: 'dashboard.html' },
             'spy-database': { requiresAuth: true, redirectTo: 'index.html' },
-            'spy-report': { requiresAuth: true, redirectTo: 'index.html' }
+            'spy-report': { requiresAuth: true, redirectTo: 'index.html' },
+            'admin-login': { requiresAuth: false, adminLogin: true },
+            'admin-dashboard': { requiresAuth: true, requiresSuperAdmin: true, redirectTo: 'admin-login.html' }
         };
         
         this.init();
@@ -55,7 +57,7 @@ class FirebaseSync {
         
         console.log('🔄 Auth State für', this.currentPage, ':', isLoggedIn ? 'Eingeloggt' : 'Ausgeloggt');
         
-        // Redirect-Logik
+        // Redirect-Logik (allgemein)
         if (pageConfig.requiresAuth && !isLoggedIn) {
             // Dashboard braucht Auth, aber User ist nicht eingeloggt
             console.log('🚫 Zugriff verweigert - Weiterleitung zu:', pageConfig.redirectTo);
@@ -67,6 +69,23 @@ class FirebaseSync {
                 console.log('✅ User eingeloggt - Weiterleitung zu Dashboard');
                 this.showWelcomeMessage(userData);
                 this.redirectAfterDelay(pageConfig.redirectTo, 2500);
+            }
+        }
+
+        // Admin-spezifische Logik
+        if (this.currentPage === 'admin-login') {
+            if (isLoggedIn && userData?.isSuperAdmin === true) {
+                console.log('🛡️ Super-Admin eingeloggt - Weiterleitung zum Admin-Dashboard');
+                this.redirectAfterDelay('admin-dashboard.html', 800);
+            }
+        }
+
+        if (this.currentPage === 'admin-dashboard') {
+            if (!isLoggedIn) return; // oben bereits handled
+            if (pageConfig.requiresSuperAdmin && userData?.isSuperAdmin !== true) {
+                console.log('🚫 Kein Super-Admin - Weiterleitung zum Admin-Login');
+                this.redirectAfterDelay('admin-login.html', 1000);
+                return;
             }
         }
         
