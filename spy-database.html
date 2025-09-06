@@ -50,13 +50,34 @@
 		.branch-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.5px; }
 		.branch-main { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.5); }
 		.branch-testarea { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.5); }
+		
+		/* Evaluation Styles */
+		.evaluation-result { margin-top: 15px; padding: 15px; background: var(--card-bg); border-radius: 8px; border: 1px solid var(--card-border); }
+		.evaluation-summary { margin-bottom: 15px; }
+		.evaluation-summary h4 { margin: 0 0 8px 0; color: var(--accent-primary); }
+		.threat-analysis { margin-bottom: 15px; }
+		.threat-analysis h5 { margin: 0 0 8px 0; color: var(--text-primary); }
+		.threat-badge { display: inline-block; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.9rem; }
+		.recommendations { margin-bottom: 10px; }
+		.recommendations h5 { margin: 0 0 8px 0; color: var(--text-primary); }
+		.recommendations ul { margin: 0; padding-left: 20px; }
+		.recommendations li { margin-bottom: 4px; }
+		.rec-high { color: var(--danger-color, #ef4444); font-weight: 600; }
+		.rec-medium { color: var(--warning-color, #f59e0b); }
+		.rec-low { color: var(--text-secondary); }
+		.evaluation-toggle { margin-top: 10px; }
+		.auto-eval-indicator { display: inline-block; margin-left: 10px; padding: 4px 8px; background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.5); border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
 	</style>
 </head>
 <body>
 	<div class="container">
 		<div class="card">
 			<h2>📡 Spionage-Datenbank <span id="branch-badge" class="branch-badge branch-main">MAIN</span></h2>
-			<p>Füge die URL eines Spionageberichts ein. Falls das Laden wegen CORS fehlschlägt, nutze "HTML einfügen" und kopiere den Seiteninhalt.</p>
+			<p>Füge die URL eines Spionageberichts ein. Das System versucht automatisch verschiedene Crawling-Methoden. Falls alle fehlschlagen, nutze "HTML einfügen".</p>
+			<div style="margin-bottom: 15px;">
+				<a id="player-overview-link" class="button secondary" href="player-overview.html">👥 Spieler-Übersicht</a>
+				<a href="test-crawler.html" class="button secondary" target="_blank">🕷️ Crawler testen</a>
+			</div>
 			<div class="input-row">
 				<input id="report-url" type="url" placeholder="https://beta1.game.spacenations.eu/spy-report/...">
 				<button id="fetch-and-save-btn" class="button">Kopieren & Speichern</button>
@@ -83,6 +104,7 @@
 						<th>Invasionseinheit</th>
 						<th>Plündereinheit</th>
 						<th>Sabotageeinheit</th>
+						<th>Auswertung</th>
 						<th>Bericht</th>
 					</tr>
 				</thead>
@@ -102,6 +124,9 @@
 	<script src="js/auth-manager.js"></script>
 	<script src="js/firebase-sync.js"></script>
 	<script src="js/spy-parser.js"></script>
+	<script src="js/spy-evaluator.js"></script>
+	<script src="js/spy-crawler.js"></script>
+	<script src="js/enhanced-crawler.js"></script>
 	<script src="js/spy-database.js"></script>
 </body>
 </html>
