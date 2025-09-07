@@ -23,8 +23,6 @@ class FirebaseSync {
         try {
             await window.AuthAPI.waitForInit();
             
-            console.log('🔄 FirebaseSync initialisiert für Seite:', this.currentPage);
-            
             // Auth State Changes überwachen
             window.AuthAPI.onAuthStateChange((user, userData) => {
                 this.handleAuthStateChange(user, userData);
@@ -42,7 +40,6 @@ class FirebaseSync {
         const path = window.location.pathname;
         const filename = path.split('/').pop().split('.')[0] || 'index';
         
-        console.log('📄 Aktuelle Seite erkannt:', filename);
         return filename;
     }
     
@@ -51,22 +48,17 @@ class FirebaseSync {
         const pageConfig = this.redirectRules[this.currentPage];
         
         if (!pageConfig) {
-            console.log('ℹ️ Keine Redirect-Regel für Seite:', this.currentPage);
             return;
         }
-        
-        console.log('🔄 Auth State für', this.currentPage, ':', isLoggedIn ? 'Eingeloggt' : 'Ausgeloggt');
         
         // Redirect-Logik (allgemein)
         if (pageConfig.requiresAuth && !isLoggedIn) {
             // Dashboard braucht Auth, aber User ist nicht eingeloggt
-            console.log('🚫 Zugriff verweigert - Weiterleitung zu:', pageConfig.redirectTo);
             this.redirectAfterDelay(pageConfig.redirectTo, 1000);
             
         } else if (!pageConfig.requiresAuth && isLoggedIn) {
             // Index/Register braucht keine Auth, aber User ist eingeloggt
             if (this.currentPage === 'index') {
-                console.log('✅ User eingeloggt - Weiterleitung zu Dashboard');
                 this.showWelcomeMessage(userData);
                 this.redirectAfterDelay(pageConfig.redirectTo, 2500);
             }
@@ -75,7 +67,6 @@ class FirebaseSync {
         // Admin-spezifische Logik
         if (this.currentPage === 'admin-login') {
             if (isLoggedIn && userData?.isSuperAdmin === true) {
-                console.log('🛡️ Super-Admin eingeloggt - Weiterleitung zum Admin-Dashboard');
                 this.redirectAfterDelay('admin-dashboard.html', 800);
             }
         }
@@ -83,7 +74,6 @@ class FirebaseSync {
         if (this.currentPage === 'admin-dashboard') {
             if (!isLoggedIn) return; // oben bereits handled
             if (pageConfig.requiresSuperAdmin && userData?.isSuperAdmin !== true) {
-                console.log('🚫 Kein Super-Admin - Weiterleitung zum Admin-Login');
                 this.redirectAfterDelay('admin-login.html', 1000);
                 return;
             }
@@ -100,8 +90,6 @@ class FirebaseSync {
     
     // Dashboard-spezifische Features einrichten
     setupDashboardFeatures(userData) {
-        console.log('🏠 Dashboard-Features werden eingerichtet');
-        
         // Logout-Buttons konfigurieren
         this.setupDashboardLogout();
         
@@ -128,14 +116,11 @@ class FirebaseSync {
             });
         });
         
-        console.log('🚪 Dashboard-Logout Buttons konfiguriert:', logoutButtons.length);
-    }
+        }
     
     // Dashboard-Logout Handler
     async handleDashboardLogout() {
         try {
-            console.log('🚪 Dashboard-Logout gestartet');
-            
             // Bestätigung (optional)
             const confirmed = confirm('Möchten Sie sich abmelden und zur Startseite zurückkehren?');
             if (!confirmed) return;
@@ -147,8 +132,6 @@ class FirebaseSync {
             const result = await window.AuthAPI.logout();
             
             if (result.success) {
-                console.log('✅ Dashboard-Logout erfolgreich');
-                
                 // Erfolgsmeldung für Index-Seite setzen
                 sessionStorage.setItem('logoutSuccess', 'true');
                 
@@ -282,8 +265,7 @@ class FirebaseSync {
         if (userName) userName.textContent = displayName;
         if (userEmail) userEmail.textContent = userData.email;
         
-        console.log('✅ UI für eingeloggten User aktualisiert');
-    }
+        }
     
     updateUIForLoggedOutUser() {
         const loginForm = document.getElementById('login-form');
@@ -296,11 +278,9 @@ class FirebaseSync {
             hideLoginMessages();
         }
         
-        console.log('✅ UI für ausgeloggten User aktualisiert');
-    }
+        }
     
     redirectAfterDelay(url, delay = 2000) {
-        console.log(`⏳ Weiterleitung zu ${url} in ${delay}ms`);
         const base = this.getBasePath();
         setTimeout(() => {
             window.location.href = base + url;
@@ -331,7 +311,6 @@ class FirebaseSync {
                 activities.push(doc.data());
             });
             
-            console.log('📊 Dashboard-Daten geladen');
             return { stats, activities };
             
         } catch (error) {
@@ -360,9 +339,7 @@ class FirebaseSync {
                 await statsRef.set(newStats);
             }
             
-            console.log('📈 Statistik aktualisiert:', statType, '+' + increment);
-            
-        } catch (error) {
+            } catch (error) {
             console.error('❌ Fehler beim Aktualisieren der Statistiken:', error);
         }
     }

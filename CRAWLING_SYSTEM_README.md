@@ -27,9 +27,8 @@ Das **garantierte Crawling-System** wurde vollständig implementiert, um Spionag
 
 ## 🛠️ Technische Implementierung
 
-### Neue Dateien:
-- `js/spy-crawler.js` - Haupt-Crawling-Logik mit Multi-Methoden-Ansatz
-- `test-crawler.html` - Umfassendes Test-Interface für das Crawling-System
+### Relevante Dateien (nur MAIN):
+- `js/spy-crawler.js` - Haupt-Crawling-Logik mit Multi-Methoden-Ansatz (unter `main/js/`)
 
 ### Erweiterte Dateien:
 - `spy-database.js` - Integration des Crawlers in den bestehenden Workflow
@@ -60,12 +59,8 @@ Das **garantierte Crawling-System** wurde vollständig implementiert, um Spionag
 3. **Batch-Tests**: Mehrere URLs gleichzeitig testen
 4. **Statistiken**: Erfolgsraten und Performance-Metriken
 
-### Verfügbare Tests:
-- **URL-Validierung**: Prüfung auf gültige spacenations.eu Links
-- **Alternative URLs**: Generierung verschiedener URL-Varianten
-- **Verfügbarkeitsprüfung**: HEAD-Request zur Vorab-Validierung
-- **Methoden-Vergleich**: Test aller Crawling-Methoden parallel
-- **Batch-Analyse**: Erfolgsraten-Analyse für mehrere URLs
+### Tests/Tools:
+- Interne Testseiten wurden entfernt. Verwenden Sie produktive Seiten in `main/`.
 
 ## 🔧 Crawling-Methoden im Detail
 

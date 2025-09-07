@@ -1737,5 +1737,84 @@
     </script>
     <script src="js/calculator-data.js"></script>
     <script src="js/raid-data-manager.js"></script>
+    <script>
+// Sabo-Counter Links automatisch reparieren
+function fixSaboCounterLinks() {
+    const brokenSaboLinks = document.querySelectorAll('a[onclick*="Sabo-Counter"]');
+    
+    brokenSaboLinks.forEach(link => {
+        link.href = 'dashboard-sabo-counter.html';
+        link.removeAttribute('onclick');
+        link.classList.remove('coming-soon-link');
+        
+        const icon = link.querySelector('.nav-icon, .action-icon');
+        if (icon) icon.textContent = '💥💾';
+        
+        console.log('✅ Sabo-Counter Link repariert');
+    });
+}
+
+<script>
+// Sabo-Counter Links automatisch reparieren
+function fixSaboCounterLinks() {
+    const brokenSaboLinks = document.querySelectorAll('a[onclick*="Sabo-Counter"]');
+    
+    brokenSaboLinks.forEach(link => {
+        link.href = 'dashboard-sabo-counter.html';
+        link.removeAttribute('onclick');
+        link.classList.remove('coming-soon-link');
+        
+        const icon = link.querySelector('.nav-icon, .action-icon');
+        if (icon) icon.textContent = '💥💾';
+        
+        console.log('✅ Sabo-Counter Link repariert');
+    });
+}
+
+// Fix beim Laden ausführen
+document.addEventListener('DOMContentLoaded', fixSaboCounterLinks);
+setTimeout(fixSaboCounterLinks, 1000);
+</script>
+    <script>
+// NOTFALL-REPARATUR für Sabo-Counter Button
+function emergencyFixSaboButton() {
+    console.log('🚨 EMERGENCY: Repariere Sabo-Counter Button...');
+    
+    // Alle defekten Sabo-Links finden und reparieren
+    document.querySelectorAll('a').forEach(link => {
+        const text = link.textContent || '';
+        const onclick = link.getAttribute('onclick') || '';
+        
+        if ((text.includes('Sabo') || text.includes('💥')) && 
+            (onclick.includes('showPremiumFeature') || link.href.includes('#'))) {
+            
+            console.log('🔧 Repariere Sabo-Link:', link);
+            
+            // Link komplett überschreiben
+            link.href = 'dashboard-sabo-counter.html';
+            link.removeAttribute('onclick');
+            link.onclick = null;
+            
+            // Neuen Click-Handler setzen
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('🚀 Navigiere zu Sabo-Counter Dashboard');
+                window.location.href = 'dashboard-sabo-counter.html';
+            });
+            
+            // Icon aktualisieren
+            const icon = link.querySelector('.nav-icon, .action-icon');
+            if (icon) icon.textContent = '💥💾';
+            
+            console.log('✅ Sabo-Link repariert!');
+        }
+    });
+}
+
+// Sofort ausführen
+emergencyFixSaboButton();
+setTimeout(emergencyFixSaboButton, 1000);
+setTimeout(emergencyFixSaboButton, 3000);
+</script>
 </body>
 </html>

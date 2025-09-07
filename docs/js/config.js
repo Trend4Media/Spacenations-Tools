@@ -17,7 +17,7 @@ const CONFIG = {
     },
     
     // Aktuelle Logging-Stufe
-    CURRENT_LOG_LEVEL: 0, // DEBUG für Produktion
+    CURRENT_LOG_LEVEL: 0, // DEBUG für Entwicklung, 0 für Produktion
     
     // Firebase-Einstellungen
     FIREBASE: {
@@ -56,8 +56,7 @@ const Logger = {
     
     debug: function(message, ...args) {
         if (CONFIG.CURRENT_LOG_LEVEL >= CONFIG.LOG_LEVEL.DEBUG) {
-            console.log(`🔧 [DEBUG] ${message}`, ...args);
-        }
+            }
     }
 };
 

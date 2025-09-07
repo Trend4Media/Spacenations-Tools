@@ -62,11 +62,10 @@ Die Spionage-Datenbank wurde vollständig überarbeitet und um **detaillierte au
 
 ## 🛠️ Technische Implementierung
 
-### Neue Dateien:
-- `js/spy-evaluator.js` - Detaillierte Auswertungslogik für alle Kategorien
-- `player-overview.html` - Spielerzentrierte Übersichtsseite
-- `js/player-overview.js` - Logik für Spielerauswahl und -details
-- `test-spy-evaluator.html` - Erweitertes Test-Interface
+### Relevante Dateien (nur MAIN):
+- `main/js/spy-evaluator.js` - Detaillierte Auswertungslogik
+- `main/player-overview.html` - Spielerzentrierte Übersicht
+- `main/js/player-overview.js` - Logik für Spielerauswahl und -details
 
 ### Erweiterte Dateien:
 - `js/spy-parser.js` - Umfassende Datenextraktion (Gebäude, Schiffe, Ressourcen)
@@ -125,10 +124,7 @@ Die Spionage-Datenbank wurde vollständig überarbeitet und um **detaillierte au
 
 ## 🧪 Testen
 
-Verwende `test-spy-evaluator.html` zum Testen der Auswertungslogik:
-- **Schwaches Ziel**: Niedrige Forschungswerte testen
-- **Starkes Ziel**: Hohe Forschungswerte testen  
-- **Eigene Daten**: Benutzerdefinierte Werte eingeben
+Interne Testseiten wurden entfernt. Bitte testen Sie über die produktiven Seiten unter `main/`.
 
 ## 🔧 Anpassungen
 
