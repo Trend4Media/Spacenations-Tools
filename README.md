@@ -4,17 +4,8 @@ Eine Sammlung von Hilfswerkzeugen für Space Nations Spieler.
 
 ## 🌿 Branch-Struktur
 
-Das Repository verwendet ein **Zwei-Branch-System**:
-
-- **🟢 `main`** - Stabile, produktive Version
-  - Vollständig getestete Features
-  - Live auf GitHub Pages
-  - Für den produktiven Einsatz
-
-- **🧪 `testarea`** - Experimentelle Entwicklungsversion  
-  - Neue Features in der Testphase
-  - Experimentelle Verbesserungen
-  - Spionage-Tools und erweiterte Funktionen
+Dieses Repository verwendet nur noch den **🟢 `main`** Branch für die produktive und stabile Version.
+Alle ehemals experimentellen Bereiche (Testarea/Toolkit) wurden entfernt und in MAIN überführt.
 
 ## 🎯 Features
 

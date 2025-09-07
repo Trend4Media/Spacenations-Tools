@@ -50,24 +50,15 @@ class SpyDatabasePage {
 
     _renderBranchBadge() {
         if (!this.elements.branchBadge) return;
-        const b = (this.branch || 'main').toLowerCase();
-        this.elements.branchBadge.textContent = b.toUpperCase();
+        const b = 'main';
+        this.elements.branchBadge.textContent = 'MAIN';
         this.elements.branchBadge.classList.remove('branch-main', 'branch-testarea');
-        this.elements.branchBadge.classList.add(b === 'testarea' ? 'branch-testarea' : 'branch-main');
+        this.elements.branchBadge.classList.add('branch-main');
     }
 
     _detectBranch() {
-        const params = new URLSearchParams(window.location.search);
-        let b = params.get('branch') || null;
-        if (!b) {
-            // Erkenne testarea über Pfad (z. B. /testarea/ auf GitHub Pages)
-            if (window.location.pathname.toLowerCase().includes('/testarea/')) {
-                b = 'testarea';
-            }
-        }
-        b = (b || sessionStorage.getItem('branch') || 'main').toLowerCase();
-        sessionStorage.setItem('branch', b);
-        return b;
+        sessionStorage.setItem('branch', 'main');
+        return 'main';
     }
 
     _togglePaste() {
@@ -137,7 +128,7 @@ class SpyDatabasePage {
             ? this.db.collection('spyReports').where('alliance', '==', this.alliance)
             : this.db.collection('spyReports').where('reporterUid', '==', this.user.uid);
 
-        let query = baseQuery.where('branch', '==', this.branch || 'main');
+        let query = baseQuery.where('branch', '==', 'main');
         query = query.orderBy('reportedAt', 'desc').limit(100);
 
         this.unsubscribe = query.onSnapshot(snapshot => {

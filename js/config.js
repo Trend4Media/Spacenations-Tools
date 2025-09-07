@@ -6,7 +6,7 @@
 // Umgebungskonfiguration
 const CONFIG = {
     // Entwicklungsmodus (auf false setzen für Produktion)
-    DEBUG_MODE: true,
+    DEBUG_MODE: false,
     
     // Logging-Level
     LOG_LEVEL: {
@@ -17,7 +17,7 @@ const CONFIG = {
     },
     
     // Aktuelle Logging-Stufe
-    CURRENT_LOG_LEVEL: 3, // DEBUG für Entwicklung, 0 für Produktion
+    CURRENT_LOG_LEVEL: 0, // DEBUG für Produktion
     
     // Firebase-Einstellungen
     FIREBASE: {
@@ -82,10 +82,6 @@ window.enableProductionMode = enableProductionMode;
 window.enableDevelopmentMode = enableDevelopmentMode;
 
 // Automatische Erkennung basierend auf Hostname
-if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    enableDevelopmentMode();
-} else {
-    enableProductionMode();
-}
+enableProductionMode();
 
 Logger.info('Konfiguration geladen', CONFIG);

@@ -309,9 +309,6 @@ class FirebaseSync {
     
     getBasePath() {
         const p = window.location.pathname;
-        if (p.includes('/testarea/')) {
-            return p.split('/testarea/')[0] + '/';
-        }
         return p.replace(/[^/]*$/, '');
     }
     

@@ -11,7 +11,8 @@ const { execSync } = require('child_process');
 
 // Konfiguration
 const config = {
-    srcDir: path.join(__dirname, '..'),
+    rootDir: path.join(__dirname, '..'),
+    srcDir: path.join(__dirname, '..', 'main'),
     distDir: path.join(__dirname, '..', 'dist'),
     isProduction: process.env.NODE_ENV === 'production'
 };
@@ -49,7 +50,7 @@ const build = () => {
         }
         ensureDir(config.distDir);
         
-        // HTML-Dateien kopieren und optimieren
+        // HTML-Dateien aus main/ kopieren und optimieren
         log('HTML-Dateien werden verarbeitet...');
         const htmlFiles = fs.readdirSync(config.srcDir)
             .filter(file => file.endsWith('.html'));
@@ -71,8 +72,14 @@ const build = () => {
             
             fs.writeFileSync(destPath, content);
         });
+
+        // Root-Index in dist/ bereitstellen (verweist auf main/)
+        const rootIndex = path.join(config.rootDir, 'index.html');
+        if (fs.existsSync(rootIndex)) {
+            copyFile(rootIndex, path.join(config.distDir, 'index.html'));
+        }
         
-        // CSS-Dateien kopieren
+        // CSS-Dateien aus main/ kopieren
         log('CSS-Dateien werden kopiert...');
         ensureDir(path.join(config.distDir, 'css'));
         const cssFiles = fs.readdirSync(path.join(config.srcDir, 'css'));
@@ -83,7 +90,7 @@ const build = () => {
             );
         });
         
-        // JavaScript-Dateien kopieren
+        // JavaScript-Dateien aus main/ kopieren
         log('JavaScript-Dateien werden kopiert...');
         ensureDir(path.join(config.distDir, 'js'));
         const jsFiles = fs.readdirSync(path.join(config.srcDir, 'js'));
@@ -103,17 +110,25 @@ const build = () => {
             
             fs.writeFileSync(destPath, content);
         });
-        
-        // GitHub-Ordner kopieren (falls vorhanden)
-        if (fs.existsSync(path.join(config.srcDir, '.github'))) {
-            log('.github Verzeichnis wird kopiert...');
-            execSync(`cp -r "${path.join(config.srcDir, '.github')}" "${config.distDir}"`);
+
+        // Assets aus main/ kopieren (falls vorhanden)
+        const assetsDir = path.join(config.srcDir, 'assets');
+        if (fs.existsSync(assetsDir)) {
+            log('Assets werden kopiert...');
+            ensureDir(path.join(config.distDir, 'assets'));
+            execSync(`cp -r "${assetsDir}/." "${path.join(config.distDir, 'assets')}"`);
         }
         
-        // README kopieren
-        if (fs.existsSync(path.join(config.srcDir, 'README.md'))) {
+        // GitHub-Ordner aus Root kopieren (falls vorhanden)
+        if (fs.existsSync(path.join(config.rootDir, '.github'))) {
+            log('.github Verzeichnis wird kopiert...');
+            execSync(`cp -r "${path.join(config.rootDir, '.github')}" "${config.distDir}"`);
+        }
+        
+        // README aus Root kopieren
+        if (fs.existsSync(path.join(config.rootDir, 'README.md'))) {
             copyFile(
-                path.join(config.srcDir, 'README.md'),
+                path.join(config.rootDir, 'README.md'),
                 path.join(config.distDir, 'README.md')
             );
         }

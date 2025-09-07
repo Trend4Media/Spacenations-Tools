@@ -33,17 +33,8 @@ class SpyReportPage {
     }
 
     _detectBranch() {
-        const params = new URLSearchParams(window.location.search);
-        let b = params.get('branch') || null;
-        if (!b) {
-            // Erkenne testarea über Pfad (z. B. /testarea/ auf GitHub Pages)
-            if (window.location.pathname.toLowerCase().includes('/testarea/')) {
-                b = 'testarea';
-            }
-        }
-        b = (b || sessionStorage.getItem('branch') || 'main').toLowerCase();
-        sessionStorage.setItem('branch', b);
-        return b;
+        sessionStorage.setItem('branch', 'main');
+        return 'main';
     }
 
     async _loadReport(id) {
@@ -87,20 +78,18 @@ class SpyReportPage {
     }
 
     _renderBranchBadge() {
-        const b = (this.branch || 'main').toLowerCase();
+        const b = 'main';
         const badge = document.getElementById('branch-badge');
         if (!badge) return;
-        badge.textContent = b.toUpperCase();
+        badge.textContent = 'MAIN';
         badge.classList.remove('branch-main', 'branch-testarea');
-        badge.classList.add(b === 'testarea' ? 'branch-testarea' : 'branch-main');
+        badge.classList.add('branch-main');
     }
 
     _setBackLink() {
         const link = document.getElementById('back-to-db');
         if (link) {
-            const params = new URLSearchParams(window.location.search);
-            const b = params.get('branch') || this.branch || 'main';
-            link.href = `spy-database.html?branch=${encodeURIComponent(b)}`;
+            link.href = `spy-database.html`;
         }
     }
 
