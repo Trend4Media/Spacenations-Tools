@@ -1164,7 +1164,10 @@
         document.head.appendChild(style);
         
         // Initialize advanced color picker when page loads
-        document.addEventListener('DOMContentLoaded', initAdvancedColorPicker);
+        document.addEventListener('DOMContentLoaded', () => {
+            initAdvancedColorPicker();
+            loadColorSectionState();
+        });
     </script>
 </body>
 </html>
