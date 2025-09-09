@@ -56,20 +56,6 @@ class BattleCalculator {
         return (stability * this.maxBattleDuration / duration) + armor;
     }
 
-    /**
-     * RÜCKWÄRTSRECHNUNG AUS VERLUSTEN: Welcher Angriff war nötig für bekannte Verluste?
-     * @param {number} actualStabilityLoss - Tatsächlich verlorene Stabilität
-     * @param {number} duration - Kampfdauer in Sekunden  
-     * @param {number} armor - Panzerung des Ziels (optional, Standard: 0)
-     * @returns {number} Benötigte Angriffspunkte für diesen Verlust
-     */
-    requiredAttackFromLoss(actualStabilityLoss, duration, armor = 0) {
-        // Aus der Grundformel: damage = (effectiveAttack / maxBattleDuration) * duration
-        // => effectiveAttack = (damage * maxBattleDuration) / duration
-        // => attack = effectiveAttack + armor
-        const effectiveAttack = (actualStabilityLoss * this.maxBattleDuration) / duration;
-        return effectiveAttack + armor;
-    }
 
     /**
      * Berechnet die Zeit, die benötigt wird, um X Stabilität abzubauen
@@ -143,15 +129,9 @@ if (typeof console !== 'undefined') {
     const neededAttack2 = calc.requiredAttack(832312, 12324, 100);
     console.log(`Test 2 - Benötigter Angriff: ${calc.formatNumber(neededAttack2, 0)}`);
     
-    // Test 3: Rückwärtsrechnung aus Verlusten - Ihr Beispiel
-    const attackFromLoss = calc.requiredAttackFromLoss(7584967, 77, 0);
-    console.log(`Test 3 - Angriff für 7.584.967 Stabilität in 77 Sek: ${calc.formatNumber(attackFromLoss, 0)}`);
-    
     // Gegenprobe: Wie viel Stabilität geht mit diesem Angriff verloren?
     const actualLoss1 = calc.stabilityLoss(neededAttack1, 3241, 78);
     const actualLoss2 = calc.stabilityLoss(neededAttack2, 12324, 100);
-    const actualLoss3 = calc.stabilityLoss(attackFromLoss, 0, 77);
     console.log(`Gegenprobe 1 - Tatsächlicher Verlust: ${calc.formatNumber(actualLoss1, 0)}`);
     console.log(`Gegenprobe 2 - Tatsächlicher Verlust: ${calc.formatNumber(actualLoss2, 0)}`);
-    console.log(`Gegenprobe 3 - Tatsächlicher Verlust: ${calc.formatNumber(actualLoss3, 0)}`);
 }
