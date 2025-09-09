@@ -7,7 +7,7 @@
  */
 
 class BattleCalculator {
-    constructor(maxBattleDuration = 100) {
+    constructor(maxBattleDuration = 3600) {
         this.maxBattleDuration = maxBattleDuration;
     }
 
@@ -133,7 +133,7 @@ if (typeof console !== 'undefined') {
     console.log('🧮 BattleCalculator geladen');
     
     // Test mit den Beispielwerten aus dem Prompt
-    const calc = new BattleCalculator(100);
+    const calc = new BattleCalculator(3600);
     
     // Test 1: 156.897 Stabilität und 3.241 Panzer in 78 Sekunden
     const neededAttack1 = calc.requiredAttack(156897, 3241, 78);
