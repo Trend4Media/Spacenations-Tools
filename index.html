@@ -231,54 +231,58 @@
             letter-spacing: 2px;
         }
         
-        .sidebar-menu {
-            list-style: none;
-        }
-        
-        .sidebar-item {
-            margin-bottom: 8px;
-        }
-        
-        .sidebar-link {
+        .sidebar-buttons {
             display: flex;
-            align-items: center;
+            flex-direction: column;
             gap: 16px;
+            padding: 0 24px;
+        }
+        
+        .sidebar-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
             padding: 16px 24px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: 500;
+            border: 2px solid var(--razer-green);
+            border-radius: 8px;
+            font-family: var(--font-gaming);
+            font-weight: 600;
             font-size: 16px;
-            transition: all 0.3s ease;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            background: transparent;
+            color: var(--razer-green);
+            text-align: center;
         }
         
-        .sidebar-link::before {
+        .sidebar-btn::before {
             content: '';
             position: absolute;
-            left: 0;
             top: 0;
-            width: 4px;
+            left: -100%;
+            width: 100%;
             height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .sidebar-btn:hover::before {
+            left: 100%;
+        }
+        
+        .sidebar-btn:hover {
             background: var(--razer-green);
-            transform: scaleY(0);
-            transition: transform 0.3s ease;
+            color: var(--razer-black);
+            transform: translateY(-2px);
+            box-shadow: var(--glow-green);
         }
         
-        .sidebar-link:hover {
-            color: var(--razer-green);
-            background: rgba(0, 255, 136, 0.1);
-            transform: translateX(8px);
-        }
-        
-        .sidebar-link:hover::before {
-            transform: scaleY(1);
-        }
-        
-        .sidebar-icon {
-            font-size: 20px;
-            width: 24px;
-            text-align: center;
+        .sidebar-btn:active {
+            transform: translateY(0);
         }
         
         /* Main Content */
@@ -570,44 +574,20 @@
     <!-- Sidebar Navigation -->
     <aside class="sidebar" id="sidebar">
         <h3 class="sidebar-title">Counter Tools</h3>
-        <ul class="sidebar-menu">
-            <li class="sidebar-item">
-                <a href="as-counter.html" class="sidebar-link">
-                    <span class="sidebar-icon">⚔</span>
-                    <span>AS Counter</span>
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="battle-counter.html" class="sidebar-link">
-                    <span class="sidebar-icon">🧮</span>
-                    <span>Battle Counter</span>
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="raid-counter.html" class="sidebar-link">
-                    <span class="sidebar-icon">🏴‍☠️</span>
-                    <span>Raid Counter</span>
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="sabo-counter.html" class="sidebar-link">
-                    <span class="sidebar-icon">💥</span>
-                    <span>Sabo Counter</span>
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="dashboard.html" class="sidebar-link">
-                    <span class="sidebar-icon">📊</span>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="spy-database.html" class="sidebar-link">
-                    <span class="sidebar-icon">🕵</span>
-                    <span>Spy Database</span>
-                </a>
-            </li>
-        </ul>
+        <div class="sidebar-buttons">
+            <a href="as-counter.html" class="sidebar-btn">
+                AS Counter
+            </a>
+            <a href="battle-counter.html" class="sidebar-btn">
+                Battle Counter
+            </a>
+            <a href="raid-counter.html" class="sidebar-btn">
+                Raid Counter
+            </a>
+            <a href="sabo-counter.html" class="sidebar-btn">
+                Sabo Counter
+            </a>
+        </div>
     </aside>
 
     <!-- Main Content -->
