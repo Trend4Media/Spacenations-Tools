@@ -411,6 +411,259 @@
             color: var(--text-secondary);
             font-size: 0.9rem;
         }
+
+        /* Battle Calculator Styles */
+        .battle-calculator-section {
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 0 20px var(--border-shadow);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .calculator-title {
+            color: var(--text-primary);
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(255, 140, 66, 0.3);
+        }
+
+        .calculator-desc {
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .calculator-tabs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .calc-tab {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            color: var(--text-secondary);
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .calc-tab:hover {
+            border-color: var(--accent-secondary);
+            color: var(--accent-secondary);
+            transform: translateY(-2px);
+        }
+
+        .calc-tab.active {
+            background: linear-gradient(135deg, #ff8c42, #ff9f5a);
+            border-color: #ff8c42;
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 140, 66, 0.3);
+        }
+
+        .calc-panel {
+            display: none;
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .calc-panel.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .calc-panel h4 {
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .calc-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .input-group input {
+            padding: 12px 15px;
+            border: 2px solid var(--form-border);
+            border-radius: 8px;
+            background: var(--form-bg);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
+        }
+
+        .calc-button {
+            width: 100%;
+            background: linear-gradient(135deg, #4a90e2, #3a5998);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .calc-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(74, 144, 226, 0.4);
+        }
+
+        .calc-button:active {
+            transform: translateY(0);
+        }
+
+        .calc-result {
+            background: var(--success-bg, rgba(34, 197, 94, 0.1));
+            border: 2px solid var(--success-color, #22c55e);
+            border-radius: 10px;
+            padding: 20px;
+            color: var(--success-color, #22c55e);
+            font-weight: 600;
+            text-align: center;
+            display: none;
+            animation: slideIn 0.4s ease;
+        }
+
+        .calc-result.show {
+            display: block;
+        }
+
+        .calc-result.error {
+            background: rgba(220, 38, 38, 0.1);
+            border-color: #dc2626;
+            color: #dc2626;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .calc-examples {
+            background: var(--feature-bg);
+            border: 2px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .calc-examples h5 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .example-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .example-btn {
+            background: var(--accent-secondary);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .example-btn:hover {
+            background: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+        }
+
+        .result-breakdown {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .result-breakdown strong {
+            color: var(--accent-primary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .calculator-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .calc-tab {
+                width: 100%;
+                max-width: 280px;
+            }
+
+            .calc-inputs {
+                grid-template-columns: 1fr;
+            }
+
+            .example-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .example-btn {
+                width: 100%;
+                max-width: 280px;
+            }
+        }
         
         /* Admin Embedded */
         .admin-embedded {
@@ -777,6 +1030,82 @@
                 Wählen Sie links ein Tool aus oder loggen Sie sich ein, um erweiterte Funktionen zu nutzen.
             </p>
             
+            <!-- Kampfrechner Section -->
+            <div class="battle-calculator-section">
+                <h3 class="calculator-title">🧮 Kampfrechner</h3>
+                <p class="calculator-desc">
+                    Berechnen Sie Stabilitätsverlust oder benötigte Angriffspunkte für Ihre Kämpfe
+                </p>
+                
+                <div class="calculator-tabs">
+                    <button class="calc-tab active" onclick="switchCalculatorTab('forward')">
+                        ⚔️ Stabilitätsverlust
+                    </button>
+                    <button class="calc-tab" onclick="switchCalculatorTab('reverse')">
+                        🎯 Benötigte Angriffspunkte
+                    </button>
+                </div>
+
+                <!-- Vorwärtsrechnung: Stabilitätsverlust -->
+                <div id="forward-calc" class="calc-panel active">
+                    <h4>⚔️ Wie viel Stabilität geht verloren?</h4>
+                    <div class="calc-inputs">
+                        <div class="input-group">
+                            <label>Angriffspunkte (AS):</label>
+                            <input type="number" id="forward-attack" placeholder="z.B. 25000" min="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Panzerung des Ziels:</label>
+                            <input type="number" id="forward-armor" placeholder="z.B. 3241" min="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Kampfdauer (Sekunden):</label>
+                            <input type="number" id="forward-duration" placeholder="z.B. 78" min="1" max="100">
+                        </div>
+                    </div>
+                    <button class="calc-button" onclick="calculateForward()">
+                        🧮 Stabilitätsverlust berechnen
+                    </button>
+                    <div id="forward-result" class="calc-result"></div>
+                </div>
+
+                <!-- Rückwärtsrechnung: Benötigte Angriffspunkte -->
+                <div id="reverse-calc" class="calc-panel">
+                    <h4>🎯 Wie viele Angriffspunkte werden benötigt?</h4>
+                    <div class="calc-inputs">
+                        <div class="input-group">
+                            <label>Gewünschter Stabilitätsverlust:</label>
+                            <input type="number" id="reverse-stability" placeholder="z.B. 156897" min="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Panzerung des Ziels:</label>
+                            <input type="number" id="reverse-armor" placeholder="z.B. 3241" min="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Kampfdauer (Sekunden):</label>
+                            <input type="number" id="reverse-duration" placeholder="z.B. 78" min="1" max="100">
+                        </div>
+                    </div>
+                    <button class="calc-button" onclick="calculateReverse()">
+                        🧮 Angriffspunkte berechnen
+                    </button>
+                    <div id="reverse-result" class="calc-result"></div>
+                </div>
+
+                <!-- Beispiele -->
+                <div class="calc-examples">
+                    <h5>💡 Beispiele zum Ausprobieren:</h5>
+                    <div class="example-buttons">
+                        <button class="example-btn" onclick="loadExample(1)">
+                            📝 Beispiel 1: 156k Stabilität
+                        </button>
+                        <button class="example-btn" onclick="loadExample(2)">
+                            📝 Beispiel 2: 832k Stabilität
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div class="feature-cards">
                 <div class="feature-card">
                     <span class="feature-icon">⚡</span>
@@ -913,6 +1242,7 @@
     <script src="js/auth-manager.js"></script>
     <script src="js/firebase-sync.js"></script>
     <script src="js/enhanced-navigation.js"></script>
+    <script src="js/battle-calculator.js"></script>
 
     <script>
         // Seiten-spezifische Funktionen für index.html
@@ -1096,10 +1426,191 @@
             }
         }
 
+        // Battle Calculator Functions
+        let battleCalc = null;
+
+        function initializeBattleCalculator() {
+            if (window.BattleCalculator) {
+                battleCalc = new window.BattleCalculator(100);
+                console.log('🧮 Kampfrechner initialisiert');
+            } else {
+                console.warn('⚠️ BattleCalculator noch nicht geladen');
+                // Retry in 100ms
+                setTimeout(initializeBattleCalculator, 100);
+            }
+        }
+
+        function switchCalculatorTab(tabName) {
+            // Tab-Buttons aktualisieren
+            document.querySelectorAll('.calc-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Panels aktualisieren
+            document.querySelectorAll('.calc-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            document.getElementById(tabName + '-calc').classList.add('active');
+
+            // Ergebnisse verstecken
+            hideAllResults();
+        }
+
+        function hideAllResults() {
+            document.querySelectorAll('.calc-result').forEach(result => {
+                result.classList.remove('show');
+            });
+        }
+
+        function showResult(elementId, content, isError = false) {
+            const resultElement = document.getElementById(elementId);
+            resultElement.innerHTML = content;
+            resultElement.className = 'calc-result show' + (isError ? ' error' : '');
+        }
+
+        function calculateForward() {
+            if (!battleCalc) {
+                showResult('forward-result', '❌ Kampfrechner noch nicht geladen. Bitte versuchen Sie es erneut.', true);
+                return;
+            }
+
+            const attack = parseFloat(document.getElementById('forward-attack').value);
+            const armor = parseFloat(document.getElementById('forward-armor').value);
+            const duration = parseFloat(document.getElementById('forward-duration').value);
+
+            const validation = battleCalc.validateInputs({ 
+                'Angriffspunkte': attack, 
+                'Panzerung': armor, 
+                'Kampfdauer': duration 
+            });
+
+            if (!validation.isValid) {
+                showResult('forward-result', '❌ ' + validation.errors.join('<br>❌ '), true);
+                return;
+            }
+
+            if (duration > 100) {
+                showResult('forward-result', '❌ Kampfdauer darf nicht größer als 100 Sekunden sein.', true);
+                return;
+            }
+
+            const stabilityLoss = battleCalc.stabilityLoss(attack, armor, duration);
+            const effectiveAttack = battleCalc.calculateEffectiveAttack(attack, armor);
+
+            let resultHtml = `
+                <div style="font-size: 1.3rem; margin-bottom: 15px;">
+                    ⚔️ <strong>Stabilitätsverlust: ${battleCalc.formatNumber(stabilityLoss, 0)}</strong>
+                </div>
+                <div class="result-breakdown">
+                    <strong>Berechnung:</strong><br>
+                    • Angriffspunkte: ${battleCalc.formatNumber(attack, 0)}<br>
+                    • Panzerung: ${battleCalc.formatNumber(armor, 0)}<br>
+                    • Effektiver Angriff: ${battleCalc.formatNumber(effectiveAttack, 0)}<br>
+                    • Kampfdauer: ${duration} Sekunden<br>
+                    • Formel: (${battleCalc.formatNumber(effectiveAttack, 0)} ÷ 100) × ${duration} = ${battleCalc.formatNumber(stabilityLoss, 0)}
+                </div>
+            `;
+
+            if (effectiveAttack <= 0) {
+                resultHtml = `
+                    <div style="font-size: 1.3rem; margin-bottom: 15px;">
+                        🛡️ <strong>Kein Schaden möglich!</strong>
+                    </div>
+                    <div class="result-breakdown">
+                        Die Panzerung (${battleCalc.formatNumber(armor, 0)}) ist größer oder gleich den Angriffspunkten (${battleCalc.formatNumber(attack, 0)}).<br>
+                        Es kann kein Schaden verursacht werden.
+                    </div>
+                `;
+            }
+
+            showResult('forward-result', resultHtml);
+        }
+
+        function calculateReverse() {
+            if (!battleCalc) {
+                showResult('reverse-result', '❌ Kampfrechner noch nicht geladen. Bitte versuchen Sie es erneut.', true);
+                return;
+            }
+
+            const stability = parseFloat(document.getElementById('reverse-stability').value);
+            const armor = parseFloat(document.getElementById('reverse-armor').value);
+            const duration = parseFloat(document.getElementById('reverse-duration').value);
+
+            const validation = battleCalc.validateInputs({ 
+                'Stabilitätsverlust': stability, 
+                'Panzerung': armor, 
+                'Kampfdauer': duration 
+            });
+
+            if (!validation.isValid) {
+                showResult('reverse-result', '❌ ' + validation.errors.join('<br>❌ '), true);
+                return;
+            }
+
+            if (duration > 100) {
+                showResult('reverse-result', '❌ Kampfdauer darf nicht größer als 100 Sekunden sein.', true);
+                return;
+            }
+
+            const requiredAttack = battleCalc.requiredAttack(stability, armor, duration);
+            const effectiveAttack = requiredAttack - armor;
+
+            let resultHtml = `
+                <div style="font-size: 1.3rem; margin-bottom: 15px;">
+                    🎯 <strong>Benötigte Angriffspunkte: ${battleCalc.formatNumber(requiredAttack, 0)}</strong>
+                </div>
+                <div class="result-breakdown">
+                    <strong>Berechnung:</strong><br>
+                    • Gewünschter Stabilitätsverlust: ${battleCalc.formatNumber(stability, 0)}<br>
+                    • Panzerung des Ziels: ${battleCalc.formatNumber(armor, 0)}<br>
+                    • Kampfdauer: ${duration} Sekunden<br>
+                    • Effektiver Angriff benötigt: ${battleCalc.formatNumber(effectiveAttack, 0)}<br>
+                    • Formel: (${battleCalc.formatNumber(stability, 0)} × 100 ÷ ${duration}) + ${battleCalc.formatNumber(armor, 0)} = ${battleCalc.formatNumber(requiredAttack, 0)}
+                </div>
+            `;
+
+            showResult('reverse-result', resultHtml);
+        }
+
+        function loadExample(exampleNumber) {
+            hideAllResults();
+
+            if (exampleNumber === 1) {
+                // Beispiel 1: 156.897 Stabilität und 3.241 Panzer in 78 Sekunden
+                document.getElementById('reverse-stability').value = '156897';
+                document.getElementById('reverse-armor').value = '3241';
+                document.getElementById('reverse-duration').value = '78';
+                
+                // Zur Rückwärtsrechnung wechseln
+                switchCalculatorTab('reverse');
+                document.querySelectorAll('.calc-tab')[1].classList.add('active');
+                document.querySelectorAll('.calc-tab')[0].classList.remove('active');
+                
+                setTimeout(() => calculateReverse(), 300);
+                
+            } else if (exampleNumber === 2) {
+                // Beispiel 2: Flotte mit 832.312 Stabilität und 12.324 Panzer, Dauer 100 Sek.
+                document.getElementById('reverse-stability').value = '832312';
+                document.getElementById('reverse-armor').value = '12324';
+                document.getElementById('reverse-duration').value = '100';
+                
+                // Zur Rückwärtsrechnung wechseln
+                switchCalculatorTab('reverse');
+                document.querySelectorAll('.calc-tab')[1].classList.add('active');
+                document.querySelectorAll('.calc-tab')[0].classList.remove('active');
+                
+                setTimeout(() => calculateReverse(), 300);
+            }
+        }
+
         // Coming Soon Link Animations
         document.addEventListener('DOMContentLoaded', function() {
             // Footer initialisieren
             initializeGlobalFooter();
+            
+            // Kampfrechner initialisieren
+            initializeBattleCalculator();
             
             // Coming Soon Links
             document.querySelectorAll('.coming-soon-link').forEach(link => {
@@ -1109,6 +1620,17 @@
                     setTimeout(() => {
                         this.style.transform = '';
                     }, 200);
+                });
+            });
+
+            // Enter-Taste Support für Eingabefelder
+            document.querySelectorAll('.calc-panel input').forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        const panel = this.closest('.calc-panel');
+                        const button = panel.querySelector('.calc-button');
+                        if (button) button.click();
+                    }
                 });
             });
         });
