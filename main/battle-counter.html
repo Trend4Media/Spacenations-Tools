@@ -477,52 +477,6 @@
             box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4);
         }
 
-        /* Info Section */
-        .info-section {
-            background: var(--calc-bg);
-            border: 2px solid var(--border-primary);
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-        }
-
-        .info-section h3 {
-            color: var(--battle-primary);
-            margin-bottom: 20px;
-            font-family: 'Orbitron', monospace;
-            font-size: 1.3rem;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .info-card {
-            background: var(--card-bg);
-            border: 2px solid var(--card-border);
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .info-card .icon {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        .info-card h4 {
-            color: var(--text-primary);
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .info-card p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
 
         /* Navigation Back */
         .nav-back {
@@ -607,27 +561,6 @@
             <div class="subtitle">Kampfrechner für Spacenations</div>
         </div>
 
-        <!-- Info Section -->
-        <div class="info-section">
-            <h3>⚡ Wie funktioniert der Battle-Counter?</h3>
-            <div class="info-grid">
-                <div class="info-card">
-                    <span class="icon">⚔️</span>
-                    <h4>Vorwärtsrechnung</h4>
-                    <p>Berechnet den Stabilitätsverlust basierend auf Ihren Angriffspunkten, der gegnerischen Panzerung und der Kampfdauer.</p>
-                </div>
-                <div class="info-card">
-                    <span class="icon">🎯</span>
-                    <h4>Rückwärtsrechnung</h4>
-                    <p>Ermittelt die benötigten Angriffspunkte für einen gewünschten Stabilitätsverlust bei gegebener Panzerung und Kampfdauer.</p>
-                </div>
-                <div class="info-card">
-                    <span class="icon">📐</span>
-                    <h4>Formel</h4>
-                    <p>Schaden = (Angriff - Panzerung) ÷ 100 × Kampfdauer<br>Maximal 100 Sekunden Kampfdauer</p>
-                </div>
-            </div>
-        </div>
 
         <!-- Battle Calculator -->
         <div class="battle-calculator">
