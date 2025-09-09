@@ -8,21 +8,36 @@
     <!-- Modern Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --primary: #007AFF;
-            --secondary: #5856D6;
-            --accent: #FF6B35;
-            --success: #34C759;
-            --text-primary: #1D1D1F;
-            --text-secondary: #6E6E73;
-            --bg-primary: #FFFFFF;
-            --bg-secondary: #F5F5F7;
-            --bg-glass: rgba(255, 255, 255, 0.8);
-            --shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
-            --radius: 16px;
+            /* Razer Color Scheme */
+            --razer-green: #00FF88;
+            --razer-green-dark: #00CC6A;
+            --razer-green-light: #44FF99;
+            --razer-black: #0A0A0A;
+            --razer-dark: #111111;
+            --razer-gray: #1A1A1A;
+            --razer-gray-light: #2A2A2A;
+            --razer-white: #FFFFFF;
+            --razer-silver: #C0C0C0;
+            
+            --text-primary: var(--razer-white);
+            --text-secondary: var(--razer-silver);
+            --text-accent: var(--razer-green);
+            
+            --bg-primary: var(--razer-black);
+            --bg-secondary: var(--razer-dark);
+            --bg-tertiary: var(--razer-gray);
+            --bg-card: var(--razer-gray-light);
+            
+            --glow-green: 0 0 20px rgba(0, 255, 136, 0.5);
+            --glow-green-strong: 0 0 30px rgba(0, 255, 136, 0.8);
+            --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.6);
+            
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            --font-gaming: 'Orbitron', monospace;
         }
         
         * {
@@ -31,291 +46,507 @@
             box-sizing: border-box;
         }
         
+        html {
+            scroll-behavior: smooth;
+        }
+        
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            font-family: var(--font-primary);
             background: var(--bg-primary);
             color: var(--text-primary);
             line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            min-height: 100vh;
         }
         
-        /* Header */
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
+                linear-gradient(45deg, var(--razer-black) 0%, var(--razer-dark) 100%);
+            z-index: -1;
+            animation: backgroundPulse 8s ease-in-out infinite;
+        }
+        
+        @keyframes backgroundPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        /* Header Navigation */
         .header {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             z-index: 1000;
+            background: rgba(10, 10, 10, 0.95);
             backdrop-filter: blur(20px);
-            background: var(--bg-glass);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            transition: all 0.3s ease;
         }
         
         .nav {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 0 24px;
+            padding: 0 32px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            height: 72px;
+            height: 80px;
         }
         
         .logo {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
             text-decoration: none;
             color: var(--text-primary);
+            font-family: var(--font-gaming);
             font-weight: 700;
-            font-size: 24px;
+            font-size: 28px;
+            transition: all 0.3s ease;
+        }
+        
+        .logo:hover {
+            color: var(--razer-green);
+            text-shadow: var(--glow-green);
+            transform: scale(1.05);
         }
         
         .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--razer-green), var(--razer-green-light));
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: var(--razer-black);
             font-weight: 800;
-            font-size: 16px;
+            font-size: 18px;
+            box-shadow: var(--glow-green);
+            animation: logoGlow 3s ease-in-out infinite;
         }
         
-        .nav-menu {
+        @keyframes logoGlow {
+            0%, 100% { box-shadow: var(--glow-green); }
+            50% { box-shadow: var(--glow-green-strong); }
+        }
+        
+        .nav-actions {
             display: flex;
-            gap: 32px;
-            list-style: none;
-        }
-        
-        .nav-link {
-            text-decoration: none;
-            color: var(--text-secondary);
-            font-weight: 500;
-            transition: all 0.2s ease;
-            padding: 8px 16px;
-            border-radius: 8px;
-        }
-        
-        .nav-link:hover {
-            color: var(--text-primary);
-            background: rgba(0, 122, 255, 0.1);
+            align-items: center;
+            gap: 20px;
         }
         
         .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 28px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            font-family: var(--font-gaming);
             font-weight: 600;
+            font-size: 16px;
             text-decoration: none;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
         
-        .btn-primary {
-            background: var(--primary);
-            color: white;
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s ease;
         }
         
-        .btn-primary:hover {
-            background: #0056CC;
-            transform: translateY(-1px);
+        .btn:hover::before {
+            left: 100%;
         }
         
-        /* Hero */
-        .hero {
-            padding: 120px 0 80px;
-            background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-            text-align: center;
+        .btn-game {
+            background: var(--razer-green);
+            color: var(--razer-black);
+            border-color: var(--razer-green);
+            box-shadow: var(--glow-green);
         }
         
-        .hero-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
+        .btn-game:hover {
+            background: var(--razer-green-light);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: var(--glow-green-strong);
         }
         
-        .hero-title {
-            font-size: clamp(48px, 8vw, 80px);
-            font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 24px;
-            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .btn-login {
+            background: transparent;
+            color: var(--razer-green);
+            border-color: var(--razer-green);
         }
         
-        .hero-subtitle {
-            font-size: 24px;
-            color: var(--text-secondary);
-            margin-bottom: 40px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
+        .btn-login:hover {
+            background: var(--razer-green);
+            color: var(--razer-black);
+            transform: translateY(-2px);
+            box-shadow: var(--glow-green);
         }
         
-        /* Tools Grid */
-        .tools {
-            padding: 80px 0;
+        /* Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            width: 280px;
+            height: calc(100vh - 80px);
+            background: var(--bg-secondary);
+            border-right: 1px solid rgba(0, 255, 136, 0.2);
+            padding: 32px 0;
+            z-index: 900;
+            overflow-y: auto;
         }
         
-        .tools-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-        
-        .section-title {
-            font-size: 48px;
+        .sidebar-title {
+            font-family: var(--font-gaming);
+            font-size: 20px;
             font-weight: 700;
-            text-align: center;
-            margin-bottom: 60px;
+            color: var(--razer-green);
+            margin-bottom: 24px;
+            padding: 0 24px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
         
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 32px;
+        .sidebar-menu {
+            list-style: none;
         }
         
-        .tool-card {
-            background: var(--bg-primary);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            border-radius: var(--radius);
-            padding: 32px;
-            text-align: center;
+        .sidebar-item {
+            margin-bottom: 8px;
+        }
+        
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 24px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
         }
         
-        .tool-card::before {
+        .sidebar-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--razer-green);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar-link:hover {
+            color: var(--razer-green);
+            background: rgba(0, 255, 136, 0.1);
+            transform: translateX(8px);
+        }
+        
+        .sidebar-link:hover::before {
+            transform: scaleY(1);
+        }
+        
+        .sidebar-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 80px 0 0 0;
+            min-height: 100vh;
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 120px 48px 80px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .hero::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, transparent, rgba(0, 122, 255, 0.05));
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            background: radial-gradient(ellipse at center, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
+            pointer-events: none;
         }
         
-        .tool-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow);
-            border-color: rgba(0, 122, 255, 0.2);
-        }
-        
-        .tool-card:hover::before {
-            opacity: 1;
-        }
-        
-        .tool-icon {
-            width: 64px;
-            height: 64px;
-            margin: 0 auto 24px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            color: white;
+        .hero-container {
+            max-width: 800px;
+            margin: 0 auto;
             position: relative;
             z-index: 1;
         }
         
-        .tool-title {
+        .hero-title {
+            font-family: var(--font-gaming);
+            font-size: clamp(48px, 8vw, 96px);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 32px;
+            background: linear-gradient(135deg, var(--razer-white) 0%, var(--razer-green) 50%, var(--razer-green-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(0, 255, 136, 0.3);
+            animation: titleGlow 4s ease-in-out infinite;
+        }
+        
+        @keyframes titleGlow {
+            0%, 100% { 
+                filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.3));
+            }
+            50% { 
+                filter: drop-shadow(0 0 30px rgba(0, 255, 136, 0.6));
+            }
+        }
+        
+        .hero-subtitle {
             font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .tool-description {
             color: var(--text-secondary);
-            margin-bottom: 24px;
-            position: relative;
-            z-index: 1;
+            margin-bottom: 48px;
+            line-height: 1.4;
+            animation: fadeInUp 1s ease-out 0.3s both;
         }
         
-        .tool-link {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-            position: relative;
-            z-index: 1;
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
-        .tool-link:hover {
-            transform: translateX(4px);
+        .hero-cta {
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+        
+        /* Stats Section */
+        .stats-section {
+            padding: 80px 48px;
+            background: var(--bg-secondary);
+            border-top: 1px solid rgba(0, 255, 136, 0.2);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 32px 24px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--razer-green), var(--razer-green-light));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--razer-green);
+            box-shadow: var(--glow-green);
+        }
+        
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .stat-number {
+            font-family: var(--font-gaming);
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--razer-green);
+            margin-bottom: 8px;
+            text-shadow: var(--glow-green);
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
         /* Footer */
         .footer {
-            background: #000;
-            color: white;
-            padding: 60px 0 40px;
+            background: var(--razer-black);
+            border-top: 1px solid rgba(0, 255, 136, 0.2);
+            padding: 60px 48px 40px;
+            margin-left: 280px;
         }
         
-        .footer-container {
-            max-width: 1200px;
+        .footer-content {
+            max-width: 1000px;
             margin: 0 auto;
-            padding: 0 24px;
+            text-align: center;
         }
         
-        .footer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-        
-        .footer-section h4 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 16px;
+        .footer-text {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
         }
         
         .footer-links {
-            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
         }
         
-        .footer-links li {
-            margin-bottom: 8px;
-        }
-        
-        .footer-links a {
-            color: rgba(255, 255, 255, 0.7);
+        .footer-link {
+            color: var(--text-secondary);
             text-decoration: none;
-            transition: color 0.2s ease;
+            transition: all 0.3s ease;
+            position: relative;
         }
         
-        .footer-links a:hover {
-            color: white;
+        .footer-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--razer-green);
+            transition: width 0.3s ease;
+        }
+        
+        .footer-link:hover {
+            color: var(--razer-green);
+        }
+        
+        .footer-link:hover::after {
+            width: 100%;
         }
         
         .footer-bottom {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 32px;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(192, 192, 192, 0.6);
+            font-size: 14px;
         }
         
-        /* Mobile */
+        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .nav-menu { display: none; }
-            .tools-grid { grid-template-columns: 1fr; }
-            .hero-container, .tools-container, .footer-container { padding: 0 16px; }
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .footer {
+                margin-left: 0;
+            }
+            
+            .hero {
+                padding: 80px 24px 60px;
+            }
+            
+            .stats-section {
+                padding: 60px 24px;
+            }
+            
+            .nav {
+                padding: 0 16px;
+            }
+            
+            .mobile-menu {
+                display: block;
+                background: none;
+                border: none;
+                color: var(--razer-green);
+                font-size: 24px;
+                cursor: pointer;
+            }
+        }
+        
+        .mobile-menu {
+            display: none;
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--razer-green);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--razer-green-light);
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
+    <!-- Header Navigation -->
     <header class="header">
         <div class="nav">
             <a href="#" class="logo">
@@ -323,139 +554,187 @@
                 <span>Spacenations</span>
             </a>
             
-            <ul class="nav-menu">
-                <li><a href="#tools" class="nav-link">Tools</a></li>
-                <li><a href="as-counter.html" class="nav-link">AS Counter</a></li>
-                <li><a href="battle-counter.html" class="nav-link">Battle Counter</a></li>
-                <li><a href="raid-counter.html" class="nav-link">Raid Counter</a></li>
-            </ul>
+            <div class="nav-actions">
+                <a href="https://spacenations.eu" target="_blank" class="btn btn-game">
+                    Zum Spiel
+                </a>
+                <a href="#login" class="btn btn-login">
+                    Login
+                </a>
+            </div>
             
-            <a href="dashboard.html" class="btn btn-primary">Dashboard</a>
+            <button class="mobile-menu" onclick="toggleSidebar()">☰</button>
         </div>
     </header>
 
-    <!-- Hero -->
-    <section class="hero">
-        <div class="hero-container">
-            <h1 class="hero-title">Professional Gaming Tools</h1>
-            <p class="hero-subtitle">Advanced counter tools and analytics for competitive Spacenations players</p>
-        </div>
-    </section>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <h3 class="sidebar-title">Counter Tools</h3>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a href="as-counter.html" class="sidebar-link">
+                    <span class="sidebar-icon">⚔</span>
+                    <span>AS Counter</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="battle-counter.html" class="sidebar-link">
+                    <span class="sidebar-icon">🧮</span>
+                    <span>Battle Counter</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="raid-counter.html" class="sidebar-link">
+                    <span class="sidebar-icon">🏴‍☠️</span>
+                    <span>Raid Counter</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="sabo-counter.html" class="sidebar-link">
+                    <span class="sidebar-icon">💥</span>
+                    <span>Sabo Counter</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="dashboard.html" class="sidebar-link">
+                    <span class="sidebar-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="spy-database.html" class="sidebar-link">
+                    <span class="sidebar-icon">🕵</span>
+                    <span>Spy Database</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
 
-    <!-- Tools -->
-    <section id="tools" class="tools">
-        <div class="tools-container">
-            <h2 class="section-title">Choose Your Tool</h2>
-            
-            <div class="tools-grid">
-                <div class="tool-card">
-                    <div class="tool-icon">⚔</div>
-                    <h3 class="tool-title">AS Counter</h3>
-                    <p class="tool-description">Advanced attack statistics and battle analysis for optimal combat performance.</p>
-                    <a href="as-counter.html" class="tool-link">Launch Tool →</a>
-                </div>
-                
-                <div class="tool-card">
-                    <div class="tool-icon">🧮</div>
-                    <h3 class="tool-title">Battle Counter</h3>
-                    <p class="tool-description">Calculate stability loss and required attack points with precision.</p>
-                    <a href="battle-counter.html" class="tool-link">Launch Tool →</a>
-                </div>
-                
-                <div class="tool-card">
-                    <div class="tool-icon">🏴‍☠️</div>
-                    <h3 class="tool-title">Raid Counter</h3>
-                    <p class="tool-description">Strategic raid planning and resource optimization.</p>
-                    <a href="raid-counter.html" class="tool-link">Launch Tool →</a>
-                </div>
-                
-                <div class="tool-card">
-                    <div class="tool-icon">💥</div>
-                    <h3 class="tool-title">Sabo Counter</h3>
-                    <p class="tool-description">Sabotage mission tracking and analysis.</p>
-                    <a href="sabo-counter.html" class="tool-link">Launch Tool →</a>
-                </div>
-                
-                <div class="tool-card">
-                    <div class="tool-icon">📊</div>
-                    <h3 class="tool-title">Dashboard</h3>
-                    <p class="tool-description">Comprehensive analytics and performance metrics.</p>
-                    <a href="dashboard.html" class="tool-link">Launch Tool →</a>
-                </div>
-                
-                <div class="tool-card">
-                    <div class="tool-icon">🕵</div>
-                    <h3 class="tool-title">Spy Database</h3>
-                    <p class="tool-description">Intelligence gathering and data management.</p>
-                    <a href="spy-database.html" class="tool-link">Launch Tool →</a>
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-container">
+                <h1 class="hero-title">GAMING TOOLS</h1>
+                <p class="hero-subtitle">Professional counter tools and analytics for competitive Spacenations players</p>
+                <div class="hero-cta">
+                    <a href="dashboard.html" class="btn btn-game">Get Started</a>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">6</div>
+                    <div class="stat-label">Tools Available</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Online Access</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">Calculations</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">PRO</div>
+                    <div class="stat-label">Performance</div>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-grid">
-                <div class="footer-section">
-                    <h4>Tools</h4>
-                    <ul class="footer-links">
-                        <li><a href="as-counter.html">AS Counter</a></li>
-                        <li><a href="battle-counter.html">Battle Counter</a></li>
-                        <li><a href="raid-counter.html">Raid Counter</a></li>
-                        <li><a href="sabo-counter.html">Sabo Counter</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Platform</h4>
-                    <ul class="footer-links">
-                        <li><a href="dashboard.html">Dashboard</a></li>
-                        <li><a href="spy-database.html">Spy Database</a></li>
-                        <li><a href="register.html">Create Account</a></li>
-                        <li><a href="admin-login.html">Admin</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Community</h4>
-                    <ul class="footer-links">
-                        <li><a href="https://spacenations.eu" target="_blank">Spacenations</a></li>
-                        <li><a href="#">Discord</a></li>
-                        <li><a href="#">GitHub</a></li>
-                        <li><a href="#">Support</a></li>
-                    </ul>
-                </div>
+        <div class="footer-content">
+            <p class="footer-text">Professional gaming tools for competitive Spacenations players</p>
+            
+            <div class="footer-links">
+                <a href="https://spacenations.eu" target="_blank" class="footer-link">Spacenations</a>
+                <a href="dashboard.html" class="footer-link">Dashboard</a>
+                <a href="admin-login.html" class="footer-link">Admin</a>
+                <a href="#" class="footer-link">Support</a>
+                <a href="#" class="footer-link">Privacy</a>
             </div>
             
-            <div class="footer-bottom">
-                <p>&copy; 2025 Spacenations Tools. Professional gaming tools for competitive players.</p>
-            </div>
+            <p class="footer-bottom">&copy; 2025 Spacenations Tools. Built for gamers, by gamers.</p>
         </div>
     </footer>
 
     <script>
-        // Smooth scrolling
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
+        // Sidebar toggle for mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
 
         // Header scroll effect
+        let lastScrollY = window.scrollY;
         window.addEventListener('scroll', () => {
             const header = document.querySelector('.header');
-            if (window.scrollY > 100) {
-                header.style.background = 'rgba(255, 255, 255, 0.95)';
-                header.style.boxShadow = '0 1px 20px rgba(0, 0, 0, 0.1)';
+            const currentScrollY = window.scrollY;
+            
+            if (currentScrollY > 100) {
+                header.style.background = 'rgba(10, 10, 10, 0.98)';
+                header.style.borderBottom = '1px solid rgba(0, 255, 136, 0.4)';
             } else {
-                header.style.background = 'rgba(255, 255, 255, 0.8)';
-                header.style.boxShadow = 'none';
+                header.style.background = 'rgba(10, 10, 10, 0.95)';
+                header.style.borderBottom = '1px solid rgba(0, 255, 136, 0.2)';
             }
+            
+            lastScrollY = currentScrollY;
         });
+
+        // Animate stats on scroll
+        const observerOptions = {
+            threshold: 0.5,
+            rootMargin: '0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeInUp 0.8s ease-out forwards';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.stat-card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // Add particle effect on mouse move
+        document.addEventListener('mousemove', (e) => {
+            const cursor = document.createElement('div');
+            cursor.style.position = 'fixed';
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            cursor.style.width = '4px';
+            cursor.style.height = '4px';
+            cursor.style.background = 'rgba(0, 255, 136, 0.6)';
+            cursor.style.borderRadius = '50%';
+            cursor.style.pointerEvents = 'none';
+            cursor.style.zIndex = '9999';
+            cursor.style.animation = 'fadeOut 1s ease-out forwards';
+            
+            document.body.appendChild(cursor);
+            
+            setTimeout(() => {
+                cursor.remove();
+            }, 1000);
+        });
+
+        // Add fadeOut animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                0% { opacity: 1; transform: scale(1); }
+                100% { opacity: 0; transform: scale(0); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
