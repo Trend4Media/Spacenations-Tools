@@ -199,15 +199,16 @@ class AutoGlobalFooterLoader {
                 window.AuthAPI.onAuthStateChange((user, userData) => {
                     const adminLoginLink = document.getElementById('auto-admin-login-link');
                     const adminDashboardLink = document.getElementById('auto-admin-dashboard-link');
-                    const quickAdmin = document.getElementById('auto-quick-admin');
                     
                     if (userData && userData.isSuperAdmin === true) {
                         if (adminLoginLink) adminLoginLink.style.display = 'none';
                         if (adminDashboardLink) adminDashboardLink.style.display = 'block';
+                        const quickAdmin = document.getElementById('auto-quick-admin');
                         if (quickAdmin) { quickAdmin.textContent = '🛡️ Admin-Dashboard'; quickAdmin.href = 'admin-dashboard.html'; quickAdmin.style.display = 'inline-block'; }
                     } else {
                         if (adminLoginLink) adminLoginLink.style.display = 'block';
                         if (adminDashboardLink) adminDashboardLink.style.display = 'none';
+                        const quickAdmin = document.getElementById('auto-quick-admin');
                         if (quickAdmin) { quickAdmin.textContent = '🔐 Admin-Login'; quickAdmin.href = 'admin-login.html'; quickAdmin.style.display = 'inline-block'; }
                     }
                 });

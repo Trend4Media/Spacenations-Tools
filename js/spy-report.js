@@ -33,17 +33,8 @@ class SpyReportPage {
     }
 
     _detectBranch() {
-        const params = new URLSearchParams(window.location.search);
-        let b = params.get('branch') || null;
-        if (!b) {
-            // Erkenne testarea über Pfad (z. B. /testarea/ auf GitHub Pages)
-            if (window.location.pathname.toLowerCase().includes('/testarea/')) {
-                b = 'testarea';
-            }
-        }
-        b = (b || sessionStorage.getItem('branch') || 'main').toLowerCase();
-        sessionStorage.setItem('branch', b);
-        return b;
+        sessionStorage.setItem('branch', 'main');
+        return 'main';
     }
 
     async _loadReport(id) {
@@ -54,7 +45,6 @@ class SpyReportPage {
         }
         const data = doc.data();
         this._renderMeta(data);
-        this._renderEvaluation(data);
         this._renderSnapshot(data);
     }
 
@@ -81,28 +71,6 @@ class SpyReportPage {
 		`;
     }
 
-    _renderEvaluation(data) {
-        const evaluationContainer = document.getElementById('evaluation-container');
-        const evaluationContent = document.getElementById('evaluation-content');
-        
-        if (data.evaluation) {
-            evaluationContainer.style.display = 'block';
-            // Verwende die detaillierte Formatierung falls verfügbar
-            if (data.evaluation.buildings || data.evaluation.ships) {
-                evaluationContent.innerHTML = window.SpyEvaluator.formatDetailedEvaluationForUI(data.evaluation);
-            } else {
-                evaluationContent.innerHTML = window.SpyEvaluator.formatEvaluationForUI(data.evaluation);
-            }
-        } else if (data.evaluationError) {
-            evaluationContainer.style.display = 'block';
-            evaluationContent.innerHTML = `<div class="evaluation-result">
-                <p style="color: var(--danger-color, #ef4444);">⚠️ Auswertung fehlgeschlagen: ${this._esc(data.evaluationError)}</p>
-            </div>`;
-        } else {
-            evaluationContainer.style.display = 'none';
-        }
-    }
-
     _renderSnapshot(data) {
         const frame = document.getElementById('snapshot-frame');
         const safeHtml = this._sanitizeForSrcDoc(data.rawHtml || '<p>Kein Snapshot verfügbar</p>');
@@ -110,20 +78,18 @@ class SpyReportPage {
     }
 
     _renderBranchBadge() {
-        const b = (this.branch || 'main').toLowerCase();
+        const b = 'main';
         const badge = document.getElementById('branch-badge');
         if (!badge) return;
-        badge.textContent = b.toUpperCase();
+        badge.textContent = 'MAIN';
         badge.classList.remove('branch-main', 'branch-testarea');
-        badge.classList.add(b === 'testarea' ? 'branch-testarea' : 'branch-main');
+        badge.classList.add('branch-main');
     }
 
     _setBackLink() {
         const link = document.getElementById('back-to-db');
         if (link) {
-            const params = new URLSearchParams(window.location.search);
-            const b = params.get('branch') || this.branch || 'main';
-            link.href = `spy-database.html?branch=${encodeURIComponent(b)}`;
+            link.href = `spy-database.html`;
         }
     }
 

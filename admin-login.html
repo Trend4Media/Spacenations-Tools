@@ -66,12 +66,9 @@
                 if (data && (data.isSuperAdmin === true)) {
                     return true;
                 }
-                // Direct reject and sign out
                 await window.AuthAPI.logout();
                 throw new Error('Kein Super-Admin. Zugriff verweigert.');
-            } catch (e) {
-                throw e;
-            }
+            } catch (e) { throw e; }
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -107,6 +104,5 @@
     </script>
     <script src="js/global-footer-loader.js"></script>
 </body>
-<!-- Ende Admin Login -->
 </html>
 

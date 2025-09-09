@@ -6,10 +6,6 @@
     <title>Space Nations Kampfbericht Rechner</title>
     <!-- Gemeinsame Theme-Variablen -->
     <link rel="stylesheet" href="css/theme-variables.css">
-    <!-- Fonts im Stil des neuen Designs -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* Calculator-spezifische Variablen */
         :root {
@@ -230,38 +226,23 @@
         }
         
         body {
-            font-family: 'Rajdhani', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+            font-family: Arial, sans-serif;
             background: var(--bg-gradient);
             color: var(--text-primary);
             min-height: 100vh;
             padding: 20px;
             transition: all 0.3s ease;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        /* Cyber-Grid Overlay im Stil des neuen Designs */
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            background-image:
-                linear-gradient(rgba(0, 255, 255, 0.08) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 255, 0.08) 1px, transparent 1px);
-            background-size: 50px 50px;
-            opacity: 0.25;
         }
         
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background: color-mix(in oklab, var(--bg-panel) 85%, transparent);
-            border: 1px solid color-mix(in oklab, var(--border-primary) 50%, transparent);
-            border-radius: 14px;
-            padding: 24px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px rgba(255,255,255,0.1);
-            backdrop-filter: blur(18px);
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 20px var(--border-shadow);
+            backdrop-filter: blur(10px);
             transition: all 0.3s ease;
         }
         
@@ -320,11 +301,10 @@
         }
         
         .spacenations {
-            font-family: 'Orbitron', monospace;
-            font-size: 2.6rem;
-            font-weight: 700;
+            font-size: 2.5rem;
+            font-weight: bold;
             color: #ff8c42;
-            text-shadow: 0 0 10px rgba(255, 140, 66, 0.55);
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
             letter-spacing: 2px;
             margin: 0;
             line-height: 1;
@@ -345,11 +325,10 @@
         }
         
         .input-box {
-            background: color-mix(in oklab, var(--bg-panel) 90%, transparent);
-            border: 1px solid color-mix(in oklab, var(--border-primary) 50%, transparent);
-            border-radius: 12px;
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
+            border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.25);
             transition: all 0.3s ease;
         }
         
@@ -400,12 +379,10 @@
         }
         
         .input-box h2 {
-            font-family: 'Orbitron', monospace;
-            color: #22d3ee;
+            color: #4a90e2;
             margin-bottom: 15px;
             text-align: center;
-            text-shadow: 0 0 6px rgba(34, 211, 238, 0.5);
-            letter-spacing: 0.5px;
+            text-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
         }
         
         .input-box.destroyed h2 {
@@ -448,38 +425,33 @@
         .button-section {
             display: flex;
             justify-content: center;
-            gap: 16px;
+            gap: 20px;
             margin-bottom: 30px;
         }
         
         button {
-            background: linear-gradient(135deg, #06b6d4, #22d3ee);
-            border: 1px solid rgba(34, 211, 238, 0.5);
+            background: linear-gradient(45deg, #3a5998, #4a90e2);
+            border: none;
             color: white;
-            padding: 12px 28px;
-            border-radius: 10px;
+            padding: 12px 30px;
+            border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
-            font-weight: 700;
-            transition: all 0.25s ease;
-            box-shadow: 0 10px 25px rgba(34, 211, 238, 0.25);
+            font-weight: bold;
+            transition: all 0.3s ease;
         }
         
         button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(34, 211, 238, 0.35);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
         }
         
         .calculate-btn {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            border-color: rgba(34, 197, 94, 0.5);
-            box-shadow: 0 10px 25px rgba(34, 197, 94, 0.25);
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
         }
         
         .clear-btn {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            border-color: rgba(239, 68, 68, 0.5);
-            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.25);
+            background: linear-gradient(45deg, #c0392b, #e74c3c);
         }
         
         .results {
@@ -489,20 +461,18 @@
         }
         
         .result-box {
-            background: color-mix(in oklab, var(--bg-panel) 90%, transparent);
-            border: 1px solid color-mix(in oklab, var(--border-primary) 50%, transparent);
-            border-radius: 12px;
+            background: var(--bg-panel);
+            border: 2px solid var(--border-primary);
+            border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.25);
             transition: all 0.3s ease;
         }
         
         .result-box h2 {
-            font-family: 'Orbitron', monospace;
-            color: #22d3ee;
+            color: #4a90e2;
             margin-bottom: 15px;
             text-align: center;
-            text-shadow: 0 0 6px rgba(34, 211, 238, 0.5);
+            text-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
         }
         
         .destroyed {

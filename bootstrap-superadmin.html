@@ -57,9 +57,8 @@
     <script src="js/auth-manager.js"></script>
 
     <script>
-        // Konfiguration
         const BOOTSTRAP_CODE = 'SN-BOOTSTRAP-2025-01';
-        const ALLOWED_EMAILS = ['info@trend4media.de']; // anpassbar
+        const ALLOWED_EMAILS = ['info@trend4media.de'];
 
         function show(elId, msg){ const el = document.getElementById(elId); el.textContent = msg; el.style.display = 'block'; }
         function hideAll(){ ['msg-ok','msg-err','msg-info'].forEach(id => document.getElementById(id).style.display='none'); }

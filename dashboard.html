@@ -1016,10 +1016,11 @@
             </li>
             <li class="nav-item">
                 <a href="spy-database.html" class="nav-link">
-                    <span class="nav-icon">🕵️</span>
+                    <span class="nav-icon">📡</span>
                     Spionage-Datenbank
                 </a>
             </li>
+            
         </ul>
     </nav>
     
@@ -1228,9 +1229,36 @@
     </footer>
 
     <!-- Firebase SDK - MUSS ZUERST geladen werden -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" onerror="handleFirebaseError('app')"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js" onerror="handleFirebaseError('auth')"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js" onerror="handleFirebaseError('firestore')"></script>
+    
+    <script>
+        // Firebase Error Handling
+        let firebaseErrors = [];
+        function handleFirebaseError(module) {
+            console.error(`❌ Firebase ${module} konnte nicht geladen werden`);
+            firebaseErrors.push(module);
+            
+            // Fallback für lokale Entwicklung
+            if (firebaseErrors.length >= 3) {
+                console.warn('🔄 Firebase CDN nicht verfügbar - Fallback-Modus aktiviert');
+                showFirebaseErrorMessage();
+            }
+        }
+        
+        function showFirebaseErrorMessage() {
+            const errorDiv = document.createElement('div');
+            errorDiv.innerHTML = `
+                <div style="position: fixed; top: 20px; left: 20px; right: 20px; background: rgba(255, 0, 0, 0.9); color: white; padding: 15px; border-radius: 8px; z-index: 10000; text-align: center;">
+                    <h3>⚠️ Verbindungsproblem</h3>
+                    <p>Firebase-Dienste sind nicht verfügbar. Login-Funktionen sind eingeschränkt.</p>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background: white; color: red; border: none; padding: 5px 15px; border-radius: 4px; cursor: pointer;">OK</button>
+                </div>
+            `;
+            document.body.appendChild(errorDiv);
+        }
+    </script>
 
     <!-- Modulare JavaScript-Dateien in der richtigen Reihenfolge -->
     <script src="js/firebase-config.js"></script>        <!-- 1. Firebase-Konfiguration -->
@@ -1724,84 +1752,5 @@
     </script>
     <script src="js/calculator-data.js"></script>
     <script src="js/raid-data-manager.js"></script>
-    <script>
-// Sabo-Counter Links automatisch reparieren
-function fixSaboCounterLinks() {
-    const brokenSaboLinks = document.querySelectorAll('a[onclick*="Sabo-Counter"]');
-    
-    brokenSaboLinks.forEach(link => {
-        link.href = 'dashboard-sabo-counter.html';
-        link.removeAttribute('onclick');
-        link.classList.remove('coming-soon-link');
-        
-        const icon = link.querySelector('.nav-icon, .action-icon');
-        if (icon) icon.textContent = '💥💾';
-        
-        console.log('✅ Sabo-Counter Link repariert');
-    });
-}
-
-<script>
-// Sabo-Counter Links automatisch reparieren
-function fixSaboCounterLinks() {
-    const brokenSaboLinks = document.querySelectorAll('a[onclick*="Sabo-Counter"]');
-    
-    brokenSaboLinks.forEach(link => {
-        link.href = 'dashboard-sabo-counter.html';
-        link.removeAttribute('onclick');
-        link.classList.remove('coming-soon-link');
-        
-        const icon = link.querySelector('.nav-icon, .action-icon');
-        if (icon) icon.textContent = '💥💾';
-        
-        console.log('✅ Sabo-Counter Link repariert');
-    });
-}
-
-// Fix beim Laden ausführen
-document.addEventListener('DOMContentLoaded', fixSaboCounterLinks);
-setTimeout(fixSaboCounterLinks, 1000);
-</script>
-    <script>
-// NOTFALL-REPARATUR für Sabo-Counter Button
-function emergencyFixSaboButton() {
-    console.log('🚨 EMERGENCY: Repariere Sabo-Counter Button...');
-    
-    // Alle defekten Sabo-Links finden und reparieren
-    document.querySelectorAll('a').forEach(link => {
-        const text = link.textContent || '';
-        const onclick = link.getAttribute('onclick') || '';
-        
-        if ((text.includes('Sabo') || text.includes('💥')) && 
-            (onclick.includes('showPremiumFeature') || link.href.includes('#'))) {
-            
-            console.log('🔧 Repariere Sabo-Link:', link);
-            
-            // Link komplett überschreiben
-            link.href = 'dashboard-sabo-counter.html';
-            link.removeAttribute('onclick');
-            link.onclick = null;
-            
-            // Neuen Click-Handler setzen
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                console.log('🚀 Navigiere zu Sabo-Counter Dashboard');
-                window.location.href = 'dashboard-sabo-counter.html';
-            });
-            
-            // Icon aktualisieren
-            const icon = link.querySelector('.nav-icon, .action-icon');
-            if (icon) icon.textContent = '💥💾';
-            
-            console.log('✅ Sabo-Link repariert!');
-        }
-    });
-}
-
-// Sofort ausführen
-emergencyFixSaboButton();
-setTimeout(emergencyFixSaboButton, 1000);
-setTimeout(emergencyFixSaboButton, 3000);
-</script>
 </body>
 </html>
