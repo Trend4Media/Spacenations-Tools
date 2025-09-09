@@ -497,14 +497,17 @@
 
         <!-- Battle Calculator -->
         <div class="battle-calculator">
-            <div class="calculator-tabs">
-                <button class="calc-tab active" onclick="switchCalculatorTab('forward')">
-                    ⚔️ Stabilitätsverlust
-                </button>
-                <button class="calc-tab" onclick="switchCalculatorTab('reverse')">
-                    🎯 Benötigte Angriffspunkte
-                </button>
-            </div>
+                <div class="calculator-tabs">
+                    <button class="calc-tab active" onclick="switchCalculatorTab('forward')">
+                        ⚔️ Stabilitätsverlust
+                    </button>
+                    <button class="calc-tab" onclick="switchCalculatorTab('reverse')">
+                        🎯 Benötigte Angriffspunkte
+                    </button>
+                    <button class="calc-tab" onclick="switchCalculatorTab('fromLoss')">
+                        🔍 Angriff aus Verlusten
+                    </button>
+                </div>
 
             <!-- Vorwärtsrechnung: Stabilitätsverlust -->
             <div id="forward-calc" class="calc-panel active">
@@ -552,6 +555,29 @@
                 <div id="reverse-result" class="calc-result"></div>
             </div>
 
+            <!-- Rückwärtsrechnung aus Verlusten -->
+            <div id="fromLoss-calc" class="calc-panel">
+                <h3>🔍 Welcher Angriff war für bekannte Verluste nötig?</h3>
+                <div class="calc-inputs">
+                    <div class="input-group">
+                        <label>Tatsächlich verlorene Stabilität:</label>
+                        <input type="number" id="fromLoss-stability" placeholder="z.B. 7584967" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label>Kampfdauer (Sekunden):</label>
+                        <input type="number" id="fromLoss-duration" placeholder="z.B. 77" min="1" max="100">
+                    </div>
+                    <div class="input-group">
+                        <label>Panzerung des Ziels (optional):</label>
+                        <input type="number" id="fromLoss-armor" placeholder="z.B. 0" min="0" value="0">
+                    </div>
+                </div>
+                <button class="calc-button" onclick="calculateFromLoss()">
+                    🧮 Angriff berechnen
+                </button>
+                <div id="fromLoss-result" class="calc-result"></div>
+            </div>
+
             <!-- Beispiele -->
             <div class="calc-examples">
                 <h4>💡 Beispiele zum Ausprobieren</h4>
@@ -563,7 +589,7 @@
                         📝 Beispiel 2: 832k Stabilität
                     </button>
                     <button class="example-btn" onclick="loadExample(3)">
-                        📝 Test: 25k AS vs 3k Panzer
+                        📝 Beispiel 3: 7.5M Verlust in 77s
                     </button>
                 </div>
             </div>
@@ -737,6 +763,51 @@
             showResult('reverse-result', resultHtml);
         }
 
+        function calculateFromLoss() {
+            if (!battleCalc) {
+                showResult('fromLoss-result', '❌ Kampfrechner noch nicht geladen. Bitte versuchen Sie es erneut.', true);
+                return;
+            }
+
+            const actualLoss = parseFloat(document.getElementById('fromLoss-stability').value);
+            const duration = parseFloat(document.getElementById('fromLoss-duration').value);
+            const armor = parseFloat(document.getElementById('fromLoss-armor').value) || 0;
+
+            const validation = battleCalc.validateInputs({ 
+                'Verlorene Stabilität': actualLoss, 
+                'Kampfdauer': duration 
+            });
+
+            if (!validation.isValid) {
+                showResult('fromLoss-result', '❌ ' + validation.errors.join('<br>❌ '), true);
+                return;
+            }
+
+            if (duration > 100) {
+                showResult('fromLoss-result', '❌ Kampfdauer darf nicht größer als 100 Sekunden sein.', true);
+                return;
+            }
+
+            const requiredAttack = battleCalc.requiredAttackFromLoss(actualLoss, duration, armor);
+            const effectiveAttack = requiredAttack - armor;
+
+            let resultHtml = `
+                <div class="result-main">
+                    🔍 <strong>Benötigte Angriffspunkte: ${battleCalc.formatNumber(requiredAttack, 0)}</strong>
+                </div>
+                <div class="result-breakdown">
+                    <strong>🔍 Detaillierte Berechnung:</strong><br>
+                    • Tatsächlich verlorene Stabilität: ${battleCalc.formatNumber(actualLoss, 0)}<br>
+                    • Kampfdauer: ${duration} Sekunden<br>
+                    • Panzerung des Ziels: ${battleCalc.formatNumber(armor, 0)}<br>
+                    • Effektiver Angriff: ${battleCalc.formatNumber(effectiveAttack, 0)}<br><br>
+                    <strong>📐 Formel:</strong> (${battleCalc.formatNumber(actualLoss, 0)} × 100 ÷ ${duration}) + ${battleCalc.formatNumber(armor, 0)} = ${battleCalc.formatNumber(requiredAttack, 0)}
+                </div>
+            `;
+
+            showResult('fromLoss-result', resultHtml);
+        }
+
         function loadExample(exampleNumber) {
             hideAllResults();
 
@@ -765,16 +836,17 @@
                 setTimeout(() => calculateReverse(), 300);
 
             } else if (exampleNumber === 3) {
-                // Beispiel 3: 25.000 AS gegen 3.241 Panzer für 78 Sekunden
-                document.getElementById('forward-attack').value = '25000';
-                document.getElementById('forward-armor').value = '3241';
-                document.getElementById('forward-duration').value = '78';
+                // Beispiel 3: 7.584.967 Stabilität verloren in 77 Sekunden - Ihr Beispiel
+                document.getElementById('fromLoss-stability').value = '7584967';
+                document.getElementById('fromLoss-duration').value = '77';
+                document.getElementById('fromLoss-armor').value = '0';
                 
-                switchCalculatorTab('forward');
-                document.querySelectorAll('.calc-tab')[0].classList.add('active');
+                switchCalculatorTab('fromLoss');
+                document.querySelectorAll('.calc-tab')[2].classList.add('active');
+                document.querySelectorAll('.calc-tab')[0].classList.remove('active');
                 document.querySelectorAll('.calc-tab')[1].classList.remove('active');
                 
-                setTimeout(() => calculateForward(), 300);
+                setTimeout(() => calculateFromLoss(), 300);
             }
         }
 
