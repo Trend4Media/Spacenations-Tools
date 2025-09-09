@@ -295,7 +295,11 @@
         }
 
         .calc-button {
-            width: 100%;
+            display: block;
+            margin: 0 auto 25px auto;
+            width: auto;
+            min-width: 300px;
+            max-width: 400px;
             background: linear-gradient(135deg, var(--battle-secondary), #3a5998);
             color: white;
             border: none;
@@ -305,7 +309,6 @@
             font-size: 1.2rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-bottom: 25px;
             font-family: 'Orbitron', monospace;
             letter-spacing: 1px;
             text-transform: uppercase;
@@ -511,7 +514,7 @@
                 <h3>🎯 Wie viele Angriffspunkte werden benötigt?</h3>
                 <div class="calc-inputs">
                     <div class="input-group">
-                        <label>Gewünschter Stabilitätsverlust:</label>
+                        <label>Stabilitätsverlust:</label>
                         <input type="number" id="reverse-stability" placeholder="z.B. 156897" min="0">
                     </div>
                     <div class="input-group">
@@ -689,10 +692,13 @@
         }
 
         function calculateReverse() {
+            console.log('🧮 calculateReverse() aufgerufen');
             if (!battleCalc) {
+                console.error('❌ battleCalc ist nicht initialisiert');
                 showResult('reverse-result', '❌ Kampfrechner noch nicht geladen. Bitte versuchen Sie es erneut.', true);
                 return;
             }
+            console.log('✅ battleCalc ist verfügbar');
 
             const stability = parseFloat(document.getElementById('reverse-stability').value);
             const armor = parseFloat(document.getElementById('reverse-armor').value);
@@ -723,7 +729,7 @@
                 </div>
                 <div class="result-breakdown">
                     <strong>🔍 Detaillierte Berechnung:</strong><br>
-                    • Gewünschter Stabilitätsverlust: ${battleCalc.formatNumber(stability, 0)}<br>
+                    • Stabilitätsverlust: ${battleCalc.formatNumber(stability, 0)}<br>
                     • Panzerung des Ziels: ${battleCalc.formatNumber(armor, 0)}<br>
                     • Kampfdauer: ${duration} Sekunden<br>
                     • Effektiver Angriff benötigt: ${battleCalc.formatNumber(effectiveAttack, 0)}<br><br>
@@ -736,6 +742,7 @@
 
 
         function loadExample(exampleNumber) {
+            console.log('📝 loadExample() aufgerufen mit Nummer:', exampleNumber);
             hideAllResults();
 
             if (exampleNumber === 1) {
@@ -744,7 +751,12 @@
                 document.getElementById('reverse-armor').value = '3241';
                 document.getElementById('reverse-duration').value = '78';
                 
-                // Tab 1 (AS Ermitteln) ist bereits aktiv
+                // Stelle sicher, dass AS Ermitteln Tab aktiv ist
+                document.querySelectorAll('.calc-tab').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.calc-panel').forEach(panel => panel.classList.remove('active'));
+                document.querySelectorAll('.calc-tab')[0].classList.add('active');
+                document.getElementById('reverse-calc').classList.add('active');
+                
                 setTimeout(() => calculateReverse(), 300);
                 
             } else if (exampleNumber === 2) {
@@ -753,9 +765,14 @@
                 document.getElementById('reverse-armor').value = '12324';
                 document.getElementById('reverse-duration').value = '100';
                 
-                // Tab 1 (AS Ermitteln) ist bereits aktiv
+                // Stelle sicher, dass AS Ermitteln Tab aktiv ist  
+                document.querySelectorAll('.calc-tab').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.calc-panel').forEach(panel => panel.classList.remove('active'));
+                document.querySelectorAll('.calc-tab')[0].classList.add('active');
+                document.getElementById('reverse-calc').classList.add('active');
+                
                 setTimeout(() => calculateReverse(), 300);
-
+            }
         }
 
         // Initialize on page load
