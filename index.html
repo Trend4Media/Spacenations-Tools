@@ -658,7 +658,9 @@
         }
         
         function showToolMessage(toolName) {
-            alert(toolName + ' ist derzeit nicht verfügbar.');
+            // Diese Funktion sollte nicht mehr aufgerufen werden, da Counter-Links aktiv sind
+            console.log('showToolMessage wurde aufgerufen für:', toolName);
+            return false;
         }
 
         // Sidebar toggle for mobile
