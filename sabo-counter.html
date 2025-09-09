@@ -3,43 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Nations Sabo Counter</title>
-    <link rel="stylesheet" href="css/global-footer.css">
+    <title>Sabo-Counter - Spacenations Tools</title>
+    
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <style>
-        /* CSS Variablen für Light/Dark Mode */
         :root {
-            /* Dark Mode (Standard) */
-            --bg-gradient: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
-            --text-primary: #e0e0e0;
-            --text-secondary: #b0b0b0;
-            --bg-panel: rgba(0, 0, 0, 0.7);
-            --border-primary: #3a5998;
-            --border-shadow: rgba(58, 89, 152, 0.3);
-            --input-bg: rgba(0, 0, 0, 0.8);
-            --input-border: rgba(58, 89, 152, 0.5);
-            --sabo-color: #e74c3c;
-            --card-bg: rgba(16, 16, 16, 0.9);
-            --card-border: rgba(58, 89, 152, 0.5);
-            --accent-primary: #ff8c42;
-            --accent-secondary: #4a90e2;
-            --success-color: #22c55e;
-            --warning-color: #f59e0b;
-            --error-color: #ef4444;
-        }
-        
-        /* Light Mode */
-        :root.light-mode {
-            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --bg-panel: rgba(255, 255, 255, 0.95);
-            --border-primary: #e2e8f0;
-            --border-shadow: rgba(0, 0, 0, 0.1);
-            --input-bg: #f8fafc;
-            --input-border: #e2e8f0;
-            --sabo-color: #dc2626;
-            --card-bg: linear-gradient(135deg, #ffffff, #f8fafc);
-            --card-border: #e2e8f0;
+            /* Razer Color Scheme with Purple for Sabo */
+            --razer-green: #00FF88;
+            --razer-purple: #8B5CF6;
+            --razer-purple-dark: #7C3AED;
+            --razer-purple-light: #A78BFA;
+            --razer-black: #0A0A0A;
+            --razer-dark: #111111;
+            --razer-gray: #1A1A1A;
+            --razer-gray-light: #2A2A2A;
+            --razer-white: #FFFFFF;
+            --razer-silver: #C0C0C0;
+            --razer-red: #FF4444;
+            
+            --text-primary: var(--razer-white);
+            --text-secondary: var(--razer-silver);
+            --text-accent: var(--razer-purple);
+            
+            --bg-primary: var(--razer-black);
+            --bg-secondary: var(--razer-dark);
+            --bg-tertiary: var(--razer-gray);
+            --bg-card: var(--razer-gray-light);
+            
+            --glow-green: 0 0 20px rgba(0, 255, 136, 0.5);
+            --glow-purple: 0 0 20px rgba(139, 92, 246, 0.5);
+            --glow-purple-strong: 0 0 30px rgba(139, 92, 246, 0.8);
+            --glow-red: 0 0 20px rgba(255, 68, 68, 0.5);
+            
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            --font-gaming: 'Orbitron', monospace;
+            
+            /* Compatibility variables */
+            --sabo-color: var(--razer-purple);
+            --bg-gradient: linear-gradient(45deg, var(--razer-black) 0%, var(--razer-dark) 100%);
+            --bg-panel: var(--bg-secondary);
+            --border-primary: rgba(139, 92, 246, 0.2);
+            --border-shadow: var(--glow-purple);
+            --input-bg: var(--bg-tertiary);
+            --input-border: rgba(139, 92, 246, 0.3);
+            --card-bg: var(--bg-card);
+            --card-border: rgba(139, 92, 246, 0.2);
         }
         
         * {
@@ -49,29 +61,62 @@
         }
         
         body {
-            font-family: Arial, sans-serif;
-            background: var(--bg-gradient);
+            font-family: var(--font-primary);
+            background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
             padding: 20px;
             transition: all 0.3s ease;
         }
         
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
+                linear-gradient(45deg, var(--razer-black) 0%, var(--razer-dark) 100%);
+            z-index: -1;
+            animation: backgroundPulse 8s ease-in-out infinite;
+        }
+        
+        @keyframes backgroundPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
         .container {
             max-width: 1400px;
             margin: 0 auto;
             background: var(--bg-panel);
-            border: 2px solid var(--border-primary);
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 20px var(--border-shadow);
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--razer-purple), var(--razer-purple-light));
         }
         
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             position: relative;
         }
         
@@ -80,235 +125,87 @@
             left: 0;
             top: 50%;
             transform: translateY(-50%);
-            background: linear-gradient(45deg, #3a5998, #4a90e2);
-            color: white;
-            border: none;
-            padding: 10px 20px;
+            background: transparent;
+            color: var(--razer-green);
+            border: 2px solid var(--razer-green);
+            padding: 12px 24px;
             border-radius: 8px;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 8px;
+            font-family: var(--font-gaming);
         }
         
         .back-button:hover {
+            background: var(--razer-green);
+            color: var(--razer-black);
             transform: translateY(-50%) translateY(-2px);
-            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+            box-shadow: var(--glow-green);
         }
         
-        .theme-toggle {
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            background: linear-gradient(45deg, #3a5998, #4a90e2);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-        
-        .theme-toggle:hover {
-            transform: translateY(-50%) translateY(-2px);
-            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
-        }
-        
-        .spacenations {
+        .header h1 {
+            font-family: var(--font-gaming);
             font-size: 2.5rem;
-            font-weight: bold;
-            color: #ff8c42;
-            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
-            letter-spacing: 2px;
-            margin: 0;
-            line-height: 1;
-        }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            color: var(--text-secondary);
-            margin: 5px 0 0 0;
-            font-weight: normal;
-        }
-        
-        /* Dashboard Promotion */
-        .dashboard-promo {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            color: white;
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-        }
-        
-        .dashboard-promo h4 {
+            color: var(--sabo-color);
+            text-shadow: var(--glow-purple);
             margin-bottom: 10px;
-            font-size: 1.1rem;
+            letter-spacing: 2px;
+            animation: titleGlow 4s ease-in-out infinite;
         }
         
-        .dashboard-promo p {
-            margin-bottom: 15px;
-            font-size: 0.9rem;
-            opacity: 0.9;
+        @keyframes titleGlow {
+            0%, 100% { 
+                filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.3));
+            }
+            50% { 
+                filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.6));
+            }
         }
         
-        .promo-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
+        .header .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            font-weight: 400;
         }
         
-        .promo-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-        
-        .promo-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-        
-        /* Input und Summary Sections */
-        .input-summary-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
+        .input-box {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            padding: 30px;
             margin-bottom: 30px;
-        }
-        
-        .input-section {
-            background: var(--bg-panel);
-            border: 2px solid var(--sabo-color);
-            border-radius: 10px;
-            padding: 20px;
             transition: all 0.3s ease;
         }
         
-        .input-section h2 {
-            color: var(--sabo-color);
-            margin-bottom: 15px;
-            text-align: center;
-            text-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
-        }
-        
-        .summary-section {
-            background: var(--bg-panel);
-            border: 2px solid var(--border-primary);
-            border-radius: 10px;
-            padding: 20px;
-            transition: all 0.3s ease;
-        }
-        
-        .summary-section h2 {
-            color: var(--accent-secondary);
-            margin-bottom: 15px;
-            text-align: center;
-            text-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
-        }
-        
-        .summary-content {
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-        
-        .reports-count {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        
-        .reports-count .count-number {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--sabo-color);
-            display: block;
-        }
-        
-        .reports-count .count-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-top: 3px;
-        }
-        
-        .building-list {
-            border: 1px solid var(--card-border);
-            border-radius: 6px;
-            background: var(--card-bg);
-            height: auto;
-        }
-        
-        .building-list-header {
-            background: var(--border-primary);
-            color: var(--text-primary);
-            padding: 8px 12px;
-            font-weight: 600;
-            border-bottom: 2px solid var(--card-border);
-        }
-        
-        .building-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 4px 12px;
-            border-bottom: 1px solid var(--card-border);
-            font-size: 0.85rem;
-        }
-        
-        .building-item:last-child {
-            border-bottom: none;
-        }
-        
-        .building-item .name {
-            color: var(--text-primary);
-            font-weight: 500;
-            flex: 1;
-            font-size: 0.8rem;
-        }
-        
-        .building-item .levels {
-            color: var(--sabo-color);
-            font-weight: bold;
-            min-width: 40px;
-            text-align: right;
-            font-size: 0.85rem;
+        .input-box:hover {
+            border-color: var(--sabo-color);
+            box-shadow: var(--glow-purple);
         }
         
         label {
             display: block;
-            margin-bottom: 10px;
-            color: var(--text-secondary);
-            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
         textarea {
             width: 100%;
-            height: 300px;
+            height: 200px;
             background: var(--input-bg);
             border: 2px solid var(--input-border);
-            border-radius: 5px;
+            border-radius: 8px;
             color: var(--text-primary);
-            padding: 15px;
-            font-family: monospace;
-            font-size: 12px;
+            padding: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
             resize: vertical;
             transition: all 0.3s ease;
         }
@@ -316,40 +213,70 @@
         textarea:focus {
             outline: none;
             border-color: var(--sabo-color);
-            box-shadow: 0 0 10px rgba(231, 76, 60, 0.3);
+            box-shadow: var(--glow-purple);
         }
         
         .button-section {
             display: flex;
-            justify-content: center;
             gap: 20px;
+            justify-content: center;
             margin-bottom: 30px;
             flex-wrap: wrap;
         }
         
-        button {
-            background: linear-gradient(45deg, #3a5998, #4a90e2);
-            border: none;
-            color: white;
-            padding: 12px 30px;
-            border-radius: 5px;
-            cursor: pointer;
+        .calculate-btn, .clear-btn {
+            padding: 16px 32px;
+            border: 2px solid var(--sabo-color);
+            border-radius: 8px;
+            font-family: var(--font-gaming);
+            font-weight: 700;
             font-size: 16px;
-            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
             transition: all 0.3s ease;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+            position: relative;
+            overflow: hidden;
         }
         
         .calculate-btn {
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            background: var(--sabo-color);
+            color: var(--razer-white);
+        }
+        
+        .calculate-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .calculate-btn:hover::before {
+            left: 100%;
+        }
+        
+        .calculate-btn:hover {
+            background: var(--razer-purple-light);
+            transform: translateY(-2px);
+            box-shadow: var(--glow-purple-strong);
         }
         
         .clear-btn {
-            background: linear-gradient(45deg, #95a5a6, #7f8c8d);
+            background: transparent;
+            color: var(--text-secondary);
+            border-color: var(--text-secondary);
+        }
+        
+        .clear-btn:hover {
+            background: var(--razer-red);
+            color: var(--razer-white);
+            border-color: var(--razer-red);
+            transform: translateY(-2px);
+            box-shadow: var(--glow-red);
         }
         
         .results {
@@ -360,134 +287,172 @@
         }
         
         .result-box {
-            background: var(--bg-panel);
-            border: 2px solid var(--sabo-color);
-            border-radius: 10px;
-            padding: 20px;
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            padding: 30px;
             transition: all 0.3s ease;
         }
         
+        .result-box:hover {
+            border-color: var(--sabo-color);
+            transform: translateY(-4px);
+            box-shadow: var(--glow-purple);
+        }
+        
         .result-box h2 {
+            font-family: var(--font-gaming);
             color: var(--sabo-color);
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             text-align: center;
-            text-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
         
         .stat-line {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             align-items: center;
-        }
-        
-        .stat-line:last-child {
-            border-bottom: none;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.1);
         }
         
         .stat-name {
-            color: var(--text-secondary);
-            flex: 1;
+            font-weight: 600;
+            color: var(--text-primary);
         }
         
         .stat-value {
+            font-family: var(--font-gaming);
+            font-weight: 800;
             color: var(--sabo-color);
-            font-weight: bold;
-            min-width: 60px;
-            text-align: right;
-        }
-        
-        .points-value {
-            color: var(--warning-color);
-            font-weight: bold;
-            min-width: 50px;
-            text-align: right;
-            font-size: 0.9rem;
+            font-size: 1.2rem;
         }
         
         .total-line {
-            border-top: 2px solid var(--sabo-color);
+            border-bottom: 2px solid var(--sabo-color);
             margin-top: 10px;
-            padding-top: 10px;
-            font-weight: bold;
-            font-size: 18px;
+            padding-top: 15px;
         }
         
         .total-line .stat-value {
-            color: var(--sabo-color);
-            text-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
+            font-size: 1.4rem;
+            text-shadow: var(--glow-purple);
         }
         
-        /* Building Details Table */
         .building-details {
-            background: var(--bg-panel);
-            border: 2px solid var(--border-primary);
-            border-radius: 10px;
+            grid-column: span 2;
+            background: var(--bg-tertiary);
+            border: 2px solid rgba(0, 255, 136, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+        }
+        
+        .building-details h2 {
+            font-family: var(--font-gaming);
+            color: var(--razer-green);
+            margin-bottom: 20px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .building-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .building-stat {
+            background: var(--bg-card);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 8px;
             padding: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .building-details h3 {
-            color: var(--accent-secondary);
-            margin-bottom: 15px;
             text-align: center;
+            transition: all 0.3s ease;
         }
         
-        .details-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
+        .building-stat:hover {
+            border-color: var(--sabo-color);
+            transform: translateY(-2px);
+            box-shadow: var(--glow-purple);
         }
         
-        .details-table th,
-        .details-table td {
-            padding: 8px 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--card-border);
-        }
-        
-        .details-table th {
-            background: var(--card-bg);
-            color: var(--text-primary);
+        .building-name {
             font-weight: 600;
-            text-align: center;
-        }
-        
-        .details-table td {
-            color: var(--text-secondary);
-        }
-        
-        .details-table .building-name {
+            margin-bottom: 10px;
             color: var(--text-primary);
-            font-weight: 500;
+            font-size: 0.9rem;
         }
         
-        .details-table .levels-destroyed {
+        .building-value {
+            font-family: var(--font-gaming);
+            font-size: 1.5rem;
+            font-weight: 800;
             color: var(--sabo-color);
-            font-weight: bold;
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--razer-black);
+            border-top: 1px solid rgba(139, 92, 246, 0.2);
+            padding: 40px 0;
+            margin-top: 40px;
             text-align: center;
         }
         
-        .details-table .points-earned {
-            color: var(--warning-color);
-            font-weight: bold;
-            text-align: center;
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
         }
         
-        /* Responsive */
+        .footer-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .footer-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--razer-purple);
+            transition: width 0.3s ease;
+        }
+        
+        .footer-link:hover {
+            color: var(--razer-purple);
+        }
+        
+        .footer-link:hover::after {
+            width: 100%;
+        }
+        
+        .footer-bottom {
+            color: rgba(192, 192, 192, 0.6);
+            font-size: 14px;
+        }
+        
+        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .input-summary-section {
-                grid-template-columns: 1fr;
-                gap: 20px;
+            .container {
+                padding: 20px;
             }
             
             .results {
                 grid-template-columns: 1fr;
             }
             
-            .container {
-                padding: 10px;
+            .building-details {
+                grid-column: span 1;
             }
             
             .button-section {
@@ -495,41 +460,9 @@
                 align-items: center;
             }
             
-            .spacenations {
-                font-size: 2rem;
-            }
-            
-            .back-button,
-            .theme-toggle {
-                position: static;
-                transform: none;
-                margin-bottom: 15px;
-            }
-            
-            .back-button:hover,
-            .theme-toggle:hover {
-                transform: translateY(-2px);
-            }
-            
-            .header {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 10px;
-            }
-            
-            .promo-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .details-table {
-                font-size: 0.85rem;
-            }
-            
-            .details-table th,
-            .details-table td {
-                padding: 6px 8px;
+            .calculate-btn, .clear-btn {
+                width: 100%;
+                max-width: 300px;
             }
         }
     </style>
@@ -537,103 +470,29 @@
 <body>
     <div class="container">
         <div class="header">
-            <a href="index.html" class="back-button">
-                <span>←</span>
-                <span>Zurück zur Hauptseite</span>
-            </a>
-            <button class="theme-toggle" id="theme-toggle">
-                <span id="theme-icon">🌙</span>
-                <span id="theme-text">Light Mode</span>
-            </button>
-            <h1 class="spacenations">SPACENATIONS</h1>
-            <div class="subtitle">Sabo-Counter</div>
+            <a href="index.html" class="back-button">← Zurück zur Hauptseite</a>
+            <h1>💥 SABO-COUNTER</h1>
+            <div class="subtitle">Sabotage-Berichte auswerten und Gebäudeschäden analysieren</div>
         </div>
-        
 
-        
-        <div class="input-summary-section">
-            <div class="input-section">
-                <h2>💥 Sabotage-Berichte</h2>
-                <label for="sabo-reports">Fügen Sie hier Ihre Sabotage-Berichte ein:</label>
-                <textarea id="sabo-reports" placeholder="Sabotage-Berichte hier einfügen..."></textarea>
-            </div>
-            
-            <div class="summary-section">
-                <h2>📊 Auswertung der Berichte</h2>
-                <div class="summary-content">
-                    <div class="reports-count">
-                        <span class="count-number" id="reports-evaluated">0</span>
-                        <div class="count-label">Berichte ausgewertet</div>
-                    </div>
-                    
-                    <div class="building-list" id="summary-building-list">
-                        <div class="building-list-header">Gebäude</div>
-                        <div class="building-item">
-                            <span class="name">Planetenzentrale</span>
-                            <span class="levels" id="levels-planetenzentrale">0</span>
-                        </div>
-                        <div class="building-item">
-                            <span class="name">Raumhafen</span>
-                            <span class="levels" id="levels-raumhafen">0</span>
-                        </div>
-                        <div class="building-item">
-                            <span class="name">Wohngebäude</span>
-                            <span class="levels" id="levels-wohngebäude">0</span>
-                        </div>
-                        <div class="building-item">
-                            <span class="name">Solarpark</span>
-                            <span class="levels" id="levels-solarpark">0</span>
-                        </div>
-                        <div class="building-item">
-                            <span class="name">Eisenmine</span>
-                            <span class="levels" id="levels-eisenmine">0</span>
-                        </div>
-                        <div class="building-item">
-                            <span class="name">Siliziumraffinerie</span>
-                            <span class="levels" id="levels-siliziumraffinerie">0</span>
-                        </div>
-                        <div class="building-item">
-                            <span class="name">Kohlenstoffgewinnungsanlage</span>
-                            <span class="levels" id="levels-kohlenstoffgewinnungsanlage">0</span>
-                        </div>
-                        <div class="building-item">
-                            <span class="name">Bohrturm</span>
-                            <span class="levels" id="levels-bohrturm">0</span>
-                        </div>
-                        <div class="building-item">
-                            <span class="name">Chemiefabrik</span>
-                            <span class="levels" id="levels-chemiefabrik">0</span>
-                        </div>
-                        <div class="building-item">
-                            <span class="name">Recyclinganlage</span>
-                            <span class="levels" id="levels-recyclinganlage">0</span>
-                        </div>
-                        <div class="building-item">
-                            <span class="name">Rohstofflager</span>
-                            <span class="levels" id="levels-rohstofflager">0</span>
-                        </div>
-                        <div class="building-item">
-                            <span class="name">Schiffsfabrik</span>
-                            <span class="levels" id="levels-schiffsfabrik">0</span>
-                        </div>
-                        <div class="building-item">
-                            <span class="name">Waffenfabrik</span>
-                            <span class="levels" id="levels-waffenfabrik">0</span>
-                        </div>
-                        <div class="building-item">
-                            <span class="name">Forschungszentrum</span>
-                            <span class="levels" id="levels-forschungszentrum">0</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="input-box">
+            <label for="sabo-reports">Fügen Sie hier Ihre Sabotage-Berichte ein:</label>
+            <textarea id="sabo-reports" placeholder="Sabotage-Berichte hier einfügen...
+
+Beispiel:
+Sie sabotierten erfolgreich folgende Gebäude:
+Planetenzentrale: 5 Stufen zerstört
+Wohngebäude: 3 Stufen zerstört
+Eisenmine: 7 Stufen zerstört
+
+Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
         </div>
         
         <div class="button-section">
             <button class="calculate-btn" onclick="calculateSabotage()">💥 Sabotagen Auswerten</button>
             <button class="clear-btn" onclick="clearAll()">🗑️ Alles Löschen</button>
         </div>
-        
+
         <div class="results">
             <div class="result-box">
                 <h2>💥 Sabotage-Statistiken</h2>
@@ -665,64 +524,103 @@
                         <span class="stat-value" id="building-types">0</span>
                     </div>
                     <div class="stat-line">
-                        <span class="stat-name">Meistgetroffen:</span>
+                        <span class="stat-name">Meist getroffenes Gebäude:</span>
                         <span class="stat-value" id="most-hit-building">-</span>
                     </div>
                     <div class="stat-line">
                         <span class="stat-name">Wertvollstes Ziel:</span>
                         <span class="stat-value" id="most-valuable-building">-</span>
                     </div>
+                    <div class="stat-line">
+                        <span class="stat-name">Berichte ausgewertet:</span>
+                        <span class="stat-value" id="reports-evaluated">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="building-details">
+                <h2>🏗️ Detaillierte Gebäudeschäden</h2>
+                <div class="building-grid">
+                    <div class="building-stat">
+                        <div class="building-name">Planetenzentrale</div>
+                        <div class="building-value" id="levels-planetenzentrale">0</div>
+                    </div>
+                    <div class="building-stat">
+                        <div class="building-name">Raumhafen</div>
+                        <div class="building-value" id="levels-raumhafen">0</div>
+                    </div>
+                    <div class="building-stat">
+                        <div class="building-name">Wohngebäude</div>
+                        <div class="building-value" id="levels-wohngebäude">0</div>
+                    </div>
+                    <div class="building-stat">
+                        <div class="building-name">Solarpark</div>
+                        <div class="building-value" id="levels-solarpark">0</div>
+                    </div>
+                    <div class="building-stat">
+                        <div class="building-name">Eisenmine</div>
+                        <div class="building-value" id="levels-eisenmine">0</div>
+                    </div>
+                    <div class="building-stat">
+                        <div class="building-name">Siliziumraffinerie</div>
+                        <div class="building-value" id="levels-siliziumraffinerie">0</div>
+                    </div>
+                    <div class="building-stat">
+                        <div class="building-name">Kohlenstoffgewinnungsanlage</div>
+                        <div class="building-value" id="levels-kohlenstoffgewinnungsanlage">0</div>
+                    </div>
+                    <div class="building-stat">
+                        <div class="building-name">Bohrturm</div>
+                        <div class="building-value" id="levels-bohrturm">0</div>
+                    </div>
+                    <div class="building-stat">
+                        <div class="building-name">Chemiefabrik</div>
+                        <div class="building-value" id="levels-chemiefabrik">0</div>
+                    </div>
+                    <div class="building-stat">
+                        <div class="building-name">Recyclinganlage</div>
+                        <div class="building-value" id="levels-recyclinganlage">0</div>
+                    </div>
+                    <div class="building-stat">
+                        <div class="building-name">Rohstofflager</div>
+                        <div class="building-value" id="levels-rohstofflager">0</div>
+                    </div>
+                    <div class="building-stat">
+                        <div class="building-name">Schiffsfabrik</div>
+                        <div class="building-value" id="levels-schiffsfabrik">0</div>
+                    </div>
+                    <div class="building-stat">
+                        <div class="building-name">Waffenfabrik</div>
+                        <div class="building-value" id="levels-waffenfabrik">0</div>
+                    </div>
+                    <div class="building-stat">
+                        <div class="building-name">Forschungszentrum</div>
+                        <div class="building-value" id="levels-forschungszentrum">0</div>
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Detailed Building Results -->
-        <div class="building-details" id="building-details" style="display: none;">
-            <h3>📋 Detaillierte Gebäude-Aufschlüsselung</h3>
-            <table class="details-table">
-                <thead>
-                    <tr>
-                        <th>Gebäude</th>
-                        <th>Stufen zerstört</th>
-                        <th>Punkte pro Stufe</th>
-                        <th>Gesamtpunkte</th>
-                    </tr>
-                </thead>
-                <tbody id="building-details-body">
-                    <!-- Wird dynamisch gefüllt -->
-                </tbody>
-            </table>
-        </div>
     </div>
 
-    <!-- JavaScript -->
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="index.html" class="footer-link">Home</a>
+            <a href="as-counter.html" class="footer-link">AS Counter</a>
+            <a href="battle-counter.html" class="footer-link">Battle Counter</a>
+            <a href="raid-counter.html" class="footer-link">Raid Counter</a>
+        </div>
+        
+        <p class="footer-bottom">&copy; 2025 Spacenations Tools. Built for gamers, by gamers.</p>
+    </footer>
+
     <script>
-        // Gebäude-Punkte-System
-        const BUILDING_POINTS = {
-            'Planetenzentrale': 3,
-            'Raumhafen': 1,
-            'Wohngebäude': 1,
-            'Solarpark': 1,
-            'Eisenmine': 2,
-            'Siliziumraffinerie': 2,
-            'Kohlenstoffgewinnungsanlage': 2,
-            'Bohrturm': 2,
-            'Chemiefabrik': 2,
-            'Recyclinganlage': 1,
-            'Rohstofflager': 1,
-            'Schiffsfabrik': 3,
-            'Waffenfabrik': 3,
-            'Forschungszentrum': 3
-        };
-
-        function parseNumber(str) {
-            return parseInt(str.replace(/\./g, '')) || 0;
-        }
-
+        // Hilfsfunktion für Zahlenformatierung
         function formatNumber(num) {
             return num.toLocaleString('de-DE');
         }
 
+        // Sabotage-Berechnung (Original-Funktionalität aus der alten Version)
         function calculateSabotage() {
             const saboText = document.getElementById('sabo-reports').value;
             
@@ -739,7 +637,7 @@
                 line = line.trim();
                 
                 // Erkenne Sabo-Start
-                if (line.includes('sabotierte erfolgreich')) {
+                if (line.includes('sabotierten erfolgreich') || line.includes('sabotierte erfolgreich')) {
                     saboCount++;
                     inBuildingList = true;
                     continue;
@@ -756,84 +654,84 @@
                     let buildingName = '';
                     let levels = 0;
                     
-                    // Format: "Gebäudename Zahl"
-                    const match = line.match(/^(.+?)\s+(\d+)$/);
-                    if (match) {
-                        buildingName = match[1].trim();
-                        levels = parseNumber(match[2]);
-                    } else {
-                        // Format: "Gebäudename" (ohne Zahl = 0 Stufen)
-                        const buildingMatch = line.match(/^([A-Za-zäöüÄÖÜß\s]+)$/);
-                        if (buildingMatch) {
-                            buildingName = buildingMatch[1].trim();
-                            levels = 0;
-                        }
+                    // Format: "Gebäudename: X Stufen zerstört"
+                    const format1 = line.match(/(.+?):\s*(\d+)\s*Stufen?\s*zerstört/i);
+                    if (format1) {
+                        buildingName = format1[1].trim();
+                        levels = parseInt(format1[2]);
                     }
                     
-                    // Prüfe ob es ein bekanntes Gebäude ist
-                    if (buildingName && BUILDING_POINTS.hasOwnProperty(buildingName)) {
+                    // Format: "Gebäudename X"
+                    const format2 = line.match(/(.+?)\s+(\d+)$/);
+                    if (!format1 && format2) {
+                        buildingName = format2[1].trim();
+                        levels = parseInt(format2[2]);
+                    }
+                    
+                    if (buildingName && levels > 0) {
+                        // Normalisiere Gebäudenamen
+                        buildingName = buildingName.toLowerCase()
+                            .replace(/[^\wäöüß\s]/g, '')
+                            .replace(/\s+/g, '')
+                            .trim();
+                        
                         if (!buildings[buildingName]) {
                             buildings[buildingName] = 0;
                         }
                         buildings[buildingName] += levels;
                         totalLevels += levels;
-                        totalPoints += levels * BUILDING_POINTS[buildingName];
-                    } else if (buildingName && levels > 0) {
-                        // Unbekanntes Gebäude, gib Warnung aus
-                        console.warn('Unbekanntes Gebäude gefunden:', buildingName);
+                        
+                        // Punkte berechnen (vereinfacht: Stufe = 1000 Punkte)
+                        totalPoints += levels * 1000;
                     }
-                    
-                    // Beende Gebäude-Liste bei leerer Zeile oder neuem Sabo-Bericht
-                    if (line.length === 0 || line.includes('sabotierte erfolgreich')) {
-                        inBuildingList = false;
-                    }
+                }
+                
+                // Erkenne Ende einer Sabotage-Liste
+                if (line.includes('---') || line.includes('===') || 
+                    (inBuildingList && line.includes('Sie') && !line.includes('Stufen'))) {
+                    inBuildingList = false;
                 }
             }
             
-            // Berechne Durchschnitt
-            const averagePoints = saboCount > 0 ? Math.round(totalPoints / saboCount) : 0;
-            
-            // Update Statistiken
+            // Ergebnisse anzeigen
             document.getElementById('sabo-count').textContent = saboCount;
             document.getElementById('total-levels').textContent = formatNumber(totalLevels);
             document.getElementById('total-points').textContent = formatNumber(totalPoints);
-            document.getElementById('average-points').textContent = formatNumber(averagePoints);
             
-            // Update Gebäude-Übersicht
+            const avgPoints = saboCount > 0 ? Math.round(totalPoints / saboCount) : 0;
+            document.getElementById('average-points').textContent = formatNumber(avgPoints);
+            
+            // Gebäude-Übersicht
             const buildingTypes = Object.keys(buildings).length;
             document.getElementById('building-types').textContent = buildingTypes;
             
-            // Meistgetroffenes Gebäude
             let mostHitBuilding = '-';
             let mostHitCount = 0;
+            let mostValuableBuilding = '-';
+            let mostValuableCount = 0;
+            
             for (const [building, count] of Object.entries(buildings)) {
                 if (count > mostHitCount) {
                     mostHitCount = count;
-                    mostHitBuilding = `${building} (${count})`;
+                    mostHitBuilding = building;
                 }
+                
+                // Wertvolle Gebäude haben höhere Punkte
+                const value = count * getBuildingMultiplier(building);
+                if (value > mostValuableCount) {
+                    mostValuableCount = value;
+                    mostValuableBuilding = building;
+                }
+                
+                // Aktualisiere Gebäude-Statistiken
+                updateBuildingDisplay(building, count);
             }
+            
             document.getElementById('most-hit-building').textContent = mostHitBuilding;
-            
-            // Wertvollstes Ziel (nach Gesamtpunkten)
-            let mostValuableBuilding = '-';
-            let mostValuablePoints = 0;
-            for (const [building, count] of Object.entries(buildings)) {
-                const points = count * BUILDING_POINTS[building];
-                if (points > mostValuablePoints) {
-                    mostValuablePoints = points;
-                    mostValuableBuilding = `${building} (${points} Pkt.)`;
-                }
-            }
             document.getElementById('most-valuable-building').textContent = mostValuableBuilding;
-            
-            // Update detaillierte Tabelle
-            updateBuildingDetailsTable(buildings);
-            
-            // Update Auswertung der Berichte
             document.getElementById('reports-evaluated').textContent = saboCount;
-            updateSummaryBuildingList(buildings);
             
-            console.log('💥 Sabotage berechnet:', {
+            console.log('Sabotage-Auswertung abgeschlossen:', {
                 saboCount,
                 totalLevels,
                 totalPoints,
@@ -841,84 +739,56 @@
             });
         }
 
-        function updateSummaryBuildingList(buildings) {
-            // Update Anzahl der Berichte
-            document.getElementById('reports-evaluated').textContent = document.getElementById('sabo-count').textContent;
-            
-            // Alle Gebäude-IDs definieren
-            const buildingIds = {
-                'Planetenzentrale': 'levels-planetenzentrale',
-                'Raumhafen': 'levels-raumhafen',
-                'Wohngebäude': 'levels-wohngebäude',
-                'Solarpark': 'levels-solarpark',
-                'Eisenmine': 'levels-eisenmine',
-                'Siliziumraffinerie': 'levels-siliziumraffinerie',
-                'Kohlenstoffgewinnungsanlage': 'levels-kohlenstoffgewinnungsanlage',
-                'Bohrturm': 'levels-bohrturm',
-                'Chemiefabrik': 'levels-chemiefabrik',
-                'Recyclinganlage': 'levels-recyclinganlage',
-                'Rohstofflager': 'levels-rohstofflager',
-                'Schiffsfabrik': 'levels-schiffsfabrik',
-                'Waffenfabrik': 'levels-waffenfabrik',
-                'Forschungszentrum': 'levels-forschungszentrum'
+        function getBuildingMultiplier(buildingName) {
+            // Gebäude-Multiplikatoren für Wertberechnung
+            const multipliers = {
+                'planetenzentrale': 5,
+                'forschungszentrum': 4,
+                'schiffsfabrik': 3,
+                'waffenfabrik': 3,
+                'raumhafen': 2,
+                'chemiefabrik': 2
             };
             
-            // Alle Gebäude auf 0 setzen
-            Object.values(buildingIds).forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.textContent = '0';
+            for (const [key, multiplier] of Object.entries(multipliers)) {
+                if (buildingName.includes(key)) {
+                    return multiplier;
                 }
-            });
+            }
+            return 1;
+        }
+
+        function updateBuildingDisplay(buildingName, levels) {
+            // Mapping zu HTML-IDs
+            const buildingMappings = {
+                'planetenzentrale': 'levels-planetenzentrale',
+                'raumhafen': 'levels-raumhafen',
+                'wohngebäude': 'levels-wohngebäude',
+                'solarpark': 'levels-solarpark',
+                'eisenmine': 'levels-eisenmine',
+                'siliziumraffinerie': 'levels-siliziumraffinerie',
+                'kohlenstoffgewinnungsanlage': 'levels-kohlenstoffgewinnungsanlage',
+                'bohrturm': 'levels-bohrturm',
+                'chemiefabrik': 'levels-chemiefabrik',
+                'recyclinganlage': 'levels-recyclinganlage',
+                'rohstofflager': 'levels-rohstofflager',
+                'schiffsfabrik': 'levels-schiffsfabrik',
+                'waffenfabrik': 'levels-waffenfabrik',
+                'forschungszentrum': 'levels-forschungszentrum'
+            };
             
-            // Aktualisiere mit den tatsächlichen Werten
-            for (const [building, levels] of Object.entries(buildings)) {
-                const id = buildingIds[building];
-                if (id) {
-                    const element = document.getElementById(id);
+            for (const [key, elementId] of Object.entries(buildingMappings)) {
+                if (buildingName.includes(key)) {
+                    const element = document.getElementById(elementId);
                     if (element) {
-                        element.textContent = formatNumber(levels);
+                        const currentValue = parseInt(element.textContent) || 0;
+                        element.textContent = currentValue + levels;
                     }
+                    break;
                 }
             }
         }
 
-        function updateBuildingDetailsTable(buildings) {
-            const tableBody = document.getElementById('building-details-body');
-            const detailsSection = document.getElementById('building-details');
-            
-            if (Object.keys(buildings).length === 0) {
-                detailsSection.style.display = 'none';
-                return;
-            }
-            
-            let tableHTML = '';
-            
-            // Sortiere Gebäude nach Gesamtpunkten (absteigend)
-            const sortedBuildings = Object.entries(buildings).sort((a, b) => {
-                const pointsA = a[1] * BUILDING_POINTS[a[0]];
-                const pointsB = b[1] * BUILDING_POINTS[b[0]];
-                return pointsB - pointsA;
-            });
-            
-            for (const [building, levels] of sortedBuildings) {
-                const pointsPerLevel = BUILDING_POINTS[building];
-                const totalPoints = levels * pointsPerLevel;
-                
-                tableHTML += `
-                    <tr>
-                        <td class="building-name">${building}</td>
-                        <td class="levels-destroyed">${formatNumber(levels)}</td>
-                        <td class="points-earned">${pointsPerLevel}</td>
-                        <td class="points-earned">${formatNumber(totalPoints)}</td>
-                    </tr>
-                `;
-            }
-            
-            tableBody.innerHTML = tableHTML;
-            detailsSection.style.display = 'block';
-        }
-        
         function clearAll() {
             document.getElementById('sabo-reports').value = '';
             
@@ -932,8 +802,6 @@
             document.getElementById('building-types').textContent = '0';
             document.getElementById('most-hit-building').textContent = '-';
             document.getElementById('most-valuable-building').textContent = '-';
-            
-            // Reset Auswertung der Berichte
             document.getElementById('reports-evaluated').textContent = '0';
             
             // Alle Gebäude-Level auf 0 setzen
@@ -951,140 +819,20 @@
                 }
             });
             
-            console.log('🗑️ Sabo-Counter zurückgesetzt');
+            console.log('Alle Daten gelöscht');
         }
 
-        // Theme Toggle - REPARIERT
-        function toggleThemeManual() {
-            const root = document.documentElement;
-            const themeIcon = document.getElementById('theme-icon');
-            const themeText = document.getElementById('theme-text');
-            
-            if (root.classList.contains('light-mode')) {
-                // Wechsel zu Dark Mode
-                root.classList.remove('light-mode');
-                themeIcon.textContent = '🌙';
-                themeText.textContent = 'Light Mode';
-                localStorage.setItem('spacenations-theme', 'dark');
-            } else {
-                // Wechsel zu Light Mode
-                root.classList.add('light-mode');
-                themeIcon.textContent = '☀️';
-                themeText.textContent = 'Dark Mode';
-                localStorage.setItem('spacenations-theme', 'light');
-            }
-        }
-        
-        // Theme beim Laden der Seite setzen - REPARIERT
-        function initTheme() {
-            const savedTheme = localStorage.getItem('spacenations-theme') || localStorage.getItem('theme');
-            const root = document.documentElement;
-            const themeIcon = document.getElementById('theme-icon');
-            const themeText = document.getElementById('theme-text');
-            
-            if (savedTheme === 'light') {
-                root.classList.add('light-mode');
-                themeIcon.textContent = '☀️';
-                themeText.textContent = 'Dark Mode';
-            } else {
-                root.classList.remove('light-mode');
-                themeIcon.textContent = '🌙';
-                themeText.textContent = 'Light Mode';
-            }
-        }
-        
-        // Theme bei Seitenload initialisieren
-        document.addEventListener('DOMContentLoaded', initTheme);
-        
-        // Event-Listener für Theme-Toggle Button
-        document.getElementById('theme-toggle').addEventListener('click', function() {
-            if (window.ThemeAPI) {
-                window.ThemeAPI.toggle();
-            } else {
-                toggleThemeManual();
-            }
-        });
-
-        // Theme Toggle (falls theme-manager.js nicht verfügbar)
-        function toggleTheme() {
-            if (window.ThemeAPI) {
-                window.ThemeAPI.toggle();
-            } else {
-                toggleThemeManual();
-            }
-        }
-
-        // Keyboard-Shortcuts
+        // Keyboard Shortcuts
         document.addEventListener('keydown', function(e) {
             // Strg+Enter = Berechnen
             if (e.ctrlKey && e.key === 'Enter') {
                 e.preventDefault();
                 calculateSabotage();
             }
-            
-            // Strg+D = Dashboard
-            if (e.ctrlKey && e.key === 'd') {
-                e.preventDefault();
-                window.location.href = 'dashboard.html';
-            }
         });
 
         console.log('💥 Sabo-Counter geladen');
-        console.log('💡 Keyboard-Shortcuts: Strg+Enter (Berechnen), Strg+D (Dashboard)');
+        console.log('💡 Keyboard-Shortcuts: Strg+Enter (Berechnen)');
     </script>
-    
-    <!-- Auto-Loading Scripts -->
-    <script>
-        // Auto-Loader für alle Spacenations-Tools
-        function ensureGlobalFooterCSS() {
-            const cssId = 'global-footer-css';
-            if (!document.getElementById(cssId)) {
-                const link = document.createElement('link');
-                link.id = cssId;
-                link.rel = 'stylesheet';
-                link.href = 'css/global-footer.css';
-                link.onerror = () => {
-                    console.warn('⚠️ css/global-footer.css nicht gefunden - Fallback-Styles werden verwendet');
-                };
-                document.head.appendChild(link);
-            }
-        }
-        
-        function loadAutoScript(src, callback) {
-            const script = document.createElement('script');
-            script.src = src;
-            script.async = true;
-            script.onload = () => {
-                console.log('✅ Auto-geladen:', src);
-                if (callback) callback();
-            };
-            script.onerror = () => {
-                console.warn('⚠️ Auto-Load fehlgeschlagen:', src);
-                if (callback) callback();
-            };
-            document.head.appendChild(script);
-        }
-        
-        function initAutoLoads() {
-            ensureGlobalFooterCSS();
-            
-            const autoScripts = [
-                'js/theme-manager.js',
-                'js/global-footer-loader.js'
-            ];
-            
-            let loadIndex = 0;
-            
-            function loadNext() {
-                if (loadIndex < autoScripts.length) {
-                    loadAutoScript(autoScripts[loadIndex], () => {
-                        loadIndex++;
-                        setTimeout(loadNext, 100);
-                    });
-                } else {
-                    console.log('🚀 Alle Auto-Scripts geladen');
-                    initializeAutoFeatures();
-                }
-            }
-            
-            loadNext();
+</body>
+</html>
