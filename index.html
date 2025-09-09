@@ -562,9 +562,9 @@
                 <a href="https://spacenations.eu" target="_blank" class="btn btn-game">
                     Zum Spiel
                 </a>
-                <a href="#login" class="btn btn-login">
+                <button class="btn btn-login" onclick="showLoginMessage()">
                     Login
-                </a>
+                </button>
             </div>
             
             <button class="mobile-menu" onclick="toggleSidebar()">☰</button>
@@ -575,18 +575,18 @@
     <aside class="sidebar" id="sidebar">
         <h3 class="sidebar-title">Counter Tools</h3>
         <div class="sidebar-buttons">
-            <a href="as-counter.html" class="sidebar-btn">
+            <button class="sidebar-btn" onclick="showToolMessage('AS Counter')">
                 AS Counter
-            </a>
-            <a href="battle-counter.html" class="sidebar-btn">
+            </button>
+            <button class="sidebar-btn" onclick="showToolMessage('Battle Counter')">
                 Battle Counter
-            </a>
-            <a href="raid-counter.html" class="sidebar-btn">
+            </button>
+            <button class="sidebar-btn" onclick="showToolMessage('Raid Counter')">
                 Raid Counter
-            </a>
-            <a href="sabo-counter.html" class="sidebar-btn">
+            </button>
+            <button class="sidebar-btn" onclick="showToolMessage('Sabo Counter')">
                 Sabo Counter
-            </a>
+            </button>
         </div>
     </aside>
 
@@ -598,7 +598,7 @@
                 <h1 class="hero-title">GAMING TOOLS</h1>
                 <p class="hero-subtitle">Professional counter tools and analytics for competitive Spacenations players</p>
                 <div class="hero-cta">
-                    <a href="dashboard.html" class="btn btn-game">Get Started</a>
+                    <button class="btn btn-game" onclick="showDashboardMessage()">Get Started</button>
                 </div>
             </div>
         </section>
@@ -633,8 +633,8 @@
             
             <div class="footer-links">
                 <a href="https://spacenations.eu" target="_blank" class="footer-link">Spacenations</a>
-                <a href="dashboard.html" class="footer-link">Dashboard</a>
-                <a href="admin-login.html" class="footer-link">Admin</a>
+                <button class="footer-link" onclick="showDashboardMessage()" style="background: none; border: none; font: inherit; cursor: pointer; padding: 0;">Dashboard</button>
+                <button class="footer-link" onclick="showAdminMessage()" style="background: none; border: none; font: inherit; cursor: pointer; padding: 0;">Admin</button>
                 <a href="#" class="footer-link">Support</a>
                 <a href="#" class="footer-link">Privacy</a>
             </div>
@@ -644,6 +644,23 @@
     </footer>
 
     <script>
+        // Message functions for disabled links
+        function showLoginMessage() {
+            alert('Login-Funktion ist derzeit deaktiviert.');
+        }
+        
+        function showDashboardMessage() {
+            alert('Dashboard ist derzeit nicht verfügbar.');
+        }
+        
+        function showAdminMessage() {
+            alert('Admin-Bereich ist derzeit nicht verfügbar.');
+        }
+        
+        function showToolMessage(toolName) {
+            alert(toolName + ' ist derzeit nicht verfügbar.');
+        }
+
         // Sidebar toggle for mobile
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
