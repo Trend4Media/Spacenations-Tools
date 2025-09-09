@@ -1,36 +1,48 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<link rel="stylesheet" href="css/global-footer.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Nations Raid Counter</title>
+    <title>Raid-Counter - Spacenations Tools</title>
+    
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <style>
-        /* CSS Variablen für Light/Dark Mode */
         :root {
-            /* Dark Mode (Standard) */
-            --bg-gradient: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
-            --text-primary: #e0e0e0;
-            --text-secondary: #b0b0b0;
-            --bg-panel: rgba(0, 0, 0, 0.7);
-            --border-primary: #3a5998;
-            --border-shadow: rgba(58, 89, 152, 0.3);
-            --input-bg: rgba(0, 0, 0, 0.8);
-            --input-border: rgba(58, 89, 152, 0.5);
-            --raid-color: #27ae60;
-        }
-        
-        /* Light Mode */
-        :root.light-mode {
-            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --bg-panel: rgba(255, 255, 255, 0.95);
-            --border-primary: #e2e8f0;
-            --border-shadow: rgba(0, 0, 0, 0.1);
-            --input-bg: #f8fafc;
-            --input-border: #e2e8f0;
-            --raid-color: #059669;
+            /* Razer Color Scheme */
+            --razer-green: #00FF88;
+            --razer-green-dark: #00CC6A;
+            --razer-green-light: #44FF99;
+            --razer-orange: #FF9900;
+            --razer-orange-light: #FFAA44;
+            --razer-black: #0A0A0A;
+            --razer-dark: #111111;
+            --razer-gray: #1A1A1A;
+            --razer-gray-light: #2A2A2A;
+            --razer-white: #FFFFFF;
+            --razer-silver: #C0C0C0;
+            
+            --text-primary: var(--razer-white);
+            --text-secondary: var(--razer-silver);
+            --text-accent: var(--razer-orange);
+            
+            --bg-primary: var(--razer-black);
+            --bg-secondary: var(--razer-dark);
+            --bg-tertiary: var(--razer-gray);
+            --bg-card: var(--razer-gray-light);
+            
+            --glow-orange: 0 0 20px rgba(255, 153, 0, 0.5);
+            --glow-orange-strong: 0 0 30px rgba(255, 153, 0, 0.8);
+            --glow-green: 0 0 20px rgba(0, 255, 136, 0.5);
+            
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            --font-gaming: 'Orbitron', monospace;
+            
+            /* Compatibility variables */
+            --raid-color: var(--razer-orange);
         }
         
         * {
@@ -40,29 +52,62 @@
         }
         
         body {
-            font-family: Arial, sans-serif;
-            background: var(--bg-gradient);
+            font-family: var(--font-primary);
+            background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
             padding: 20px;
             transition: all 0.3s ease;
         }
         
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 153, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
+                linear-gradient(45deg, var(--razer-black) 0%, var(--razer-dark) 100%);
+            z-index: -1;
+            animation: backgroundPulse 8s ease-in-out infinite;
+        }
+        
+        @keyframes backgroundPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background: var(--bg-panel);
-            border: 2px solid var(--border-primary);
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 20px var(--border-shadow);
+            background: var(--bg-secondary);
+            border: 1px solid rgba(255, 153, 0, 0.2);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--razer-orange), var(--razer-orange-light));
         }
         
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             position: relative;
         }
         
@@ -71,202 +116,319 @@
             left: 0;
             top: 50%;
             transform: translateY(-50%);
-            background: linear-gradient(45deg, #3a5998, #4a90e2);
-            color: white;
-            border: none;
-            padding: 10px 20px;
+            background: transparent;
+            color: var(--razer-green);
+            border: 2px solid var(--razer-green);
+            padding: 12px 24px;
             border-radius: 8px;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 8px;
+            font-family: var(--font-gaming);
         }
         
         .back-button:hover {
+            background: var(--razer-green);
+            color: var(--razer-black);
             transform: translateY(-50%) translateY(-2px);
-            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+            box-shadow: var(--glow-green);
         }
         
-        .theme-toggle {
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            background: linear-gradient(45deg, #3a5998, #4a90e2);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-        
-        .theme-toggle:hover {
-            transform: translateY(-50%) translateY(-2px);
-            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
-        }
-        
-        .spacenations {
+        .header h1 {
+            font-family: var(--font-gaming);
             font-size: 2.5rem;
-            font-weight: bold;
-            color: #ff8c42;
-            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+            color: var(--razer-orange);
+            text-shadow: var(--glow-orange);
+            margin-bottom: 10px;
             letter-spacing: 2px;
-            margin: 0;
-            line-height: 1;
+            animation: titleGlow 4s ease-in-out infinite;
         }
         
-        .subtitle {
-            font-size: 1.2rem;
+        @keyframes titleGlow {
+            0%, 100% { 
+                filter: drop-shadow(0 0 10px rgba(255, 153, 0, 0.3));
+            }
+            50% { 
+                filter: drop-shadow(0 0 30px rgba(255, 153, 0, 0.6));
+            }
+        }
+        
+        .header .subtitle {
             color: var(--text-secondary);
-            margin: 5px 0 0 0;
-            font-weight: normal;
+            font-size: 1.2rem;
+            font-weight: 400;
         }
         
-        .input-section {
-            background: var(--bg-panel);
-            border: 2px solid var(--raid-color);
-            border-radius: 10px;
-            padding: 20px;
+        .input-box {
+            background: var(--bg-tertiary);
+            border: 2px solid rgba(255, 153, 0, 0.2);
+            border-radius: 12px;
+            padding: 30px;
             margin-bottom: 30px;
             transition: all 0.3s ease;
         }
         
-        .input-section h2 {
-            color: var(--raid-color);
-            margin-bottom: 15px;
-            text-align: center;
-            text-shadow: 0 0 5px rgba(39, 174, 96, 0.5);
+        .input-box:hover {
+            border-color: var(--razer-orange);
+            box-shadow: var(--glow-orange);
         }
         
         label {
             display: block;
-            margin-bottom: 10px;
-            color: var(--text-secondary);
-            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
         textarea {
             width: 100%;
-            height: 300px;
-            background: var(--input-bg);
-            border: 2px solid var(--input-border);
-            border-radius: 5px;
+            height: 200px;
+            background: var(--bg-card);
+            border: 2px solid rgba(255, 153, 0, 0.3);
+            border-radius: 8px;
             color: var(--text-primary);
-            padding: 15px;
-            font-family: monospace;
-            font-size: 12px;
+            padding: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
             resize: vertical;
             transition: all 0.3s ease;
         }
         
         textarea:focus {
             outline: none;
-            border-color: var(--raid-color);
-            box-shadow: 0 0 10px rgba(39, 174, 96, 0.3);
+            border-color: var(--razer-orange);
+            box-shadow: var(--glow-orange);
         }
         
         .button-section {
             display: flex;
-            justify-content: center;
             gap: 20px;
+            justify-content: center;
             margin-bottom: 30px;
+            flex-wrap: wrap;
         }
         
-        button {
-            background: linear-gradient(45deg, #3a5998, #4a90e2);
-            border: none;
-            color: white;
-            padding: 12px 30px;
-            border-radius: 5px;
-            cursor: pointer;
+        .calculate-btn, .clear-btn {
+            padding: 16px 32px;
+            border: 2px solid var(--razer-orange);
+            border-radius: 8px;
+            font-family: var(--font-gaming);
+            font-weight: 700;
             font-size: 16px;
-            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
             transition: all 0.3s ease;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+            position: relative;
+            overflow: hidden;
         }
         
         .calculate-btn {
-            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            background: var(--razer-orange);
+            color: var(--razer-black);
+        }
+        
+        .calculate-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .calculate-btn:hover::before {
+            left: 100%;
+        }
+        
+        .calculate-btn:hover {
+            background: var(--razer-orange-light);
+            transform: translateY(-2px);
+            box-shadow: var(--glow-orange-strong);
         }
         
         .clear-btn {
-            background: linear-gradient(45deg, #c0392b, #e74c3c);
+            background: transparent;
+            color: var(--text-secondary);
+            border-color: var(--text-secondary);
+        }
+        
+        .clear-btn:hover {
+            background: #FF4444;
+            color: var(--razer-white);
+            border-color: #FF4444;
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
         }
         
         .results {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
+            margin-bottom: 30px;
         }
         
         .result-box {
-            background: var(--bg-panel);
-            border: 2px solid var(--raid-color);
-            border-radius: 10px;
-            padding: 20px;
+            background: var(--bg-card);
+            border: 2px solid rgba(255, 153, 0, 0.2);
+            border-radius: 12px;
+            padding: 30px;
             transition: all 0.3s ease;
         }
         
+        .result-box:hover {
+            border-color: var(--razer-orange);
+            transform: translateY(-4px);
+            box-shadow: var(--glow-orange);
+        }
+        
         .result-box h2 {
-            color: var(--raid-color);
-            margin-bottom: 15px;
+            font-family: var(--font-gaming);
+            color: var(--razer-orange);
+            margin-bottom: 20px;
             text-align: center;
-            text-shadow: 0 0 5px rgba(39, 174, 96, 0.5);
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
         
         .stat-line {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .stat-line:last-child {
-            border-bottom: none;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 153, 0, 0.1);
         }
         
         .stat-name {
-            color: var(--text-secondary);
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
         .stat-value {
-            color: var(--raid-color);
-            font-weight: bold;
+            font-family: var(--font-gaming);
+            font-weight: 800;
+            color: var(--razer-orange);
+            font-size: 1.2rem;
         }
         
-        .total-line {
-            border-top: 2px solid var(--raid-color);
-            margin-top: 10px;
-            padding-top: 10px;
-            font-weight: bold;
-            font-size: 18px;
+        .raid-summary {
+            grid-column: span 2;
+            background: var(--bg-tertiary);
+            border: 2px solid rgba(0, 255, 136, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
         }
         
-        .total-line .stat-value {
-            color: var(--raid-color);
-            text-shadow: 0 0 5px rgba(39, 174, 96, 0.5);
+        .raid-summary h2 {
+            font-family: var(--font-gaming);
+            color: var(--razer-green);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
         
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+        
+        .summary-stat {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+        
+        .summary-stat .value {
+            font-family: var(--font-gaming);
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--razer-green);
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .summary-stat .label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--razer-black);
+            border-top: 1px solid rgba(255, 153, 0, 0.2);
+            padding: 40px 0;
+            margin-top: 40px;
+            text-align: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+        
+        .footer-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .footer-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--razer-orange);
+            transition: width 0.3s ease;
+        }
+        
+        .footer-link:hover {
+            color: var(--razer-orange);
+        }
+        
+        .footer-link:hover::after {
+            width: 100%;
+        }
+        
+        .footer-bottom {
+            color: rgba(192, 192, 192, 0.6);
+            font-size: 14px;
+        }
+        
+        /* Mobile Responsive */
         @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
             .results {
                 grid-template-columns: 1fr;
             }
             
-            .container {
-                padding: 10px;
+            .raid-summary {
+                grid-column: span 1;
             }
             
             .button-section {
@@ -274,60 +436,44 @@
                 align-items: center;
             }
             
-            .spacenations {
-                font-size: 2rem;
-            }
-            
-            .back-button,
-            .theme-toggle {
-                position: static;
-                transform: none;
-                margin-bottom: 15px;
-            }
-            
-            .back-button:hover,
-            .theme-toggle:hover {
-                transform: translateY(-2px);
-            }
-            
-            .header {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 10px;
+            .calculate-btn, .clear-btn {
+                width: 100%;
+                max-width: 300px;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Back Button -->
     <div class="container">
         <div class="header">
-            <a href="index.html" class="back-button">
-                <span>←</span>
-                <span>Zurück zur Hauptseite</span>
-            </a>
-            <button class="theme-toggle" id="theme-toggle">
-                <span id="theme-icon">🌙</span>
-                <span id="theme-text">Light Mode</span>
-            </button>
-            <h1 class="spacenations">SPACENATIONS</h1>
-            <div class="subtitle">Raid-Counter</div>
+            <a href="index.html" class="back-button">← Zurück zur Hauptseite</a>
+            <h1>RAID-COUNTER</h1>
+            <div class="subtitle">Raid-Berichte auswerten und Rohstoffe berechnen</div>
         </div>
-        
-        <div class="input-section">
-            <h2>🏴‍☠️ Raid-Berichte</h2>
+
+        <!-- Input Section -->
+        <div class="input-box">
             <label for="raid-reports">Fügen Sie hier Ihre Raid-Berichte ein:</label>
-            <textarea id="raid-reports" placeholder="Raid-Berichte hier einfügen..."></textarea>
+            <textarea id="raid-reports" placeholder="Raid-Berichte hier einfügen...
+
+Beispiel:
+Sie haben erfolgreich geplündert:
+- 1.234.567 Eisen
+- 987.654 Silizium
+- 456.789 Kohlenstoff
+
+Oder fügen Sie mehrere Raids ein..."></textarea>
         </div>
         
         <div class="button-section">
-            <button class="calculate-btn" onclick="calculateRaids()">📊 Raids Auswerten</button>
-            <button class="clear-btn" onclick="clearAll()">🗑️ Alles Löschen</button>
+            <button class="calculate-btn" onclick="calculateRaids()">Raids Auswerten</button>
+            <button class="clear-btn" onclick="clearAll()">Alles Löschen</button>
         </div>
-        
+
         <div class="results">
             <div class="result-box">
-                <h2>🏴‍☠️ Geplünderte Rohstoffe - Gesamt</h2>
+                <h2>Geplünderte Rohstoffe - Gesamt</h2>
                 <div id="raid-stats">
                     <div class="stat-line">
                         <span class="stat-name">Eisen:</span>
@@ -355,10 +501,10 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="result-box">
-                <h2>📈 Raid-Statistiken</h2>
-                <div id="raid-statistics">
+                <h2>Raid-Statistiken</h2>
+                <div id="raid-summary">
                     <div class="stat-line">
                         <span class="stat-name">Anzahl Raids:</span>
                         <span class="stat-value" id="raid-count">0</span>
@@ -367,72 +513,56 @@
                         <span class="stat-name">Erfolgreiche Raids:</span>
                         <span class="stat-value" id="successful-raids">0</span>
                     </div>
-                    <div class="stat-line total-line">
-                        <span class="stat-name">Gesamtbeute:</span>
-                        <span class="stat-value" id="total-loot">0</span>
+                    <div class="stat-line">
+                        <span class="stat-name">Erfolgsrate:</span>
+                        <span class="stat-value" id="success-rate">0%</span>
                     </div>
                     <div class="stat-line">
-                        <span class="stat-name">Ø Beute pro Raid:</span>
-                        <span class="stat-value" id="average-loot">0</span>
+                        <span class="stat-name">Durchschnitt pro Raid:</span>
+                        <span class="stat-value" id="avg-per-raid">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="raid-summary">
+                <h2>Gesamtübersicht</h2>
+                <div class="summary-stats">
+                    <div class="summary-stat">
+                        <span class="value" id="total-resources">0</span>
+                        <span class="label">Gesamt Rohstoffe</span>
+                    </div>
+                    <div class="summary-stat">
+                        <span class="value" id="best-raid">0</span>
+                        <span class="label">Bester Raid</span>
+                    </div>
+                    <div class="summary-stat">
+                        <span class="value" id="efficiency">0%</span>
+                        <span class="label">Effizienz</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="index.html" class="footer-link">Home</a>
+            <a href="as-counter.html" class="footer-link">AS Counter</a>
+            <a href="battle-counter.html" class="footer-link">Battle Counter</a>
+            <a href="sabo-counter.html" class="footer-link">Sabo Counter</a>
+        </div>
+        
+        <p class="footer-bottom">&copy; 2025 Spacenations Tools. Built for gamers, by gamers.</p>
+    </footer>
+
     <script>
-        // Theme Management
-        function toggleTheme() {
-            const root = document.documentElement;
-            const themeIcon = document.getElementById('theme-icon');
-            const themeText = document.getElementById('theme-text');
-            
-            if (root.classList.contains('light-mode')) {
-                // Wechsel zu Dark Mode
-                root.classList.remove('light-mode');
-                themeIcon.textContent = '🌙';
-                themeText.textContent = 'Light Mode';
-                localStorage.setItem('theme', 'dark');
-            } else {
-                // Wechsel zu Light Mode
-                root.classList.add('light-mode');
-                themeIcon.textContent = '☀️';
-                themeText.textContent = 'Dark Mode';
-                localStorage.setItem('theme', 'light');
-            }
-        }
-        
-        // Theme beim Laden der Seite setzen
-        function initTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            const root = document.documentElement;
-            const themeIcon = document.getElementById('theme-icon');
-            const themeText = document.getElementById('theme-text');
-            
-            if (savedTheme === 'light') {
-                root.classList.add('light-mode');
-                themeIcon.textContent = '☀️';
-                themeText.textContent = 'Dark Mode';
-            } else {
-                root.classList.remove('light-mode');
-                themeIcon.textContent = '🌙';
-                themeText.textContent = 'Light Mode';
-            }
-        }
-        
-        // Theme bei Seitenload initialisieren
-        document.addEventListener('DOMContentLoaded', initTheme);
-
-        function parseNumber(str) {
-            // Entfernt Punkte als Tausendertrennzeichen und konvertiert zu Zahl
-            return parseInt(str.replace(/\./g, '')) || 0;
-        }
-
+        // Hilfsfunktion für Zahlenformatierung
         function formatNumber(num) {
-            // Formatiert Zahl mit Punkten als Tausendertrennzeichen
             return num.toLocaleString('de-DE');
         }
 
+        // Raid-Berechnung (aus Dashboard übernommen, ohne Login-Requirement)
         function calculateRaids() {
             const raidText = document.getElementById('raid-reports').value;
             
@@ -448,68 +578,100 @@
             
             let raidCount = 0;
             let successfulRaids = 0;
+            let currentRaidHasLoot = false;
+            let bestRaid = 0;
+            let raidValues = [];
             
             const lines = raidText.split('\n');
-            let currentRaidHasLoot = false;
             
             for (let line of lines) {
                 line = line.trim();
                 
-                // Erkenne Raid-Start
-                if (line.includes('plünderte erfolgreich')) {
+                if (!line) continue;
+                
+                // Erkenne Raid-Beginn
+                if (line.includes('Raid') || line.includes('geplündert') || line.includes('erfolgreich')) {
+                    if (currentRaidHasLoot) {
+                        successfulRaids++;
+                    }
                     raidCount++;
                     currentRaidHasLoot = false;
+                    continue;
                 }
                 
-                // Parse Rohstoff-Zeilen
-                if (line.match(/^(Eisen|Silizium|Kohlenstoff|Wasser|Sauerstoff|Wasserstoff)\s+\d+/)) {
-                    const match = line.match(/^(Eisen|Silizium|Kohlenstoff|Wasser|Sauerstoff|Wasserstoff)\s+(\d+)/);
+                // Extrahiere Rohstoffe mit verschiedenen Formaten
+                const resourcePatterns = [
+                    // Standard Format: "1.234.567 Eisen"
+                    /([0-9.]+)\s*(Eisen|Iron)/i,
+                    /([0-9.]+)\s*(Silizium|Silicon)/i,
+                    /([0-9.]+)\s*(Kohlenstoff|Carbon)/i,
+                    /([0-9.]+)\s*(Wasser|Water)/i,
+                    /([0-9.]+)\s*(Sauerstoff|Oxygen)/i,
+                    /([0-9.]+)\s*(Wasserstoff|Hydrogen)/i,
+                    
+                    // Alternative Formate
+                    /(Eisen|Iron):\s*([0-9.]+)/i,
+                    /(Silizium|Silicon):\s*([0-9.]+)/i,
+                    /(Kohlenstoff|Carbon):\s*([0-9.]+)/i,
+                    /(Wasser|Water):\s*([0-9.]+)/i,
+                    /(Sauerstoff|Oxygen):\s*([0-9.]+)/i,
+                    /(Wasserstoff|Hydrogen):\s*([0-9.]+)/i
+                ];
+                
+                let raidValue = 0;
+                
+                resourcePatterns.forEach((pattern, index) => {
+                    const match = line.match(pattern);
                     if (match) {
-                        const resourceType = match[1].toLowerCase();
-                        const value = parseNumber(match[2]);
+                        let value, resource;
                         
-                        if (value > 0) {
-                            currentRaidHasLoot = true;
+                        if (index < 6) {
+                            // Format: "1.234.567 Eisen"
+                            value = parseFloat(match[1].replace(/\./g, '')) || 0;
+                            resource = match[2].toLowerCase();
+                        } else {
+                            // Format: "Eisen: 1.234.567"
+                            resource = match[1].toLowerCase();
+                            value = parseFloat(match[2].replace(/\./g, '')) || 0;
                         }
                         
-                        switch(resourceType) {
-                            case 'eisen':
-                                resources.iron += value;
-                                break;
-                            case 'silizium':
-                                resources.silicon += value;
-                                break;
-                            case 'kohlenstoff':
-                                resources.carbon += value;
-                                break;
-                            case 'wasser':
-                                resources.water += value;
-                                break;
-                            case 'sauerstoff':
-                                resources.oxygen += value;
-                                break;
-                            case 'wasserstoff':
-                                resources.hydrogen += value;
-                                break;
+                        // Zuordnung zu Rohstoff-Typ
+                        if (resource.includes('eisen') || resource.includes('iron')) {
+                            resources.iron += value;
+                            raidValue += value;
+                        } else if (resource.includes('silizium') || resource.includes('silicon')) {
+                            resources.silicon += value;
+                            raidValue += value;
+                        } else if (resource.includes('kohlenstoff') || resource.includes('carbon')) {
+                            resources.carbon += value;
+                            raidValue += value;
+                        } else if (resource.includes('wasser') || resource.includes('water')) {
+                            resources.water += value;
+                            raidValue += value;
+                        } else if (resource.includes('sauerstoff') || resource.includes('oxygen')) {
+                            resources.oxygen += value;
+                            raidValue += value;
+                        } else if (resource.includes('wasserstoff') || resource.includes('hydrogen')) {
+                            resources.hydrogen += value;
+                            raidValue += value;
                         }
+                        
+                        currentRaidHasLoot = true;
                     }
-                }
+                });
                 
-                // Zähle erfolgreiche Raids (wenn Beute > 0)
-                if (line.includes('Wasserstoff') && currentRaidHasLoot) {
-                    successfulRaids++;
-                    currentRaidHasLoot = false;
+                if (raidValue > 0) {
+                    raidValues.push(raidValue);
+                    bestRaid = Math.max(bestRaid, raidValue);
                 }
             }
             
-            // Berechne Gesamtbeute
-            const totalLoot = resources.iron + resources.silicon + resources.carbon + 
-                            resources.water + resources.oxygen + resources.hydrogen;
+            // Letzten Raid berücksichtigen
+            if (currentRaidHasLoot) {
+                successfulRaids++;
+            }
             
-            // Berechne Durchschnitt
-            const averageLoot = raidCount > 0 ? Math.round(totalLoot / raidCount) : 0;
-            
-            // Update Anzeige - Rohstoffe
+            // Ergebnisse anzeigen
             document.getElementById('total-iron').textContent = formatNumber(resources.iron);
             document.getElementById('total-silicon').textContent = formatNumber(resources.silicon);
             document.getElementById('total-carbon').textContent = formatNumber(resources.carbon);
@@ -517,259 +679,54 @@
             document.getElementById('total-oxygen').textContent = formatNumber(resources.oxygen);
             document.getElementById('total-hydrogen').textContent = formatNumber(resources.hydrogen);
             
-            // Update Anzeige - Statistiken
+            // Raid-Statistiken
             document.getElementById('raid-count').textContent = raidCount;
             document.getElementById('successful-raids').textContent = successfulRaids;
-            document.getElementById('total-loot').textContent = formatNumber(totalLoot);
-            document.getElementById('average-loot').textContent = formatNumber(averageLoot);
+            
+            const successRate = raidCount > 0 ? Math.round((successfulRaids / raidCount) * 100) : 0;
+            document.getElementById('success-rate').textContent = successRate + '%';
+            
+            const totalResources = resources.iron + resources.silicon + resources.carbon + resources.water + resources.oxygen + resources.hydrogen;
+            const avgPerRaid = successfulRaids > 0 ? Math.round(totalResources / successfulRaids) : 0;
+            document.getElementById('avg-per-raid').textContent = formatNumber(avgPerRaid);
+            
+            // Gesamtübersicht
+            document.getElementById('total-resources').textContent = formatNumber(totalResources);
+            document.getElementById('best-raid').textContent = formatNumber(bestRaid);
+            
+            const efficiency = raidCount > 0 ? Math.round((totalResources / (raidCount * 1000000)) * 100) : 0;
+            document.getElementById('efficiency').textContent = efficiency + '%';
+            
+            console.log('Raid-Auswertung abgeschlossen:', {
+                totalResources,
+                raidCount,
+                successfulRaids,
+                successRate: successRate + '%'
+            });
         }
-        
+
         function clearAll() {
             document.getElementById('raid-reports').value = '';
             
-            // Reset alle Rohstoff-Werte auf 0
-            document.getElementById('total-iron').textContent = '0';
-            document.getElementById('total-silicon').textContent = '0';
-            document.getElementById('total-carbon').textContent = '0';
-            document.getElementById('total-water').textContent = '0';
-            document.getElementById('total-oxygen').textContent = '0';
-            document.getElementById('total-hydrogen').textContent = '0';
+            // Reset alle Werte
+            document.querySelectorAll('.stat-value').forEach(element => {
+                element.textContent = '0';
+            });
             
-            // Reset alle Statistik-Werte auf 0
-            document.getElementById('raid-count').textContent = '0';
-            document.getElementById('successful-raids').textContent = '0';
-            document.getElementById('total-loot').textContent = '0';
-            document.getElementById('average-loot').textContent = '0';
+            document.getElementById('success-rate').textContent = '0%';
+            document.getElementById('efficiency').textContent = '0%';
+            
+            console.log('Alle Daten gelöscht');
         }
-    </script>
-    <!-- Auto-Loading Scripts - Immer als LETZTES vor </body> -->
-<script>
-    /**
-     * UNIVERSELLER Auto-Loader für alle Spacenations-Tools
-     * Lädt automatisch alle benötigten Skripte auf jeder Seite
-     */
-    
-    // 1. CSS für Global Footer sicherstellen
-    function ensureGlobalFooterCSS() {
-        const cssId = 'global-footer-css';
-        if (!document.getElementById(cssId)) {
-            const link = document.createElement('link');
-            link.id = cssId;
-            link.rel = 'stylesheet';
-            link.href = 'css/global-footer.css';
-            link.onerror = () => {
-                console.warn('⚠️ css/global-footer.css nicht gefunden - Fallback-Styles werden verwendet');
-                // Minimale Fallback-Styles direkt einfügen
-                const style = document.createElement('style');
-                style.innerHTML = `
-                    .global-footer { 
-                        background: var(--bg-panel, rgba(0,0,0,0.8)); 
-                        border-top: 2px solid var(--border-primary, #3a5998); 
-                        padding: 20px; 
-                        margin-top: 40px;
-                        color: var(--text-primary, #e0e0e0);
-                    }
-                    .footer-content { 
-                        display: grid; 
-                        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-                        gap: 20px; 
-                        max-width: 1200px; 
-                        margin: 0 auto;
-                    }
-                    .footer-links { 
-                        list-style: none; 
-                        padding: 0; 
-                        margin: 0; 
-                    }
-                    .footer-links a { 
-                        color: var(--text-secondary, #b0b0b0); 
-                        text-decoration: none; 
-                        display: flex; 
-                        align-items: center; 
-                        gap: 8px; 
-                        padding: 4px 0;
-                        transition: all 0.3s ease;
-                    }
-                    .footer-links a:hover { 
-                        color: var(--accent-secondary, #4a90e2); 
-                        transform: translateX(5px);
-                    }
-                    .footer-bottom { 
-                        border-top: 1px solid rgba(255,255,255,0.1); 
-                        margin-top: 20px; 
-                        padding-top: 20px; 
-                        display: flex; 
-                        justify-content: space-between; 
-                        align-items: center; 
-                        flex-wrap: wrap; 
-                        gap: 15px;
-                    }
-                    @media (max-width: 768px) { 
-                        .footer-content { grid-template-columns: 1fr; text-align: center; }
-                        .footer-bottom { flex-direction: column; text-align: center; }
-                    }
-                `;
-                document.head.appendChild(style);
-            };
-            document.head.appendChild(link);
-        }
-    }
-    
-    // 2. Auto-Loader für JavaScript-Module
-    function loadAutoScript(src, callback) {
-        const script = document.createElement('script');
-        script.src = src;
-        script.async = true;
-        script.onload = () => {
-            console.log('✅ Auto-geladen:', src);
-            if (callback) callback();
-        };
-        script.onerror = () => {
-            console.warn('⚠️ Auto-Load fehlgeschlagen:', src);
-            if (callback) callback();
-        };
-        document.head.appendChild(script);
-    }
-    
-    // 3. Initiale Auto-Loads
-    function initAutoLoads() {
-        // CSS sicherstellen
-        ensureGlobalFooterCSS();
-        
-        // Universelle Scripts in der richtigen Reihenfolge laden
-        const autoScripts = [
-            'js/theme-manager.js',
-            'js/global-footer-loader.js'  // Ihr reparierter Footer-Loader
-        ];
-        
-        let loadIndex = 0;
-        
-        function loadNext() {
-            if (loadIndex < autoScripts.length) {
-                loadAutoScript(autoScripts[loadIndex], () => {
-                    loadIndex++;
-                    setTimeout(loadNext, 100); // Kleine Verzögerung zwischen Loads
-                });
-            } else {
-                // Alle Scripts geladen
-                console.log('🚀 Alle Auto-Scripts geladen');
-                initializeAutoFeatures();
-            }
-        }
-        
-        loadNext();
-    }
-    
-    // 4. Auto-Features nach dem Laden initialisieren
-    function initializeAutoFeatures() {
-        // Theme-System aktivieren
-        setTimeout(() => {
-            if (window.ThemeAPI) {
-                // Theme-Toggle-Buttons automatisch konfigurieren
-                const themeButtons = document.querySelectorAll('.theme-toggle, #theme-toggle');
-                themeButtons.forEach(btn => {
-                    if (!btn.dataset.autoConfigured) {
-                        btn.addEventListener('click', (e) => {
-                            e.preventDefault();
-                            window.ThemeAPI.toggle();
-                        });
-                        btn.dataset.autoConfigured = 'true';
-                    }
-                });
-            }
-        }, 500);
-        
-        // Footer-Status prüfen
-        setTimeout(() => {
-            if (window.AutoFooterAPI) {
-                console.log('✅ Auto-Footer bereit');
-            } else {
-                console.warn('⚠️ Auto-Footer nicht verfügbar');
-            }
-        }, 1000);
-    }
-    
-    // 5. Firebase Auto-Load für Dashboard-Seiten
-    function loadFirebaseIfNeeded() {
-        const isDashboardPage = window.location.pathname.includes('dashboard') || 
-                               window.location.pathname.includes('register') ||
-                               document.querySelector('[id*="dashboard"]') ||
-                               document.querySelector('[class*="dashboard"]');
-        
-        if (isDashboardPage) {
-            console.log('📊 Dashboard-Seite erkannt - Firebase wird geladen');
-            
-            // Firebase SDK laden
-            if (!window.firebase) {
-                const firebaseScripts = [
-                    'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js',
-                    'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js',
-                    'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js'
-                ];
-                
-                let fbIndex = 0;
-                function loadNextFirebase() {
-                    if (fbIndex < firebaseScripts.length) {
-                        loadAutoScript(firebaseScripts[fbIndex], () => {
-                            fbIndex++;
-                            loadNextFirebase();
-                        });
-                    } else {
-                        // Firebase geladen, jetzt Config laden
-                        setTimeout(() => {
-                            loadAutoScript('js/firebase-config.js', () => {
-                                loadAutoScript('js/auth-manager.js', () => {
-                                    loadAutoScript('js/firebase-sync.js');
-                                });
-                            });
-                        }, 500);
-                    }
-                }
-                loadNextFirebase();
-            }
-        }
-    }
-    
-    // 6. SOFORTIGER Start des Auto-Loaders
-    function startAutoLoader() {
-        console.log('🤖 Auto-Loader gestartet für:', window.location.pathname);
-        
-        // CSS und grundlegende Scripts
-        initAutoLoads();
-        
-        // Firebase für Dashboard-Seiten
-        loadFirebaseIfNeeded();
-        
-        // Page-spezifische Auto-Loads
-        setTimeout(() => {
-            const pageName = window.location.pathname.split('/').pop().split('.')[0] || 'index';
-            
-            // Calculator-spezifische Scripts
-            if (pageName.includes('calculator')) {
-                loadAutoScript('js/calculator-data.js');
-            }
-            
-            // Raid-Counter-spezifische Scripts  
-            if (pageName.includes('raid')) {
-                loadAutoScript('js/raid-data-manager.js');
-            }
-            
-        }, 1500);
-    }
-    
-    // 7. Auto-Loader starten (mehrere Einstiegspunkte)
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', startAutoLoader);
-    } else {
-        startAutoLoader();
-    }
-    
-    // Backup für sehr späte Initialisierung
-    setTimeout(startAutoLoader, 2000);
-    
-    console.log('🔄 Auto-Include Script geladen - Footer wird automatisch auf JEDER Seite angezeigt!');
-</script>
 
-<!-- Ende Auto-Include Script -->
+        // Keyboard Shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Strg+Enter = Berechnen
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                calculateRaids();
+            }
+        });
+    </script>
 </body>
 </html>
