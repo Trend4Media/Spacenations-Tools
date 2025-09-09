@@ -575,18 +575,18 @@
     <aside class="sidebar" id="sidebar">
         <h3 class="sidebar-title">Counter Tools</h3>
         <div class="sidebar-buttons">
-            <button class="sidebar-btn" onclick="showToolMessage('AS Counter')">
+            <a href="as-counter.html" class="sidebar-btn">
                 AS Counter
-            </button>
-            <button class="sidebar-btn" onclick="showToolMessage('Battle Counter')">
+            </a>
+            <a href="battle-counter.html" class="sidebar-btn">
                 Battle Counter
-            </button>
-            <button class="sidebar-btn" onclick="showToolMessage('Raid Counter')">
+            </a>
+            <a href="raid-counter.html" class="sidebar-btn">
                 Raid Counter
-            </button>
-            <button class="sidebar-btn" onclick="showToolMessage('Sabo Counter')">
+            </a>
+            <a href="sabo-counter.html" class="sidebar-btn">
                 Sabo Counter
-            </button>
+            </a>
         </div>
     </aside>
 
@@ -657,11 +657,6 @@
             alert('Admin-Bereich ist derzeit nicht verfügbar.');
         }
         
-        function showToolMessage(toolName) {
-            // Diese Funktion sollte nicht mehr aufgerufen werden, da Counter-Links aktiv sind
-            console.log('showToolMessage wurde aufgerufen für:', toolName);
-            return false;
-        }
 
         // Sidebar toggle for mobile
         function toggleSidebar() {
