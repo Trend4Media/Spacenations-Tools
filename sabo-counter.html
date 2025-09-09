@@ -52,6 +52,7 @@
             --input-border: rgba(139, 92, 246, 0.3);
             --card-bg: var(--bg-card);
             --card-border: rgba(139, 92, 246, 0.2);
+            --accent-secondary: #4a90e2;
         }
         
         * {
@@ -172,18 +173,140 @@
             font-weight: 400;
         }
         
-        .input-box {
-            background: var(--card-bg);
-            border: 2px solid var(--card-border);
+        /* Input und Summary Sections */
+        .input-summary-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .input-section {
+            background: var(--bg-panel);
+            border: 2px solid var(--sabo-color);
             border-radius: 12px;
             padding: 30px;
-            margin-bottom: 30px;
             transition: all 0.3s ease;
         }
         
-        .input-box:hover {
-            border-color: var(--sabo-color);
+        .input-section:hover {
+            border-color: var(--razer-purple-light);
             box-shadow: var(--glow-purple);
+        }
+        
+        .input-section h2 {
+            color: var(--sabo-color);
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 0 0 5px rgba(139, 92, 246, 0.5);
+            font-family: var(--font-gaming);
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .summary-section {
+            background: var(--bg-panel);
+            border: 2px solid var(--accent-secondary);
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+        
+        .summary-section:hover {
+            border-color: var(--razer-green);
+            box-shadow: var(--glow-green);
+        }
+        
+        .summary-section h2 {
+            color: var(--accent-secondary);
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+            font-family: var(--font-gaming);
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .summary-content {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .reports-count {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .reports-count .count-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--sabo-color);
+            display: block;
+            font-family: var(--font-gaming);
+        }
+        
+        .reports-count .count-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .building-list {
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            background: var(--card-bg);
+            overflow: hidden;
+        }
+        
+        .building-list-header {
+            background: var(--razer-purple);
+            color: var(--text-primary);
+            padding: 12px;
+            font-weight: 600;
+            text-align: center;
+            font-family: var(--font-gaming);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .building-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--card-border);
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .building-item:hover {
+            background: rgba(139, 92, 246, 0.1);
+        }
+        
+        .building-item:last-child {
+            border-bottom: none;
+        }
+        
+        .building-item .name {
+            color: var(--text-primary);
+            font-weight: 500;
+            flex: 1;
+            font-size: 0.85rem;
+        }
+        
+        .building-item .levels {
+            color: var(--sabo-color);
+            font-weight: bold;
+            min-width: 50px;
+            text-align: right;
+            font-size: 1rem;
+            font-family: var(--font-gaming);
         }
         
         label {
@@ -198,14 +321,14 @@
         
         textarea {
             width: 100%;
-            height: 200px;
+            height: 250px;
             background: var(--input-bg);
             border: 2px solid var(--input-border);
             border-radius: 8px;
             color: var(--text-primary);
             padding: 16px;
             font-family: 'Courier New', monospace;
-            font-size: 14px;
+            font-size: 13px;
             resize: vertical;
             transition: all 0.3s ease;
         }
@@ -358,39 +481,51 @@
             letter-spacing: 2px;
         }
         
-        .building-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
         }
         
-        .building-stat {
-            background: var(--bg-card);
-            border: 1px solid rgba(139, 92, 246, 0.2);
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.3s ease;
+        .details-table th,
+        .details-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--card-border);
         }
         
-        .building-stat:hover {
-            border-color: var(--sabo-color);
-            transform: translateY(-2px);
-            box-shadow: var(--glow-purple);
-        }
-        
-        .building-name {
-            font-weight: 600;
-            margin-bottom: 10px;
+        .details-table th {
+            background: var(--card-bg);
             color: var(--text-primary);
+            font-weight: 600;
+            text-align: center;
+            font-family: var(--font-gaming);
+            text-transform: uppercase;
+            letter-spacing: 1px;
             font-size: 0.9rem;
         }
         
-        .building-value {
-            font-family: var(--font-gaming);
-            font-size: 1.5rem;
-            font-weight: 800;
+        .details-table td {
+            color: var(--text-secondary);
+        }
+        
+        .details-table .building-name {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .details-table .levels-destroyed {
             color: var(--sabo-color);
+            font-weight: bold;
+            text-align: center;
+            font-family: var(--font-gaming);
+        }
+        
+        .details-table .points-earned {
+            color: #f59e0b;
+            font-weight: bold;
+            text-align: center;
+            font-family: var(--font-gaming);
         }
         
         /* Footer */
@@ -447,6 +582,11 @@
                 padding: 20px;
             }
             
+            .input-summary-section {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
             .results {
                 grid-template-columns: 1fr;
             }
@@ -464,6 +604,19 @@
                 width: 100%;
                 max-width: 300px;
             }
+            
+            .back-button {
+                position: static;
+                transform: none;
+                margin-bottom: 20px;
+            }
+            
+            .header {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
         }
     </style>
 </head>
@@ -475,9 +628,11 @@
             <div class="subtitle">Sabotage-Berichte auswerten und Gebäudeschäden analysieren</div>
         </div>
 
-        <div class="input-box">
-            <label for="sabo-reports">Fügen Sie hier Ihre Sabotage-Berichte ein:</label>
-            <textarea id="sabo-reports" placeholder="Sabotage-Berichte hier einfügen...
+        <div class="input-summary-section">
+            <div class="input-section">
+                <h2>💥 Sabotage-Berichte</h2>
+                <label for="sabo-reports">Fügen Sie hier Ihre Sabotage-Berichte ein:</label>
+                <textarea id="sabo-reports" placeholder="Sabotage-Berichte hier einfügen...
 
 Beispiel:
 Sie sabotierten erfolgreich folgende Gebäude:
@@ -486,6 +641,77 @@ Wohngebäude: 3 Stufen zerstört
 Eisenmine: 7 Stufen zerstört
 
 Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
+            </div>
+            
+            <div class="summary-section">
+                <h2>📊 Auswertung der Berichte</h2>
+                <div class="summary-content">
+                    <div class="reports-count">
+                        <span class="count-number" id="reports-evaluated">0</span>
+                        <div class="count-label">Berichte ausgewertet</div>
+                    </div>
+                    
+                    <div class="building-list" id="summary-building-list">
+                        <div class="building-list-header">Gebäude</div>
+                        <div class="building-item">
+                            <span class="name">Planetenzentrale</span>
+                            <span class="levels" id="levels-planetenzentrale">0</span>
+                        </div>
+                        <div class="building-item">
+                            <span class="name">Raumhafen</span>
+                            <span class="levels" id="levels-raumhafen">0</span>
+                        </div>
+                        <div class="building-item">
+                            <span class="name">Wohngebäude</span>
+                            <span class="levels" id="levels-wohngebäude">0</span>
+                        </div>
+                        <div class="building-item">
+                            <span class="name">Solarpark</span>
+                            <span class="levels" id="levels-solarpark">0</span>
+                        </div>
+                        <div class="building-item">
+                            <span class="name">Eisenmine</span>
+                            <span class="levels" id="levels-eisenmine">0</span>
+                        </div>
+                        <div class="building-item">
+                            <span class="name">Siliziumraffinerie</span>
+                            <span class="levels" id="levels-siliziumraffinerie">0</span>
+                        </div>
+                        <div class="building-item">
+                            <span class="name">Kohlenstoffgewinnungsanlage</span>
+                            <span class="levels" id="levels-kohlenstoffgewinnungsanlage">0</span>
+                        </div>
+                        <div class="building-item">
+                            <span class="name">Bohrturm</span>
+                            <span class="levels" id="levels-bohrturm">0</span>
+                        </div>
+                        <div class="building-item">
+                            <span class="name">Chemiefabrik</span>
+                            <span class="levels" id="levels-chemiefabrik">0</span>
+                        </div>
+                        <div class="building-item">
+                            <span class="name">Recyclinganlage</span>
+                            <span class="levels" id="levels-recyclinganlage">0</span>
+                        </div>
+                        <div class="building-item">
+                            <span class="name">Rohstofflager</span>
+                            <span class="levels" id="levels-rohstofflager">0</span>
+                        </div>
+                        <div class="building-item">
+                            <span class="name">Schiffsfabrik</span>
+                            <span class="levels" id="levels-schiffsfabrik">0</span>
+                        </div>
+                        <div class="building-item">
+                            <span class="name">Waffenfabrik</span>
+                            <span class="levels" id="levels-waffenfabrik">0</span>
+                        </div>
+                        <div class="building-item">
+                            <span class="name">Forschungszentrum</span>
+                            <span class="levels" id="levels-forschungszentrum">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <div class="button-section">
@@ -531,73 +757,24 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
                         <span class="stat-name">Wertvollstes Ziel:</span>
                         <span class="stat-value" id="most-valuable-building">-</span>
                     </div>
-                    <div class="stat-line">
-                        <span class="stat-name">Berichte ausgewertet:</span>
-                        <span class="stat-value" id="reports-evaluated">0</span>
-                    </div>
                 </div>
             </div>
 
-            <div class="building-details">
-                <h2>🏗️ Detaillierte Gebäudeschäden</h2>
-                <div class="building-grid">
-                    <div class="building-stat">
-                        <div class="building-name">Planetenzentrale</div>
-                        <div class="building-value" id="levels-planetenzentrale">0</div>
-                    </div>
-                    <div class="building-stat">
-                        <div class="building-name">Raumhafen</div>
-                        <div class="building-value" id="levels-raumhafen">0</div>
-                    </div>
-                    <div class="building-stat">
-                        <div class="building-name">Wohngebäude</div>
-                        <div class="building-value" id="levels-wohngebäude">0</div>
-                    </div>
-                    <div class="building-stat">
-                        <div class="building-name">Solarpark</div>
-                        <div class="building-value" id="levels-solarpark">0</div>
-                    </div>
-                    <div class="building-stat">
-                        <div class="building-name">Eisenmine</div>
-                        <div class="building-value" id="levels-eisenmine">0</div>
-                    </div>
-                    <div class="building-stat">
-                        <div class="building-name">Siliziumraffinerie</div>
-                        <div class="building-value" id="levels-siliziumraffinerie">0</div>
-                    </div>
-                    <div class="building-stat">
-                        <div class="building-name">Kohlenstoffgewinnungsanlage</div>
-                        <div class="building-value" id="levels-kohlenstoffgewinnungsanlage">0</div>
-                    </div>
-                    <div class="building-stat">
-                        <div class="building-name">Bohrturm</div>
-                        <div class="building-value" id="levels-bohrturm">0</div>
-                    </div>
-                    <div class="building-stat">
-                        <div class="building-name">Chemiefabrik</div>
-                        <div class="building-value" id="levels-chemiefabrik">0</div>
-                    </div>
-                    <div class="building-stat">
-                        <div class="building-name">Recyclinganlage</div>
-                        <div class="building-value" id="levels-recyclinganlage">0</div>
-                    </div>
-                    <div class="building-stat">
-                        <div class="building-name">Rohstofflager</div>
-                        <div class="building-value" id="levels-rohstofflager">0</div>
-                    </div>
-                    <div class="building-stat">
-                        <div class="building-name">Schiffsfabrik</div>
-                        <div class="building-value" id="levels-schiffsfabrik">0</div>
-                    </div>
-                    <div class="building-stat">
-                        <div class="building-name">Waffenfabrik</div>
-                        <div class="building-value" id="levels-waffenfabrik">0</div>
-                    </div>
-                    <div class="building-stat">
-                        <div class="building-name">Forschungszentrum</div>
-                        <div class="building-value" id="levels-forschungszentrum">0</div>
-                    </div>
-                </div>
+            <div class="building-details" id="building-details" style="display: none;">
+                <h2>📋 Detaillierte Gebäude-Aufschlüsselung</h2>
+                <table class="details-table">
+                    <thead>
+                        <tr>
+                            <th>Gebäude</th>
+                            <th>Stufen zerstört</th>
+                            <th>Punkte pro Stufe</th>
+                            <th>Gesamtpunkte</th>
+                        </tr>
+                    </thead>
+                    <tbody id="building-details-body">
+                        <!-- Wird dynamisch gefüllt -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -615,194 +792,372 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
     </footer>
 
     <script>
-        // Hilfsfunktion für Zahlenformatierung
+        // Gebäude-Punkte-System (aus sabo-counter.js)
+        const BUILDING_POINTS = {
+            'Planetenzentrale': 3,
+            'Raumhafen': 1,
+            'Wohngebäude': 1,
+            'Solarpark': 1,
+            'Eisenmine': 2,
+            'Siliziumraffinerie': 2,
+            'Kohlenstoffgewinnungsanlage': 2,
+            'Bohrturm': 2,
+            'Chemiefabrik': 2,
+            'Recyclinganlage': 1,
+            'Rohstofflager': 1,
+            'Schiffsfabrik': 3,
+            'Waffenfabrik': 3,
+            'Forschungszentrum': 3
+        };
+
         function formatNumber(num) {
+            if (!num || num === 0) return '0';
             return num.toLocaleString('de-DE');
         }
 
-        // Sabotage-Berechnung (Original-Funktionalität aus der alten Version)
+        // Gebäudename normalisieren (für bessere Erkennung)
+        function normalizeBuilding(buildingName) {
+            const name = buildingName.trim();
+            
+            // Exakte Matches zuerst
+            if (Object.prototype.hasOwnProperty.call(BUILDING_POINTS, name)) {
+                return name;
+            }
+            
+            // Fuzzy Matching für häufige Varianten
+            const variations = {
+                'eismine': 'Eisenmine',
+                'solaranlage': 'Solarpark',
+                'forschungslabor': 'Forschungszentrum',
+                'militärfabrik': 'Waffenfabrik',
+                'pz': 'Planetenzentrale',
+                'rh': 'Raumhafen'
+            };
+            
+            const lowerName = name.toLowerCase();
+            if (variations[lowerName]) {
+                return variations[lowerName];
+            }
+            
+            // Partial matching
+            for (const key of Object.keys(BUILDING_POINTS)) {
+                if (key.toLowerCase().includes(lowerName) || lowerName.includes(key.toLowerCase())) {
+                    return key;
+                }
+            }
+            
+            return name; // Rückgabe des ursprünglichen Namens wenn nichts gefunden
+        }
+
+        // Gebäude-Zeile parsen (robuste Variante aus sabo-counter.js)
+        function parseBuildingLine(line) {
+            // Entferne führende Symbole und Leerzeichen
+            line = line.replace(/^[•\-*+\s]+/, '').trim();
+            
+            // Verschiedene Formate versuchen:
+            // Format 1: "Gebäudename 5" oder "Gebäudename: 5"
+            let match = line.match(/^(.+?)[:\s]+(\d+)$/);
+            if (match) {
+                return {
+                    name: match[1].trim(),
+                    levels: parseInt(match[2])
+                };
+            }
+            
+            // Format 2: "5 Gebäudename" 
+            match = line.match(/^(\d+)\s+(.+)$/);
+            if (match) {
+                return {
+                    name: match[2].trim(),
+                    levels: parseInt(match[1])
+                };
+            }
+            
+            // Format 3: "Gebäudename (5)" oder "Gebäudename [5]"
+            match = line.match(/^(.+?)\s*[([]]\s*(\d+)\s*[)\]]$/);
+            if (match) {
+                return {
+                    name: match[1].trim(),
+                    levels: parseInt(match[2])
+                };
+            }
+            
+            // Format 4: Nur Gebäudename (0 Stufen angenommen)
+            if (line.length > 0 && !/\d/.test(line)) {
+                return {
+                    name: line,
+                    levels: 0
+                };
+            }
+            
+            // Nichts gefunden
+            return {
+                name: '',
+                levels: 0
+            };
+        }
+
+        // HAUPTFUNKTION: Sabotage-Berechnung (aus sabo-counter.js)
         function calculateSabotage() {
+            console.log('💥 Starte Sabotage-Berechnung...');
+            
             const saboText = document.getElementById('sabo-reports').value;
             
-            // Initialisiere Gebäude-Zähler
+            if (!saboText.trim()) {
+                alert('Bitte fügen Sie Sabotage-Berichte ein!');
+                return;
+            }
+            
+            // Initialisiere Gebäude-Zähler und Statistiken
             const buildings = {};
             let saboCount = 0;
             let totalLevels = 0;
             let totalPoints = 0;
             
             const lines = saboText.split('\n');
+            let inSabotageReport = false;
             let inBuildingList = false;
+            let currentSabotage = null;
             
-            for (let line of lines) {
-                line = line.trim();
+            console.log('📋 Verarbeite', lines.length, 'Zeilen...');
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
                 
-                // Erkenne Sabo-Start
-                if (line.includes('sabotierten erfolgreich') || line.includes('sabotierte erfolgreich')) {
+                // Erkenne Sabotage-Start (verschiedene Varianten)
+                if (line.includes('sabotierte erfolgreich') || 
+                    line.includes('Sabotage erfolgreich') ||
+                    line.includes('Sabotage-Aktion erfolgreich')) {
+                    
                     saboCount++;
-                    inBuildingList = true;
-                    continue;
-                }
-                
-                // Überspringe Header-Zeile
-                if (line.includes('Gebäude') && line.includes('Stufen')) {
-                    continue;
-                }
-                
-                // Parse Gebäude-Zeilen
-                if (inBuildingList && line.length > 0) {
-                    // Versuche verschiedene Formate zu parsen
-                    let buildingName = '';
-                    let levels = 0;
-                    
-                    // Format: "Gebäudename: X Stufen zerstört"
-                    const format1 = line.match(/(.+?):\s*(\d+)\s*Stufen?\s*zerstört/i);
-                    if (format1) {
-                        buildingName = format1[1].trim();
-                        levels = parseInt(format1[2]);
-                    }
-                    
-                    // Format: "Gebäudename X"
-                    const format2 = line.match(/(.+?)\s+(\d+)$/);
-                    if (!format1 && format2) {
-                        buildingName = format2[1].trim();
-                        levels = parseInt(format2[2]);
-                    }
-                    
-                    if (buildingName && levels > 0) {
-                        // Normalisiere Gebäudenamen
-                        buildingName = buildingName.toLowerCase()
-                            .replace(/[^\wäöüß\s]/g, '')
-                            .replace(/\s+/g, '')
-                            .trim();
-                        
-                        if (!buildings[buildingName]) {
-                            buildings[buildingName] = 0;
-                        }
-                        buildings[buildingName] += levels;
-                        totalLevels += levels;
-                        
-                        // Punkte berechnen (vereinfacht: Stufe = 1000 Punkte)
-                        totalPoints += levels * 1000;
-                    }
-                }
-                
-                // Erkenne Ende einer Sabotage-Liste
-                if (line.includes('---') || line.includes('===') || 
-                    (inBuildingList && line.includes('Sie') && !line.includes('Stufen'))) {
+                    inSabotageReport = true;
                     inBuildingList = false;
+                    currentSabotage = {
+                        buildings: {},
+                        totalLevels: 0,
+                        totalPoints: 0
+                    };
+                    
+                    console.log(`🎯 Sabotage #${saboCount} erkannt:`, line);
+                    continue;
+                }
+                
+                // Erkenne Gebäude-Liste-Start
+                if (inSabotageReport && (
+                    line.includes('Gebäude') && line.includes('Stufen') ||
+                    line.includes('Zerstört') ||
+                    line.includes('Beschädigt'))) {
+                    
+                    inBuildingList = true;
+                    console.log('🏢 Gebäude-Liste erkannt');
+                    continue;
+                }
+                
+                // Parse Gebäude-Zeilen wenn in Gebäude-Liste
+                if (inBuildingList && line.length > 0) {
+                    const buildingData = parseBuildingLine(line);
+                    
+                    if (buildingData.name && buildingData.levels > 0) {
+                        const normalizedName = normalizeBuilding(buildingData.name);
+                        
+                        if (Object.prototype.hasOwnProperty.call(BUILDING_POINTS, normalizedName)) {
+                            // Gültiges Gebäude gefunden
+                            if (!buildings[normalizedName]) {
+                                buildings[normalizedName] = 0;
+                            }
+                            buildings[normalizedName] += buildingData.levels;
+                            totalLevels += buildingData.levels;
+                            totalPoints += buildingData.levels * BUILDING_POINTS[normalizedName];
+                            
+                            console.log(`✅ ${normalizedName}: ${buildingData.levels} Stufen (${buildingData.levels * BUILDING_POINTS[normalizedName]} Punkte)`);
+                        } else {
+                            console.warn('⚠️ Unbekanntes Gebäude:', buildingData.name);
+                        }
+                    }
+                    
+                    // Beende Gebäude-Liste bei leerer Zeile oder neuem Sabotage-Bericht
+                    if (line.length === 0 || line.includes('sabotierte erfolgreich')) {
+                        inBuildingList = false;
+                        inSabotageReport = false;
+                        currentSabotage = null;
+                    }
                 }
             }
             
-            // Ergebnisse anzeigen
-            document.getElementById('sabo-count').textContent = saboCount;
-            document.getElementById('total-levels').textContent = formatNumber(totalLevels);
-            document.getElementById('total-points').textContent = formatNumber(totalPoints);
+            // Berechne Durchschnitt
+            const averagePoints = saboCount > 0 ? Math.round(totalPoints / saboCount) : 0;
             
-            const avgPoints = saboCount > 0 ? Math.round(totalPoints / saboCount) : 0;
-            document.getElementById('average-points').textContent = formatNumber(avgPoints);
-            
-            // Gebäude-Übersicht
-            const buildingTypes = Object.keys(buildings).length;
-            document.getElementById('building-types').textContent = buildingTypes;
-            
-            let mostHitBuilding = '-';
-            let mostHitCount = 0;
-            let mostValuableBuilding = '-';
-            let mostValuableCount = 0;
-            
-            for (const [building, count] of Object.entries(buildings)) {
-                if (count > mostHitCount) {
-                    mostHitCount = count;
-                    mostHitBuilding = building;
-                }
-                
-                // Wertvolle Gebäude haben höhere Punkte
-                const value = count * getBuildingMultiplier(building);
-                if (value > mostValuableCount) {
-                    mostValuableCount = value;
-                    mostValuableBuilding = building;
-                }
-                
-                // Aktualisiere Gebäude-Statistiken
-                updateBuildingDisplay(building, count);
-            }
-            
-            document.getElementById('most-hit-building').textContent = mostHitBuilding;
-            document.getElementById('most-valuable-building').textContent = mostValuableBuilding;
-            document.getElementById('reports-evaluated').textContent = saboCount;
-            
-            console.log('Sabotage-Auswertung abgeschlossen:', {
+            console.log('📊 Berechnung abgeschlossen:', {
                 saboCount,
                 totalLevels,
                 totalPoints,
+                averagePoints,
                 buildings
             });
+            
+            // Update UI
+            updateSabotageStats(saboCount, totalLevels, totalPoints, averagePoints);
+            updateBuildingOverview(buildings);
+            updateSummaryBuildingList(buildings);
+            updateBuildingDetailsTable(buildings);
+            
+            console.log('✅ Sabotage-Berechnung erfolgreich abgeschlossen!');
         }
 
-        function getBuildingMultiplier(buildingName) {
-            // Gebäude-Multiplikatoren für Wertberechnung
-            const multipliers = {
-                'planetenzentrale': 5,
-                'forschungszentrum': 4,
-                'schiffsfabrik': 3,
-                'waffenfabrik': 3,
-                'raumhafen': 2,
-                'chemiefabrik': 2
+        // UI Update-Funktionen
+        function updateSabotageStats(saboCount, totalLevels, totalPoints, averagePoints) {
+            const elements = {
+                'sabo-count': saboCount,
+                'total-levels': formatNumber(totalLevels),
+                'total-points': formatNumber(totalPoints),
+                'average-points': formatNumber(averagePoints)
             };
             
-            for (const [key, multiplier] of Object.entries(multipliers)) {
-                if (buildingName.includes(key)) {
-                    return multiplier;
+            for (const [id, value] of Object.entries(elements)) {
+                const element = document.getElementById(id);
+                if (element) element.textContent = value;
+            }
+        }
+
+        function updateBuildingOverview(buildings) {
+            const buildingTypes = Object.keys(buildings).length;
+            const buildingTypesElement = document.getElementById('building-types');
+            if (buildingTypesElement) buildingTypesElement.textContent = buildingTypes;
+            
+            // Meistgetroffenes Gebäude
+            let mostHitBuilding = '-';
+            let mostHitCount = 0;
+            for (const [building, count] of Object.entries(buildings)) {
+                if (count > mostHitCount) {
+                    mostHitCount = count;
+                    mostHitBuilding = `${building} (${count})`;
                 }
             }
-            return 1;
+            const mostHitElement = document.getElementById('most-hit-building');
+            if (mostHitElement) mostHitElement.textContent = mostHitBuilding;
+            
+            // Wertvollstes Ziel (nach Gesamtpunkten)
+            let mostValuableBuilding = '-';
+            let mostValuablePoints = 0;
+            for (const [building, count] of Object.entries(buildings)) {
+                const points = count * BUILDING_POINTS[building];
+                if (points > mostValuablePoints) {
+                    mostValuablePoints = points;
+                    mostValuableBuilding = `${building} (${points} Pkt.)`;
+                }
+            }
+            const mostValuableElement = document.getElementById('most-valuable-building');
+            if (mostValuableElement) mostValuableElement.textContent = mostValuableBuilding;
         }
 
-        function updateBuildingDisplay(buildingName, levels) {
-            // Mapping zu HTML-IDs
-            const buildingMappings = {
-                'planetenzentrale': 'levels-planetenzentrale',
-                'raumhafen': 'levels-raumhafen',
-                'wohngebäude': 'levels-wohngebäude',
-                'solarpark': 'levels-solarpark',
-                'eisenmine': 'levels-eisenmine',
-                'siliziumraffinerie': 'levels-siliziumraffinerie',
-                'kohlenstoffgewinnungsanlage': 'levels-kohlenstoffgewinnungsanlage',
-                'bohrturm': 'levels-bohrturm',
-                'chemiefabrik': 'levels-chemiefabrik',
-                'recyclinganlage': 'levels-recyclinganlage',
-                'rohstofflager': 'levels-rohstofflager',
-                'schiffsfabrik': 'levels-schiffsfabrik',
-                'waffenfabrik': 'levels-waffenfabrik',
-                'forschungszentrum': 'levels-forschungszentrum'
+        function updateSummaryBuildingList(buildings) {
+            // Update Anzahl der Berichte
+            const reportsEvaluated = document.getElementById('reports-evaluated');
+            const saboCount = document.getElementById('sabo-count');
+            if (reportsEvaluated && saboCount) {
+                reportsEvaluated.textContent = saboCount.textContent;
+            }
+            
+            // Alle Gebäude-IDs definieren
+            const buildingIds = {
+                'Planetenzentrale': 'levels-planetenzentrale',
+                'Raumhafen': 'levels-raumhafen',
+                'Wohngebäude': 'levels-wohngebäude',
+                'Solarpark': 'levels-solarpark',
+                'Eisenmine': 'levels-eisenmine',
+                'Siliziumraffinerie': 'levels-siliziumraffinerie',
+                'Kohlenstoffgewinnungsanlage': 'levels-kohlenstoffgewinnungsanlage',
+                'Bohrturm': 'levels-bohrturm',
+                'Chemiefabrik': 'levels-chemiefabrik',
+                'Recyclinganlage': 'levels-recyclinganlage',
+                'Rohstofflager': 'levels-rohstofflager',
+                'Schiffsfabrik': 'levels-schiffsfabrik',
+                'Waffenfabrik': 'levels-waffenfabrik',
+                'Forschungszentrum': 'levels-forschungszentrum'
             };
             
-            for (const [key, elementId] of Object.entries(buildingMappings)) {
-                if (buildingName.includes(key)) {
-                    const element = document.getElementById(elementId);
+            // Alle Gebäude auf 0 setzen
+            Object.values(buildingIds).forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = '0';
+                }
+            });
+            
+            // Aktualisiere mit den tatsächlichen Werten
+            for (const [building, levels] of Object.entries(buildings)) {
+                const id = buildingIds[building];
+                if (id) {
+                    const element = document.getElementById(id);
                     if (element) {
-                        const currentValue = parseInt(element.textContent) || 0;
-                        element.textContent = currentValue + levels;
+                        element.textContent = formatNumber(levels);
                     }
-                    break;
                 }
             }
+        }
+
+        function updateBuildingDetailsTable(buildings) {
+            const tableBody = document.getElementById('building-details-body');
+            const detailsSection = document.getElementById('building-details');
+            
+            if (Object.keys(buildings).length === 0) {
+                if (detailsSection) detailsSection.style.display = 'none';
+                return;
+            }
+            
+            if (!tableBody) return;
+            
+            let tableHTML = '';
+            
+            // Sortiere Gebäude nach Gesamtpunkten (absteigend)
+            const sortedBuildings = Object.entries(buildings).sort((a, b) => {
+                const pointsA = a[1] * BUILDING_POINTS[a[0]];
+                const pointsB = b[1] * BUILDING_POINTS[b[0]];
+                return pointsB - pointsA;
+            });
+            
+            for (const [building, levels] of sortedBuildings) {
+                const pointsPerLevel = BUILDING_POINTS[building];
+                const totalPoints = levels * pointsPerLevel;
+                
+                tableHTML += `
+                    <tr>
+                        <td class="building-name">${building}</td>
+                        <td class="levels-destroyed">${formatNumber(levels)}</td>
+                        <td class="points-earned">${pointsPerLevel}</td>
+                        <td class="points-earned">${formatNumber(totalPoints)}</td>
+                    </tr>
+                `;
+            }
+            
+            tableBody.innerHTML = tableHTML;
+            if (detailsSection) detailsSection.style.display = 'block';
         }
 
         function clearAll() {
-            document.getElementById('sabo-reports').value = '';
+            const saboReports = document.getElementById('sabo-reports');
+            if (saboReports) saboReports.value = '';
             
             // Reset alle Statistik-Werte auf 0
-            document.getElementById('sabo-count').textContent = '0';
-            document.getElementById('total-levels').textContent = '0';
-            document.getElementById('total-points').textContent = '0';
-            document.getElementById('average-points').textContent = '0';
+            const statsElements = ['sabo-count', 'total-levels', 'total-points', 'average-points'];
+            statsElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.textContent = '0';
+            });
             
             // Reset Gebäude-Übersicht
-            document.getElementById('building-types').textContent = '0';
-            document.getElementById('most-hit-building').textContent = '-';
-            document.getElementById('most-valuable-building').textContent = '-';
-            document.getElementById('reports-evaluated').textContent = '0';
+            const overviewElements = {
+                'building-types': '0',
+                'most-hit-building': '-',
+                'most-valuable-building': '-',
+                'reports-evaluated': '0'
+            };
+            
+            for (const [id, value] of Object.entries(overviewElements)) {
+                const element = document.getElementById(id);
+                if (element) element.textContent = value;
+            }
             
             // Alle Gebäude-Level auf 0 setzen
             const buildingIds = [
@@ -814,12 +1169,14 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
             
             buildingIds.forEach(id => {
                 const element = document.getElementById(id);
-                if (element) {
-                    element.textContent = '0';
-                }
+                if (element) element.textContent = '0';
             });
             
-            console.log('Alle Daten gelöscht');
+            // Hide building details table
+            const buildingDetails = document.getElementById('building-details');
+            if (buildingDetails) buildingDetails.style.display = 'none';
+            
+            console.log('🗑️ Sabo-Counter zurückgesetzt');
         }
 
         // Keyboard Shortcuts
@@ -829,10 +1186,18 @@ Oder fügen Sie mehrere Sabotage-Berichte ein..."></textarea>
                 e.preventDefault();
                 calculateSabotage();
             }
+            
+            // Strg+Delete = Alles löschen
+            if (e.ctrlKey && e.key === 'Delete') {
+                e.preventDefault();
+                if (confirm('Alle Eingaben löschen?')) {
+                    clearAll();
+                }
+            }
         });
 
         console.log('💥 Sabo-Counter geladen');
-        console.log('💡 Keyboard-Shortcuts: Strg+Enter (Berechnen)');
+        console.log('💡 Keyboard-Shortcuts: Strg+Enter (Berechnen), Strg+Delete (Löschen)');
     </script>
 </body>
 </html>
