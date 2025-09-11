@@ -15,12 +15,23 @@ class SpyReportPage {
         // Branch erkennen
         this.branch = this._detectBranch();
 
+        // Warte kurz, um sicherzustellen, dass der Auth-State geladen ist
+        let authChecked = false;
+        
         window.AuthAPI.onAuthStateChange(async (user) => {
+            authChecked = true;
             this.user = user;
+            
             if (!user) {
-                window.location.href = 'index.html';
+                // Nur weiterleiten, wenn wirklich kein User eingeloggt ist
+                console.log('❌ Kein Benutzer eingeloggt - Weiterleitung zur Startseite');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
                 return;
             }
+            
+            console.log('✅ Benutzer eingeloggt');
             const id = new URLSearchParams(window.location.search).get('id');
             if (!id) {
                 alert('Keine Bericht-ID angegeben');
@@ -30,6 +41,14 @@ class SpyReportPage {
             this._setBackLink();
             await this._loadReport(id);
         });
+        
+        // Fallback: Wenn nach 3 Sekunden kein Auth-State kam, prüfen
+        setTimeout(() => {
+            if (!authChecked && !window.AuthAPI.isLoggedIn()) {
+                console.log('⏱️ Auth-Timeout - Weiterleitung zur Startseite');
+                window.location.href = 'index.html';
+            }
+        }, 3000);
     }
 
     _detectBranch() {

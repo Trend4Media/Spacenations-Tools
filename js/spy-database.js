@@ -18,18 +18,38 @@ class SpyDatabasePage {
         // Branch erkennen und speichern
         this.branch = this._detectBranch();
 
+        // Warte kurz, um sicherzustellen, dass der Auth-State geladen ist
+        let authChecked = false;
+        
         window.AuthAPI.onAuthStateChange((user, userData) => {
+            authChecked = true;
             this.user = user;
             this.userData = userData;
             this.alliance = userData?.alliance || null;
+            
             if (!user) {
-                window.location.href = 'index.html';
+                // Nur weiterleiten, wenn wirklich kein User eingeloggt ist
+                // und nicht während der Initialisierung
+                console.log('❌ Kein Benutzer eingeloggt - Weiterleitung zur Startseite');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
                 return;
             }
+            
+            console.log('✅ Benutzer eingeloggt:', userData?.username);
             this._setupUI();
             this._renderBranchBadge();
             this._startListening();
         });
+        
+        // Fallback: Wenn nach 3 Sekunden kein Auth-State kam, prüfen
+        setTimeout(() => {
+            if (!authChecked && !window.AuthAPI.isLoggedIn()) {
+                console.log('⏱️ Auth-Timeout - Weiterleitung zur Startseite');
+                window.location.href = 'index.html';
+            }
+        }, 3000);
     }
 
     _setupUI() {
