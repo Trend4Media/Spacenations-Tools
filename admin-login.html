@@ -4,105 +4,423 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - Spacenations Tools</title>
-    <link rel="stylesheet" href="css/global-footer.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%); color: #e0e0e0; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .card { background: rgba(16,16,16,0.9); border: 2px solid #3a5998; border-radius: 15px; padding: 30px; width: 100%; max-width: 420px; box-shadow: 0 10px 30px rgba(58,89,152,0.3); }
-        h1 { color: #ff8c42; margin: 0 0 5px 0; text-align: center; }
-        .subtitle { color: #b0b0b0; text-align: center; margin-bottom: 20px; }
-        .form-group { margin: 12px 0; }
-        label { display: block; margin-bottom: 6px; color: #b0b0b0; font-size: 0.95rem; }
-        input { width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #3a5998; background: rgba(0,0,0,0.6); color: #fff; font-size: 1rem; }
-        .btn { width: 100%; margin-top: 14px; padding: 12px; border: none; border-radius: 10px; background: linear-gradient(135deg, #3a5998, #4a90e2); color: white; font-weight: 600; cursor: pointer; }
-        .btn:hover { filter: brightness(1.05); }
-        .message { display: none; margin-top: 12px; padding: 10px; border-radius: 8px; font-weight: 600; text-align: center; }
-        .error { display: none; background: rgba(239,68,68,0.1); border: 1px solid #ef4444; color: #ef4444; }
-        .info { display: none; background: rgba(59,130,246,0.1); border: 1px solid #3b82f6; color: #93c5fd; }
-        .help { text-align: center; margin-top: 14px; }
-        .help a { color: #4a90e2; text-decoration: none; }
+        :root {
+            --primary: #00FF88;
+            --primary-dark: #00CC6A;
+            --bg-dark: #0A0A0A;
+            --bg-card: #111111;
+            --border: rgba(0, 255, 136, 0.2);
+            --text-primary: #FFFFFF;
+            --text-secondary: #C0C0C0;
+            --error: #FF4444;
+            --success: #00FF88;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Background effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .login-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 48px 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .login-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            filter: grayscale(0.2);
+        }
+        
+        .login-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+        
+        .login-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 400;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(0, 255, 136, 0.05);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+        }
+        
+        .form-input::placeholder {
+            color: rgba(192, 192, 192, 0.4);
+        }
+        
+        .login-button {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 8px;
+            font-family: 'Orbitron', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 32px;
+        }
+        
+        .login-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .login-button:hover::before {
+            left: 100%;
+        }
+        
+        .login-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 255, 136, 0.3);
+        }
+        
+        .login-button:active {
+            transform: translateY(0);
+        }
+        
+        .login-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .message {
+            margin-top: 20px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+        }
+        
+        .message.error {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            color: var(--error);
+        }
+        
+        .message.success {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            color: var(--success);
+        }
+        
+        .back-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        
+        .back-link:hover {
+            color: var(--primary);
+            transform: translateX(-4px);
+        }
+        
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 32px 24px;
+            }
+            
+            .login-title {
+                font-size: 24px;
+            }
+            
+            .back-link {
+                position: static;
+                margin-bottom: 20px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>🔐 Admin Login</h1>
-        <div class="subtitle">Nur für Super-Admins</div>
-
-        <div id="msg-error" class="message error"></div>
-        <div id="msg-info" class="message info"></div>
-
-        <form id="admin-login-form">
-            <div class="form-group">
-                <label for="email">E-Mail</label>
-                <input type="email" id="email" placeholder="admin@email.de" required>
+    <a href="index.html" class="back-link">
+        <span>←</span>
+        <span>Zurück</span>
+    </a>
+    
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-icon">🔐</div>
+                <h1 class="login-title">Admin Login</h1>
+                <p class="login-subtitle">Restricted Access</p>
             </div>
-            <div class="form-group">
-                <label for="password">Passwort</label>
-                <input type="password" id="password" placeholder="Passwort" required>
-            </div>
-            <button type="submit" class="btn" id="login-btn">Anmelden</button>
-        </form>
-
-        <div class="help">
-            <a href="index.html">← Zurück</a>
+            
+            <form id="admin-login-form">
+                <div class="form-group">
+                    <label class="form-label" for="email">E-Mail Adresse</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        class="form-input" 
+                        placeholder="admin@example.com" 
+                        required
+                        autocomplete="email"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="password">Passwort</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        class="form-input" 
+                        placeholder="••••••••" 
+                        required
+                        autocomplete="current-password"
+                    >
+                </div>
+                
+                <button type="submit" class="login-button" id="login-btn">
+                    Anmelden
+                </button>
+            </form>
+            
+            <div id="msg-error" class="message error"></div>
+            <div id="msg-success" class="message success"></div>
         </div>
     </div>
 
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
+    <!-- App Scripts -->
     <script src="js/firebase-config.js"></script>
     <script src="js/auth-manager.js"></script>
     <script src="js/firebase-sync.js"></script>
+    
     <script>
-        function showError(msg) { const el = document.getElementById('msg-error'); el.textContent = msg; el.style.display = 'block'; document.getElementById('msg-info').style.display = 'none'; }
-        function showInfo(msg) { const el = document.getElementById('msg-info'); el.textContent = msg; el.style.display = 'block'; document.getElementById('msg-error').style.display = 'none'; }
-
-        async function ensureSuperAdminOrReject(user) {
+        // Message functions
+        function showError(msg) {
+            const errorEl = document.getElementById('msg-error');
+            const successEl = document.getElementById('msg-success');
+            errorEl.textContent = msg;
+            errorEl.style.display = 'block';
+            successEl.style.display = 'none';
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                errorEl.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showSuccess(msg) {
+            const errorEl = document.getElementById('msg-error');
+            const successEl = document.getElementById('msg-success');
+            successEl.textContent = msg;
+            successEl.style.display = 'block';
+            errorEl.style.display = 'none';
+        }
+        
+        // Check if user is super admin
+        async function verifySuperAdmin(user) {
             try {
                 const db = window.FirebaseConfig.getDB();
                 const doc = await db.collection('users').doc(user.uid).get();
                 const data = doc.exists ? doc.data() : null;
-                if (data && (data.isSuperAdmin === true)) {
+                
+                if (data && data.isSuperAdmin === true) {
                     return true;
                 }
+                
+                // Not a super admin, logout
                 await window.AuthAPI.logout();
-                throw new Error('Kein Super-Admin. Zugriff verweigert.');
-            } catch (e) { throw e; }
+                throw new Error('Zugriff verweigert. Nur für Super-Admins.');
+            } catch (error) {
+                throw error;
+            }
         }
-
+        
+        // Check auth state on load
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 await window.AuthAPI.waitForInit();
+                
+                // If already logged in as super admin, redirect
                 window.AuthAPI.onAuthStateChange(async (user, userData) => {
-                    if (user && userData && userData.isSuperAdmin) {
-                        window.location.href = 'admin-dashboard.html';
+                    if (user && userData && userData.isSuperAdmin === true) {
+                        showSuccess('Bereits angemeldet. Weiterleitung...');
+                        setTimeout(() => {
+                            window.location.href = 'admin-dashboard.html';
+                        }, 1000);
                     }
                 });
-            } catch (e) { /* ignore */ }
-        });
-
-        document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('login-btn');
-            btn.disabled = true; btn.textContent = '⏳ Prüfe...';
-            try {
-                await window.AuthAPI.waitForInit();
-                const email = document.getElementById('email').value.trim();
-                const password = document.getElementById('password').value;
-                const res = await window.AuthAPI.login(email, password);
-                if (!res.success) { throw new Error(res.error || 'Login fehlgeschlagen'); }
-                showInfo('Angemeldet. Prüfe Berechtigung...');
-                await ensureSuperAdminOrReject(res.user);
-                window.location.href = 'admin-dashboard.html';
-            } catch (err) {
-                showError(err.message || 'Fehler beim Login');
-            } finally {
-                btn.disabled = false; btn.textContent = 'Anmelden';
+            } catch (error) {
+                console.error('Auth init error:', error);
             }
         });
+        
+        // Handle login form submission
+        document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const button = document.getElementById('login-btn');
+            const originalText = button.textContent;
+            
+            // Disable button and show loading
+            button.disabled = true;
+            button.textContent = 'Anmeldung läuft...';
+            
+            try {
+                // Wait for auth to be ready
+                await window.AuthAPI.waitForInit();
+                
+                // Get form values
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                
+                // Attempt login
+                const result = await window.AuthAPI.login(email, password);
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Anmeldung fehlgeschlagen');
+                }
+                
+                // Show success message
+                showSuccess('Anmeldung erfolgreich. Prüfe Berechtigung...');
+                
+                // Verify super admin status
+                await verifySuperAdmin(result.user);
+                
+                // Redirect to admin dashboard
+                showSuccess('Berechtigung bestätigt. Weiterleitung...');
+                setTimeout(() => {
+                    window.location.href = 'admin-dashboard.html';
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                showError(error.message || 'Ein Fehler ist aufgetreten');
+            } finally {
+                // Re-enable button
+                button.disabled = false;
+                button.textContent = originalText;
+            }
+        });
+        
+        // Focus email field on load
+        window.addEventListener('load', () => {
+            document.getElementById('email').focus();
+        });
     </script>
-    <script src="js/global-footer-loader.js"></script>
 </body>
 </html>
-
