@@ -56,9 +56,17 @@ class AutoGlobalFooterLoader {
                 border-top: 1px solid rgba(0, 255, 136, 0.2);
                 padding: 60px 48px 40px;
                 margin-top: 80px;
+                margin-left: 280px;
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
                 position: relative;
                 overflow: hidden;
+                transition: margin-left 0.3s ease;
+            }
+            
+            @media (max-width: 768px) {
+                .global-footer {
+                    margin-left: 0;
+                }
             }
             
             .global-footer::before {
@@ -421,10 +429,43 @@ class AutoGlobalFooterLoader {
         document.body.insertAdjacentHTML('beforeend', this.footerHTML);
         this.isLoaded = true;
         
+        // Sidebar-Anpassung
+        this.adjustForSidebar();
+        
         console.log('✅ Global Footer automatisch eingefügt');
         
         // Footer-Features nach kleiner Verzögerung initialisieren
         setTimeout(() => this.initializeFooterFeatures(), 100);
+    }
+    
+    // Footer an Sidebar anpassen
+    adjustForSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        const footer = document.querySelector('.global-footer');
+        
+        if (sidebar && footer) {
+            // Prüfen ob Sidebar sichtbar ist
+            const sidebarStyle = window.getComputedStyle(sidebar);
+            if (sidebarStyle.display !== 'none' && sidebarStyle.visibility !== 'hidden') {
+                const sidebarWidth = sidebar.offsetWidth;
+                if (window.innerWidth > 768) {
+                    footer.style.marginLeft = `${sidebarWidth}px`;
+                    console.log(`📏 Footer an Sidebar angepasst: ${sidebarWidth}px`);
+                }
+            }
+        }
+        
+        // Bei Fenstergrößenänderung anpassen
+        window.addEventListener('resize', () => {
+            if (footer) {
+                if (window.innerWidth <= 768) {
+                    footer.style.marginLeft = '0';
+                } else if (sidebar) {
+                    const sidebarWidth = sidebar.offsetWidth;
+                    footer.style.marginLeft = `${sidebarWidth}px`;
+                }
+            }
+        });
     }
     
     // Footer HTML Template

@@ -218,6 +218,25 @@
             padding: 32px 0;
             z-index: 900;
             overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--razer-green) var(--bg-secondary);
+        }
+        
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 136, 0.3);
+            border-radius: 3px;
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 255, 136, 0.5);
         }
         
         .sidebar-title {
@@ -250,24 +269,34 @@
         }
         
         .sidebar-btn {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 16px 24px;
-            border: 2px solid var(--razer-green);
-            border-radius: 8px;
+            gap: 12px;
+            padding: 14px 20px;
+            background: rgba(0, 255, 136, 0.05);
+            border: 2px solid rgba(0, 255, 136, 0.2);
+            border-radius: 10px;
             font-family: var(--font-gaming);
             font-weight: 600;
-            font-size: 16px;
+            font-size: 15px;
             text-decoration: none;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
-            background: transparent;
-            color: var(--razer-green);
-            text-align: center;
+            color: var(--text-secondary);
+        }
+        
+        .sidebar-btn-icon {
+            font-size: 20px;
+            filter: grayscale(0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-btn-text {
+            flex: 1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
         .sidebar-btn::before {
@@ -277,7 +306,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.2), transparent);
             transition: left 0.6s ease;
         }
         
@@ -286,14 +315,56 @@
         }
         
         .sidebar-btn:hover {
-            background: var(--razer-green);
-            color: var(--razer-black);
-            transform: translateY(-2px);
-            box-shadow: var(--glow-green);
+            background: rgba(0, 255, 136, 0.1);
+            border-color: var(--razer-green);
+            color: var(--razer-green);
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+        }
+        
+        .sidebar-btn:hover .sidebar-btn-icon {
+            filter: grayscale(0);
+            transform: scale(1.1);
         }
         
         .sidebar-btn:active {
-            transform: translateY(0);
+            transform: translateX(3px);
+        }
+        
+        .sidebar-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.2), transparent);
+            margin: 32px 24px;
+        }
+        
+        .sidebar-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 0 24px;
+        }
+        
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .sidebar-link:hover {
+            background: rgba(0, 255, 136, 0.05);
+            color: var(--razer-green);
+            transform: translateX(5px);
+        }
+        
+        .sidebar-link span {
+            font-size: 16px;
         }
         
         
@@ -524,22 +595,40 @@
 
     <!-- Sidebar Navigation -->
     <aside class="sidebar" id="sidebar">
-        <h3 class="sidebar-title">Counter Tools</h3>
+        <h3 class="sidebar-title">🎮 Gaming Tools</h3>
         <div class="sidebar-buttons">
             <a href="as-counter.html" class="sidebar-btn">
-                AS Counter
+                <span class="sidebar-btn-icon">⚔️</span>
+                <span class="sidebar-btn-text">AS Counter</span>
             </a>
             <a href="battle-counter.html" class="sidebar-btn">
-                Battle Counter
+                <span class="sidebar-btn-icon">🧮</span>
+                <span class="sidebar-btn-text">Battle Counter</span>
             </a>
             <a href="raid-counter.html" class="sidebar-btn">
-                Raid Counter
+                <span class="sidebar-btn-icon">🏴‍☠️</span>
+                <span class="sidebar-btn-text">Raid Counter</span>
             </a>
             <a href="sabo-counter.html" class="sidebar-btn">
-                Sabo Counter
+                <span class="sidebar-btn-icon">💣</span>
+                <span class="sidebar-btn-text">Sabo Counter</span>
             </a>
         </div>
         
+        <div class="sidebar-divider"></div>
+        
+        <h3 class="sidebar-subtitle">🚀 Quick Links</h3>
+        <div class="sidebar-links">
+            <a href="dashboard.html" class="sidebar-link">
+                <span>📊</span> Dashboard
+            </a>
+            <a href="register.html" class="sidebar-link">
+                <span>🔐</span> Register
+            </a>
+            <a href="spy-database.html" class="sidebar-link">
+                <span>🕵️</span> Spy Database
+            </a>
+        </div>
     </aside>
 
     <!-- Main Content -->
