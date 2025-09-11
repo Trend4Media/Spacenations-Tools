@@ -46,62 +46,7 @@
             --font-gaming: 'Orbitron', monospace;
         }
 
-        /* Footer */
-        .footer {
-            background: var(--razer-black);
-            border-top: 1px solid rgba(0, 255, 136, 0.2);
-            padding: 60px 48px 40px;
-        }
-        
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            text-align: center;
-        }
-        
-        .footer-text {
-            color: var(--text-secondary);
-            margin-bottom: 24px;
-        }
-        
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 32px;
-            flex-wrap: wrap;
-            margin-bottom: 32px;
-        }
-        
-        .footer-link {
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
-        .footer-link::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--razer-green);
-            transition: width 0.3s ease;
-        }
-        
-        .footer-link:hover {
-            color: var(--razer-green);
-        }
-        
-        .footer-link:hover::after {
-            width: 100%;
-        }
-        
-        .footer-bottom {
-            color: rgba(192, 192, 192, 0.6);
-            font-size: 14px;
-        }
+        /* Footer styles are now loaded from global-footer-loader.js */
 
         /* Main Layout */
         * {
@@ -469,18 +414,6 @@
                 width: 100%;
                 max-width: 300px;
             }
-
-            .footer-content {
-                grid-template-columns: 1fr;
-                gap: 25px;
-                text-align: center;
-            }
-            
-            .footer-bottom {
-                flex-direction: column;
-                text-align: center;
-                gap: 15px;
-            }
         }
     </style>
 </head>
@@ -570,25 +503,12 @@
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <p class="footer-text">Professional gaming tools for competitive Spacenations players</p>
-            
-            <div class="footer-links">
-                <a href="index.html" class="footer-link">Home</a>
-                <a href="as-counter.html" class="footer-link">AS Counter</a>
-                <a href="raid-counter.html" class="footer-link">Raid Counter</a>
-                <a href="sabo-counter.html" class="footer-link">Sabo Counter</a>
-            </div>
-            
-            <p class="footer-bottom">&copy; 2025 Spacenations Tools. Built for gamers, by gamers.</p>
-        </div>
-    </footer>
+    <!-- Global Footer wird automatisch geladen -->
 
     <!-- Scripts -->
     <script src="js/battle-calculator.js"></script>
     <script src="js/theme-manager.js"></script>
+    <script src="js/global-footer-loader.js"></script>
     
     <script>
         // Battle Calculator Functions
