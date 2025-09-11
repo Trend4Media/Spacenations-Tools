@@ -6,9 +6,21 @@
     <title>Dashboard - Spacenations Tools</title>
     <!-- Gemeinsame Theme-Variablen -->
     <link rel="stylesheet" href="css/theme-variables.css">
-    <link rel="stylesheet" href="css/global-footer.css">
-    <link rel="stylesheet" href="css/enhanced-navigation.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #00FF88;
+            --primary-dark: #00CC6A;
+            --bg-dark: #0A0A0A;
+            --bg-panel: #111111;
+            --border-primary: rgba(0, 255, 136, 0.2);
+            --text-primary: #FFFFFF;
+            --text-secondary: #C0C0C0;
+            --accent-primary: #00FF88;
+            --accent-secondary: #00CC6A;
+        }
         
         * {
             margin: 0;
@@ -17,33 +29,62 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-gradient);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: var(--bg-dark);
             color: var(--text-primary);
             min-height: 100vh;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        /* Background effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .dashboard-wrapper {
             display: grid;
             grid-template-areas: 
                 "header header header"
-                "nav main sidebar"
-                "footer footer footer";
+                "nav main sidebar";
             grid-template-columns: 250px 1fr 300px;
-            grid-template-rows: auto 1fr auto;
+            grid-template-rows: auto 1fr;
             gap: 20px;
             padding: 20px;
-            transition: all 0.3s ease;
+            min-height: calc(100vh - 40px);
         }
         
         /* Header */
         .header {
             grid-area: header;
             background: var(--bg-panel);
-            border: 2px solid var(--border-primary);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 0 20px var(--border-shadow);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(10px);
             position: relative;
             transition: all 0.3s ease;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
         }
         
         .header-content {
@@ -771,14 +812,6 @@
             font-size: 1.2rem;
         }
         
-        /* Footer */
-        .footer {
-            grid-area: footer;
-            text-align: center;
-            padding: 20px;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
         
         /* Loading States */
         .loading {
@@ -838,27 +871,25 @@
         
         /* Responsive */
         @media (max-width: 1024px) {
-            body {
+            .dashboard-wrapper {
                 grid-template-areas: 
                     "header header"
                     "nav sidebar"
-                    "main main"
-                    "footer footer";
+                    "main main";
                 grid-template-columns: 1fr 300px;
-                grid-template-rows: auto auto 1fr auto;
+                grid-template-rows: auto auto 1fr;
             }
         }
         
         @media (max-width: 768px) {
-            body {
+            .dashboard-wrapper {
                 grid-template-areas: 
                     "header"
                     "main"
                     "sidebar"
-                    "nav"
-                    "footer";
+                    "nav";
                 grid-template-columns: 1fr;
-                grid-template-rows: auto 1fr auto auto auto;
+                grid-template-rows: auto 1fr auto auto;
                 padding: 10px;
                 gap: 15px;
             }
@@ -969,7 +1000,8 @@
         </div>
     </div>
 
-    <div class="header">
+    <div class="dashboard-wrapper">
+        <div class="header">
         <div class="header-content">
             <div class="header-left">
                 <h1>🏠 Dashboard</h1>
@@ -1224,9 +1256,7 @@
         </div>
     </div>
     
-    <footer class="footer">
-        <p>Spacenations Dashboard © 2025 | Dein persönlicher Bereich</p>
-    </footer>
+    </div> <!-- Ende dashboard-wrapper -->
 
     <!-- Firebase SDK - MUSS ZUERST geladen werden -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" onerror="handleFirebaseError('app')"></script>
