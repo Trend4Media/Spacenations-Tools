@@ -1492,8 +1492,16 @@
             if (!isAdmin || !permissionManager) return;
 
             // Zeige nur die Mitglieder-Verwaltung, keine Allianz-weiten Toggle-Switches
-            document.getElementById('permission-section').style.display = 'none';
-            document.getElementById('member-management-section').style.display = 'block';
+            const permissionSection = document.getElementById('permission-section');
+            const memberManagement = document.getElementById('member-management');
+            
+            if (permissionSection) {
+                permissionSection.style.display = 'none';
+            }
+            
+            if (memberManagement) {
+                memberManagement.style.display = 'block';
+            }
         }
 
         async function loadMemberManagement() {
