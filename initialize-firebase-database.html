@@ -106,7 +106,42 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     
-    <script src="js/firebase-config.js"></script>
+    <script>
+        // Direkte Firebase-Initialisierung
+        const firebaseConfig = {
+            apiKey: 'AIzaSyDr4-ap_EubUn0UdP7hkEpS2jkzLIVgvyc',
+            authDomain: 'spacenations-tools.firebaseapp.com',
+            projectId: 'spacenations-tools',
+            storageBucket: 'spacenations-tools.firebasestorage.app',
+            messagingSenderId: '651338201276',
+            appId: '1:651338201276:web:89e7d9c19dbd2611d3f8b9',
+            measurementId: 'G-SKWJWH2ERX'
+        };
+
+        // Firebase initialisieren
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        // Globale Firebase-Services
+        window.firebaseServices = {
+            auth: firebase.auth(),
+            db: firebase.firestore(),
+            serverTimestamp: firebase.firestore.FieldValue.serverTimestamp,
+            initialized: true
+        };
+
+        // FirebaseConfig Mock für Kompatibilität
+        window.FirebaseConfig = {
+            isReady: () => true,
+            getAuth: () => firebase.auth(),
+            getDB: () => firebase.firestore(),
+            getServerTimestamp: () => firebase.firestore.FieldValue.serverTimestamp(),
+            waitForInit: () => Promise.resolve()
+        };
+
+        console.log('✅ Firebase direkt initialisiert');
+    </script>
     
     <script>
         let logs = [];
