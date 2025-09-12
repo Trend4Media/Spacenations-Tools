@@ -874,7 +874,7 @@
         </div>
 
         <!-- Permissions Section (only for admins) -->
-        <section class="permission-section" id="permission-section" style="display: none;">
+        <section class="permission-section" id="permission-section">
             <h3>🔐 Berechtigungen verwalten</h3>
             
             <!-- Alliance-wide Permissions -->
@@ -1106,9 +1106,9 @@
                 await initializePermissionManager();
                 await initializeMemberManager();
                 
-                // Lade Berechtigungen und Mitgliederverwaltung nur für Admins
+                // Lade Berechtigungen für alle Benutzer (Inhalte nur für Admins)
+                loadPermissions();
                 if (isAdmin) {
-                    loadPermissions();
                     loadMemberManagement();
                 }
                 
@@ -1188,9 +1188,9 @@
                 await initializePermissionManager();
                 await initializeMemberManager();
                 
-                // Lade Berechtigungen und Mitgliederverwaltung nur für Admins
+                // Lade Berechtigungen für alle Benutzer (Inhalte nur für Admins)
+                loadPermissions();
                 if (isAdmin) {
-                    loadPermissions();
                     loadMemberManagement();
                 }
                 
@@ -1268,9 +1268,9 @@
                 
                 // Initialisiere Permission Manager
                 initializePermissionManager().then(() => {
-                    // Lade Berechtigungen und Mitgliederverwaltung nur für Admins
+                    // Lade Berechtigungen für alle Benutzer (Inhalte nur für Admins)
+                    loadPermissions();
                     if (isAdmin) {
-                        loadPermissions();
                         loadMemberManagement();
                     }
                 });
@@ -1396,10 +1396,10 @@
                 loadActiveMembers();
                 loadChatMessages();
                 
+                await initializePermissionManager();
+                await initializeMemberManager();
+                loadPermissions();
                 if (isAdmin) {
-                    await initializePermissionManager();
-                    await initializeMemberManager();
-                    loadPermissions();
                     loadMemberManagement();
                 }
 
@@ -1422,9 +1422,9 @@
                 await initializePermissionManager();
                 await initializeMemberManager();
                 
-                // Lade Berechtigungen und Mitgliederverwaltung nur für Admins
+                // Lade Berechtigungen für alle Benutzer (Inhalte nur für Admins)
+                loadPermissions();
                 if (isAdmin) {
-                    loadPermissions();
                     loadMemberManagement();
                 }
             } else {
@@ -1663,15 +1663,10 @@
         async function loadPermissions() {
             console.log('🔐 loadPermissions aufgerufen:', { isAdmin, permissionManager: !!permissionManager });
             
-            if (!isAdmin || !permissionManager) {
-                console.log('⚠️ loadPermissions abgebrochen - nicht Admin oder kein PermissionManager');
-                return;
-            }
-
-            // Zeige die Berechtigungs-Sektion für Admins
             const permissionSection = document.getElementById('permission-section');
             const memberManagement = document.getElementById('member-management');
             
+            // Zeige die Berechtigungs-Sektion immer an
             if (permissionSection) {
                 permissionSection.style.display = 'block';
                 console.log('✅ Berechtigungs-Sektion angezeigt');
@@ -1680,6 +1675,23 @@
             if (memberManagement) {
                 memberManagement.style.display = 'block';
                 console.log('✅ Mitglieder-Verwaltung angezeigt');
+            }
+            
+            // Lade nur die Inhalte für Admins
+            if (!isAdmin || !permissionManager) {
+                console.log('⚠️ Keine Admin-Berechtigung - zeige nur leere Sektion');
+                
+                // Zeige Nachricht für Nicht-Admins
+                if (memberManagement) {
+                    memberManagement.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                            <div style="font-size: 2rem; margin-bottom: 15px;">🔒</div>
+                            <h4 style="color: var(--razer-green); margin-bottom: 10px;">Admin-Berechtigung erforderlich</h4>
+                            <p>Nur Allianz-Admins können Berechtigungen verwalten.</p>
+                        </div>
+                    `;
+                }
+                return;
             }
         }
 
