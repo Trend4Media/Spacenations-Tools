@@ -539,7 +539,8 @@
 
             // Aktualisiere User-Dokument mit Admin-Rolle
             await db.collection('users').doc(allianceData.founder).update({
-                alliance: allianceId,
+                alliance: allianceData.name, // Verwende Allianz-Namen statt ID
+                allianceTag: allianceData.tag, // Füge Allianz-Tag hinzu
                 allianceRole: 'admin',
                 lastUpdated: window.FirebaseConfig.getServerTimestamp()
             });
@@ -588,7 +589,8 @@
 
             // Aktualisiere User-Dokument mit Admin-Rolle
             await db.collection('users').doc(newAdmin).update({
-                alliance: allianceId,
+                alliance: allianceData.name, // Verwende Allianz-Namen statt ID
+                allianceTag: allianceData.tag, // Füge Allianz-Tag hinzu
                 allianceRole: 'admin',
                 lastUpdated: window.FirebaseConfig.getServerTimestamp()
             });
