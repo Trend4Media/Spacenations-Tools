@@ -355,19 +355,127 @@
             try {
                 await window.AuthAPI.waitForInit();
                 
-                // If already logged in as super admin, redirect
-                window.AuthAPI.onAuthStateChange(async (user, userData) => {
-                    if (user && userData && userData.isSuperAdmin === true) {
-                        showSuccess('Bereits angemeldet. Weiterleitung...');
-                        setTimeout(() => {
-                            window.location.href = 'admin-dashboard.html';
-                        }, 1000);
-                    }
-                });
+                // Check if user is already logged in
+                const currentUser = window.AuthAPI.getCurrentUser();
+                const userData = window.AuthAPI.getUserData();
+                
+                if (currentUser) {
+                    console.log('🔍 Benutzer bereits angemeldet:', currentUser.email);
+                    
+                    // Show current user info and options
+                    showCurrentUserInfo(currentUser, userData);
+                }
+                
             } catch (error) {
                 console.error('Auth init error:', error);
             }
         });
+
+        // Show current user info and options
+        function showCurrentUserInfo(user, userData) {
+            const loginCard = document.querySelector('.login-card');
+            const loginForm = document.getElementById('admin-login-form');
+            
+            // Create user info section
+            const userInfoHTML = `
+                <div id="current-user-info" style="margin-bottom: 30px; padding: 20px; background: rgba(0,255,136,0.1); border: 1px solid rgba(0,255,136,0.3); border-radius: 8px;">
+                    <h3 style="color: var(--primary); margin-bottom: 15px; font-family: 'Orbitron', monospace;">👤 Aktuell angemeldet</h3>
+                    <div style="margin-bottom: 10px;">
+                        <strong>E-Mail:</strong> ${user.email}
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <strong>Super-Admin:</strong> ${userData?.isSuperAdmin === true ? '✅ Ja' : '❌ Nein'}
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <strong>Alliance-Admin:</strong> ${userData?.isAllianceAdmin === true ? '✅ Ja' : '❌ Nein'}
+                    </div>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button type="button" class="login-button" onclick="redirectToDashboard()" style="flex: 1; min-width: 120px;">
+                            🚀 Zum Dashboard
+                        </button>
+                        <button type="button" class="login-button" onclick="logoutAndReload()" style="background: var(--error); flex: 1; min-width: 120px;">
+                            🚪 Abmelden
+                        </button>
+                    </div>
+                    <div style="margin-top: 15px; text-align: center;">
+                        <button type="button" onclick="showLoginForm()" style="background: none; border: 1px solid var(--border); color: var(--text-secondary); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 12px;">
+                            🔄 Als anderer Benutzer anmelden
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Insert user info before login form
+            loginForm.insertAdjacentHTML('beforebegin', userInfoHTML);
+            
+            // Hide login form
+            loginForm.style.display = 'none';
+            
+            // Update title
+            document.querySelector('.login-title').textContent = 'Admin Portal';
+            document.querySelector('.login-subtitle').textContent = 'Willkommen zurück';
+        }
+
+        // Redirect to dashboard
+        function redirectToDashboard() {
+            showSuccess('Weiterleitung zum Dashboard...');
+            setTimeout(() => {
+                window.location.href = 'admin-dashboard.html';
+            }, 1000);
+        }
+
+        // Logout and reload
+        async function logoutAndReload() {
+            try {
+                showSuccess('Abmeldung läuft...');
+                await window.AuthAPI.logout();
+                
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Logout error:', error);
+                showError('Fehler beim Abmelden: ' + error.message);
+            }
+        }
+
+        // Show login form for different user
+        async function showLoginForm() {
+            try {
+                // Logout current user
+                await window.AuthAPI.logout();
+                
+                // Remove user info section
+                const userInfoSection = document.getElementById('current-user-info');
+                if (userInfoSection) {
+                    userInfoSection.remove();
+                }
+                
+                // Show login form
+                const loginForm = document.getElementById('admin-login-form');
+                loginForm.style.display = 'block';
+                
+                // Reset title
+                document.querySelector('.login-title').textContent = 'Admin Login';
+                document.querySelector('.login-subtitle').textContent = 'Restricted Access';
+                
+                // Clear form
+                document.getElementById('email').value = '';
+                document.getElementById('password').value = '';
+                
+                // Focus email field
+                setTimeout(() => {
+                    document.getElementById('email').focus();
+                }, 100);
+                
+                showSuccess('Bereit für neue Anmeldung');
+                
+            } catch (error) {
+                console.error('Error showing login form:', error);
+                showError('Fehler beim Zurücksetzen: ' + error.message);
+            }
+        }
         
         // Handle login form submission
         document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
