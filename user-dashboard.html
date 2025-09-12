@@ -816,14 +816,27 @@
         async function handleCreateAlliance(event) {
             event.preventDefault();
             
-            const name = document.getElementById('alliance-name').value.trim();
-            const tag = document.getElementById('alliance-tag').value.trim().toUpperCase();
-            const description = document.getElementById('alliance-description').value.trim();
+            // Sichere Extraktion der Formularwerte
+            const nameElement = document.getElementById('alliance-name');
+            const tagElement = document.getElementById('alliance-tag');
+            const descriptionElement = document.getElementById('alliance-description');
+            
+            console.log('🔍 Debug - Formular-Elemente:', {
+                nameElement: nameElement,
+                tagElement: tagElement,
+                descriptionElement: descriptionElement
+            });
+            
+            const name = nameElement ? (nameElement.value || '').trim() : '';
+            const tag = tagElement ? (tagElement.value || '').trim().toUpperCase() : '';
+            const description = descriptionElement ? (descriptionElement.value || '').trim() : '';
             const username = getCurrentUsername();
             
             console.log('🔍 Debug - Username:', username, 'Type:', typeof username);
             
             console.log('Allianz-Erstellung gestartet:', { name, tag, username });
+            
+            console.log('🔍 Debug - Extrahierte Werte:', { name, tag, description, username });
             
             if (!username || username === 'guest') {
                 alert('Bitte melde dich an, um eine Allianz zu erstellen.\n\nAktueller Username: ' + (username || 'undefined'));
@@ -831,7 +844,18 @@
             }
             
             if (!name || !tag) {
-                alert('Bitte fülle alle Pflichtfelder aus.');
+                alert('Bitte fülle alle Pflichtfelder aus.\n\nName: "' + name + '"\nTag: "' + tag + '"');
+                return;
+            }
+            
+            // Prüfe ob alle Formular-Elemente gefunden wurden
+            if (!nameElement || !tagElement || !descriptionElement) {
+                alert('Fehler: Formular-Elemente nicht gefunden. Bitte lade die Seite neu.');
+                console.error('Fehlende Formular-Elemente:', {
+                    nameElement: !!nameElement,
+                    tagElement: !!tagElement,
+                    descriptionElement: !!descriptionElement
+                });
                 return;
             }
             
@@ -1035,7 +1059,30 @@
         }
         
         function openCreateAllianceModal() {
-            document.getElementById('create-alliance-modal').style.display = 'flex';
+            const modal = document.getElementById('create-alliance-modal');
+            if (!modal) {
+                console.error('❌ Modal nicht gefunden!');
+                alert('Fehler: Allianz-Modal nicht gefunden. Bitte lade die Seite neu.');
+                return;
+            }
+            
+            // Prüfe ob alle Formular-Elemente existieren
+            const nameElement = document.getElementById('alliance-name');
+            const tagElement = document.getElementById('alliance-tag');
+            const descriptionElement = document.getElementById('alliance-description');
+            
+            if (!nameElement || !tagElement || !descriptionElement) {
+                console.error('❌ Formular-Elemente nicht gefunden!', {
+                    nameElement: !!nameElement,
+                    tagElement: !!tagElement,
+                    descriptionElement: !!descriptionElement
+                });
+                alert('Fehler: Formular-Elemente nicht gefunden. Bitte lade die Seite neu.');
+                return;
+            }
+            
+            console.log('✅ Modal und Formular-Elemente gefunden');
+            modal.style.display = 'flex';
         }
         
         function closeModal(modalId) {
