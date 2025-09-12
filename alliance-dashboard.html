@@ -901,6 +901,11 @@
 
         // Funktion zur korrekten Admin-Status-Prüfung
         async function checkAdminStatus(username) {
+            if (!currentAlliance) {
+                console.warn('⚠️ Keine Allianz-Daten verfügbar für Admin-Check');
+                return false;
+            }
+            
             // Prüfe zuerst Alliance-Daten
             let adminFromAlliance = currentAlliance.admin === username || currentAlliance.founder === username;
             
@@ -925,8 +930,11 @@
             
             console.log('👑 Admin-Status-Prüfung:', {
                 username: username,
+                currentAlliance: currentAlliance ? currentAlliance.name : 'Nicht verfügbar',
                 adminFromAlliance: adminFromAlliance,
                 adminFromUserData: adminFromUserData,
+                allianceAdmin: currentAlliance ? currentAlliance.admin : 'N/A',
+                allianceFounder: currentAlliance ? currentAlliance.founder : 'N/A',
                 finalStatus: isUserAdmin
             });
             
@@ -935,6 +943,11 @@
 
         // Funktion zur Prüfung der Member-Rolle
         async function checkMemberRole(username) {
+            if (!currentAlliance) {
+                console.warn('⚠️ Keine Allianz-Daten verfügbar für Member-Rolle-Check');
+                return false;
+            }
+            
             // Prüfe zuerst Alliance-Daten
             let adminFromAlliance = currentAlliance.admin === username || currentAlliance.founder === username;
             
@@ -1045,6 +1058,12 @@
                 isAdmin = await checkAdminStatus(username);
                 console.log('👑 Admin-Status:', isAdmin);
                 
+                if (isAdmin) {
+                    console.log('🎉 User ist Admin - Berechtigungen und Mitgliederverwaltung werden geladen');
+                } else {
+                    console.log('ℹ️ User ist kein Admin - nur Standard-Features verfügbar');
+                }
+                
                 // Prüfe Allianz-Status
                 if (currentAlliance.status !== 'approved') {
                     showError(`Deine Allianz wurde noch nicht genehmigt. Status: ${currentAlliance.status}`);
@@ -1074,8 +1093,12 @@
                 // Initialisiere Permission Manager und Member Manager
                 await initializePermissionManager();
                 await initializeMemberManager();
-                loadPermissions();
-                loadMemberManagement();
+                
+                // Lade Berechtigungen und Mitgliederverwaltung nur für Admins
+                if (isAdmin) {
+                    loadPermissions();
+                    loadMemberManagement();
+                }
                 
                 console.log('🎉 Allianz-Dashboard aus localStorage erfolgreich geladen');
                 
@@ -1117,6 +1140,12 @@
                 isAdmin = await checkAdminStatus(username);
                 console.log('👑 Admin-Status:', isAdmin);
                 
+                if (isAdmin) {
+                    console.log('🎉 User ist Admin - Berechtigungen und Mitgliederverwaltung werden geladen');
+                } else {
+                    console.log('ℹ️ User ist kein Admin - nur Standard-Features verfügbar');
+                }
+                
                 // Prüfe Allianz-Status
                 if (currentAlliance.status !== 'approved') {
                     showError(`Deine Allianz wurde noch nicht genehmigt. Status: ${currentAlliance.status}`);
@@ -1146,8 +1175,12 @@
                 // Initialisiere Permission Manager und Member Manager
                 await initializePermissionManager();
                 await initializeMemberManager();
-                loadPermissions();
-                loadMemberManagement();
+                
+                // Lade Berechtigungen und Mitgliederverwaltung nur für Admins
+                if (isAdmin) {
+                    loadPermissions();
+                    loadMemberManagement();
+                }
                 
                 console.log('🎉 Individuelles Allianz-Dashboard (ID) erfolgreich geladen');
                 
@@ -1199,6 +1232,12 @@
                 isAdmin = await checkAdminStatus(username);
                 console.log('👑 Admin-Status:', isAdmin);
                 
+                if (isAdmin) {
+                    console.log('🎉 User ist Admin - Berechtigungen und Mitgliederverwaltung werden geladen');
+                } else {
+                    console.log('ℹ️ User ist kein Admin - nur Standard-Features verfügbar');
+                }
+                
                 // Prüfe Allianz-Status
                 if (currentAlliance.status !== 'approved') {
                     showError(`Deine Allianz wurde noch nicht genehmigt. Status: ${currentAlliance.status}`);
@@ -1217,8 +1256,11 @@
                 
                 // Initialisiere Permission Manager
                 initializePermissionManager().then(() => {
-                    loadPermissions();
-                    loadMemberManagement();
+                    // Lade Berechtigungen und Mitgliederverwaltung nur für Admins
+                    if (isAdmin) {
+                        loadPermissions();
+                        loadMemberManagement();
+                    }
                 });
                 
                 console.log('🎉 Individuelles Allianz-Dashboard erfolgreich geladen');
@@ -1344,6 +1386,7 @@
                 
                 if (isAdmin) {
                     await initializePermissionManager();
+                    await initializeMemberManager();
                     loadPermissions();
                     loadMemberManagement();
                 }
@@ -1365,8 +1408,13 @@
                 loadActiveMembersLocal();
                 loadChatMessagesLocal();
                 await initializePermissionManager();
-                loadPermissions();
-                loadMemberManagement();
+                await initializeMemberManager();
+                
+                // Lade Berechtigungen und Mitgliederverwaltung nur für Admins
+                if (isAdmin) {
+                    loadPermissions();
+                    loadMemberManagement();
+                }
             } else {
                 showError('Keine Allianzdaten gefunden');
             }
@@ -1601,23 +1649,35 @@
         }
 
         async function loadPermissions() {
-            if (!isAdmin || !permissionManager) return;
+            console.log('🔐 loadPermissions aufgerufen:', { isAdmin, permissionManager: !!permissionManager });
+            
+            if (!isAdmin || !permissionManager) {
+                console.log('⚠️ loadPermissions abgebrochen - nicht Admin oder kein PermissionManager');
+                return;
+            }
 
-            // Zeige nur die Mitglieder-Verwaltung, keine Allianz-weiten Toggle-Switches
+            // Zeige die Berechtigungs-Sektion für Admins
             const permissionSection = document.getElementById('permission-section');
             const memberManagement = document.getElementById('member-management');
             
             if (permissionSection) {
-                permissionSection.style.display = 'none';
+                permissionSection.style.display = 'block';
+                console.log('✅ Berechtigungs-Sektion angezeigt');
             }
             
             if (memberManagement) {
                 memberManagement.style.display = 'block';
+                console.log('✅ Mitglieder-Verwaltung angezeigt');
             }
         }
 
         async function loadMemberManagement() {
-            if (!isAdmin || !permissionManager || !memberManager) return;
+            console.log('👥 loadMemberManagement aufgerufen:', { isAdmin, permissionManager: !!permissionManager, memberManager: !!memberManager });
+            
+            if (!isAdmin || !permissionManager || !memberManager) {
+                console.log('⚠️ loadMemberManagement abgebrochen - nicht alle Voraussetzungen erfüllt');
+                return;
+            }
 
             const members = memberManager.getMembers();
             const permissions = permissionManager.getPermissionList();
@@ -1710,6 +1770,7 @@
             `;
 
             container.innerHTML = html;
+            console.log('✅ Mitglieder-Verwaltung HTML generiert und angezeigt');
         }
 
         function setupEventListeners() {
