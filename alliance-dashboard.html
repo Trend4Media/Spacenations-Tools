@@ -907,10 +907,14 @@
             // Prüfe zusätzlich User-Datenbank für allianceRole
             let adminFromUserData = false;
             try {
-                const userDoc = await db.collection('users').doc(username).get();
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    adminFromUserData = userData.allianceRole === 'admin' || userData.allianceRole === 'founder';
+                // Prüfe ob Firebase verfügbar ist
+                if (typeof window.FirebaseConfig !== 'undefined' && window.FirebaseConfig.isReady()) {
+                    const db = window.FirebaseConfig.getDB();
+                    const userDoc = await db.collection('users').doc(username).get();
+                    if (userDoc.exists) {
+                        const userData = userDoc.data();
+                        adminFromUserData = userData.allianceRole === 'admin' || userData.allianceRole === 'founder';
+                    }
                 }
             } catch (error) {
                 console.warn('⚠️ Konnte User-Daten nicht laden:', error);
