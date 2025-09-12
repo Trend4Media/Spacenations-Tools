@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sabocounter - Spacenations Tools</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2em;
+            color: #6c757d;
+        }
+        .error {
+            text-align: center;
+            padding: 50px;
+            color: #dc3545;
+            background: #f8d7da;
+            margin: 20px;
+            border-radius: 10px;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2a5298;
+        }
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        .table-container {
+            padding: 20px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .week-badge {
+            background: #007bff;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        .score-high {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .score-medium {
+            color: #ffc107;
+            font-weight: bold;
+        }
+        .score-low {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            background: #f8f9fa;
+        }
+        .refresh-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 10px;
+        }
+        .refresh-btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌌 Proxima Sabocounter</h1>
+            <p>Spacenations Tools - Planetenverfolgung</p>
+            <button class="refresh-btn" onclick="loadData()">🔄 Aktualisieren</button>
+        </div>
+        
+        <div id="content">
+            <div class="loading">
+                <p>Lade Proxima-Daten...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ProximaDB API Endpoint
+        const API_BASE = 'https://trend4media.github.io/Spacenations-Tools/';
+        
+        async function loadData() {
+            const content = document.getElementById('content');
+            content.innerHTML = '<div class="loading"><p>Lade Proxima-Daten...</p></div>';
+            
+            try {
+                // Lade JSON-Daten
+                const response = await fetch(API_BASE + 'proxima_data.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                displayData(data);
+                
+            } catch (error) {
+                console.error('Fehler beim Laden der Daten:', error);
+                content.innerHTML = `
+                    <div class="error">
+                        <h3>⚠️ Fehler beim Laden der Daten</h3>
+                        <p>Die Proxima-Daten konnten nicht geladen werden.</p>
+                        <p><strong>Fehler:</strong> ${error.message}</p>
+                        <p>Bitte versuchen Sie es später erneut oder kontaktieren Sie den Administrator.</p>
+                        <button class="refresh-btn" onclick="loadData()">🔄 Erneut versuchen</button>
+                    </div>
+                `;
+            }
+        }
+        
+        function displayData(planets) {
+            if (!Array.isArray(planets)) {
+                throw new Error('Ungültiges Datenformat');
+            }
+            
+            // Konvertiere Array-Format zu Objekt-Format
+            const planetObjects = planets.map(planet => ({
+                name: planet[0],
+                coordinates: planet[1],
+                score: planet[2],
+                deleteOn: planet[3],
+                weekNumber: planet[4]
+            }));
+            
+            // Statistiken berechnen
+            const totalPlanets = planetObjects.length;
+            const weekNumbers = [...new Set(planetObjects.map(p => p.weekNumber))];
+            const latestWeek = Math.max(...weekNumbers);
+            
+            // Planeten nach Woche und Nummer sortieren
+            planetObjects.sort((a, b) => {
+                if (a.weekNumber !== b.weekNumber) return b.weekNumber - a.weekNumber;
+                
+                const numA = extractPlanetNumber(a.name);
+                const numB = extractPlanetNumber(b.name);
+                return numA - numB;
+            });
+            
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-number">${totalPlanets}</div>
+                        <div class="stat-label">Planeten</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">${latestWeek}</div>
+                        <div class="stat-label">Aktuelle Woche</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">${new Date().toLocaleDateString('de-DE')}</div>
+                        <div class="stat-label">Letzte Aktualisierung</div>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Koordinaten</th>
+                                <th>Punkte</th>
+                                <th>Tag der Zerstörung</th>
+                                <th>Woche</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${planetObjects.map(planet => `
+                                <tr>
+                                    <td><strong>${planet.name}</strong></td>
+                                    <td><code>${planet.coordinates}</code></td>
+                                    <td class="${getScoreClass(planet.score)}">${planet.score.toLocaleString()}</td>
+                                    <td>${formatDeleteDate(planet.deleteOn)}</td>
+                                    <td><span class="week-badge">Woche ${planet.weekNumber}</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="footer">
+                    <p>Automatisch aktualisiert jeden Mittwoch um 18:45 Uhr</p>
+                    <p>Datenquelle: <a href="https://beta1.game.spacenations.eu/api/proxima" target="_blank">Spacenations API</a></p>
+                </div>
+            `;
+        }
+        
+        function extractWeekNumber(planetName) {
+            const match = planetName.match(/Proxima (\d+)-/);
+            return match ? parseInt(match[1]) : 0;
+        }
+        
+        function extractPlanetNumber(planetName) {
+            const match = planetName.match(/Proxima \d+-(\d+)/);
+            return match ? parseInt(match[1]) : 0;
+        }
+        
+        function getScoreClass(score) {
+            if (score >= 500) return 'score-high';
+            if (score >= 200) return 'score-medium';
+            return 'score-low';
+        }
+        
+        function formatDeleteDate(deleteOnStr) {
+            try {
+                const date = new Date(deleteOnStr);
+                return date.toLocaleDateString('de-DE') + ' ' + date.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit'});
+            } catch (e) {
+                return deleteOnStr;
+            }
+        }
+        
+        // Beim Laden der Seite Daten laden
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>
