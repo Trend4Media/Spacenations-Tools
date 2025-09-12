@@ -617,7 +617,12 @@
         const doc = await ref.get();
         if (!doc.exists) return alert('Benutzer nicht gefunden');
         const val = !!doc.data().isAllianceAdmin;
-        await ref.update({ isAllianceAdmin: !val });
+        await ref.update({ 
+            isAllianceAdmin: !val,
+            updatedAt: window.FirebaseConfig.getServerTimestamp(),
+            updatedBy: window.AuthAPI.getCurrentUser().uid
+        });
+        console.log(`✅ Alliance Admin Status für ${uid} auf ${!val} gesetzt`);
     }
 
     async function toggleSuperAdmin(uid){
@@ -625,12 +630,28 @@
         if (me && me.uid === uid){
             if (!confirm('Sie sind dabei, Ihre eigene Super-Admin Rolle zu toggeln. Fortfahren?')) return;
         }
+        
         const db = window.FirebaseConfig.getDB();
         const ref = db.collection('users').doc(uid);
         const doc = await ref.get();
         if (!doc.exists) return alert('Benutzer nicht gefunden');
+        
         const val = !!doc.data().isSuperAdmin;
-        await ref.update({ isSuperAdmin: !val });
+        await ref.update({ 
+            isSuperAdmin: !val,
+            updatedAt: window.FirebaseConfig.getServerTimestamp(),
+            updatedBy: me.uid
+        });
+        
+        console.log(`✅ Super Admin Status für ${uid} auf ${!val} gesetzt`);
+        
+        // Log activity
+        await db.collection('userActivities').add({
+            userId: me.uid,
+            icon: '⚡',
+            text: `Super-Admin Status geändert für Benutzer ${uid}: ${!val}`,
+            timestamp: window.FirebaseConfig.getServerTimestamp()
+        });
     }
 
     // User subscription
@@ -868,29 +889,55 @@ ${state.proximaData.length > 10 ? `\n... und ${state.proximaData.length - 10} we
         });
     }
 
+    // Update admin user info with current Super Admin status
+    async function updateAdminUserInfo() {
+        try {
+            const currentUser = window.AuthAPI.getCurrentUser();
+            const status = await window.AdminAuth.checkSuperAdminStatus(currentUser.uid);
+            
+            const username = status.userData?.username || currentUser?.email || 'Admin';
+            const superStatus = status.isSuperAdmin ? '<span class="pill super">Super</span>' : '<span class="pill user">User</span>';
+            const lastUpdate = status.userData?.updatedAt ? 
+                `<div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 4px;">
+                    Aktualisiert: ${formatTimestamp(status.userData.updatedAt)}
+                </div>` : '';
+            
+            document.getElementById('admin-user-info').innerHTML = `
+                <div>${username} · ${superStatus}</div>
+                ${lastUpdate}
+            `;
+            
+            // Update system status mini with Super Admin info
+            document.getElementById('system-status-mini').innerHTML = `
+                <div style="font-size: 0.8rem;">
+                    <div>🟢 System Online</div>
+                    <div style="color: var(--text-secondary);">Super-Admin: ${status.isSuperAdmin ? '✅ Ja' : '❌ Nein'}</div>
+                    <div style="color: var(--text-secondary);">Letztes Update: ${formatTimestamp(new Date())}</div>
+                </div>
+            `;
+            
+        } catch (error) {
+            console.error('Fehler beim Aktualisieren der Admin-Info:', error);
+        }
+    }
+
     // Initialize dashboard
     async function gateAndInit(){
         try {
             await window.AdminAuth.requireSuperAdmin();
             document.getElementById('access-ok').style.display = 'block';
             
-            const ud = window.AuthAPI.getUserData();
-            const info = `${ud?.username || ud?.email || 'Admin'} · <span class="pill super">Super</span>`;
-            document.getElementById('admin-user-info').innerHTML = info;
-
-            // Initialize system status mini
-            document.getElementById('system-status-mini').innerHTML = `
-                <div style="font-size: 0.8rem;">
-                    <div>🟢 System Online</div>
-                    <div style="color: var(--text-secondary);">Letztes Update: ${formatTimestamp(new Date())}</div>
-                </div>
-            `;
+            // Update admin user info with current status
+            await updateAdminUserInfo();
 
             attachEvents();
             subscribeUsers();
             subscribeAlliances();
             loadSystemStatus();
             loadProximaData();
+            
+            // Set up periodic status updates
+            setInterval(updateAdminUserInfo, 30000); // Update every 30 seconds
             
         } catch (e){
             console.warn('Access denied', e);
