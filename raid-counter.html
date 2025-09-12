@@ -369,53 +369,11 @@
             letter-spacing: 1px;
         }
         
-        /* Footer */
-        .footer {
-            background: var(--razer-black);
-            border-top: 1px solid rgba(255, 153, 0, 0.2);
-            padding: 40px 0;
-            margin-top: 40px;
-            text-align: center;
+        /* Abstand vor dem globalen Footer */
+        .container {
+            margin-bottom: 40px;
         }
         
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 32px;
-            flex-wrap: wrap;
-            margin-bottom: 24px;
-        }
-        
-        .footer-link {
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
-        .footer-link::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--razer-orange);
-            transition: width 0.3s ease;
-        }
-        
-        .footer-link:hover {
-            color: var(--razer-orange);
-        }
-        
-        .footer-link:hover::after {
-            width: 100%;
-        }
-        
-        .footer-bottom {
-            color: rgba(192, 192, 192, 0.6);
-            font-size: 14px;
-        }
         
         /* Mobile Responsive */
         @media (max-width: 768px) {
@@ -543,18 +501,6 @@ Oder fügen Sie mehrere Raids ein..."></textarea>
             </div>
         </div>
     </div>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-links">
-            <a href="index.html" class="footer-link">Home</a>
-            <a href="as-counter.html" class="footer-link">AS Counter</a>
-            <a href="battle-counter.html" class="footer-link">Battle Counter</a>
-            <a href="sabo-counter.html" class="footer-link">Sabo Counter</a>
-        </div>
-        
-        <p class="footer-bottom">&copy; 2025 Spacenations Tools. Built for gamers, by gamers.</p>
-    </footer>
 
     <script>
         // Hilfsfunktion für Zahlenformatierung
