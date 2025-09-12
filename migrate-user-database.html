@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Database Migration - Spacenations Tools</title>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0A0A0A;
+            color: #FFFFFF;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #1A1A1A;
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #00FF88;
+        }
+        
+        h1 {
+            color: #00FF88;
+            margin-bottom: 30px;
+        }
+        
+        .btn {
+            background: #00FF88;
+            color: #000000;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #44FF99;
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        
+        .success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+            border: 1px solid #4CAF50;
+        }
+        
+        .error {
+            background: rgba(244, 67, 54, 0.2);
+            color: #F44336;
+            border: 1px solid #F44336;
+        }
+        
+        .info {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196F3;
+            border: 1px solid #2196F3;
+        }
+        
+        .warning {
+            background: rgba(255, 152, 0, 0.2);
+            color: #FF9800;
+            border: 1px solid #FF9800;
+        }
+        
+        .user-list {
+            text-align: left;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            background: #2A2A2A;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            background: #333;
+            border-radius: 5px;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-weight: bold;
+            color: #00FF88;
+        }
+        
+        .user-details {
+            font-size: 0.9rem;
+            color: #CCC;
+        }
+        
+        .migration-status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .status-pending {
+            background: #FF9800;
+            color: #000;
+        }
+        
+        .status-migrated {
+            background: #4CAF50;
+            color: #000;
+        }
+        
+        .status-error {
+            background: #F44336;
+            color: #FFF;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 User Database Migration</h1>
+        <p>Standardisiert die User-Struktur in der Firebase-Datenbank</p>
+        
+        <button class="btn" onclick="analyzeUsers()">📊 User analysieren</button>
+        <button class="btn" onclick="migrateUsers()" id="migrate-btn" disabled>🚀 Migration starten</button>
+        <button class="btn" onclick="createSampleUsers()">👥 Beispiel-User erstellen</button>
+        
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <div id="user-list" class="user-list" style="display: none;"></div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Firebase-Konfiguration
+        const firebaseConfig = {
+            apiKey: 'AIzaSyDr4-ap_EubUn0UdP7hkEpS2jkzLIVgvyc',
+            authDomain: 'spacenations-tools.firebaseapp.com',
+            projectId: 'spacenations-tools',
+            storageBucket: 'spacenations-tools.firebasestorage.app',
+            messagingSenderId: '651338201276',
+            appId: '1:651338201276:web:89e7d9c19dbd2611d3f8b9',
+            measurementId: 'G-SKWJWH2ERX'
+        };
+        
+        // Firebase initialisieren
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        
+        const db = firebase.firestore();
+        let users = [];
+        let migrationResults = [];
+        
+        async function analyzeUsers() {
+            try {
+                showStatus('Analysiere bestehende User...', 'info');
+                
+                const usersSnapshot = await db.collection('users').get();
+                users = [];
+                
+                usersSnapshot.forEach(doc => {
+                    const userData = doc.data();
+                    users.push({
+                        id: doc.id,
+                        ...userData,
+                        needsMigration: needsMigration(userData)
+                    });
+                });
+                
+                displayUsers(users);
+                document.getElementById('migrate-btn').disabled = false;
+                showStatus(`${users.length} User gefunden, ${users.filter(u => u.needsMigration).length} benötigen Migration`, 'info');
+                
+            } catch (error) {
+                console.error('Fehler beim Analysieren der User:', error);
+                showStatus('Fehler beim Analysieren: ' + error.message, 'error');
+            }
+        }
+        
+        function needsMigration(userData) {
+            const requiredFields = ['systemRole', 'isActive', 'loginCount', 'permissions'];
+            return requiredFields.some(field => !(field in userData));
+        }
+        
+        function displayUsers(users) {
+            const container = document.getElementById('user-list');
+            container.style.display = 'block';
+            
+            container.innerHTML = users.map(user => `
+                <div class="user-item">
+                    <div class="user-info">
+                        <div class="user-name">${user.username || user.id}</div>
+                        <div class="user-details">
+                            E-Mail: ${user.email || 'N/A'} | 
+                            System-Rolle: ${user.systemRole || 'N/A'} | 
+                            Allianz: ${user.alliance || 'Keine'} | 
+                            Allianz-Rolle: ${user.allianceRole || 'N/A'}
+                        </div>
+                    </div>
+                    <div class="migration-status ${user.needsMigration ? 'status-pending' : 'status-migrated'}">
+                        ${user.needsMigration ? 'Migration nötig' : 'Aktuell'}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        async function migrateUsers() {
+            try {
+                showStatus('Starte Migration...', 'info');
+                const migrateBtn = document.getElementById('migrate-btn');
+                migrateBtn.disabled = true;
+                migrateBtn.textContent = 'Migration läuft...';
+                
+                migrationResults = [];
+                let migratedCount = 0;
+                let errorCount = 0;
+                
+                for (const user of users) {
+                    if (!user.needsMigration) {
+                        migrationResults.push({ username: user.username || user.id, status: 'skipped', message: 'Bereits aktuell' });
+                        continue;
+                    }
+                    
+                    try {
+                        await migrateUser(user);
+                        migrationResults.push({ username: user.username || user.id, status: 'success', message: 'Erfolgreich migriert' });
+                        migratedCount++;
+                    } catch (error) {
+                        migrationResults.push({ username: user.username || user.id, status: 'error', message: error.message });
+                        errorCount++;
+                    }
+                }
+                
+                displayMigrationResults();
+                showStatus(`Migration abgeschlossen: ${migratedCount} erfolgreich, ${errorCount} Fehler`, 
+                          errorCount > 0 ? 'warning' : 'success');
+                
+            } catch (error) {
+                console.error('Fehler bei der Migration:', error);
+                showStatus('Fehler bei der Migration: ' + error.message, 'error');
+            } finally {
+                const migrateBtn = document.getElementById('migrate-btn');
+                migrateBtn.disabled = false;
+                migrateBtn.textContent = '🚀 Migration starten';
+            }
+        }
+        
+        async function migrateUser(user) {
+            const updates = {};
+            
+            // Füge fehlende Felder hinzu
+            if (!user.systemRole) {
+                updates.systemRole = 'user';
+            }
+            
+            if (!user.isActive) {
+                updates.isActive = true;
+            }
+            
+            if (!user.loginCount) {
+                updates.loginCount = 0;
+            }
+            
+            if (!user.permissions) {
+                updates.permissions = getDefaultPermissions(user.systemRole || 'user');
+            }
+            
+            if (!user.createdAt) {
+                updates.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+            }
+            
+            updates.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+            updates.updatedBy = 'migration-script';
+            
+            if (Object.keys(updates).length > 0) {
+                await db.collection('users').doc(user.id).update(updates);
+            }
+        }
+        
+        function getDefaultPermissions(systemRole) {
+            const basePermissions = {
+                dashboard_access: true,
+                profile_edit: true
+            };
+            
+            switch (systemRole) {
+                case 'superadmin':
+                    return {
+                        ...basePermissions,
+                        admin_dashboard: true,
+                        user_management: true,
+                        alliance_management: true,
+                        system_settings: true
+                    };
+                case 'admin':
+                    return {
+                        ...basePermissions,
+                        alliance_management: true,
+                        member_management: true
+                    };
+                default:
+                    return basePermissions;
+            }
+        }
+        
+        function displayMigrationResults() {
+            const container = document.getElementById('user-list');
+            
+            container.innerHTML = migrationResults.map(result => `
+                <div class="user-item">
+                    <div class="user-info">
+                        <div class="user-name">${result.username}</div>
+                        <div class="user-details">${result.message}</div>
+                    </div>
+                    <div class="migration-status status-${result.status}">
+                        ${result.status === 'success' ? 'Erfolgreich' : 
+                          result.status === 'error' ? 'Fehler' : 'Übersprungen'}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        async function createSampleUsers() {
+            try {
+                showStatus('Erstelle Beispiel-User...', 'info');
+                
+                const sampleUsers = [
+                    {
+                        username: 'SuperAdmin',
+                        email: 'superadmin@spacenations.com',
+                        systemRole: 'superadmin',
+                        alliance: null,
+                        allianceRole: null
+                    },
+                    {
+                        username: 'AllianceLeader',
+                        email: 'leader@alliance.com',
+                        systemRole: 'user',
+                        alliance: 'sampleAllianceId',
+                        allianceRole: 'admin'
+                    },
+                    {
+                        username: 'SpacePilot',
+                        email: 'pilot@spacenations.com',
+                        systemRole: 'user',
+                        alliance: 'sampleAllianceId',
+                        allianceRole: 'member'
+                    },
+                    {
+                        username: 'TestUser',
+                        email: 'test@example.com',
+                        systemRole: 'user',
+                        alliance: null,
+                        allianceRole: null
+                    }
+                ];
+                
+                for (const userData of sampleUsers) {
+                    const userDoc = {
+                        ...userData,
+                        isActive: true,
+                        loginCount: 0,
+                        permissions: getDefaultPermissions(userData.systemRole),
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedBy: 'migration-script'
+                    };
+                    
+                    await db.collection('users').doc(userData.username).set(userDoc, { merge: true });
+                }
+                
+                showStatus('Beispiel-User erfolgreich erstellt!', 'success');
+                analyzeUsers(); // Aktualisiere die Liste
+                
+            } catch (error) {
+                console.error('Fehler beim Erstellen der Beispiel-User:', error);
+                showStatus('Fehler beim Erstellen: ' + error.message, 'error');
+            }
+        }
+        
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+            
+            // Nach 5 Sekunden ausblenden
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Beim Laden der Seite User analysieren
+        document.addEventListener('DOMContentLoaded', () => {
+            analyzeUsers();
+        });
+    </script>
+</body>
+</html>
