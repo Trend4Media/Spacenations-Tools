@@ -645,16 +645,23 @@
                 
                 // Prüfe ob Firebase verfügbar ist
                 if (typeof window.FirebaseConfig === 'undefined') {
-                    console.log('Firebase nicht verfügbar, verwende lokale Daten');
-                    loadAllianceStatusLocal();
-                    setupAllianceEventListeners();
-                    return;
+                    console.log('⚠️ Firebase nicht verfügbar - initialisiere Firebase...');
+                    try {
+                        await initializeFirebaseForAlliance();
+                        console.log('✅ Firebase erfolgreich initialisiert');
+                    } catch (error) {
+                        console.error('❌ Firebase-Initialisierung fehlgeschlagen:', error);
+                        console.log('🔄 Verwende lokale Daten als Fallback');
+                        loadAllianceStatusLocal();
+                        setupAllianceEventListeners();
+                        return;
+                    }
+                } else {
+                    // Warte auf Firebase-Initialisierung
+                    console.log('Warte auf Firebase-Initialisierung...');
+                    await window.FirebaseConfig.waitForInit();
+                    console.log('Firebase initialisiert, lade Allianz-Status...');
                 }
-                
-                // Warte auf Firebase-Initialisierung
-                console.log('Warte auf Firebase-Initialisierung...');
-                await window.FirebaseConfig.waitForInit();
-                console.log('Firebase initialisiert, lade Allianz-Status...');
                 
                 await loadAllianceStatus();
                 setupAllianceEventListeners();
@@ -673,7 +680,14 @@
                 // Prüfe ob Firebase verfügbar ist
                 if (typeof window.FirebaseConfig === 'undefined' || !window.FirebaseConfig.isReady()) {
                     console.log('⚠️ Firebase nicht verfügbar - initialisiere...');
-                    await initializeFirebaseForAlliance();
+                    try {
+                        await initializeFirebaseForAlliance();
+                        console.log('✅ Firebase erfolgreich initialisiert für Status-Loading');
+                    } catch (error) {
+                        console.error('❌ Firebase-Initialisierung fehlgeschlagen:', error);
+                        showAllianceStatus('error', 'Fehler beim Verbinden zur Datenbank: ' + error.message);
+                        return;
+                    }
                 }
                 
                 const db = window.FirebaseConfig.getDB();
@@ -1111,11 +1125,27 @@
             console.log('getCurrentUsername() type:', typeof getCurrentUsername());
         }
         
+        // Debug-Funktion für Firebase-Problem
+        function debugFirebase() {
+            console.log('🔍 DEBUG FIREBASE:');
+            console.log('firebase available:', typeof firebase !== 'undefined');
+            console.log('window.FirebaseConfig available:', typeof window.FirebaseConfig !== 'undefined');
+            if (typeof window.FirebaseConfig !== 'undefined') {
+                console.log('window.FirebaseConfig.isReady():', window.FirebaseConfig.isReady());
+            }
+            console.log('Firebase scripts loaded:', {
+                app: typeof firebase !== 'undefined' && typeof firebase.initializeApp === 'function',
+                auth: typeof firebase !== 'undefined' && typeof firebase.auth === 'function',
+                firestore: typeof firebase !== 'undefined' && typeof firebase.firestore === 'function'
+            });
+        }
+        
         // Debug-Button hinzufügen (nur für Entwicklung)
         document.addEventListener('DOMContentLoaded', () => {
             // Füge Debug-Button hinzu (nur sichtbar wenn ?debug=true in URL)
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('debug') === 'true') {
+                // Username Debug Button
                 const debugBtn = document.createElement('button');
                 debugBtn.textContent = '🔍 Debug Username';
                 debugBtn.style.position = 'fixed';
@@ -1128,8 +1158,25 @@
                 debugBtn.style.padding = '10px';
                 debugBtn.style.borderRadius = '5px';
                 debugBtn.style.cursor = 'pointer';
+                debugBtn.style.marginRight = '10px';
                 debugBtn.onclick = debugUsername;
                 document.body.appendChild(debugBtn);
+                
+                // Firebase Debug Button
+                const firebaseDebugBtn = document.createElement('button');
+                firebaseDebugBtn.textContent = '🔥 Debug Firebase';
+                firebaseDebugBtn.style.position = 'fixed';
+                firebaseDebugBtn.style.top = '10px';
+                firebaseDebugBtn.style.right = '200px';
+                firebaseDebugBtn.style.zIndex = '9999';
+                firebaseDebugBtn.style.background = '#f44336';
+                firebaseDebugBtn.style.color = 'white';
+                firebaseDebugBtn.style.border = 'none';
+                firebaseDebugBtn.style.padding = '10px';
+                firebaseDebugBtn.style.borderRadius = '5px';
+                firebaseDebugBtn.style.cursor = 'pointer';
+                firebaseDebugBtn.onclick = debugFirebase;
+                document.body.appendChild(firebaseDebugBtn);
             }
         });
     </script>
