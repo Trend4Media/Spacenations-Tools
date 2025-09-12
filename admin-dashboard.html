@@ -302,6 +302,12 @@
             border: 1px solid var(--razer-green);
         }
         
+        .pill.danger { 
+            background: linear-gradient(135deg, #ff4757, #ff3742); 
+            color: white; 
+            border: 1px solid #ff4757;
+        }
+        
         .actions { 
             display: flex; 
             gap: 4px; 
@@ -774,6 +780,7 @@
                             <h3 class="title">🤝 Allianzen Management</h3>
                             <div class="controls">
                                 <button class="btn success" id="approve-all-alliances">✅ Alle genehmigen</button>
+                                <button class="btn warning" id="reject-all-alliances">❌ Alle ablehnen</button>
                                 <button class="btn" id="refresh-alliances">🔄 Aktualisieren</button>
                             </div>
                         </div>
@@ -802,15 +809,17 @@
                                 <thead>
                                     <tr>
                                         <th>Allianz Name</th>
+                                        <th>Tag</th>
                                         <th>Gründer</th>
                                         <th>Mitglieder</th>
                                         <th>Status</th>
                                         <th>Erstellt</th>
+                                        <th>Admin</th>
                                         <th>Aktionen</th>
                                     </tr>
                                 </thead>
                                 <tbody id="alliances-table-body">
-                                    <tr><td colspan="6" style="text-align:center; color: var(--text-secondary)">Laden...</td></tr>
+                                    <tr><td colspan="8" style="text-align:center; color: var(--text-secondary)">Laden...</td></tr>
                                 </tbody>
                             </table>
                         </div>

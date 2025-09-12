@@ -213,22 +213,50 @@
     }
 
     function allianceRow(alliance) {
-        const status = alliance.status === 'approved' ? '<span class="pill approved">Genehmigt</span>' : '<span class="pill pending">Ausstehend</span>';
+        let statusBadge = '';
+        switch (alliance.status) {
+            case 'approved':
+                statusBadge = '<span class="pill approved">Genehmigt</span>';
+                break;
+            case 'pending':
+                statusBadge = '<span class="pill pending">Ausstehend</span>';
+                break;
+            case 'rejected':
+                statusBadge = '<span class="pill danger">Abgelehnt</span>';
+                break;
+            default:
+                statusBadge = '<span class="pill user">Unbekannt</span>';
+        }
+
         const created = formatTimestamp(alliance.createdAt);
         const members = alliance.members ? alliance.members.length : 0;
         const founder = alliance.founder || '-';
+        const admin = alliance.admin || 'Nicht gesetzt';
+        const description = alliance.description ? `"${alliance.description}"` : '';
 
         return `
             <tr data-alliance-id="${alliance.id}">
-                <td>${alliance.name || '-'} [${alliance.tag || ''}]</td>
+                <td>
+                    <div style="font-weight: 600;">${alliance.name || '-'}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary);">${description}</div>
+                </td>
+                <td><span style="font-family: monospace; background: var(--bg-secondary); padding: 2px 6px; border-radius: 4px;">${alliance.tag || '-'}</span></td>
                 <td>${founder}</td>
                 <td>${members}</td>
-                <td>${status}</td>
+                <td>${statusBadge}</td>
                 <td>${created}</td>
+                <td>${admin}</td>
                 <td>
                     <div class="actions">
-                        ${alliance.status === 'pending' ? '<button class="btn success" data-action="approve-alliance" title="Genehmigen">✅</button>' : ''}
+                        ${alliance.status === 'pending' ? `
+                            <button class="btn success" data-action="approve-alliance" title="Genehmigen">✅</button>
+                            <button class="btn danger" data-action="reject-alliance" title="Ablehnen">❌</button>
+                        ` : ''}
+                        ${alliance.status === 'rejected' ? `
+                            <button class="btn success" data-action="approve-alliance" title="Doch genehmigen">✅</button>
+                        ` : ''}
                         <button class="btn" data-action="set-admin" title="Admin setzen">👑</button>
+                        <button class="btn" data-action="view-details" title="Details anzeigen">👁️</button>
                         <button class="btn danger" data-action="delete-alliance" title="Löschen">🗑️</button>
                     </div>
                 </td>
@@ -567,6 +595,122 @@
         }
     }
 
+    async function rejectAlliance(allianceId) {
+        try {
+            const db = window.FirebaseConfig.getDB();
+            
+            // Hole die Allianz-Daten
+            const allianceDoc = await db.collection('alliances').doc(allianceId).get();
+            const allianceData = allianceDoc.data();
+            
+            if (!allianceData) {
+                throw new Error('Allianz nicht gefunden');
+            }
+            
+            await db.collection('alliances').doc(allianceId).update({
+                status: 'rejected',
+                rejectedAt: window.FirebaseConfig.getServerTimestamp(),
+                rejectedBy: window.AuthAPI.getCurrentUser().uid
+            });
+
+            // Log activity
+            await db.collection('userActivities').add({
+                userId: window.AuthAPI.getCurrentUser().uid,
+                icon: '❌',
+                text: `Allianz abgelehnt: ${allianceData.name} [${allianceData.tag}]`,
+                timestamp: window.FirebaseConfig.getServerTimestamp()
+            });
+
+            console.log('Allianz erfolgreich abgelehnt');
+            return { success: true };
+        } catch (error) {
+            console.error('Fehler beim Ablehnen der Allianz:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    async function viewAllianceDetails(allianceId) {
+        try {
+            const db = window.FirebaseConfig.getDB();
+            const allianceDoc = await db.collection('alliances').doc(allianceId).get();
+            const allianceData = allianceDoc.data();
+            
+            if (!allianceData) {
+                throw new Error('Allianz nicht gefunden');
+            }
+
+            // Erstelle Modal für Details
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'flex';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 600px;">
+                    <h3>📋 Allianz Details: ${allianceData.name}</h3>
+                    <div style="margin: 20px 0;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                            <div>
+                                <strong>Name:</strong><br>
+                                ${allianceData.name || '-'}
+                            </div>
+                            <div>
+                                <strong>Tag:</strong><br>
+                                <span style="font-family: monospace; background: var(--bg-secondary); padding: 4px 8px; border-radius: 4px;">${allianceData.tag || '-'}</span>
+                            </div>
+                            <div>
+                                <strong>Gründer:</strong><br>
+                                ${allianceData.founder || '-'}
+                            </div>
+                            <div>
+                                <strong>Admin:</strong><br>
+                                ${allianceData.admin || 'Nicht gesetzt'}
+                            </div>
+                            <div>
+                                <strong>Status:</strong><br>
+                                <span class="pill ${allianceData.status === 'approved' ? 'approved' : (allianceData.status === 'pending' ? 'pending' : 'danger')}">${allianceData.status}</span>
+                            </div>
+                            <div>
+                                <strong>Mitglieder:</strong><br>
+                                ${allianceData.members ? allianceData.members.length : 0}
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <strong>Beschreibung:</strong><br>
+                            <div style="background: var(--bg-secondary); padding: 10px; border-radius: 6px; margin-top: 5px;">
+                                ${allianceData.description || 'Keine Beschreibung'}
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <strong>Mitglieder-Liste:</strong><br>
+                            <div style="background: var(--bg-secondary); padding: 10px; border-radius: 6px; margin-top: 5px; max-height: 150px; overflow-y: auto;">
+                                ${allianceData.members ? allianceData.members.map(member => `• ${member}`).join('<br>') : 'Keine Mitglieder'}
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 0.9rem; color: var(--text-secondary);">
+                            <div>
+                                <strong>Erstellt:</strong><br>
+                                ${formatTimestamp(allianceData.createdAt)}
+                            </div>
+                            <div>
+                                <strong>Genehmigt:</strong><br>
+                                ${allianceData.approvedAt ? formatTimestamp(allianceData.approvedAt) : 'Nicht genehmigt'}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="controls">
+                        <button class="btn" onclick="closeModal('alliance-details-modal')">Schließen</button>
+                    </div>
+                </div>
+            `;
+            
+            modal.id = 'alliance-details-modal';
+            document.body.appendChild(modal);
+            
+        } catch (error) {
+            console.error('Fehler beim Anzeigen der Allianz-Details:', error);
+            alert('Fehler beim Laden der Details: ' + error.message);
+        }
+    }
+
     async function deleteAlliance(allianceId) {
         try {
             const db = window.FirebaseConfig.getDB();
@@ -879,10 +1023,20 @@
             
             switch(action) {
                 case 'approve-alliance':
-                    await approveAlliance(allianceId);
+                    if (confirm('Allianz genehmigen?')) {
+                        await approveAlliance(allianceId);
+                    }
+                    break;
+                case 'reject-alliance':
+                    if (confirm('Allianz ablehnen?')) {
+                        await rejectAlliance(allianceId);
+                    }
                     break;
                 case 'set-admin':
                     await setAllianceAdmin(allianceId);
+                    break;
+                case 'view-details':
+                    await viewAllianceDetails(allianceId);
                     break;
                 case 'delete-alliance':
                     if (confirm('Allianz wirklich löschen?')) {
@@ -935,6 +1089,22 @@ ${state.proximaData.length > 10 ? `\n... und ${state.proximaData.length - 10} we
                     await approveAlliance(alliance.id);
                 }
                 alert('Alle Allianzen genehmigt!');
+            }
+        });
+
+        // Reject all alliances
+        document.getElementById('reject-all-alliances').addEventListener('click', async () => {
+            const pendingAlliances = state.alliances.filter(a => a.status === 'pending');
+            if (pendingAlliances.length === 0) {
+                alert('Keine ausstehenden Allianzen gefunden');
+                return;
+            }
+            
+            if (confirm(`${pendingAlliances.length} Allianzen ablehnen?`)) {
+                for (const alliance of pendingAlliances) {
+                    await rejectAlliance(alliance.id);
+                }
+                alert('Alle Allianzen abgelehnt!');
             }
         });
 

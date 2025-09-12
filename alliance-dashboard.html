@@ -732,7 +732,13 @@
                 currentAlliance = { id: allianceDoc.id, ...allianceDoc.data() };
 
                 if (currentAlliance.status !== 'approved') {
-                    showError('Deine Allianz wurde noch nicht genehmigt.');
+                    showError(`Deine Allianz wurde noch nicht genehmigt. Status: ${currentAlliance.status}`);
+                    // Zeige zusätzliche Informationen je nach Status
+                    if (currentAlliance.status === 'pending') {
+                        showError('Deine Allianz wartet auf Genehmigung durch einen Super-Admin. Bitte warte auf die Bestätigung.');
+                    } else if (currentAlliance.status === 'rejected') {
+                        showError('Deine Allianz wurde abgelehnt. Kontaktiere einen Super-Admin für weitere Informationen.');
+                    }
                     return;
                 }
 
