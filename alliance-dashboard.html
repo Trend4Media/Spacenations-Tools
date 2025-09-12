@@ -711,15 +711,31 @@
                 const storedAlliance = localStorage.getItem('currentAlliance');
                 const storedUsername = localStorage.getItem('currentUsername');
                 
+                console.log('🔍 localStorage Debug:', {
+                    currentAlliance: storedAlliance ? 'Vorhanden' : 'Nicht vorhanden',
+                    currentUsername: storedUsername || 'Nicht vorhanden',
+                    allKeys: Object.keys(localStorage)
+                });
+                
                 if (storedAlliance && storedUsername) {
-                    console.log('✅ Allianz-Daten aus localStorage gefunden:', { 
-                        alliance: JSON.parse(storedAlliance).name,
-                        username: storedUsername 
-                    });
-                    loadAllianceFromLocalStorage(storedAlliance, storedUsername);
+                    try {
+                        const allianceData = JSON.parse(storedAlliance);
+                        console.log('✅ Allianz-Daten aus localStorage gefunden:', { 
+                            alliance: allianceData.name,
+                            tag: allianceData.tag,
+                            status: allianceData.status,
+                            username: storedUsername 
+                        });
+                        loadAllianceFromLocalStorage(storedAlliance, storedUsername);
+                    } catch (error) {
+                        console.error('❌ Fehler beim Parsen der localStorage-Daten:', error);
+                        console.log('🔄 Verwende Standard-Initialisierung');
+                        initializeAllianceDashboard();
+                    }
                 } else {
                     console.log('❌ Keine Allianz-Daten gefunden, verwende Standard-Initialisierung');
                     console.log('💡 Tipp: Gehe über das User-Dashboard zum Allianz-Dashboard');
+                    console.log('🔧 Debug: localStorage Keys:', Object.keys(localStorage));
                     initializeAllianceDashboard();
                 }
             }
@@ -1439,6 +1455,72 @@
         window.addEventListener('beforeunload', () => {
             if (chatUnsubscribe) chatUnsubscribe();
             if (membersUnsubscribe) membersUnsubscribe();
+        });
+        // Debug-Funktionen
+        function createTestAllianceData() {
+            const testAlliance = {
+                id: 'test-alliance-123',
+                name: 'Test Allianz',
+                tag: 'TEST',
+                description: 'Test-Allianz für Debugging',
+                founder: 'testuser',
+                members: ['testuser'],
+                status: 'approved',
+                admin: 'testuser',
+                createdAt: new Date().toISOString()
+            };
+            
+            localStorage.setItem('currentAlliance', JSON.stringify(testAlliance));
+            localStorage.setItem('currentUsername', 'testuser');
+            
+            console.log('✅ Test-Allianz-Daten erstellt:', testAlliance);
+            alert('Test-Allianz-Daten erstellt! Lade die Seite neu.');
+        }
+        
+        function clearAllianceData() {
+            localStorage.removeItem('currentAlliance');
+            localStorage.removeItem('currentUsername');
+            console.log('🗑️ Allianz-Daten gelöscht');
+            alert('Allianz-Daten gelöscht! Lade die Seite neu.');
+        }
+        
+        // Debug-Buttons hinzufügen (nur für Entwicklung)
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('debug') === 'true') {
+                // Test Alliance Button
+                const testBtn = document.createElement('button');
+                testBtn.textContent = '🧪 Test Allianz';
+                testBtn.style.position = 'fixed';
+                testBtn.style.top = '10px';
+                testBtn.style.right = '10px';
+                testBtn.style.zIndex = '9999';
+                testBtn.style.background = '#4CAF50';
+                testBtn.style.color = 'white';
+                testBtn.style.border = 'none';
+                testBtn.style.padding = '10px';
+                testBtn.style.borderRadius = '5px';
+                testBtn.style.cursor = 'pointer';
+                testBtn.style.marginRight = '10px';
+                testBtn.onclick = createTestAllianceData;
+                document.body.appendChild(testBtn);
+                
+                // Clear Data Button
+                const clearBtn = document.createElement('button');
+                clearBtn.textContent = '🗑️ Clear Data';
+                clearBtn.style.position = 'fixed';
+                clearBtn.style.top = '10px';
+                clearBtn.style.right = '200px';
+                clearBtn.style.zIndex = '9999';
+                clearBtn.style.background = '#f44336';
+                clearBtn.style.color = 'white';
+                clearBtn.style.border = 'none';
+                clearBtn.style.padding = '10px';
+                clearBtn.style.borderRadius = '5px';
+                clearBtn.style.cursor = 'pointer';
+                clearBtn.onclick = clearAllianceData;
+                document.body.appendChild(clearBtn);
+            }
         });
     </script>
 </body>
