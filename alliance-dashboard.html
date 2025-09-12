@@ -502,6 +502,170 @@
             padding: 16px;
         }
         
+        .permission-table {
+            background: var(--razer-gray);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--razer-gray-light);
+        }
+
+        .permission-header {
+            display: grid;
+            grid-template-columns: 200px repeat(7, 1fr) 120px;
+            background: var(--razer-dark);
+            padding: 15px;
+            font-weight: bold;
+            color: var(--razer-green);
+            border-bottom: 2px solid var(--razer-green);
+        }
+
+        .permission-row {
+            display: grid;
+            grid-template-columns: 200px repeat(7, 1fr) 120px;
+            padding: 15px;
+            border-bottom: 1px solid var(--razer-gray-light);
+            align-items: center;
+        }
+
+        .permission-row:last-child {
+            border-bottom: none;
+        }
+
+        .permission-row:hover {
+            background: var(--razer-gray-light);
+        }
+
+        .member-column, .member-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--razer-green);
+            color: var(--razer-black);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .member-details {
+            flex: 1;
+        }
+
+        .member-name {
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .member-role {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .permission-column {
+            text-align: center;
+            font-size: 0.9rem;
+            padding: 0 5px;
+        }
+
+        .permission-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--razer-gray-light);
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--razer-green);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        input:disabled + .toggle-slider {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .custom-indicator {
+            color: var(--razer-green);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .action-column, .action-cell {
+            text-align: center;
+        }
+
+        .add-member-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: var(--razer-dark);
+            border-radius: 10px;
+            border: 1px solid var(--razer-gray-light);
+        }
+
+        .add-member-section h4 {
+            color: var(--razer-green);
+            margin-bottom: 15px;
+        }
+
+        .add-member-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .add-member-form .input {
+            flex: 1;
+            min-width: 200px;
+        }
+
         .member-item-admin {
             display: flex;
             align-items: center;
@@ -682,6 +846,7 @@
     
     <!-- Scripts -->
     <script src="js/alliance-permissions.js"></script>
+    <script src="js/alliance-member-management.js"></script>
     <script>
         // Alliance Dashboard JavaScript
         let currentAlliance = null;
@@ -689,6 +854,7 @@
         let chatUnsubscribe = null;
         let membersUnsubscribe = null;
         let permissionManager = null;
+        let memberManager = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             console.log('Alliance Dashboard loaded');
@@ -801,8 +967,9 @@
                     loadChatMessagesLocal();
                 }
                 
-                // Initialisiere Permission Manager
+                // Initialisiere Permission Manager und Member Manager
                 await initializePermissionManager();
+                await initializeMemberManager();
                 loadPermissions();
                 loadMemberManagement();
                 
@@ -872,8 +1039,9 @@
                     loadChatMessagesLocal();
                 }
                 
-                // Initialisiere Permission Manager
+                // Initialisiere Permission Manager und Member Manager
                 await initializePermissionManager();
+                await initializeMemberManager();
                 loadPermissions();
                 loadMemberManagement();
                 
@@ -1284,6 +1452,23 @@
             }
         }
 
+        async function initializeMemberManager() {
+            try {
+                memberManager = new window.AllianceMemberManager();
+                await memberManager.initialize(currentAlliance.id, getCurrentUsername(), permissionManager);
+                
+                // Setze Callbacks für Real-time Updates
+                memberManager.onMembersUpdated = () => {
+                    loadMemberManagement();
+                    loadActiveMembers();
+                };
+                
+                console.log('✅ Member Manager initialisiert');
+            } catch (error) {
+                console.error('❌ Fehler beim Initialisieren des Member Managers:', error);
+            }
+        }
+
         async function loadPermissions() {
             if (!isAdmin || !permissionManager) return;
 
@@ -1305,38 +1490,89 @@
         }
 
         async function loadMemberManagement() {
-            if (!isAdmin || !permissionManager) return;
+            if (!isAdmin || !permissionManager || !memberManager) return;
 
-            const members = currentAlliance.members || [];
+            const members = memberManager.getMembers();
+            const permissions = permissionManager.getPermissionList();
             const container = document.getElementById('member-management');
             
-            container.innerHTML = members.map(member => {
+            // Erstelle Tabellen-Header
+            let html = `
+                <div class="permission-table">
+                    <div class="permission-header">
+                        <div class="member-column">Mitglieder</div>
+                        ${permissions.map(perm => `
+                            <div class="permission-column" title="${perm.description}">
+                                ${perm.description}
+                            </div>
+                        `).join('')}
+                        <div class="action-column">Aktionen</div>
+                    </div>
+            `;
+
+            // Erstelle Zeilen für jedes Mitglied
+            members.forEach(member => {
                 const memberPermissions = permissionManager.getMemberPermissionList(member);
                 const isCurrentUser = member === getCurrentUsername();
                 
-                return `
-                    <div class="member-item-admin">
-                        <div class="member-info-admin">
+                html += `
+                    <div class="permission-row">
+                        <div class="member-info">
                             <div class="member-avatar">${member.charAt(0).toUpperCase()}</div>
-                            <div>
+                            <div class="member-details">
                                 <div class="member-name">${member} ${isCurrentUser ? '(Du)' : ''}</div>
-                                <div class="member-permissions">
-                                    ${memberPermissions.map(perm => `
-                                        <span class="permission-indicator ${perm.isCustom ? 'permission-custom' : (perm.enabled ? 'permission-enabled' : 'permission-disabled')}"></span>
-                                        ${perm.description}
-                                    `).join('')}
-                                </div>
+                                <div class="member-role">${member === currentAlliance.admin ? 'Admin' : 'Mitglied'}</div>
                             </div>
                         </div>
-                        <div class="member-actions">
+                        ${permissions.map(perm => {
+                            const memberPerm = memberPermissions.find(p => p.id === perm.id);
+                            const isEnabled = memberPerm ? memberPerm.enabled : perm.enabled;
+                            const isCustom = memberPerm ? memberPerm.isCustom : false;
+                            
+                            return `
+                                <div class="permission-cell">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" 
+                                               ${isEnabled ? 'checked' : ''} 
+                                               ${!isAdmin || isCurrentUser ? 'disabled' : ''}
+                                               onchange="toggleMemberPermission('${member}', '${perm.id}', this.checked)"
+                                               data-member="${member}" 
+                                               data-permission="${perm.id}">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    ${isCustom ? '<span class="custom-indicator" title="Individuelle Berechtigung">*</span>' : ''}
+                                </div>
+                            `;
+                        }).join('')}
+                        <div class="action-cell">
                             ${!isCurrentUser ? `
-                                <button class="btn" onclick="editMemberPermissions('${member}')">Berechtigungen</button>
-                                <button class="btn danger" onclick="removeMember('${member}')">Entfernen</button>
+                                <button class="btn small danger" 
+                                        onclick="removeMember('${member}')"
+                                        ${!isAdmin ? 'disabled' : ''}>
+                                    Entfernen
+                                </button>
                             ` : '<span style="color: var(--text-secondary); font-size: 0.8rem;">Eigener Account</span>'}
                         </div>
                     </div>
                 `;
-            }).join('');
+            });
+
+            html += '</div>';
+
+            // Füge "Mitglied hinzufügen" Button hinzu
+            html += `
+                <div class="add-member-section">
+                    <h4>Mitglied hinzufügen</h4>
+                    <div class="add-member-form">
+                        <input type="text" id="new-member-username" placeholder="Benutzername" class="input">
+                        <input type="email" id="new-member-email" placeholder="E-Mail" class="input">
+                        <button class="btn success" onclick="addMemberByUsername()">Per Benutzername</button>
+                        <button class="btn success" onclick="addMemberByEmail()">Per E-Mail</button>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
         }
 
         function setupEventListeners() {
@@ -1497,13 +1733,57 @@
             }
         }
 
+        async function addMemberByUsername() {
+            const username = document.getElementById('new-member-username').value.trim();
+            if (!username) {
+                alert('Bitte gib einen Benutzernamen ein');
+                return;
+            }
+
+            try {
+                await memberManager.addMemberByUsername(username);
+                document.getElementById('new-member-username').value = '';
+                showSuccess(`Mitglied "${username}" erfolgreich hinzugefügt`);
+            } catch (error) {
+                showError('Fehler beim Hinzufügen des Mitglieds: ' + error.message);
+            }
+        }
+
+        async function addMemberByEmail() {
+            const email = document.getElementById('new-member-email').value.trim();
+            if (!email) {
+                alert('Bitte gib eine E-Mail-Adresse ein');
+                return;
+            }
+
+            try {
+                await memberManager.addMemberByEmail(email);
+                document.getElementById('new-member-email').value = '';
+                showSuccess(`Mitglied per E-Mail "${email}" erfolgreich hinzugefügt`);
+            } catch (error) {
+                showError('Fehler beim Hinzufügen des Mitglieds: ' + error.message);
+            }
+        }
+
+        async function toggleMemberPermission(member, permission, enabled) {
+            try {
+                await permissionManager.setMemberPermission(member, permission, enabled);
+                console.log(`Berechtigung ${permission} für ${member} auf ${enabled} gesetzt`);
+            } catch (error) {
+                console.error('Fehler beim Setzen der Berechtigung:', error);
+                showError('Fehler beim Setzen der Berechtigung: ' + error.message);
+            }
+        }
+
         async function removeMember(memberUsername) {
             if (!confirm(`Mitglied ${memberUsername} wirklich aus der Allianz entfernen?`)) {
                 return;
             }
             
             try {
-                if (permissionManager) {
+                if (memberManager) {
+                    await memberManager.removeMember(memberUsername);
+                } else if (permissionManager) {
                     await permissionManager.removeMember(memberUsername);
                 }
                 
@@ -1514,12 +1794,56 @@
                 
                 loadMemberManagement();
                 loadActiveMembers();
-                console.log(`Mitglied ${memberUsername} entfernt`);
+                showSuccess(`Mitglied "${memberUsername}" erfolgreich entfernt`);
                 
             } catch (error) {
                 console.error('Fehler beim Entfernen des Mitglieds:', error);
-                alert('Fehler beim Entfernen des Mitglieds: ' + error.message);
+                showError('Fehler beim Entfernen des Mitglieds: ' + error.message);
             }
+        }
+
+        function showSuccess(message) {
+            // Einfache Erfolgsmeldung
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #4CAF50;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                z-index: 1000;
+                font-weight: bold;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 3000);
+        }
+
+        function showError(message) {
+            // Einfache Fehlermeldung
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #F44336;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                z-index: 1000;
+                font-weight: bold;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 5000);
         }
 
         function formatTime(timestamp) {

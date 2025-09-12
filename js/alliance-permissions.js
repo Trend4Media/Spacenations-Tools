@@ -60,11 +60,13 @@ class AlliancePermissionManager {
             } else {
                 // Erstelle Standard-Berechtigungen
                 this.permissions = new Map([
-                    ['chat_read', { enabled: true, description: 'Chat lesen' }],
+                    ['alliance_admin', { enabled: false, description: 'Allianzadmin' }],
                     ['chat_write', { enabled: true, description: 'Chat schreiben' }],
-                    ['spy_database', { enabled: false, description: 'Spionage-Datenbank' }],
+                    ['chat_read', { enabled: true, description: 'Chat lesen' }],
                     ['member_approval', { enabled: false, description: 'Mitglieder bestätigen' }],
-                    ['permission_manage', { enabled: false, description: 'Berechtigungen verwalten' }]
+                    ['permission_manage', { enabled: false, description: 'Berechtigungen verwalten' }],
+                    ['spy_database_admin', { enabled: false, description: 'Spionage-Datenbank Admin' }],
+                    ['spy_database_user', { enabled: false, description: 'Spionage-Datenbank User' }]
                 ]);
                 
                 await this.saveAlliancePermissions();
@@ -100,11 +102,13 @@ class AlliancePermissionManager {
         // Fallback für lokale Entwicklung
         this.isAdmin = true; // Für lokale Entwicklung
         this.permissions = new Map([
-            ['chat_read', { enabled: true, description: 'Chat lesen' }],
+            ['alliance_admin', { enabled: false, description: 'Allianzadmin' }],
             ['chat_write', { enabled: true, description: 'Chat schreiben' }],
-            ['spy_database', { enabled: false, description: 'Spionage-Datenbank' }],
+            ['chat_read', { enabled: true, description: 'Chat lesen' }],
             ['member_approval', { enabled: false, description: 'Mitglieder bestätigen' }],
-            ['permission_manage', { enabled: false, description: 'Berechtigungen verwalten' }]
+            ['permission_manage', { enabled: false, description: 'Berechtigungen verwalten' }],
+            ['spy_database_admin', { enabled: false, description: 'Spionage-Datenbank Admin' }],
+            ['spy_database_user', { enabled: false, description: 'Spionage-Datenbank User' }]
         ]);
     }
 
@@ -181,7 +185,15 @@ class AlliancePermissionManager {
     }
 
     canAccessSpyDatabase(memberUsername = null) {
-        return this.hasPermission('spy_database', memberUsername);
+        return this.hasPermission('spy_database_user', memberUsername) || this.hasPermission('spy_database_admin', memberUsername);
+    }
+
+    canAccessSpyDatabaseAdmin(memberUsername = null) {
+        return this.hasPermission('spy_database_admin', memberUsername);
+    }
+
+    isAllianceAdmin(memberUsername = null) {
+        return this.hasPermission('alliance_admin', memberUsername);
     }
 
     canReadChat(memberUsername = null) {
