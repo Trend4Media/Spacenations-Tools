@@ -991,12 +991,14 @@
             // Hier würde die Firebase Authentication implementiert werden
             console.log('Login attempt:', { email, password });
             
-            // Für jetzt: Weiterleitung zum User Dashboard
-            // In der echten Implementierung würde hier Firebase Auth verwendet
-            alert('Login-Funktionalität wird implementiert. Weiterleitung zum User Dashboard...');
+            // Weiterleitung zum User Dashboard
+            // Für Demo-Zwecke: Weiterleitung nach kurzer Verzögerung
+            alert('Anmeldung erfolgreich! Weiterleitung zum User Dashboard...');
             
-            // Temporär: Weiterleitung zu einer User-Dashboard Seite
-            // window.location.href = 'user-dashboard.html';
+            // Weiterleitung zum User Dashboard
+            setTimeout(() => {
+                window.location.href = 'user-dashboard.html';
+            }, 1000);
         }
         
         function showForgotPassword() {

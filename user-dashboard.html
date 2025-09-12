@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Spacenations Tools</title>
+    
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Razer Color Scheme */
+            --razer-green: #00FF88;
+            --razer-green-dark: #00CC6A;
+            --razer-green-light: #44FF99;
+            --razer-black: #0A0A0A;
+            --razer-dark: #111111;
+            --razer-gray: #1A1A1A;
+            --razer-gray-light: #2A2A2A;
+            --razer-white: #FFFFFF;
+            --razer-silver: #C0C0C0;
+            
+            --text-primary: var(--razer-white);
+            --text-secondary: var(--razer-silver);
+            --text-accent: var(--razer-green);
+            
+            --bg-primary: var(--razer-black);
+            --bg-secondary: var(--razer-dark);
+            --bg-tertiary: var(--razer-gray);
+            --bg-card: var(--razer-gray-light);
+            
+            --glow-green: 0 0 20px rgba(0, 255, 136, 0.5);
+            --glow-green-strong: 0 0 30px rgba(0, 255, 136, 0.8);
+            --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.6);
+            
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            --font-gaming: 'Orbitron', monospace;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-primary);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
+                linear-gradient(45deg, var(--razer-black) 0%, var(--razer-dark) 100%);
+            z-index: -1;
+            animation: backgroundPulse 8s ease-in-out infinite;
+        }
+        
+        @keyframes backgroundPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--razer-green);
+            text-decoration: none;
+            font-family: var(--font-gaming);
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--razer-green), var(--razer-green-light));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--razer-black);
+            font-weight: 900;
+            font-size: 1.2rem;
+        }
+        
+        .nav-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: 2px solid var(--razer-green);
+            background: transparent;
+            color: var(--razer-green);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background: var(--razer-green);
+            color: var(--razer-black);
+            transform: translateY(-2px);
+            box-shadow: var(--glow-green);
+        }
+        
+        .btn.primary {
+            background: linear-gradient(135deg, var(--razer-green), var(--razer-green-light));
+            color: var(--razer-black);
+            border: none;
+        }
+        
+        .btn.primary:hover {
+            background: var(--razer-green-light);
+            box-shadow: var(--glow-green-strong);
+        }
+        
+        /* Main Content */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 32px;
+        }
+        
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .welcome-title {
+            font-family: var(--font-gaming);
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--razer-green);
+            margin-bottom: 16px;
+            text-shadow: var(--glow-green);
+        }
+        
+        .welcome-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+        
+        .user-info {
+            background: var(--bg-card);
+            border: 2px solid var(--razer-green);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow-dark), var(--glow-green);
+        }
+        
+        .user-info h3 {
+            color: var(--razer-green);
+            font-family: var(--font-gaming);
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        
+        .info-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--razer-gray);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        
+        .info-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+        
+        .info-value {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-family: var(--font-gaming);
+        }
+        
+        /* Tools Grid */
+        .tools-section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-family: var(--font-gaming);
+            font-size: 2rem;
+            color: var(--razer-green);
+            text-align: center;
+            margin-bottom: 32px;
+            text-shadow: var(--glow-green);
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        
+        .tool-card {
+            background: var(--bg-card);
+            border: 2px solid var(--razer-green);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-dark);
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-dark), var(--glow-green);
+            border-color: var(--razer-green-light);
+        }
+        
+        .tool-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+        
+        .tool-title {
+            font-family: var(--font-gaming);
+            font-size: 1.3rem;
+            color: var(--razer-green);
+            margin-bottom: 12px;
+        }
+        
+        .tool-description {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .tool-link {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--razer-green), var(--razer-green-light));
+            color: var(--razer-black);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        
+        .tool-link:hover {
+            background: var(--razer-green-light);
+            transform: translateY(-2px);
+            box-shadow: var(--glow-green);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav {
+                padding: 0 16px;
+            }
+            
+            .container {
+                padding: 20px 16px;
+            }
+            
+            .welcome-title {
+                font-size: 2rem;
+            }
+            
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-actions {
+                gap: 12px;
+            }
+            
+            .btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">SN</div>
+                <span>Spacenations</span>
+            </a>
+            
+            <div class="nav-actions">
+                <a href="index.html" class="btn">Zur Startseite</a>
+                <a href="logout-all.html" class="btn">Abmelden</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+            <h1 class="welcome-title">🎮 User Dashboard</h1>
+            <p class="welcome-subtitle">Willkommen in Ihrem persönlichen Spacenations Tools Bereich</p>
+        </section>
+
+        <!-- User Info -->
+        <section class="user-info">
+            <h3>👤 Benutzerinformationen</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Benutzername</div>
+                    <div class="info-value">Demo User</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">E-Mail</div>
+                    <div class="info-value">demo@spacenations.eu</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Mitglied seit</div>
+                    <div class="info-value">2024</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Status</div>
+                    <div class="info-value" style="color: var(--razer-green);">Aktiv</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tools Section -->
+        <section class="tools-section">
+            <h2 class="section-title">🛠️ Verfügbare Tools</h2>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-icon">⚔️</div>
+                    <h3 class="tool-title">AS Counter</h3>
+                    <p class="tool-description">
+                        Berechnen Sie die optimale Anzahl von Angriffsschiffen für Ihre Raids und Kämpfe.
+                    </p>
+                    <a href="as-counter.html" class="tool-link">Tool öffnen</a>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-icon">🧮</div>
+                    <h3 class="tool-title">Battle Counter</h3>
+                    <p class="tool-description">
+                        Strategische Planung Ihrer Schlachten mit präzisen Berechnungen.
+                    </p>
+                    <a href="battle-counter.html" class="tool-link">Tool öffnen</a>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-icon">🏴‍☠️</div>
+                    <h3 class="tool-title">Raid Counter</h3>
+                    <p class="tool-description">
+                        Optimieren Sie Ihre Raid-Strategien mit detaillierten Berechnungen.
+                    </p>
+                    <a href="raid-counter.html" class="tool-link">Tool öffnen</a>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-icon">💣</div>
+                    <h3 class="tool-title">Sabo Counter</h3>
+                    <p class="tool-description">
+                        Planen Sie Sabotage-Aktionen mit präzisen Schadensberechnungen.
+                    </p>
+                    <a href="sabo-counter.html" class="tool-link">Tool öffnen</a>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-icon">🌌</div>
+                    <h3 class="tool-title">ProximaDB</h3>
+                    <p class="tool-description">
+                        Zugriff auf die Proxima-Datenbank mit aktuellen Spielinformationen.
+                    </p>
+                    <a href="ProximaDB.html" class="tool-link">Tool öffnen</a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // User Dashboard JavaScript
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('User Dashboard loaded');
+            
+            // Hier könnte später echte Benutzerdaten geladen werden
+            // z.B. aus localStorage oder einer API
+            
+            // Demo: Zeige Willkommensnachricht
+            setTimeout(() => {
+                console.log('User Dashboard bereit');
+            }, 500);
+        });
+    </script>
+</body>
+</html>
