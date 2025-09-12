@@ -3,105 +3,497 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Admin-Dashboard</title>
+    <title>Spacenations Master Admin-Dashboard</title>
     <link rel="stylesheet" href="css/theme-variables.css">
     <link rel="stylesheet" href="css/global-footer.css">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-gradient, linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%)); color: var(--text-primary, #e0e0e0); margin: 0; min-height: 100vh; padding: 20px; }
-        .layout { display: grid; grid-template-columns: 280px 1fr; gap: 20px; }
-        .panel { background: var(--bg-panel, rgba(0,0,0,0.7)); border: 2px solid var(--border-primary, #3a5998); border-radius: 14px; padding: 20px; box-shadow: 0 0 20px var(--border-shadow, rgba(58,89,152,0.3)); }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: var(--bg-gradient, linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%)); 
+            color: var(--text-primary, #e0e0e0); 
+            margin: 0; 
+            min-height: 100vh; 
+            padding: 20px; 
+        }
+        
+        .dashboard-container { max-width: 1400px; margin: 0 auto; }
+        
+        .layout { display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
+        
+        .panel { 
+            background: var(--bg-panel, rgba(0,0,0,0.7)); 
+            border: 2px solid var(--border-primary, #3a5998); 
+            border-radius: 14px; 
+            padding: 20px; 
+            box-shadow: 0 0 20px var(--border-shadow, rgba(58,89,152,0.3)); 
+            margin-bottom: 20px;
+        }
+        
         .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
         .title { color: var(--accent-primary, #ff8c42); margin: 0; }
-        .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-weight: 700; background: linear-gradient(135deg, #06b6d4, #22d3ee); color: #002b36; font-size: 0.75rem; }
-        .controls { display: flex; gap: 8px; }
-        .btn { padding: 10px 14px; border-radius: 10px; border: 2px solid var(--card-border, #2b3a67); background: var(--card-bg, rgba(0,0,0,0.5)); color: var(--text-primary, #e0e0e0); font-weight: 600; cursor: pointer; }
+        
+        .badge { 
+            display: inline-block; 
+            padding: 4px 10px; 
+            border-radius: 999px; 
+            font-weight: 700; 
+            background: linear-gradient(135deg, #06b6d4, #22d3ee); 
+            color: #002b36; 
+            font-size: 0.75rem; 
+        }
+        
+        .controls { display: flex; gap: 8px; flex-wrap: wrap; }
+        
+        .btn { 
+            padding: 10px 14px; 
+            border-radius: 10px; 
+            border: 2px solid var(--card-border, #2b3a67); 
+            background: var(--card-bg, rgba(0,0,0,0.5)); 
+            color: var(--text-primary, #e0e0e0); 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        
         .btn.primary { background: linear-gradient(135deg, #3a5998, #4a90e2); color: white; border: none; }
+        .btn.success { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border: none; }
         .btn.danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; }
-        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-        .stat { background: var(--card-bg, rgba(0,0,0,0.5)); border: 2px solid var(--card-border, #2b3a67); border-radius: 12px; padding: 16px; text-align: center; }
-        .stat .value { font-size: 1.6rem; font-weight: 800; color: var(--accent-primary, #ff8c42); }
-        .stat .label { color: var(--text-secondary, #b0b0b0); font-size: 0.9rem; }
+        .btn.warning { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: none; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        
+        .stat { 
+            background: var(--card-bg, rgba(0,0,0,0.5)); 
+            border: 2px solid var(--card-border, #2b3a67); 
+            border-radius: 12px; 
+            padding: 16px; 
+            text-align: center; 
+            transition: all 0.3s ease;
+        }
+        
+        .stat:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+        
+        .stat .value { font-size: 1.8rem; font-weight: 800; color: var(--accent-primary, #ff8c42); }
+        .stat .label { color: var(--text-secondary, #b0b0b0); font-size: 0.9rem; margin-top: 4px; }
+        .stat .sub-value { color: var(--text-secondary, #b0b0b0); font-size: 0.8rem; margin-top: 2px; }
+        
         .search { display: grid; grid-template-columns: 1fr 150px; gap: 10px; margin-bottom: 12px; }
-        .input { padding: 12px; border-radius: 10px; border: 2px solid var(--card-border, #2b3a67); background: rgba(0,0,0,0.5); color: white; }
+        
+        .input { 
+            padding: 12px; 
+            border-radius: 10px; 
+            border: 2px solid var(--card-border, #2b3a67); 
+            background: rgba(0,0,0,0.5); 
+            color: white; 
+        }
+        
+        .input:focus { outline: none; border-color: var(--accent-primary, #ff8c42); }
+        
         table { width: 100%; border-collapse: collapse; }
-        th, td { border-bottom: 1px solid rgba(255,255,255,0.08); padding: 10px; text-align: left; font-size: 0.95rem; }
-        th { color: var(--text-secondary, #b0b0b0); font-weight: 700; }
+        th, td { border-bottom: 1px solid rgba(255,255,255,0.08); padding: 12px; text-align: left; font-size: 0.95rem; }
+        th { color: var(--text-secondary, #b0b0b0); font-weight: 700; background: rgba(0,0,0,0.2); }
+        
         .role { display: inline-flex; gap: 6px; align-items: center; }
         .pill { padding: 3px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
         .pill.admin { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
         .pill.super { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
         .pill.user { background: linear-gradient(135deg, #64748b, #475569); color: white; }
-        .actions { display: flex; gap: 8px; }
+        .pill.pending { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+        .pill.approved { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
+        
+        .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        
         .warning { background: rgba(239,68,68,0.1); border: 1px solid #ef4444; color: #ef4444; padding: 10px; border-radius: 8px; margin-bottom: 10px; display: none; }
         .ok { background: rgba(34,197,94,0.1); border: 1px solid #22c55e; color: #22c55e; padding: 10px; border-radius: 8px; margin-bottom: 10px; display: none; }
+        .info { background: rgba(59,130,246,0.1); border: 1px solid #3b82f6; color: #3b82f6; padding: 10px; border-radius: 8px; margin-bottom: 10px; display: none; }
+        
         .hint { color: var(--text-secondary, #b0b0b0); font-size: 0.85rem; }
-        @media (max-width: 1024px){ .layout { grid-template-columns: 1fr; } .grid { grid-template-columns: repeat(2, 1fr); } }
+        
+        .status-indicator { 
+            display: inline-block; 
+            width: 8px; 
+            height: 8px; 
+            border-radius: 50%; 
+            margin-right: 6px; 
+        }
+        
+        .status-online { background: #22c55e; }
+        .status-offline { background: #ef4444; }
+        .status-warning { background: #f59e0b; }
+        
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.8); 
+            z-index: 1000; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        
+        .modal-content { 
+            background: var(--bg-panel, rgba(0,0,0,0.9)); 
+            border: 2px solid var(--border-primary, #3a5998); 
+            border-radius: 14px; 
+            padding: 30px; 
+            max-width: 500px; 
+            width: 90%; 
+            max-height: 80vh; 
+            overflow-y: auto; 
+        }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: var(--text-primary, #e0e0e0); font-weight: 600; }
+        
+        .tabs { 
+            display: flex; 
+            border-bottom: 2px solid var(--card-border, #2b3a67); 
+            margin-bottom: 20px; 
+        }
+        
+        .tab { 
+            padding: 12px 20px; 
+            cursor: pointer; 
+            border-bottom: 2px solid transparent; 
+            color: var(--text-secondary, #b0b0b0); 
+            transition: all 0.3s ease; 
+        }
+        
+        .tab.active { 
+            color: var(--accent-primary, #ff8c42); 
+            border-bottom-color: var(--accent-primary, #ff8c42); 
+        }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .system-status { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 15px; 
+            margin-top: 20px; 
+        }
+        
+        .status-card { 
+            background: var(--card-bg, rgba(0,0,0,0.5)); 
+            border: 2px solid var(--card-border, #2b3a67); 
+            border-radius: 12px; 
+            padding: 16px; 
+            text-align: center; 
+        }
+        
+        .status-card.online { border-color: #22c55e; }
+        .status-card.offline { border-color: #ef4444; }
+        .status-card.warning { border-color: #f59e0b; }
+        
+        @media (max-width: 1024px) { 
+            .layout { grid-template-columns: 1fr; } 
+            .grid { grid-template-columns: repeat(2, 1fr); } 
+            .controls { flex-direction: column; }
+            .search { grid-template-columns: 1fr; }
+        }
+        
+        @media (max-width: 768px) { 
+            .grid { grid-template-columns: 1fr; }
+            .tabs { flex-direction: column; }
+            .tab { border-bottom: none; border-left: 2px solid transparent; }
+            .tab.active { border-left-color: var(--accent-primary, #ff8c42); }
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1 class="title">🛡️ Master Admin-Dashboard</h1>
-        <div class="controls">
-            <a class="btn" href="index.html">← Zur Startseite</a>
-            <button class="btn danger" id="logout-btn">Abmelden</button>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1 class="title">🛡️ Spacenations Master Admin-Dashboard</h1>
+            <div class="controls">
+                <a class="btn" href="index.html">← Zur Startseite</a>
+                <button class="btn danger" id="logout-btn">Abmelden</button>
+            </div>
+        </div>
+
+        <div class="layout">
+            <aside class="panel">
+                <h3 style="margin-top:0">👤 Angemeldet</h3>
+                <div id="admin-user-info" class="hint">Lädt...</div>
+                <hr style="border-color: rgba(255,255,255,0.08); margin: 16px 0">
+                <div class="warning" id="access-denied">Zugriff verweigert. Nur Super-Admins.</div>
+                <div class="ok" id="access-ok">Zugriff gewährt.</div>
+                
+                <h3>⚙️ Aktionen</h3>
+                <div class="controls" style="margin-top: 8px; flex-wrap: wrap;">
+                    <button class="btn primary" id="refresh-btn">🔄 Aktualisieren</button>
+                    <button class="btn success" id="add-user-btn">➕ Benutzer hinzufügen</button>
+                    <button class="btn" id="export-users-btn">📊 Export</button>
+                </div>
+
+                <h3>📈 System Status</h3>
+                <div id="system-status-mini" class="hint">Lädt...</div>
+            </aside>
+
+            <main>
+                <!-- Haupt-Übersicht -->
+                <div class="panel">
+                    <div class="header">
+                        <h2 class="title">📊 Plattform Übersicht</h2>
+                        <span class="badge">Live</span>
+                    </div>
+                    <div class="grid" id="stats-grid">
+                        <div class="stat">
+                            <div class="value" id="stat-users">-</div>
+                            <div class="label">Gesamt Benutzer</div>
+                            <div class="sub-value" id="stat-users-new">Neu heute: -</div>
+                        </div>
+                        <div class="stat">
+                            <div class="value" id="stat-active">-</div>
+                            <div class="label">Aktiv (7 Tage)</div>
+                            <div class="sub-value" id="stat-active-percent">-</div>
+                        </div>
+                        <div class="stat">
+                            <div class="value" id="stat-alliances">-</div>
+                            <div class="label">Allianzen</div>
+                            <div class="sub-value" id="stat-alliances-pending">Ausstehend: -</div>
+                        </div>
+                        <div class="stat">
+                            <div class="value" id="stat-logins-today">-</div>
+                            <div class="label">Logins heute</div>
+                            <div class="sub-value" id="stat-first-logins">Erstes Login: -</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs für verschiedene Bereiche -->
+                <div class="panel">
+                    <div class="tabs">
+                        <div class="tab active" data-tab="users">👥 Benutzer</div>
+                        <div class="tab" data-tab="alliances">🤝 Allianzen</div>
+                        <div class="tab" data-tab="system">⚙️ System</div>
+                        <div class="tab" data-tab="proxima">🌌 ProximaDB</div>
+                    </div>
+
+                    <!-- Benutzer Tab -->
+                    <div class="tab-content active" id="users-tab">
+                        <div class="header">
+                            <h3 class="title">👥 Benutzerverwaltung</h3>
+                            <div class="controls">
+                                <button class="btn success" id="add-user-tab-btn">➕ Neuen Benutzer</button>
+                                <button class="btn warning" id="bulk-actions-btn">📋 Bulk Actions</button>
+                            </div>
+                        </div>
+
+                        <div class="search">
+                            <input id="search-input" class="input" type="text" placeholder="Suchen nach Benutzername, E-Mail, Allianz...">
+                            <button class="btn" id="search-btn">🔍 Suchen</button>
+                        </div>
+
+                        <div style="overflow: auto;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Benutzername</th>
+                                        <th>E-Mail</th>
+                                        <th>Allianz</th>
+                                        <th>Erstes Login</th>
+                                        <th>Letzter Login</th>
+                                        <th>Rollen</th>
+                                        <th>Aktionen</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table-body">
+                                    <tr><td colspan="8" style="text-align:center; color: var(--text-secondary)">Laden...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Allianzen Tab -->
+                    <div class="tab-content" id="alliances-tab">
+                        <div class="header">
+                            <h3 class="title">🤝 Allianzen Management</h3>
+                            <div class="controls">
+                                <button class="btn success" id="approve-all-alliances">✅ Alle genehmigen</button>
+                                <button class="btn" id="refresh-alliances">🔄 Aktualisieren</button>
+                            </div>
+                        </div>
+
+                        <div class="grid">
+                            <div class="stat">
+                                <div class="value" id="stat-alliances-total">-</div>
+                                <div class="label">Gesamt Allianzen</div>
+                            </div>
+                            <div class="stat">
+                                <div class="value" id="stat-alliances-approved">-</div>
+                                <div class="label">Genehmigt</div>
+                            </div>
+                            <div class="stat">
+                                <div class="value" id="stat-alliances-pending-tab">-</div>
+                                <div class="label">Ausstehend</div>
+                            </div>
+                            <div class="stat">
+                                <div class="value" id="stat-alliances-members">-</div>
+                                <div class="label">Durchschn. Mitglieder</div>
+                            </div>
+                        </div>
+
+                        <div style="overflow: auto;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Allianz Name</th>
+                                        <th>Gründer</th>
+                                        <th>Mitglieder</th>
+                                        <th>Status</th>
+                                        <th>Erstellt</th>
+                                        <th>Aktionen</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="alliances-table-body">
+                                    <tr><td colspan="6" style="text-align:center; color: var(--text-secondary)">Laden...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- System Tab -->
+                    <div class="tab-content" id="system-tab">
+                        <div class="header">
+                            <h3 class="title">⚙️ System Monitoring</h3>
+                            <div class="controls">
+                                <button class="btn primary" id="run-system-tests">🧪 System Tests</button>
+                                <button class="btn" id="refresh-system">🔄 Aktualisieren</button>
+                            </div>
+                        </div>
+
+                        <div class="system-status" id="system-status-grid">
+                            <!-- System Status Cards werden hier dynamisch eingefügt -->
+                        </div>
+
+                        <div class="panel">
+                            <h4>📊 Datenbank Status</h4>
+                            <div id="database-status" class="hint">Lädt...</div>
+                        </div>
+
+                        <div class="panel">
+                            <h4>🔄 Letzte Aktivitäten</h4>
+                            <div id="recent-activities" class="hint">Lädt...</div>
+                        </div>
+                    </div>
+
+                    <!-- ProximaDB Tab -->
+                    <div class="tab-content" id="proxima-tab">
+                        <div class="header">
+                            <h3 class="title">🌌 ProximaDB Status</h3>
+                            <div class="controls">
+                                <button class="btn primary" id="force-proxima-update">🔄 Update erzwingen</button>
+                                <button class="btn" id="view-proxima-data">👁️ Daten anzeigen</button>
+                            </div>
+                        </div>
+
+                        <div class="grid">
+                            <div class="stat">
+                                <div class="value" id="proxima-last-update">-</div>
+                                <div class="label">Letztes Update</div>
+                            </div>
+                            <div class="stat">
+                                <div class="value" id="proxima-total-systems">-</div>
+                                <div class="label">Gesamt Systeme</div>
+                            </div>
+                            <div class="stat">
+                                <div class="value" id="proxima-update-status">-</div>
+                                <div class="label">Update Status</div>
+                            </div>
+                            <div class="stat">
+                                <div class="value" id="proxima-next-update">-</div>
+                                <div class="label">Nächstes Update</div>
+                            </div>
+                        </div>
+
+                        <div class="panel">
+                            <h4>📈 ProximaDB Statistiken</h4>
+                            <div id="proxima-stats" class="hint">Lädt...</div>
+                        </div>
+                    </div>
+                </div>
+            </main>
         </div>
     </div>
 
-    <div class="layout">
-        <aside class="panel">
-            <h3 style="margin-top:0">👤 Angemeldet</h3>
-            <div id="admin-user-info" class="hint">Lädt...</div>
-            <hr style="border-color: rgba(255,255,255,0.08); margin: 16px 0">
-            <div class="warning" id="access-denied">Zugriff verweigert. Nur Super-Admins.</div>
-            <div class="ok" id="access-ok">Zugriff gewährt.</div>
-            <h3>⚙️ Aktionen</h3>
-            <div class="controls" style="margin-top: 8px; flex-wrap: wrap;">
-                <button class="btn primary" id="refresh-btn">Aktualisieren</button>
-                <button class="btn" id="export-users-btn">Benutzer exportieren</button>
-            </div>
-        </aside>
+    <!-- Modals -->
+    <!-- Add User Modal -->
+    <div class="modal" id="add-user-modal">
+        <div class="modal-content">
+            <h3>➕ Neuen Benutzer hinzufügen</h3>
+            <form id="add-user-form">
+                <div class="form-group">
+                    <label for="new-user-email">E-Mail Adresse</label>
+                    <input type="email" id="new-user-email" class="input" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-user-password">Temporäres Passwort</label>
+                    <input type="password" id="new-user-password" class="input" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-user-username">Benutzername</label>
+                    <input type="text" id="new-user-username" class="input" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-user-alliance">Allianz (optional)</label>
+                    <input type="text" id="new-user-alliance" class="input">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="new-user-alliance-admin"> Alliance Admin
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="new-user-super-admin"> Super Admin
+                    </label>
+                </div>
+                <div class="controls">
+                    <button type="submit" class="btn success">Benutzer erstellen</button>
+                    <button type="button" class="btn" onclick="closeModal('add-user-modal')">Abbrechen</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-        <main class="panel">
-            <div class="header" style="margin: 0 0 10px 0;">
-                <h2 class="title" style="font-size:1.2rem">📊 Übersicht</h2>
-            </div>
-            <div class="grid" id="stats-grid">
-                <div class="stat"><div class="value" id="stat-users">-</div><div class="label">Benutzer</div></div>
-                <div class="stat"><div class="value" id="stat-admins">-</div><div class="label">Alliance Admins</div></div>
-                <div class="stat"><div class="value" id="stat-super">-</div><div class="label">Super-Admins</div></div>
-                <div class="stat"><div class="value" id="stat-active">-</div><div class="label">Aktiv (7 Tage)</div></div>
-            </div>
+    <!-- Change Password Modal -->
+    <div class="modal" id="change-password-modal">
+        <div class="modal-content">
+            <h3>🔑 Passwort ändern</h3>
+            <form id="change-password-form">
+                <input type="hidden" id="change-password-user-id">
+                <div class="form-group">
+                    <label for="new-password">Neues Passwort</label>
+                    <input type="password" id="new-password" class="input" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password">Passwort bestätigen</label>
+                    <input type="password" id="confirm-password" class="input" required>
+                </div>
+                <div class="controls">
+                    <button type="submit" class="btn success">Passwort ändern</button>
+                    <button type="button" class="btn" onclick="closeModal('change-password-modal')">Abbrechen</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-            <div class="header" style="margin-top: 20px;">
-                <h2 class="title" style="font-size:1.2rem">👥 Benutzerverwaltung</h2>
-                <span class="badge">Live</span>
+    <!-- View Proxima Data Modal -->
+    <div class="modal" id="view-proxima-modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <h3>🌌 ProximaDB Daten</h3>
+            <div id="proxima-data-content" class="hint">Lädt...</div>
+            <div class="controls" style="margin-top: 20px;">
+                <button class="btn" onclick="closeModal('view-proxima-modal')">Schließen</button>
             </div>
-
-            <div class="search">
-                <input id="search-input" class="input" type="text" placeholder="Suchen nach Benutzername, E-Mail, Allianz...">
-                <button class="btn" id="search-btn">Suchen</button>
-            </div>
-
-            <div style="overflow: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Benutzername</th>
-                            <th>E-Mail</th>
-                            <th>Allianz</th>
-                            <th>Letzter Login</th>
-                            <th>Rollen</th>
-                            <th>Aktionen</th>
-                        </tr>
-                    </thead>
-                    <tbody id="users-table-body">
-                        <tr><td colspan="6" style="text-align:center; color: var(--text-secondary)">Laden...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div id="admin-debug-section"></div>
-        </main>
+        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -111,9 +503,8 @@
     <script src="js/firebase-config.js"></script>
     <script src="js/auth-manager.js"></script>
     <script src="js/firebase-sync.js"></script>
-    <script src="../js/admin-auth.js"></script>
-    <script src="../js/admin-dashboard.js"></script>
-    <script src="../js/admin-debug.js"></script>
+    <script src="js/admin-auth.js"></script>
+    <script src="js/admin-dashboard-enhanced.js"></script>
     <script src="js/global-footer-loader.js"></script>
 </body>
 </html>
