@@ -465,28 +465,8 @@
         }
         
         function getCurrentUsername() {
-            // Methode 1: Aus URL-Parameter (falls beim Login weitergegeben)
-            const urlParams = new URLSearchParams(window.location.search);
-            const usernameFromUrl = urlParams.get('username');
-            if (usernameFromUrl) {
-                return usernameFromUrl;
-            }
-            
-            // Methode 2: Aus localStorage (falls beim Login gespeichert)
-            const usernameFromStorage = localStorage.getItem('currentUsername');
-            if (usernameFromStorage) {
-                return usernameFromStorage;
-            }
-            
-            // Methode 3: Aus sessionStorage
-            const usernameFromSession = sessionStorage.getItem('currentUsername');
-            if (usernameFromSession) {
-                return usernameFromSession;
-            }
-            
-            // Methode 4: Demo-Fallback für Entwicklung
-            // In der echten Implementierung würde hier Firebase Auth verwendet
-            return 'Demo User';
+            // Fester Benutzername für das Dashboard
+            return 'Daikin';
         }
     </script>
 </body>

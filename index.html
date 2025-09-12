@@ -1008,10 +1008,8 @@
         }
         
         function extractUsernameFromEmail(email) {
-            // Extrahiert Benutzername aus E-Mail (vor dem @)
-            // Für Demo-Zwecke - in echter Implementierung würde Firebase Auth verwendet
-            const username = email.split('@')[0];
-            return username.charAt(0).toUpperCase() + username.slice(1);
+            // Fester Benutzername für das Dashboard
+            return 'Daikin';
         }
         
         function showForgotPassword() {
