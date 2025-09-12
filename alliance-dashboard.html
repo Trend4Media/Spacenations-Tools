@@ -293,6 +293,30 @@
         
         .member-name {
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .role-badge {
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .role-badge.admin {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            border: 1px solid #FFA500;
+        }
+        
+        .role-badge.member {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: #fff;
+            border: 1px solid #45a049;
         }
         
         .member-status {
@@ -905,6 +929,30 @@
             return isUserAdmin;
         }
 
+        // Funktion zur Prüfung der Member-Rolle
+        async function checkMemberRole(username) {
+            // Prüfe zuerst Alliance-Daten
+            let adminFromAlliance = currentAlliance.admin === username || currentAlliance.founder === username;
+            
+            // Prüfe zusätzlich User-Datenbank für allianceRole
+            let adminFromUserData = false;
+            try {
+                if (typeof window.FirebaseConfig !== 'undefined' && window.FirebaseConfig.isReady()) {
+                    const db = window.FirebaseConfig.getDB();
+                    const userDoc = await db.collection('users').doc(username).get();
+                    if (userDoc.exists) {
+                        const userData = userDoc.data();
+                        adminFromUserData = userData.allianceRole === 'admin' || userData.allianceRole === 'founder';
+                    }
+                }
+            } catch (error) {
+                console.warn('⚠️ Konnte User-Daten für Member-Rolle nicht laden:', error);
+            }
+            
+            // User ist Admin wenn er in Alliance-Daten ODER User-Daten als Admin markiert ist
+            return adminFromAlliance || adminFromUserData;
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             console.log('Alliance Dashboard loaded');
             
@@ -1342,29 +1390,39 @@
                 
                 const db = window.FirebaseConfig.getDB();
                 
-                // Simuliere aktive Mitglieder (in einer echten App würde man Online-Status tracken)
+                // Lade Mitglieder mit Admin/Member-Status
                 const members = currentAlliance.members || [];
-                const membersWithStatus = members.map(member => ({
-                    name: member,
-                    status: Math.random() > 0.3 ? 'online' : 'offline', // Simuliert Online-Status
-                    lastSeen: new Date()
+                const membersWithStatus = await Promise.all(members.map(async member => {
+                    // Prüfe Admin-Status für jeden Member
+                    const isMemberAdmin = await checkMemberRole(member);
+                    
+                    return {
+                        name: member,
+                        status: Math.random() > 0.3 ? 'online' : 'offline', // Simuliert Online-Status
+                        lastSeen: new Date(),
+                        role: isMemberAdmin ? 'admin' : 'member'
+                    };
                 }));
 
                 displayMembers(membersWithStatus);
 
                 // Setze up Real-time Updates für Mitglieder
                 membersUnsubscribe = db.collection('alliances').doc(currentAlliance.id)
-                    .onSnapshot(doc => {
+                    .onSnapshot(async doc => {
                         if (doc.exists) {
                             const data = doc.data();
                             currentAlliance = { id: doc.id, ...data };
                             displayAllianceInfo();
                             
                             const members = data.members || [];
-                            const membersWithStatus = members.map(member => ({
-                                name: member,
-                                status: Math.random() > 0.3 ? 'online' : 'offline',
-                                lastSeen: new Date()
+                            const membersWithStatus = await Promise.all(members.map(async member => {
+                                const isMemberAdmin = await checkMemberRole(member);
+                                return {
+                                    name: member,
+                                    status: Math.random() > 0.3 ? 'online' : 'offline',
+                                    lastSeen: new Date(),
+                                    role: isMemberAdmin ? 'admin' : 'member'
+                                };
                             }));
                             displayMembers(membersWithStatus);
                         }
@@ -1377,11 +1435,17 @@
 
         function loadActiveMembersLocal() {
             const members = currentAlliance.members || [];
-            const membersWithStatus = members.map(member => ({
-                name: member,
-                status: Math.random() > 0.3 ? 'online' : 'offline',
-                lastSeen: new Date()
-            }));
+            const membersWithStatus = members.map(member => {
+                // Prüfe Admin-Status für lokale Entwicklung
+                const isMemberAdmin = currentAlliance.admin === member || currentAlliance.founder === member;
+                
+                return {
+                    name: member,
+                    status: Math.random() > 0.3 ? 'online' : 'offline',
+                    lastSeen: new Date(),
+                    role: isMemberAdmin ? 'admin' : 'member'
+                };
+            });
             displayMembers(membersWithStatus);
         }
 
@@ -1398,7 +1462,10 @@
                     <div class="member-info">
                         <div class="member-avatar">${member.name.charAt(0).toUpperCase()}</div>
                         <div>
-                            <div class="member-name">${member.name}</div>
+                            <div class="member-name">
+                                ${member.name}
+                                ${member.role === 'admin' ? '<span class="role-badge admin">👑 Admin</span>' : '<span class="role-badge member">👤 Member</span>'}
+                            </div>
                             <div class="member-status">
                                 <span class="status-indicator status-${member.status}"></span>
                                 ${member.status === 'online' ? 'Online' : 'Offline'}
