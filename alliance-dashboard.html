@@ -985,6 +985,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             console.log('Alliance Dashboard loaded');
+            console.log('🌐 Aktuelle URL:', window.location.href);
             
             // Event Listeners sofort einrichten
             setupEventListeners();
@@ -1036,13 +1037,11 @@
                     } catch (error) {
                         console.error('❌ Fehler beim Parsen der localStorage-Daten:', error);
                         console.log('🔄 Verwende Standard-Initialisierung');
-                        initializeAllianceDashboard();
+                        showAllianceAccessError();
                     }
                 } else {
-                    console.log('❌ Keine Allianz-Daten gefunden, verwende Standard-Initialisierung');
-                    console.log('💡 Tipp: Gehe über das User-Dashboard zum Allianz-Dashboard');
-                    console.log('🔧 Debug: localStorage Keys:', Object.keys(localStorage));
-                    initializeAllianceDashboard();
+                    console.log('❌ Keine Allianz-Daten gefunden');
+                    showAllianceAccessError();
                 }
             }
         });
@@ -2163,6 +2162,43 @@
             if (usernameFromSession) return usernameFromSession;
             
             return null;
+        }
+
+        function showAllianceAccessError() {
+            const container = document.querySelector('.container');
+            container.innerHTML = `
+                <div style="text-align: center; padding: 60px 20px; max-width: 600px; margin: 0 auto;">
+                    <div style="font-size: 4rem; margin-bottom: 20px;">🏰</div>
+                    <h1 style="color: var(--razer-green); font-family: var(--font-gaming); margin-bottom: 20px;">
+                        Allianz-Dashboard
+                    </h1>
+                    <div style="background: var(--bg-card); border: 2px solid var(--razer-green); border-radius: 12px; padding: 30px; margin-bottom: 30px;">
+                        <h2 style="color: var(--razer-green); margin-bottom: 15px;">Zugriff erforderlich</h2>
+                        <p style="color: var(--text-primary); margin-bottom: 20px; line-height: 1.6;">
+                            Um das Allianz-Dashboard zu nutzen, musst du über das User-Dashboard darauf zugreifen.
+                        </p>
+                        <div style="background: var(--bg-secondary); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                            <h3 style="color: var(--razer-green); margin-bottom: 10px;">So gelangst du hierher:</h3>
+                            <ol style="color: var(--text-primary); text-align: left; line-height: 1.8;">
+                                <li>Gehe zu <a href="user-dashboard.html" style="color: var(--razer-green);">User-Dashboard</a></li>
+                                <li>Melde dich mit deinem Account an</li>
+                                <li>Klicke auf "Zum Allianzdashboard" bei deiner Allianz</li>
+                            </ol>
+                        </div>
+                        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                            <a href="user-dashboard.html" class="btn primary" style="text-decoration: none;">
+                                🏠 Zum User-Dashboard
+                            </a>
+                            <a href="index.html" class="btn" style="text-decoration: none;">
+                                🏠 Zur Startseite
+                            </a>
+                        </div>
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                        <p>Falls du bereits angemeldet bist, versuche die Seite zu aktualisieren.</p>
+                    </div>
+                </div>
+            `;
         }
 
         function showError(message) {
