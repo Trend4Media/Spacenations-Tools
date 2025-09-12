@@ -528,6 +528,124 @@
             letter-spacing: 1px;
         }
         
+        /* Login Area */
+        .login-area {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            width: 320px;
+            background: var(--bg-card);
+            border: 2px solid var(--razer-green);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow-dark), var(--glow-green);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+        
+        .login-area:hover {
+            box-shadow: var(--shadow-dark), var(--glow-green-strong);
+            border-color: var(--razer-green-light);
+        }
+        
+        .login-title {
+            color: var(--razer-green);
+            font-family: var(--font-gaming);
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: var(--glow-green);
+        }
+        
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .login-input {
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 2px solid var(--razer-gray);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: var(--font-primary);
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .login-input:focus {
+            outline: none;
+            border-color: var(--razer-green);
+            box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.2);
+            background: var(--bg-tertiary);
+        }
+        
+        .login-input::placeholder {
+            color: var(--text-secondary);
+        }
+        
+        .login-btn {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 2px solid var(--razer-green);
+            background: linear-gradient(135deg, var(--razer-green), var(--razer-green-light));
+            color: var(--razer-black);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: var(--font-primary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-dark), var(--glow-green-strong);
+            background: var(--razer-green-light);
+        }
+        
+        .login-links {
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .login-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .login-link:hover {
+            color: var(--razer-green);
+            background: rgba(0, 255, 136, 0.1);
+        }
+        
+        .login-link.primary {
+            color: var(--razer-green);
+            font-weight: 600;
+            border: 1px solid var(--razer-green);
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .login-link.primary:hover {
+            background: var(--razer-green);
+            color: var(--razer-black);
+            transform: translateY(-1px);
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .sidebar {
@@ -569,6 +687,37 @@
                 cursor: pointer;
             }
             
+            .login-area {
+                position: relative;
+                top: auto;
+                right: auto;
+                transform: none;
+                width: 100%;
+                max-width: 400px;
+                margin: 20px auto;
+            }
+            
+        }
+        
+        @media (max-width: 480px) {
+            .login-area {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .login-title {
+                font-size: 1rem;
+            }
+            
+            .login-input {
+                padding: 10px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .login-btn {
+                padding: 10px 16px;
+                font-size: 0.85rem;
+            }
         }
         
         .mobile-menu {
@@ -609,9 +758,6 @@
                 </a>
                 <a href="admin-login.html" class="btn btn-admin" style="background: linear-gradient(135deg, #ff8c42, #ff6b1a); color: white; border: 1px solid #ff8c42;">
                     🛡️ Admin
-                </a>
-                <a href="register.html" class="btn btn-login">
-                    Login
                 </a>
                 <a href="logout-all.html" class="btn btn-logout" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: 1px solid #ef4444;">
                     🚪 Logout
@@ -682,6 +828,38 @@
                 </div>
             </div>
         </section>
+
+        <!-- Login Area -->
+        <div class="login-area">
+            <h3 class="login-title">🎮 User Login</h3>
+            <form class="login-form" id="login-form">
+                <input 
+                    type="text" 
+                    class="login-input" 
+                    id="login-email" 
+                    placeholder="Benutzername oder E-Mail" 
+                    required
+                >
+                <input 
+                    type="password" 
+                    class="login-input" 
+                    id="login-password" 
+                    placeholder="Passwort" 
+                    required
+                >
+                <button type="submit" class="login-btn">
+                    Anmelden
+                </button>
+                <div class="login-links">
+                    <a href="#" class="login-link" onclick="showForgotPassword()">
+                        Passwort vergessen?
+                    </a>
+                    <a href="register.html" class="login-link primary">
+                        Neu registrieren
+                    </a>
+                </div>
+            </form>
+        </div>
 
         <!-- Stats Section -->
         <section class="stats-section">
@@ -782,9 +960,42 @@
         `;
         document.head.appendChild(style);
         
+        // Login functionality
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                alert('Bitte füllen Sie alle Felder aus.');
+                return;
+            }
+            
+            // Hier würde die Firebase Authentication implementiert werden
+            console.log('Login attempt:', { email, password });
+            
+            // Für jetzt: Weiterleitung zum User Dashboard
+            // In der echten Implementierung würde hier Firebase Auth verwendet
+            alert('Login-Funktionalität wird implementiert. Weiterleitung zum User Dashboard...');
+            
+            // Temporär: Weiterleitung zu einer User-Dashboard Seite
+            // window.location.href = 'user-dashboard.html';
+        }
+        
+        function showForgotPassword() {
+            alert('Passwort vergessen Funktion wird implementiert. Kontaktieren Sie den Administrator.');
+        }
+        
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', () => {
             console.log('Spacenations Tools loaded');
+            
+            // Add login form event listener
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+            }
         });
     </script>
     
