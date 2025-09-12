@@ -129,7 +129,7 @@ class ProximaFetcher:
         cursor = conn.cursor()
         
         try:
-            # Aktuelle Planeten (neueste Einträge)
+            # Aktuelle Planeten (neueste Einträge) nach Punktzahl sortiert
             cursor.execute('''
                 SELECT name, coordinates, score, delete_on, week_number
                 FROM planets p1
@@ -138,7 +138,7 @@ class ProximaFetcher:
                     FROM planets p2 
                     WHERE p2.name = p1.name
                 )
-                ORDER BY week_number DESC, CAST(SUBSTR(name, INSTR(name, ' ') + 1) AS INTEGER)
+                ORDER BY score DESC
             ''')
             
             planets = cursor.fetchall()
@@ -323,7 +323,10 @@ class ProximaFetcher:
                 </thead>
                 <tbody>"""
         
-        for planet in summary['planets']:
+        # Sortiere Planeten nach Punktzahl (höchste zuerst)
+        sorted_planets = sorted(summary['planets'], key=lambda x: x[2], reverse=True)
+        
+        for planet in sorted_planets:
             name, coordinates, score, delete_on, week_number = planet
             formatted_date = self.format_delete_date(delete_on)
             

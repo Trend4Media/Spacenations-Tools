@@ -195,13 +195,9 @@
             const weekNumbers = [...new Set(planetObjects.map(p => p.weekNumber))];
             const latestWeek = Math.max(...weekNumbers);
             
-            // Planeten nach Woche und Nummer sortieren
+            // Planeten nach Punktzahl sortieren (höchste zuerst)
             planetObjects.sort((a, b) => {
-                if (a.weekNumber !== b.weekNumber) return b.weekNumber - a.weekNumber;
-                
-                const numA = extractPlanetNumber(a.name);
-                const numB = extractPlanetNumber(b.name);
-                return numA - numB;
+                return b.score - a.score;
             });
             
             const content = document.getElementById('content');
