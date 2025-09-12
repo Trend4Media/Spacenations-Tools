@@ -430,6 +430,7 @@
             
             <div class="nav-actions">
                 <a href="index.html" class="btn">Zur Startseite</a>
+                <a href="#" class="btn" id="alliance-nav-link" onclick="handleAllianceNavigation()">🏰 Allianz</a>
                 <a href="logout-all.html" class="btn">Abmelden</a>
             </div>
         </nav>
@@ -492,26 +493,20 @@
                     </p>
                     <a href="ProximaDB.html" class="tool-link">Meine ProximaDB</a>
                 </div>
-            </div>
-        </section>
-
-        <!-- Allianz Section -->
-        <section class="tools-section">
-            <h2 class="section-title">🤝 Allianz Management</h2>
-            <p class="section-subtitle">Verwalte deine Allianz oder erstelle eine neue</p>
-            <div class="tools-grid">
-                <div class="tool-card personal" id="alliance-status-card">
+                
+                <div class="tool-card personal" id="allianceboard-card">
                     <div class="tool-icon">🏰</div>
-                    <h3 class="tool-title" id="alliance-title">Allianz Status</h3>
-                    <p class="tool-description" id="alliance-description">
+                    <h3 class="tool-title" id="allianceboard-title">Allianzboard</h3>
+                    <p class="tool-description" id="allianceboard-description">
                         Lade Allianz-Informationen...
                     </p>
-                    <div id="alliance-actions">
+                    <div id="allianceboard-actions">
                         <!-- Wird dynamisch gefüllt -->
                     </div>
                 </div>
             </div>
         </section>
+
     </div>
 
     <!-- Allianz Erstellung Modal -->
@@ -777,9 +772,20 @@
         }
         
         function showAllianceStatus(status, alliance, allianceId = null) {
-            const titleElement = document.getElementById('alliance-title');
-            const descriptionElement = document.getElementById('alliance-description');
-            const actionsElement = document.getElementById('alliance-actions');
+            // Aktualisiere sowohl die Tool-Karte als auch die Navigation
+            updateAllianceboardCard(status, alliance, allianceId);
+            updateAllianceNavigation(status, alliance, allianceId);
+        }
+        
+        function updateAllianceboardCard(status, alliance, allianceId = null) {
+            const titleElement = document.getElementById('allianceboard-title');
+            const descriptionElement = document.getElementById('allianceboard-description');
+            const actionsElement = document.getElementById('allianceboard-actions');
+            
+            if (!titleElement || !descriptionElement || !actionsElement) {
+                console.warn('⚠️ Allianzboard-Elemente nicht gefunden');
+                return;
+            }
             
             switch (status) {
                 case 'no-user':
@@ -828,6 +834,66 @@
                     actionsElement.innerHTML = '<button class="tool-link" onclick="location.reload()">Neu laden</button>';
                     break;
             }
+        }
+        
+        function updateAllianceNavigation(status, alliance, allianceId = null) {
+            const navLink = document.getElementById('alliance-nav-link');
+            if (!navLink) return;
+            
+            switch (status) {
+                case 'no-user':
+                    navLink.textContent = '🔒 Allianz';
+                    navLink.href = 'index.html';
+                    break;
+                    
+                case 'none':
+                    navLink.textContent = '🏰 Allianz';
+                    navLink.href = '#';
+                    navLink.onclick = () => openCreateAllianceModal();
+                    break;
+                    
+                case 'pending':
+                    navLink.textContent = `⏳ ${alliance.name}`;
+                    navLink.href = '#';
+                    navLink.onclick = () => alert('Allianz wartet auf Genehmigung');
+                    break;
+                    
+                case 'rejected':
+                    navLink.textContent = '❌ Allianz';
+                    navLink.href = '#';
+                    navLink.onclick = () => openCreateAllianceModal();
+                    break;
+                    
+                case 'founder':
+                    if (alliance.status === 'approved') {
+                        navLink.textContent = `👑 ${alliance.name}`;
+                        navLink.href = 'alliance-dashboard-redirect.html';
+                        navLink.onclick = null;
+                    } else {
+                        navLink.textContent = `⏳ ${alliance.name}`;
+                        navLink.href = '#';
+                        navLink.onclick = () => alert('Allianz wartet auf Genehmigung');
+                    }
+                    break;
+                    
+                case 'member':
+                    navLink.textContent = `🤝 ${alliance.name}`;
+                    navLink.href = 'alliance-dashboard.html';
+                    navLink.onclick = () => redirectToAllianceDashboard();
+                    break;
+                    
+                case 'error':
+                    navLink.textContent = '❌ Allianz';
+                    navLink.href = '#';
+                    navLink.onclick = () => location.reload();
+                    break;
+            }
+        }
+        
+        function handleAllianceNavigation() {
+            // Diese Funktion wird von der Navigation aufgerufen
+            // Die eigentliche Logik ist bereits in updateAllianceNavigation implementiert
+            console.log('🏰 Allianz-Navigation geklickt');
         }
         
         function setupAllianceEventListeners() {
