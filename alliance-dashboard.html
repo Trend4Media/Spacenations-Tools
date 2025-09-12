@@ -956,6 +956,9 @@
         document.addEventListener('DOMContentLoaded', () => {
             console.log('Alliance Dashboard loaded');
             
+            // Event Listeners sofort einrichten
+            setupEventListeners();
+            
             // Lade Allianz-Daten basierend auf URL-Parameter
             const urlParams = new URLSearchParams(window.location.search);
             const allianceId = urlParams.get('id');
@@ -1288,7 +1291,6 @@
 
                 await window.FirebaseConfig.waitForInit();
                 await loadAllianceData();
-                setupEventListeners();
             } catch (error) {
                 console.error('Fehler beim Initialisieren des Allianzdashboards:', error);
                 showError('Fehler beim Laden des Allianzdashboards');
@@ -1478,6 +1480,14 @@
 
         async function loadChatMessages() {
             try {
+                // Prüfe ob User Mitglied der Allianz ist
+                const username = getCurrentUsername();
+                if (!username || !currentAlliance.members || !currentAlliance.members.includes(username)) {
+                    console.log('⚠️ User ist kein Mitglied der Allianz, Chat nicht verfügbar');
+                    displayChatMessages([]);
+                    return;
+                }
+
                 // Prüfe ob Firebase verfügbar ist
                 if (typeof window.FirebaseConfig === 'undefined' || !window.FirebaseConfig.isReady()) {
                     console.log('⚠️ Firebase nicht verfügbar, verwende lokale Chat-Daten');
@@ -1487,7 +1497,7 @@
                 
                 const db = window.FirebaseConfig.getDB();
                 
-                // Lade Chat-Nachrichten
+                // Lade Chat-Nachrichten für alle Mitglieder
                 const messagesQuery = await db.collection('allianceChats')
                     .doc(currentAlliance.id)
                     .collection('messages')
@@ -1502,7 +1512,7 @@
 
                 displayChatMessages(messages.reverse());
 
-                // Setze up Real-time Chat Updates
+                // Setze up Real-time Chat Updates für alle Mitglieder
                 chatUnsubscribe = db.collection('allianceChats')
                     .doc(currentAlliance.id)
                     .collection('messages')
@@ -1722,8 +1732,14 @@
                 return;
             }
 
+            // Prüfe ob User Mitglied der Allianz ist
+            if (!currentAlliance.members || !currentAlliance.members.includes(username)) {
+                alert('Du musst Mitglied der Allianz sein, um Nachrichten zu senden.');
+                return;
+            }
+
             try {
-                if (typeof window.FirebaseConfig !== 'undefined') {
+                if (typeof window.FirebaseConfig !== 'undefined' && window.FirebaseConfig.isReady()) {
                     await sendMessageFirebase(content, username);
                 } else {
                     sendMessageLocal(content, username);
@@ -1969,12 +1985,18 @@
         function formatTime(timestamp) {
             try {
                 const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-                return date.toLocaleTimeString('de-DE', { 
+                const time = date.toLocaleTimeString('de-DE', { 
                     hour: '2-digit', 
                     minute: '2-digit' 
                 });
+                const dateStr = date.toLocaleDateString('de-DE', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+                return `[${time}] ${dateStr}`;
             } catch {
-                return 'Unbekannt';
+                return '[Unbekannt]';
             }
         }
 
