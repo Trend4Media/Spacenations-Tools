@@ -108,6 +108,13 @@ class AllianceMemberManager {
                 lastUpdated: window.FirebaseConfig.getServerTimestamp()
             });
 
+            // Aktualisiere User-Dokument mit Allianz-Information
+            await db.collection('users').doc(username).update({
+                alliance: this.currentAlliance,
+                allianceRole: 'member',
+                lastUpdated: window.FirebaseConfig.getServerTimestamp()
+            });
+
             // Log Aktivität
             await db.collection('allianceActivities').add({
                 allianceId: this.currentAlliance,
@@ -218,6 +225,13 @@ class AllianceMemberManager {
             // Entferne Mitglied aus der Allianz
             await db.collection('alliances').doc(this.currentAlliance).update({
                 members: window.FirebaseConfig.getFieldValue().arrayRemove(username),
+                lastUpdated: window.FirebaseConfig.getServerTimestamp()
+            });
+
+            // Entferne Allianz-Information vom User
+            await db.collection('users').doc(username).update({
+                alliance: null,
+                allianceRole: null,
                 lastUpdated: window.FirebaseConfig.getServerTimestamp()
             });
 
@@ -363,6 +377,21 @@ class AllianceMemberManager {
             // Setze Allianzadmin-Berechtigung für den neuen Admin
             if (this.permissionManager) {
                 await this.permissionManager.setMemberPermission(username, 'alliance_admin', true);
+            }
+
+            // Aktualisiere User-Dokument mit Admin-Rolle
+            await db.collection('users').doc(username).update({
+                alliance: this.currentAlliance,
+                allianceRole: 'admin',
+                lastUpdated: window.FirebaseConfig.getServerTimestamp()
+            });
+
+            // Entferne Admin-Rolle vom vorherigen Admin (falls vorhanden)
+            if (this.currentUser !== username) {
+                await db.collection('users').doc(this.currentUser).update({
+                    allianceRole: 'member',
+                    lastUpdated: window.FirebaseConfig.getServerTimestamp()
+                });
             }
 
             // Log Aktivität

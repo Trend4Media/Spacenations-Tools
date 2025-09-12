@@ -537,6 +537,13 @@
                 admin: allianceData.founder // Setze Gründer als Admin
             });
 
+            // Aktualisiere User-Dokument mit Admin-Rolle
+            await db.collection('users').doc(allianceData.founder).update({
+                alliance: allianceId,
+                allianceRole: 'admin',
+                lastUpdated: window.FirebaseConfig.getServerTimestamp()
+            });
+
             // Log activity
             await db.collection('userActivities').add({
                 userId: window.AuthAPI.getCurrentUser().uid,
@@ -578,6 +585,21 @@
                 adminSetAt: window.FirebaseConfig.getServerTimestamp(),
                 adminSetBy: window.AuthAPI.getCurrentUser().uid
             });
+
+            // Aktualisiere User-Dokument mit Admin-Rolle
+            await db.collection('users').doc(newAdmin).update({
+                alliance: allianceId,
+                allianceRole: 'admin',
+                lastUpdated: window.FirebaseConfig.getServerTimestamp()
+            });
+
+            // Entferne Admin-Rolle vom vorherigen Admin (falls vorhanden)
+            if (allianceData.admin && allianceData.admin !== newAdmin) {
+                await db.collection('users').doc(allianceData.admin).update({
+                    allianceRole: 'member',
+                    lastUpdated: window.FirebaseConfig.getServerTimestamp()
+                });
+            }
 
             // Log activity
             await db.collection('userActivities').add({

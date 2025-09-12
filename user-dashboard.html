@@ -1029,6 +1029,13 @@
                 
                 const docRef = await db.collection('alliances').add(allianceData);
                 console.log('✅ Allianz erfolgreich erstellt mit ID:', docRef.id);
+
+                // Aktualisiere User-Dokument mit Allianz-Information
+                await db.collection('users').doc(founder).update({
+                    alliance: docRef.id,
+                    allianceRole: 'founder',
+                    lastUpdated: window.FirebaseConfig.getServerTimestamp()
+                });
                 
                 // Erstelle Standard-Berechtigungen
                 try {
