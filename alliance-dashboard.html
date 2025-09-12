@@ -641,6 +641,22 @@
             text-align: center;
         }
 
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .admin-badge {
+            background: var(--razer-green);
+            color: var(--razer-black);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
         .add-member-section {
             margin-top: 30px;
             padding: 20px;
@@ -663,7 +679,10 @@
 
         .add-member-form .input {
             flex: 1;
-            min-width: 200px;
+            min-width: 250px;
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            height: 50px;
         }
 
         .member-item-admin {
@@ -1472,21 +1491,9 @@
         async function loadPermissions() {
             if (!isAdmin || !permissionManager) return;
 
-            document.getElementById('permission-section').style.display = 'block';
-            
-            const permissions = permissionManager.getPermissionList();
-            const container = document.getElementById('alliance-permission-grid');
-            
-            container.innerHTML = permissions.map(permission => `
-                <div class="permission-item">
-                    <div class="permission-header">
-                        <span class="permission-title">${permission.description}</span>
-                        <div class="permission-toggle ${permission.enabled ? 'active' : ''}" 
-                             data-permission="${permission.id}"></div>
-                    </div>
-                    <div class="permission-description">${permission.description}</div>
-                </div>
-            `).join('');
+            // Zeige nur die Mitglieder-Verwaltung, keine Allianz-weiten Toggle-Switches
+            document.getElementById('permission-section').style.display = 'none';
+            document.getElementById('member-management-section').style.display = 'block';
         }
 
         async function loadMemberManagement() {
@@ -1546,11 +1553,21 @@
                         }).join('')}
                         <div class="action-cell">
                             ${!isCurrentUser ? `
-                                <button class="btn small danger" 
-                                        onclick="removeMember('${member}')"
-                                        ${!isAdmin ? 'disabled' : ''}>
-                                    Entfernen
-                                </button>
+                                <div class="action-buttons">
+                                    ${member !== currentAlliance.admin ? `
+                                        <button class="btn small success" 
+                                                onclick="setAllianceAdmin('${member}')"
+                                                ${!isAdmin ? 'disabled' : ''}
+                                                title="Als Allianzadmin setzen">
+                                            Admin
+                                        </button>
+                                    ` : '<span class="admin-badge">Admin</span>'}
+                                    <button class="btn small danger" 
+                                            onclick="removeMember('${member}')"
+                                            ${!isAdmin ? 'disabled' : ''}>
+                                        Entfernen
+                                    </button>
+                                </div>
                             ` : '<span style="color: var(--text-secondary); font-size: 0.8rem;">Eigener Account</span>'}
                         </div>
                     </div>
@@ -1584,12 +1601,7 @@
                 }
             });
 
-            // Permission toggles
-            document.getElementById('alliance-permission-grid').addEventListener('click', (e) => {
-                if (e.target.classList.contains('permission-toggle')) {
-                    toggleAlliancePermission(e.target);
-                }
-            });
+            // Permission toggles entfernt - werden jetzt über Mitgliederverwaltung gesteuert
         }
 
         async function sendMessage() {
@@ -1647,21 +1659,7 @@
             displayChatMessages(messages);
         }
 
-        async function toggleAlliancePermission(toggle) {
-            const permission = toggle.getAttribute('data-permission');
-            const enabled = !toggle.classList.contains('active');
-            
-            try {
-                if (permissionManager) {
-                    await permissionManager.updateAlliancePermission(permission, enabled);
-                }
-                toggle.classList.toggle('active');
-                console.log(`Allianz-Berechtigung ${permission} auf ${enabled} gesetzt`);
-            } catch (error) {
-                console.error('Fehler beim Ändern der Berechtigung:', error);
-                alert('Fehler beim Ändern der Berechtigung: ' + error.message);
-            }
-        }
+        // toggleAlliancePermission entfernt - Berechtigungen werden jetzt über Mitgliederverwaltung gesteuert
 
         async function editMemberPermissions(memberUsername) {
             if (!permissionManager) return;
@@ -1772,6 +1770,22 @@
             } catch (error) {
                 console.error('Fehler beim Setzen der Berechtigung:', error);
                 showError('Fehler beim Setzen der Berechtigung: ' + error.message);
+            }
+        }
+
+        async function setAllianceAdmin(username) {
+            if (!confirm(`"${username}" als neuen Allianzadmin setzen?`)) {
+                return;
+            }
+
+            try {
+                await memberManager.setAllianceAdmin(username);
+                currentAlliance.admin = username;
+                showSuccess(`"${username}" ist jetzt der neue Allianzadmin`);
+                loadMemberManagement();
+            } catch (error) {
+                console.error('Fehler beim Setzen des Allianzadmins:', error);
+                showError('Fehler beim Setzen des Allianzadmins: ' + error.message);
             }
         }
 

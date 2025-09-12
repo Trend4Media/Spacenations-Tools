@@ -49,6 +49,11 @@ class AllianceMemberManager {
             }
 
             this.isAdmin = allianceData.admin === this.currentUser || allianceData.founder === this.currentUser;
+            
+            // Setze Allianzadmin-Berechtigung für den Admin
+            if (this.isAdmin && this.permissionManager) {
+                await this.permissionManager.setMemberPermission(this.currentUser, 'alliance_admin', true);
+            }
             this.members = allianceData.members || [];
             this.pendingMembers = allianceData.pendingMembers || [];
             
@@ -333,6 +338,48 @@ class AllianceMemberManager {
 
     canManageMembers() {
         return this.isAdmin || this.permissionManager?.canApproveMembers();
+    }
+
+    async setAllianceAdmin(username) {
+        try {
+            if (!this.isAdmin) {
+                throw new Error('Nur der aktuelle Allianzadmin kann einen neuen Admin setzen');
+            }
+
+            if (typeof window.FirebaseConfig === 'undefined') {
+                // Lokale Simulation
+                console.log(`Allianzadmin auf ${username} gesetzt (lokal)`);
+                return;
+            }
+
+            const db = window.FirebaseConfig.getDB();
+            
+            // Setze neuen Admin in der Allianz
+            await db.collection('alliances').doc(this.currentAlliance).update({
+                admin: username,
+                lastUpdated: window.FirebaseConfig.getServerTimestamp()
+            });
+
+            // Setze Allianzadmin-Berechtigung für den neuen Admin
+            if (this.permissionManager) {
+                await this.permissionManager.setMemberPermission(username, 'alliance_admin', true);
+            }
+
+            // Log Aktivität
+            await db.collection('allianceActivities').add({
+                allianceId: this.currentAlliance,
+                type: 'admin_changed',
+                newAdmin: username,
+                changedBy: this.currentUser,
+                timestamp: window.FirebaseConfig.getServerTimestamp()
+            });
+
+            console.log(`Allianzadmin erfolgreich auf ${username} gesetzt`);
+
+        } catch (error) {
+            console.error('Fehler beim Setzen des Allianzadmins:', error);
+            throw error;
+        }
     }
 }
 

@@ -47,7 +47,7 @@ class AlliancePermissionManager {
                 throw new Error('Allianz nicht gefunden');
             }
 
-            this.isAdmin = allianceData.admin === this.currentUser;
+            this.isAdmin = allianceData.admin === this.currentUser || allianceData.founder === this.currentUser;
             
             // Lade Berechtigungen für die Allianz
             const permissionsDoc = await db.collection('alliancePermissions')
