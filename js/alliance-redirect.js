@@ -196,9 +196,16 @@
             
             // Erstelle individuelle Allianz-Dashboard URL
             const allianceTag = this.userAlliance.tag || this.userAlliance.id;
-            const dashboardUrl = `alliance-dashboard.html?alliance=${allianceTag}&username=${this.currentUsername}`;
+            const dashboardUrl = `alliance-dashboard.html?alliance=${encodeURIComponent(allianceTag)}&username=${encodeURIComponent(this.currentUsername)}`;
             
             console.log('🔄 Leite weiter zu individuellem Allianz-Dashboard:', dashboardUrl);
+            console.log('📋 Allianz-Daten:', {
+                id: this.userAlliance.id,
+                name: this.userAlliance.name,
+                tag: this.userAlliance.tag,
+                status: this.userAlliance.status,
+                members: this.userAlliance.members
+            });
             
             // Speichere Allianz-Daten für das Dashboard
             localStorage.setItem('currentAlliance', JSON.stringify(this.userAlliance));

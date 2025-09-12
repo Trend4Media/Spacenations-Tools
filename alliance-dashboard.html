@@ -693,11 +693,20 @@
             const allianceTag = urlParams.get('alliance');
             const username = urlParams.get('username');
             
+            console.log('🔍 URL-Parameter Debug:', {
+                url: window.location.href,
+                search: window.location.search,
+                allianceTag: allianceTag,
+                username: username,
+                allParams: Object.fromEntries(urlParams.entries())
+            });
+            
             if (allianceTag && username) {
-                console.log('🔍 Lade individuelle Allianz-Daten:', { allianceTag, username });
+                console.log('✅ Allianz-Parameter gefunden, lade individuelle Daten:', { allianceTag, username });
                 loadIndividualAllianceData(allianceTag, username);
             } else {
                 console.log('⚠️ Keine Allianz-Parameter gefunden, verwende Standard-Initialisierung');
+                console.log('💡 Tipp: Gehe über das User-Dashboard zum Allianz-Dashboard');
                 initializeAllianceDashboard();
             }
         });

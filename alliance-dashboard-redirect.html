@@ -271,6 +271,7 @@
                 
                 // Benutzer identifizieren
                 this.currentUsername = this.getCurrentUsername();
+                console.log('👤 Identifizierter Benutzer:', this.currentUsername);
                 if (!this.currentUsername) {
                     showError('Kein Benutzername gefunden. Bitte melde dich an.');
                     setTimeout(() => this.redirectToLogin(), 2000);
@@ -280,26 +281,30 @@
                 updateStep(1);
                 
                 // Firebase initialisieren
+                console.log('🔥 Initialisiere Firebase...');
                 await this.initializeFirebase();
                 
                 updateStep(2);
                 
                 // User-Allianz laden
+                console.log('🏰 Lade User-Allianz...');
                 await this.loadUserAlliance();
                 
                 updateStep(3);
                 
                 // Weiterleitung
                 if (this.userAlliance) {
+                    console.log('✅ Allianz gefunden:', this.userAlliance);
                     showSuccess(`Weiterleitung zu ${this.userAlliance.name}...`);
                     setTimeout(() => this.redirectToAllianceDashboard(), 1000);
                 } else {
+                    console.log('❌ Keine Allianz gefunden');
                     showError('Du gehörst keiner Allianz an.');
                     setTimeout(() => this.redirectToUserDashboard(), 2000);
                 }
                 
             } catch (error) {
-                console.error('Fehler:', error);
+                console.error('❌ Fehler:', error);
                 showError('Fehler beim Laden: ' + error.message);
                 setTimeout(() => this.redirectToUserDashboard(), 2000);
             }
