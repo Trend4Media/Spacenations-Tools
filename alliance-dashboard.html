@@ -834,7 +834,7 @@
                 // Prüfe ob Firebase verfügbar ist
                 if (typeof window.FirebaseConfig === 'undefined') {
                     console.log('Firebase nicht verfügbar, verwende lokale Daten');
-                    loadAllianceDataLocal();
+                    await loadAllianceDataLocal();
                     return;
                 }
 
@@ -900,7 +900,7 @@
             }
         }
 
-        function loadAllianceDataLocal() {
+        async function loadAllianceDataLocal() {
             // Fallback für lokale Entwicklung
             const localAlliance = localStorage.getItem('userAlliance');
             if (localAlliance) {
@@ -909,10 +909,9 @@
                 displayAllianceInfo();
                 loadActiveMembersLocal();
                 loadChatMessagesLocal();
-                initializePermissionManager().then(() => {
-                    loadPermissions();
-                    loadMemberManagement();
-                });
+                await initializePermissionManager();
+                loadPermissions();
+                loadMemberManagement();
             } else {
                 showError('Keine Allianzdaten gefunden');
             }
