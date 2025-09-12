@@ -323,6 +323,27 @@
             color: var(--razer-green);
         }
         
+        .user-info-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--razer-green);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+            text-align: center;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .user-info-box p {
+            margin: 8px 0;
+            color: var(--text-primary);
+        }
+        
+        .user-info-box strong {
+            color: var(--razer-green);
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .nav {
@@ -374,6 +395,10 @@
         <section class="welcome-section">
             <h1 class="welcome-title">🎮 Dein Dashboard</h1>
             <p class="welcome-subtitle" id="welcome-message">Willkommen in Ihrem persönlichen Spacenations Tools Bereich</p>
+            <div id="user-info" class="user-info-box" style="display: none;">
+                <p><strong>Eingeloggt als:</strong> <span id="current-user-display"></span></p>
+                <p><strong>E-Mail:</strong> <span id="current-email-display"></span></p>
+            </div>
         </section>
 
         <!-- Public Tools Section -->
@@ -441,32 +466,88 @@
         document.addEventListener('DOMContentLoaded', () => {
             console.log('User Dashboard loaded');
             
+            // Debugging: Zeige erkannte Benutzerdaten
+            const username = getCurrentUsername();
+            const email = getCurrentUserEmail();
+            console.log('Erkannte Benutzerdaten:', { username, email });
+            
             // Persönliche Begrüßung basierend auf Login-Daten
             updateWelcomeMessage();
             
             // Hier könnte später echte Benutzerdaten aus der Datenbank geladen werden
-            // z.B. aus localStorage, Firebase oder einer API
+            // z.B. aus Firebase oder einer API
         });
         
         function updateWelcomeMessage() {
             const welcomeElement = document.getElementById('welcome-message');
+            const userInfoBox = document.getElementById('user-info');
+            const currentUserDisplay = document.getElementById('current-user-display');
+            const currentEmailDisplay = document.getElementById('current-email-display');
             
-            // Versuche Benutzernamen aus verschiedenen Quellen zu holen
+            // Versuche Benutzernamen und E-Mail aus verschiedenen Quellen zu holen
             let username = getCurrentUsername();
+            let email = getCurrentUserEmail();
             
             if (username) {
                 welcomeElement.textContent = `Willkommen zurück, ${username}!`;
                 welcomeElement.style.color = 'var(--razer-green)';
+                
+                // User-Info-Box anzeigen und füllen
+                userInfoBox.style.display = 'block';
+                currentUserDisplay.textContent = username;
+                currentEmailDisplay.textContent = email || 'Nicht verfügbar';
+                
                 console.log(`User Dashboard für ${username} geladen`);
             } else {
                 // Fallback falls kein Benutzername gefunden wird
                 welcomeElement.textContent = 'Willkommen in Ihrem persönlichen Spacenations Tools Bereich';
+                userInfoBox.style.display = 'none';
             }
         }
         
         function getCurrentUsername() {
-            // Fester Benutzername für das Dashboard
-            return 'Daikin';
+            // Methode 1: Aus URL-Parameter (beim Login weitergegeben)
+            const urlParams = new URLSearchParams(window.location.search);
+            const usernameFromUrl = urlParams.get('username');
+            if (usernameFromUrl) {
+                return usernameFromUrl;
+            }
+            
+            // Methode 2: Aus localStorage (beim Login gespeichert)
+            const usernameFromStorage = localStorage.getItem('currentUsername');
+            if (usernameFromStorage) {
+                return usernameFromStorage;
+            }
+            
+            // Methode 3: Aus sessionStorage
+            const usernameFromSession = sessionStorage.getItem('currentUsername');
+            if (usernameFromSession) {
+                return usernameFromSession;
+            }
+            
+            // Methode 4: Fallback falls kein Benutzername gefunden wird
+            return null;
+        }
+        
+        function getCurrentUserEmail() {
+            // E-Mail-Adresse des eingeloggten Benutzers holen
+            const urlParams = new URLSearchParams(window.location.search);
+            const emailFromUrl = urlParams.get('email');
+            if (emailFromUrl) {
+                return emailFromUrl;
+            }
+            
+            const emailFromStorage = localStorage.getItem('currentUserEmail');
+            if (emailFromStorage) {
+                return emailFromStorage;
+            }
+            
+            const emailFromSession = sessionStorage.getItem('currentUserEmail');
+            if (emailFromSession) {
+                return emailFromSession;
+            }
+            
+            return null;
         }
     </script>
 </body>

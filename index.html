@@ -976,6 +976,14 @@
         `;
         document.head.appendChild(style);
         
+        // Simulierte Benutzerdatenbank für Demo
+        const userDatabase = {
+            'daikin@spacenations.eu': { username: 'Daikin', password: '123456' },
+            'admin@spacenations.eu': { username: 'Admin', password: 'admin123' },
+            'test@spacenations.eu': { username: 'TestUser', password: 'test123' },
+            'player@spacenations.eu': { username: 'Player', password: 'player123' }
+        };
+        
         // Login functionality
         function handleLogin(event) {
             event.preventDefault();
@@ -988,28 +996,40 @@
                 return;
             }
             
-            // Hier würde die Firebase Authentication implementiert werden
-            console.log('Login attempt:', { email, password });
+            // Benutzer in der simulierten Datenbank suchen
+            const user = authenticateUser(email, password);
             
-            // Benutzername aus E-Mail extrahieren (für Demo-Zwecke)
-            const username = extractUsernameFromEmail(email);
-            
-            // Benutzername in localStorage speichern für das Dashboard
-            localStorage.setItem('currentUsername', username);
-            sessionStorage.setItem('currentUsername', username);
-            
-            // Weiterleitung zum User Dashboard mit Benutzername
-            alert(`Anmeldung erfolgreich! Willkommen zurück, ${username}!`);
-            
-            // Weiterleitung zum User Dashboard
-            setTimeout(() => {
-                window.location.href = `user-dashboard.html?username=${encodeURIComponent(username)}`;
-            }, 1000);
+            if (user) {
+                // Benutzername in localStorage und sessionStorage speichern
+                localStorage.setItem('currentUsername', user.username);
+                localStorage.setItem('currentUserEmail', email);
+                sessionStorage.setItem('currentUsername', user.username);
+                sessionStorage.setItem('currentUserEmail', email);
+                
+                // Erfolgreiche Anmeldung
+                console.log('Login successful:', { email, username: user.username });
+                alert(`Anmeldung erfolgreich! Willkommen zurück, ${user.username}!`);
+                
+                // Weiterleitung zum User Dashboard mit korrektem Benutzername
+                setTimeout(() => {
+                    window.location.href = `user-dashboard.html?username=${encodeURIComponent(user.username)}&email=${encodeURIComponent(email)}`;
+                }, 1000);
+            } else {
+                // Fehlerhafte Anmeldung
+                alert('Ungültige E-Mail-Adresse oder Passwort. Bitte versuchen Sie es erneut.');
+                console.log('Login failed:', { email });
+            }
         }
         
-        function extractUsernameFromEmail(email) {
-            // Fester Benutzername für das Dashboard
-            return 'Daikin';
+        function authenticateUser(email, password) {
+            // Simuliert Benutzerauthentifizierung
+            const user = userDatabase[email.toLowerCase()];
+            
+            if (user && user.password === password) {
+                return user;
+            }
+            
+            return null;
         }
         
         function showForgotPassword() {
