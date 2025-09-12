@@ -202,9 +202,9 @@
 
     function renderAllianceStats() {
         const total = state.alliances.length;
-        const approved = state.alliances.filter(a => a.approved).length;
-        const pending = total - approved;
-        const avgMembers = total > 0 ? Math.round(state.alliances.reduce((sum, a) => sum + (a.memberCount || 0), 0) / total) : 0;
+        const approved = state.alliances.filter(a => a.status === 'approved').length;
+        const pending = state.alliances.filter(a => a.status === 'pending').length;
+        const avgMembers = total > 0 ? Math.round(state.alliances.reduce((sum, a) => sum + (a.members ? a.members.length : 0), 0) / total) : 0;
 
         document.getElementById('stat-alliances-total').textContent = total;
         document.getElementById('stat-alliances-approved').textContent = approved;
@@ -213,21 +213,22 @@
     }
 
     function allianceRow(alliance) {
-        const status = alliance.approved ? '<span class="pill approved">Genehmigt</span>' : '<span class="pill pending">Ausstehend</span>';
+        const status = alliance.status === 'approved' ? '<span class="pill approved">Genehmigt</span>' : '<span class="pill pending">Ausstehend</span>';
         const created = formatTimestamp(alliance.createdAt);
-        const members = alliance.memberCount || 0;
-        const founder = alliance.founderName || alliance.founderEmail || '-';
+        const members = alliance.members ? alliance.members.length : 0;
+        const founder = alliance.founder || '-';
 
         return `
             <tr data-alliance-id="${alliance.id}">
-                <td>${alliance.name || '-'}</td>
+                <td>${alliance.name || '-'} [${alliance.tag || ''}]</td>
                 <td>${founder}</td>
                 <td>${members}</td>
                 <td>${status}</td>
                 <td>${created}</td>
                 <td>
                     <div class="actions">
-                        ${!alliance.approved ? '<button class="btn success" data-action="approve-alliance" title="Genehmigen">✅</button>' : ''}
+                        ${alliance.status === 'pending' ? '<button class="btn success" data-action="approve-alliance" title="Genehmigen">✅</button>' : ''}
+                        <button class="btn" data-action="set-admin" title="Admin setzen">👑</button>
                         <button class="btn danger" data-action="delete-alliance" title="Löschen">🗑️</button>
                     </div>
                 </td>
@@ -493,17 +494,26 @@
         try {
             const db = window.FirebaseConfig.getDB();
             
+            // Hole die Allianz-Daten um den Gründer zu finden
+            const allianceDoc = await db.collection('alliances').doc(allianceId).get();
+            const allianceData = allianceDoc.data();
+            
+            if (!allianceData) {
+                throw new Error('Allianz nicht gefunden');
+            }
+            
             await db.collection('alliances').doc(allianceId).update({
-                approved: true,
+                status: 'approved',
                 approvedAt: window.FirebaseConfig.getServerTimestamp(),
-                approvedBy: window.AuthAPI.getCurrentUser().uid
+                approvedBy: window.AuthAPI.getCurrentUser().uid,
+                admin: allianceData.founder // Setze Gründer als Admin
             });
 
             // Log activity
             await db.collection('userActivities').add({
                 userId: window.AuthAPI.getCurrentUser().uid,
                 icon: '✅',
-                text: `Allianz genehmigt: ${allianceId}`,
+                text: `Allianz genehmigt: ${allianceData.name} [${allianceData.tag}]`,
                 timestamp: window.FirebaseConfig.getServerTimestamp()
             });
 
@@ -515,9 +525,55 @@
         }
     }
 
+    async function setAllianceAdmin(allianceId) {
+        try {
+            const db = window.FirebaseConfig.getDB();
+            
+            // Hole die Allianz-Daten
+            const allianceDoc = await db.collection('alliances').doc(allianceId).get();
+            const allianceData = allianceDoc.data();
+            
+            if (!allianceData) {
+                throw new Error('Allianz nicht gefunden');
+            }
+            
+            // Zeige Modal zur Admin-Auswahl
+            const newAdmin = prompt(`Neuer Allianz-Admin für "${allianceData.name} [${allianceData.tag}]":\n\nVerfügbare Mitglieder:\n${allianceData.members.join('\n')}\n\nBenutzername eingeben:`);
+            
+            if (!newAdmin || !allianceData.members.includes(newAdmin)) {
+                alert('Ungültiger Benutzername oder Benutzer ist kein Mitglied der Allianz!');
+                return { success: false, error: 'Ungültiger Benutzername' };
+            }
+            
+            await db.collection('alliances').doc(allianceId).update({
+                admin: newAdmin,
+                adminSetAt: window.FirebaseConfig.getServerTimestamp(),
+                adminSetBy: window.AuthAPI.getCurrentUser().uid
+            });
+
+            // Log activity
+            await db.collection('userActivities').add({
+                userId: window.AuthAPI.getCurrentUser().uid,
+                icon: '👑',
+                text: `Allianz-Admin gesetzt: ${allianceData.name} [${allianceData.tag}] → ${newAdmin}`,
+                timestamp: window.FirebaseConfig.getServerTimestamp()
+            });
+
+            console.log('Allianz-Admin erfolgreich gesetzt');
+            return { success: true };
+        } catch (error) {
+            console.error('Fehler beim Setzen des Allianz-Admins:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
     async function deleteAlliance(allianceId) {
         try {
             const db = window.FirebaseConfig.getDB();
+            
+            // Hole die Allianz-Daten für Logging
+            const allianceDoc = await db.collection('alliances').doc(allianceId).get();
+            const allianceData = allianceDoc.data();
             
             await db.collection('alliances').doc(allianceId).delete();
             
@@ -525,7 +581,7 @@
             await db.collection('userActivities').add({
                 userId: window.AuthAPI.getCurrentUser().uid,
                 icon: '🗑️',
-                text: `Allianz gelöscht: ${allianceId}`,
+                text: `Allianz gelöscht: ${allianceData?.name || allianceId}`,
                 timestamp: window.FirebaseConfig.getServerTimestamp()
             });
 
@@ -825,6 +881,9 @@
                 case 'approve-alliance':
                     await approveAlliance(allianceId);
                     break;
+                case 'set-admin':
+                    await setAllianceAdmin(allianceId);
+                    break;
                 case 'delete-alliance':
                     if (confirm('Allianz wirklich löschen?')) {
                         await deleteAlliance(allianceId);
@@ -865,7 +924,7 @@ ${state.proximaData.length > 10 ? `\n... und ${state.proximaData.length - 10} we
 
         // Approve all alliances
         document.getElementById('approve-all-alliances').addEventListener('click', async () => {
-            const pendingAlliances = state.alliances.filter(a => !a.approved);
+            const pendingAlliances = state.alliances.filter(a => a.status === 'pending');
             if (pendingAlliances.length === 0) {
                 alert('Keine ausstehenden Allianzen gefunden');
                 return;

@@ -323,6 +323,73 @@
             color: var(--razer-green);
         }
         
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: var(--bg-card);
+            border: 2px solid var(--razer-green);
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-dark), var(--glow-green);
+            position: relative;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-family: var(--font-primary);
+            font-size: 0.9rem;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 2px solid var(--razer-gray);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: var(--font-primary);
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--razer-green);
+            box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.2);
+            background: var(--bg-tertiary);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .nav {
@@ -427,6 +494,49 @@
                 </div>
             </div>
         </section>
+
+        <!-- Allianz Section -->
+        <section class="tools-section">
+            <h2 class="section-title">🤝 Allianz Management</h2>
+            <p class="section-subtitle">Verwalte deine Allianz oder erstelle eine neue</p>
+            <div class="tools-grid">
+                <div class="tool-card personal" id="alliance-status-card">
+                    <div class="tool-icon">🏰</div>
+                    <h3 class="tool-title" id="alliance-title">Allianz Status</h3>
+                    <p class="tool-description" id="alliance-description">
+                        Lade Allianz-Informationen...
+                    </p>
+                    <div id="alliance-actions">
+                        <!-- Wird dynamisch gefüllt -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Allianz Erstellung Modal -->
+    <div class="modal" id="create-alliance-modal">
+        <div class="modal-content">
+            <h3>🏰 Neue Allianz erstellen</h3>
+            <form id="create-alliance-form">
+                <div class="form-group">
+                    <label for="alliance-name">Allianz Name</label>
+                    <input type="text" id="alliance-name" class="input" required maxlength="50" placeholder="z.B. Space Warriors">
+                </div>
+                <div class="form-group">
+                    <label for="alliance-tag">Allianz Tag</label>
+                    <input type="text" id="alliance-tag" class="input" required maxlength="10" placeholder="z.B. SW" style="text-transform: uppercase;">
+                </div>
+                <div class="form-group">
+                    <label for="alliance-description">Beschreibung (optional)</label>
+                    <textarea id="alliance-description" class="input" rows="3" maxlength="200" placeholder="Kurze Beschreibung deiner Allianz..."></textarea>
+                </div>
+                <div class="controls">
+                    <button type="submit" class="btn success">Allianz erstellen</button>
+                    <button type="button" class="btn" onclick="closeModal('create-alliance-modal')">Abbrechen</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script>
@@ -444,6 +554,9 @@
             
             // Persönliche Begrüßung basierend auf Login-Daten
             updateWelcomeMessage();
+            
+            // Allianz-Funktionalität initialisieren
+            initializeAllianceFeatures();
             
             // Hier könnte später echte Benutzerdaten aus der Datenbank geladen werden
             // z.B. aus Firebase oder einer API
@@ -509,6 +622,239 @@
             
             return null;
         }
+        
+        // Allianz-Funktionalität
+        async function initializeAllianceFeatures() {
+            try {
+                // Prüfe ob Firebase verfügbar ist
+                if (typeof window.FirebaseConfig === 'undefined') {
+                    console.log('Firebase nicht verfügbar, verwende lokale Daten');
+                    loadAllianceStatusLocal();
+                    return;
+                }
+                
+                await window.FirebaseConfig.waitForInit();
+                await loadAllianceStatus();
+                setupAllianceEventListeners();
+            } catch (error) {
+                console.error('Fehler beim Initialisieren der Allianz-Features:', error);
+                loadAllianceStatusLocal();
+            }
+        }
+        
+        async function loadAllianceStatus() {
+            try {
+                const db = window.FirebaseConfig.getDB();
+                const username = getCurrentUsername();
+                
+                if (!username) {
+                    showAllianceStatus('no-user', 'Bitte melde dich an, um Allianz-Features zu nutzen.');
+                    return;
+                }
+                
+                // Suche nach Allianzen, in denen der User Mitglied ist
+                const userAlliancesQuery = await db.collection('alliances')
+                    .where('members', 'array-contains', username)
+                    .get();
+                
+                if (!userAlliancesQuery.empty) {
+                    const alliance = userAlliancesQuery.docs[0].data();
+                    const allianceId = userAlliancesQuery.docs[0].id;
+                    
+                    if (alliance.status === 'approved') {
+                        showAllianceStatus('member', alliance, allianceId);
+                    } else if (alliance.status === 'pending') {
+                        showAllianceStatus('pending', alliance, allianceId);
+                    }
+                } else {
+                    // Prüfe ob User bereits eine Allianz erstellt hat (als Gründer)
+                    const createdAlliancesQuery = await db.collection('alliances')
+                        .where('founder', '==', username)
+                        .get();
+                    
+                    if (!createdAlliancesQuery.empty) {
+                        const alliance = createdAlliancesQuery.docs[0].data();
+                        const allianceId = createdAlliancesQuery.docs[0].id;
+                        showAllianceStatus('founder', alliance, allianceId);
+                    } else {
+                        showAllianceStatus('none', null);
+                    }
+                }
+            } catch (error) {
+                console.error('Fehler beim Laden der Allianz-Status:', error);
+                showAllianceStatus('error', 'Fehler beim Laden der Allianz-Informationen.');
+            }
+        }
+        
+        function loadAllianceStatusLocal() {
+            // Fallback für lokale Entwicklung
+            const localAlliance = localStorage.getItem('userAlliance');
+            if (localAlliance) {
+                const alliance = JSON.parse(localAlliance);
+                showAllianceStatus('member', alliance);
+            } else {
+                showAllianceStatus('none', null);
+            }
+        }
+        
+        function showAllianceStatus(status, alliance, allianceId = null) {
+            const titleElement = document.getElementById('alliance-title');
+            const descriptionElement = document.getElementById('alliance-description');
+            const actionsElement = document.getElementById('alliance-actions');
+            
+            switch (status) {
+                case 'no-user':
+                    titleElement.textContent = '🔒 Anmeldung erforderlich';
+                    descriptionElement.textContent = 'Bitte melde dich an, um Allianz-Features zu nutzen.';
+                    actionsElement.innerHTML = '<a href="index.html" class="tool-link">Anmelden</a>';
+                    break;
+                    
+                case 'none':
+                    titleElement.textContent = '🏰 Keine Allianz';
+                    descriptionElement.textContent = 'Du bist noch keiner Allianz beigetreten. Erstelle eine neue Allianz oder warte auf eine Einladung.';
+                    actionsElement.innerHTML = '<button class="tool-link" onclick="openCreateAllianceModal()">Neue Allianz erstellen</button>';
+                    break;
+                    
+                case 'pending':
+                    titleElement.textContent = `⏳ ${alliance.name} [${alliance.tag}]`;
+                    descriptionElement.textContent = `Deine Allianz "${alliance.name}" wartet auf Genehmigung durch einen Super-Admin.`;
+                    actionsElement.innerHTML = '<span class="tool-link" style="opacity: 0.7;">Wartet auf Genehmigung...</span>';
+                    break;
+                    
+                case 'founder':
+                    titleElement.textContent = `👑 ${alliance.name} [${alliance.tag}] (Gründer)`;
+                    descriptionElement.textContent = `Du hast die Allianz "${alliance.name}" erstellt. Status: ${alliance.status === 'approved' ? 'Genehmigt' : 'Wartet auf Genehmigung'}`;
+                    if (alliance.status === 'approved') {
+                        actionsElement.innerHTML = '<a href="alliance-dashboard.html" class="tool-link">Zum Allianzdashboard</a>';
+                    } else {
+                        actionsElement.innerHTML = '<span class="tool-link" style="opacity: 0.7;">Wartet auf Genehmigung...</span>';
+                    }
+                    break;
+                    
+                case 'member':
+                    titleElement.textContent = `🤝 ${alliance.name} [${alliance.tag}]`;
+                    descriptionElement.textContent = `Du bist Mitglied der Allianz "${alliance.name}".`;
+                    actionsElement.innerHTML = '<a href="alliance-dashboard.html" class="tool-link">Zum Allianzdashboard</a>';
+                    break;
+                    
+                case 'error':
+                    titleElement.textContent = '❌ Fehler';
+                    descriptionElement.textContent = 'Fehler beim Laden der Allianz-Informationen.';
+                    actionsElement.innerHTML = '<button class="tool-link" onclick="location.reload()">Neu laden</button>';
+                    break;
+            }
+        }
+        
+        function setupAllianceEventListeners() {
+            // Allianz-Erstellung Form
+            const createAllianceForm = document.getElementById('create-alliance-form');
+            if (createAllianceForm) {
+                createAllianceForm.addEventListener('submit', handleCreateAlliance);
+            }
+            
+            // Tag automatisch in Großbuchstaben umwandeln
+            const tagInput = document.getElementById('alliance-tag');
+            if (tagInput) {
+                tagInput.addEventListener('input', function() {
+                    this.value = this.value.toUpperCase();
+                });
+            }
+        }
+        
+        async function handleCreateAlliance(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('alliance-name').value.trim();
+            const tag = document.getElementById('alliance-tag').value.trim().toUpperCase();
+            const description = document.getElementById('alliance-description').value.trim();
+            const username = getCurrentUsername();
+            
+            if (!username) {
+                alert('Bitte melde dich an, um eine Allianz zu erstellen.');
+                return;
+            }
+            
+            if (!name || !tag) {
+                alert('Bitte fülle alle Pflichtfelder aus.');
+                return;
+            }
+            
+            try {
+                if (typeof window.FirebaseConfig !== 'undefined') {
+                    await createAllianceFirebase(name, tag, description, username);
+                } else {
+                    createAllianceLocal(name, tag, description, username);
+                }
+                
+                closeModal('create-alliance-modal');
+                await loadAllianceStatus();
+                
+            } catch (error) {
+                console.error('Fehler beim Erstellen der Allianz:', error);
+                alert('Fehler beim Erstellen der Allianz: ' + error.message);
+            }
+        }
+        
+        async function createAllianceFirebase(name, tag, description, founder) {
+            const db = window.FirebaseConfig.getDB();
+            
+            // Prüfe ob Tag bereits existiert
+            const existingTagQuery = await db.collection('alliances')
+                .where('tag', '==', tag)
+                .get();
+            
+            if (!existingTagQuery.empty) {
+                throw new Error('Dieser Allianz-Tag ist bereits vergeben.');
+            }
+            
+            // Erstelle Allianz
+            const allianceData = {
+                name: name,
+                tag: tag,
+                description: description || '',
+                founder: founder,
+                members: [founder],
+                status: 'pending', // Wartet auf Super-Admin Genehmigung
+                createdAt: window.FirebaseConfig.getServerTimestamp(),
+                admin: null // Wird vom Super-Admin gesetzt
+            };
+            
+            await db.collection('alliances').add(allianceData);
+            console.log('Allianz erfolgreich erstellt:', name);
+        }
+        
+        function createAllianceLocal(name, tag, description, founder) {
+            const allianceData = {
+                name: name,
+                tag: tag,
+                description: description || '',
+                founder: founder,
+                members: [founder],
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+            
+            localStorage.setItem('userAlliance', JSON.stringify(allianceData));
+            console.log('Allianz lokal erstellt:', name);
+        }
+        
+        function openCreateAllianceModal() {
+            document.getElementById('create-alliance-modal').style.display = 'flex';
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // Modal schließen bei Klick außerhalb
+        window.addEventListener('click', function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
     </script>
 </body>
 </html>

@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Allianzdashboard - Spacenations Tools</title>
+    
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Razer Color Scheme */
+            --razer-green: #00FF88;
+            --razer-green-dark: #00CC6A;
+            --razer-green-light: #44FF99;
+            --razer-black: #0A0A0A;
+            --razer-dark: #111111;
+            --razer-gray: #1A1A1A;
+            --razer-gray-light: #2A2A2A;
+            --razer-white: #FFFFFF;
+            --razer-silver: #C0C0C0;
+            
+            --text-primary: var(--razer-white);
+            --text-secondary: var(--razer-silver);
+            --text-accent: var(--razer-green);
+            
+            --bg-primary: var(--razer-black);
+            --bg-secondary: var(--razer-dark);
+            --bg-tertiary: var(--razer-gray);
+            --bg-card: var(--razer-gray-light);
+            
+            --glow-green: 0 0 20px rgba(0, 255, 136, 0.5);
+            --glow-green-strong: 0 0 30px rgba(0, 255, 136, 0.8);
+            --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.6);
+            
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            --font-gaming: 'Orbitron', monospace;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-primary);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
+                linear-gradient(45deg, var(--razer-black) 0%, var(--razer-dark) 100%);
+            z-index: -1;
+            animation: backgroundPulse 8s ease-in-out infinite;
+        }
+        
+        @keyframes backgroundPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--razer-green);
+            text-decoration: none;
+            font-family: var(--font-gaming);
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--razer-green), var(--razer-green-light));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--razer-black);
+            font-weight: 900;
+            font-size: 1.2rem;
+        }
+        
+        .nav-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: 2px solid var(--razer-green);
+            background: transparent;
+            color: var(--razer-green);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background: var(--razer-green);
+            color: var(--razer-black);
+            transform: translateY(-2px);
+            box-shadow: var(--glow-green);
+        }
+        
+        .btn.primary {
+            background: linear-gradient(135deg, var(--razer-green), var(--razer-green-light));
+            color: var(--razer-black);
+            border: none;
+        }
+        
+        .btn.primary:hover {
+            background: var(--razer-green-light);
+            box-shadow: var(--glow-green-strong);
+        }
+        
+        /* Main Content */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 32px;
+        }
+        
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .welcome-title {
+            font-family: var(--font-gaming);
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--razer-green);
+            margin-bottom: 16px;
+            text-shadow: var(--glow-green);
+        }
+        
+        .welcome-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+        
+        .alliance-info {
+            background: var(--bg-card);
+            border: 2px solid var(--razer-green);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow-dark), var(--glow-green);
+        }
+        
+        .alliance-info h3 {
+            color: var(--razer-green);
+            font-family: var(--font-gaming);
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        
+        .info-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--razer-gray);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        
+        .info-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+        
+        .info-value {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-family: var(--font-gaming);
+        }
+        
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .dashboard-card {
+            background: var(--bg-card);
+            border: 2px solid var(--razer-green);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow-dark);
+            transition: all 0.3s ease;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-dark), var(--glow-green);
+            border-color: var(--razer-green-light);
+        }
+        
+        .dashboard-card h3 {
+            color: var(--razer-green);
+            font-family: var(--font-gaming);
+            font-size: 1.3rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .member-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .member-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--razer-gray);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .member-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .member-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--razer-green), var(--razer-green-light));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--razer-black);
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        
+        .member-name {
+            font-weight: 600;
+        }
+        
+        .member-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .status-online {
+            background: #22c55e;
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+        }
+        
+        .status-offline {
+            background: #ef4444;
+        }
+        
+        .status-away {
+            background: #f59e0b;
+        }
+        
+        /* Chat Section */
+        .chat-section {
+            background: var(--bg-card);
+            border: 2px solid var(--razer-green);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow-dark);
+        }
+        
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--razer-gray);
+            border-radius: 8px;
+            padding: 16px;
+            background: var(--bg-secondary);
+            margin-bottom: 16px;
+        }
+        
+        .message {
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        
+        .message-author {
+            font-weight: 600;
+            color: var(--razer-green);
+        }
+        
+        .message-time {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .message-content {
+            color: var(--text-primary);
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 2px solid var(--razer-gray);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: var(--font-primary);
+        }
+        
+        .chat-input input:focus {
+            outline: none;
+            border-color: var(--razer-green);
+            box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.2);
+        }
+        
+        .chat-input button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--razer-green), var(--razer-green-light));
+            color: var(--razer-black);
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-input button:hover {
+            background: var(--razer-green-light);
+            transform: translateY(-2px);
+            box-shadow: var(--glow-green);
+        }
+        
+        /* Permission Section */
+        .permission-section {
+            background: var(--bg-card);
+            border: 2px solid var(--razer-green);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow-dark);
+        }
+        
+        .permission-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        
+        .permission-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--razer-gray);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        
+        .permission-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .permission-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .permission-toggle {
+            width: 40px;
+            height: 20px;
+            background: var(--razer-gray);
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .permission-toggle.active {
+            background: var(--razer-green);
+        }
+        
+        .permission-toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: var(--razer-white);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .permission-toggle.active::after {
+            transform: translateX(20px);
+        }
+        
+        .permission-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .permission-subsection {
+            margin-bottom: 32px;
+        }
+        
+        .permission-subsection h4 {
+            color: var(--razer-green);
+            font-family: var(--font-gaming);
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--razer-gray);
+            padding-bottom: 8px;
+        }
+        
+        .member-management {
+            background: var(--bg-secondary);
+            border: 1px solid var(--razer-gray);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        
+        .member-item-admin {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--razer-gray);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .member-info-admin {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .member-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .member-actions .btn {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+        
+        .permission-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        
+        .permission-enabled {
+            background: #22c55e;
+        }
+        
+        .permission-disabled {
+            background: #ef4444;
+        }
+        
+        .permission-custom {
+            background: #f59e0b;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav {
+                padding: 0 16px;
+            }
+            
+            .container {
+                padding: 20px 16px;
+            }
+            
+            .welcome-title {
+                font-size: 2rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-actions {
+                gap: 12px;
+            }
+            
+            .btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="user-dashboard.html" class="logo">
+                <div class="logo-icon">🤝</div>
+                <span id="alliance-name">Allianzdashboard</span>
+            </a>
+            
+            <div class="nav-actions">
+                <a href="user-dashboard.html" class="btn">← User Dashboard</a>
+                <a href="index.html" class="btn">Zur Startseite</a>
+                <a href="logout-all.html" class="btn">Abmelden</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+            <h1 class="welcome-title">🤝 Allianzdashboard</h1>
+            <p class="welcome-subtitle" id="welcome-message">Willkommen im Allianzdashboard</p>
+        </section>
+
+        <!-- Alliance Info -->
+        <section class="alliance-info">
+            <h3 id="alliance-title">Allianz-Informationen</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Allianz Name</div>
+                    <div class="info-value" id="alliance-name-info">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Allianz Tag</div>
+                    <div class="info-value" id="alliance-tag-info">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Mitglieder</div>
+                    <div class="info-value" id="alliance-members-count">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Admin</div>
+                    <div class="info-value" id="alliance-admin-info">-</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Active Members -->
+            <div class="dashboard-card">
+                <h3>👥 Aktive Mitglieder</h3>
+                <div class="member-list" id="active-members">
+                    <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
+                        Lade Mitglieder...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alliance Chat -->
+            <div class="dashboard-card">
+                <h3>💬 Allianz Chat</h3>
+                <div class="chat-messages" id="chat-messages">
+                    <div style="text-align: center; color: var(--text-secondary); padding: 20px;">
+                        Chat wird geladen...
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="chat-input" placeholder="Nachricht eingeben..." maxlength="500">
+                    <button id="send-message">Senden</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Permissions Section (only for admins) -->
+        <section class="permission-section" id="permission-section" style="display: none;">
+            <h3>🔐 Berechtigungen verwalten</h3>
+            
+            <!-- Alliance-wide Permissions -->
+            <div class="permission-subsection">
+                <h4>Allianz-weite Berechtigungen</h4>
+                <div class="permission-grid" id="alliance-permission-grid">
+                    <!-- Wird dynamisch gefüllt -->
+                </div>
+            </div>
+
+            <!-- Member Management -->
+            <div class="permission-subsection">
+                <h4>Mitglieder verwalten</h4>
+                <div class="member-management" id="member-management">
+                    <!-- Wird dynamisch gefüllt -->
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/alliance-permissions.js"></script>
+    <script>
+        // Alliance Dashboard JavaScript
+        let currentAlliance = null;
+        let isAdmin = false;
+        let chatUnsubscribe = null;
+        let membersUnsubscribe = null;
+        let permissionManager = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Alliance Dashboard loaded');
+            initializeAllianceDashboard();
+        });
+
+        async function initializeAllianceDashboard() {
+            try {
+                // Prüfe ob Firebase verfügbar ist
+                if (typeof window.FirebaseConfig === 'undefined') {
+                    console.log('Firebase nicht verfügbar, verwende lokale Daten');
+                    loadAllianceDataLocal();
+                    return;
+                }
+
+                await window.FirebaseConfig.waitForInit();
+                await loadAllianceData();
+                setupEventListeners();
+            } catch (error) {
+                console.error('Fehler beim Initialisieren des Allianzdashboards:', error);
+                showError('Fehler beim Laden des Allianzdashboards');
+            }
+        }
+
+        async function loadAllianceData() {
+            try {
+                const db = window.FirebaseConfig.getDB();
+                const username = getCurrentUsername();
+
+                if (!username) {
+                    showError('Bitte melde dich an, um das Allianzdashboard zu nutzen.');
+                    return;
+                }
+
+                // Suche nach Allianzen, in denen der User Mitglied ist
+                const userAlliancesQuery = await db.collection('alliances')
+                    .where('members', 'array-contains', username)
+                    .get();
+
+                if (userAlliancesQuery.empty) {
+                    showError('Du bist keiner Allianz beigetreten.');
+                    return;
+                }
+
+                const allianceDoc = userAlliancesQuery.docs[0];
+                currentAlliance = { id: allianceDoc.id, ...allianceDoc.data() };
+
+                if (currentAlliance.status !== 'approved') {
+                    showError('Deine Allianz wurde noch nicht genehmigt.');
+                    return;
+                }
+
+                // Prüfe ob User Admin ist
+                isAdmin = currentAlliance.admin === username;
+
+                displayAllianceInfo();
+                loadActiveMembers();
+                loadChatMessages();
+                
+                if (isAdmin) {
+                    await initializePermissionManager();
+                    loadPermissions();
+                    loadMemberManagement();
+                }
+
+            } catch (error) {
+                console.error('Fehler beim Laden der Allianzdaten:', error);
+                showError('Fehler beim Laden der Allianzdaten');
+            }
+        }
+
+        function loadAllianceDataLocal() {
+            // Fallback für lokale Entwicklung
+            const localAlliance = localStorage.getItem('userAlliance');
+            if (localAlliance) {
+                currentAlliance = JSON.parse(localAlliance);
+                isAdmin = true; // Für lokale Entwicklung
+                displayAllianceInfo();
+                loadActiveMembersLocal();
+                loadChatMessagesLocal();
+                await initializePermissionManager();
+                loadPermissions();
+                loadMemberManagement();
+            } else {
+                showError('Keine Allianzdaten gefunden');
+            }
+        }
+
+        function displayAllianceInfo() {
+            if (!currentAlliance) return;
+
+            document.getElementById('alliance-name').textContent = currentAlliance.name;
+            document.getElementById('alliance-name-info').textContent = currentAlliance.name;
+            document.getElementById('alliance-tag-info').textContent = currentAlliance.tag;
+            document.getElementById('alliance-members-count').textContent = currentAlliance.members ? currentAlliance.members.length : 0;
+            document.getElementById('alliance-admin-info').textContent = currentAlliance.admin || 'Nicht gesetzt';
+            
+            const welcomeMessage = `Willkommen in der Allianz "${currentAlliance.name}"!`;
+            document.getElementById('welcome-message').textContent = welcomeMessage;
+        }
+
+        async function loadActiveMembers() {
+            try {
+                const db = window.FirebaseConfig.getDB();
+                
+                // Simuliere aktive Mitglieder (in einer echten App würde man Online-Status tracken)
+                const members = currentAlliance.members || [];
+                const membersWithStatus = members.map(member => ({
+                    name: member,
+                    status: Math.random() > 0.3 ? 'online' : 'offline', // Simuliert Online-Status
+                    lastSeen: new Date()
+                }));
+
+                displayMembers(membersWithStatus);
+
+                // Setze up Real-time Updates für Mitglieder
+                membersUnsubscribe = db.collection('alliances').doc(currentAlliance.id)
+                    .onSnapshot(doc => {
+                        if (doc.exists) {
+                            const data = doc.data();
+                            currentAlliance = { id: doc.id, ...data };
+                            displayAllianceInfo();
+                            
+                            const members = data.members || [];
+                            const membersWithStatus = members.map(member => ({
+                                name: member,
+                                status: Math.random() > 0.3 ? 'online' : 'offline',
+                                lastSeen: new Date()
+                            }));
+                            displayMembers(membersWithStatus);
+                        }
+                    });
+
+            } catch (error) {
+                console.error('Fehler beim Laden der Mitglieder:', error);
+            }
+        }
+
+        function loadActiveMembersLocal() {
+            const members = currentAlliance.members || [];
+            const membersWithStatus = members.map(member => ({
+                name: member,
+                status: Math.random() > 0.3 ? 'online' : 'offline',
+                lastSeen: new Date()
+            }));
+            displayMembers(membersWithStatus);
+        }
+
+        function displayMembers(members) {
+            const container = document.getElementById('active-members');
+            
+            if (members.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">Keine Mitglieder gefunden</div>';
+                return;
+            }
+
+            container.innerHTML = members.map(member => `
+                <div class="member-item">
+                    <div class="member-info">
+                        <div class="member-avatar">${member.name.charAt(0).toUpperCase()}</div>
+                        <div>
+                            <div class="member-name">${member.name}</div>
+                            <div class="member-status">
+                                <span class="status-indicator status-${member.status}"></span>
+                                ${member.status === 'online' ? 'Online' : 'Offline'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadChatMessages() {
+            try {
+                const db = window.FirebaseConfig.getDB();
+                
+                // Lade Chat-Nachrichten
+                const messagesQuery = await db.collection('allianceChats')
+                    .doc(currentAlliance.id)
+                    .collection('messages')
+                    .orderBy('timestamp', 'desc')
+                    .limit(50)
+                    .get();
+
+                const messages = [];
+                messagesQuery.forEach(doc => {
+                    messages.push({ id: doc.id, ...doc.data() });
+                });
+
+                displayChatMessages(messages.reverse());
+
+                // Setze up Real-time Chat Updates
+                chatUnsubscribe = db.collection('allianceChats')
+                    .doc(currentAlliance.id)
+                    .collection('messages')
+                    .orderBy('timestamp', 'desc')
+                    .limit(50)
+                    .onSnapshot(snapshot => {
+                        const messages = [];
+                        snapshot.forEach(doc => {
+                            messages.push({ id: doc.id, ...doc.data() });
+                        });
+                        displayChatMessages(messages.reverse());
+                    });
+
+            } catch (error) {
+                console.error('Fehler beim Laden der Chat-Nachrichten:', error);
+                displayChatMessages([]);
+            }
+        }
+
+        function loadChatMessagesLocal() {
+            // Fallback für lokale Entwicklung
+            const localMessages = JSON.parse(localStorage.getItem(`allianceChat_${currentAlliance.id}`) || '[]');
+            displayChatMessages(localMessages);
+        }
+
+        function displayChatMessages(messages) {
+            const container = document.getElementById('chat-messages');
+            
+            if (messages.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px;">Noch keine Nachrichten</div>';
+                return;
+            }
+
+            container.innerHTML = messages.map(message => `
+                <div class="message">
+                    <div class="message-header">
+                        <span class="message-author">${message.author}</span>
+                        <span class="message-time">${formatTime(message.timestamp)}</span>
+                    </div>
+                    <div class="message-content">${message.content}</div>
+                </div>
+            `).join('');
+
+            // Scroll nach unten
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function initializePermissionManager() {
+            try {
+                permissionManager = new window.AlliancePermissionManager();
+                await permissionManager.initialize(currentAlliance.id, getCurrentUsername());
+                
+                // Setze Callbacks für Real-time Updates
+                permissionManager.onPermissionsUpdated = () => {
+                    loadPermissions();
+                };
+                
+                permissionManager.onMemberPermissionsUpdated = () => {
+                    loadMemberManagement();
+                };
+                
+            } catch (error) {
+                console.error('Fehler beim Initialisieren des Berechtigungsmanagers:', error);
+            }
+        }
+
+        async function loadPermissions() {
+            if (!isAdmin || !permissionManager) return;
+
+            document.getElementById('permission-section').style.display = 'block';
+            
+            const permissions = permissionManager.getPermissionList();
+            const container = document.getElementById('alliance-permission-grid');
+            
+            container.innerHTML = permissions.map(permission => `
+                <div class="permission-item">
+                    <div class="permission-header">
+                        <span class="permission-title">${permission.description}</span>
+                        <div class="permission-toggle ${permission.enabled ? 'active' : ''}" 
+                             data-permission="${permission.id}"></div>
+                    </div>
+                    <div class="permission-description">${permission.description}</div>
+                </div>
+            `).join('');
+        }
+
+        async function loadMemberManagement() {
+            if (!isAdmin || !permissionManager) return;
+
+            const members = currentAlliance.members || [];
+            const container = document.getElementById('member-management');
+            
+            container.innerHTML = members.map(member => {
+                const memberPermissions = permissionManager.getMemberPermissionList(member);
+                const isCurrentUser = member === getCurrentUsername();
+                
+                return `
+                    <div class="member-item-admin">
+                        <div class="member-info-admin">
+                            <div class="member-avatar">${member.charAt(0).toUpperCase()}</div>
+                            <div>
+                                <div class="member-name">${member} ${isCurrentUser ? '(Du)' : ''}</div>
+                                <div class="member-permissions">
+                                    ${memberPermissions.map(perm => `
+                                        <span class="permission-indicator ${perm.isCustom ? 'permission-custom' : (perm.enabled ? 'permission-enabled' : 'permission-disabled')}"></span>
+                                        ${perm.description}
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="member-actions">
+                            ${!isCurrentUser ? `
+                                <button class="btn" onclick="editMemberPermissions('${member}')">Berechtigungen</button>
+                                <button class="btn danger" onclick="removeMember('${member}')">Entfernen</button>
+                            ` : '<span style="color: var(--text-secondary); font-size: 0.8rem;">Eigener Account</span>'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function setupEventListeners() {
+            // Chat senden
+            document.getElementById('send-message').addEventListener('click', sendMessage);
+            document.getElementById('chat-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            // Permission toggles
+            document.getElementById('alliance-permission-grid').addEventListener('click', (e) => {
+                if (e.target.classList.contains('permission-toggle')) {
+                    toggleAlliancePermission(e.target);
+                }
+            });
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const content = input.value.trim();
+            
+            if (!content) return;
+
+            const username = getCurrentUsername();
+            if (!username) {
+                alert('Bitte melde dich an, um Nachrichten zu senden.');
+                return;
+            }
+
+            try {
+                if (typeof window.FirebaseConfig !== 'undefined') {
+                    await sendMessageFirebase(content, username);
+                } else {
+                    sendMessageLocal(content, username);
+                }
+                
+                input.value = '';
+            } catch (error) {
+                console.error('Fehler beim Senden der Nachricht:', error);
+                alert('Fehler beim Senden der Nachricht');
+            }
+        }
+
+        async function sendMessageFirebase(content, author) {
+            const db = window.FirebaseConfig.getDB();
+            
+            await db.collection('allianceChats')
+                .doc(currentAlliance.id)
+                .collection('messages')
+                .add({
+                    content: content,
+                    author: author,
+                    timestamp: window.FirebaseConfig.getServerTimestamp(),
+                    allianceId: currentAlliance.id
+                });
+        }
+
+        function sendMessageLocal(content, author) {
+            const message = {
+                content: content,
+                author: author,
+                timestamp: new Date().toISOString(),
+                allianceId: currentAlliance.id
+            };
+            
+            const messages = JSON.parse(localStorage.getItem(`allianceChat_${currentAlliance.id}`) || '[]');
+            messages.push(message);
+            localStorage.setItem(`allianceChat_${currentAlliance.id}`, JSON.stringify(messages));
+            
+            displayChatMessages(messages);
+        }
+
+        async function toggleAlliancePermission(toggle) {
+            const permission = toggle.getAttribute('data-permission');
+            const enabled = !toggle.classList.contains('active');
+            
+            try {
+                if (permissionManager) {
+                    await permissionManager.updateAlliancePermission(permission, enabled);
+                }
+                toggle.classList.toggle('active');
+                console.log(`Allianz-Berechtigung ${permission} auf ${enabled} gesetzt`);
+            } catch (error) {
+                console.error('Fehler beim Ändern der Berechtigung:', error);
+                alert('Fehler beim Ändern der Berechtigung: ' + error.message);
+            }
+        }
+
+        async function editMemberPermissions(memberUsername) {
+            if (!permissionManager) return;
+            
+            const memberPermissions = permissionManager.getMemberPermissionList(memberUsername);
+            
+            // Erstelle Modal für Berechtigungsbearbeitung
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'flex';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h3>Berechtigungen für ${memberUsername}</h3>
+                    <div id="member-permission-list">
+                        ${memberPermissions.map(perm => `
+                            <div class="permission-item">
+                                <div class="permission-header">
+                                    <span class="permission-title">${perm.description}</span>
+                                    <div class="permission-toggle ${perm.enabled ? 'active' : ''}" 
+                                         data-permission="${perm.id}"></div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="controls" style="margin-top: 20px;">
+                        <button class="btn success" onclick="saveMemberPermissions('${memberUsername}')">Speichern</button>
+                        <button class="btn" onclick="closeMemberPermissionModal()">Abbrechen</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Event Listener für Toggles
+            modal.querySelectorAll('.permission-toggle').forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    toggle.classList.toggle('active');
+                });
+            });
+        }
+
+        async function saveMemberPermissions(memberUsername) {
+            if (!permissionManager) return;
+            
+            try {
+                const toggles = document.querySelectorAll('#member-permission-list .permission-toggle');
+                
+                for (const toggle of toggles) {
+                    const permission = toggle.getAttribute('data-permission');
+                    const enabled = toggle.classList.contains('active');
+                    
+                    await permissionManager.setMemberPermission(memberUsername, permission, enabled);
+                }
+                
+                closeMemberPermissionModal();
+                loadMemberManagement();
+                console.log(`Berechtigungen für ${memberUsername} gespeichert`);
+                
+            } catch (error) {
+                console.error('Fehler beim Speichern der Mitglieder-Berechtigungen:', error);
+                alert('Fehler beim Speichern der Berechtigungen: ' + error.message);
+            }
+        }
+
+        function closeMemberPermissionModal() {
+            const modal = document.querySelector('.modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        async function removeMember(memberUsername) {
+            if (!confirm(`Mitglied ${memberUsername} wirklich aus der Allianz entfernen?`)) {
+                return;
+            }
+            
+            try {
+                if (permissionManager) {
+                    await permissionManager.removeMember(memberUsername);
+                }
+                
+                // Aktualisiere lokale Daten
+                if (currentAlliance && currentAlliance.members) {
+                    currentAlliance.members = currentAlliance.members.filter(m => m !== memberUsername);
+                }
+                
+                loadMemberManagement();
+                loadActiveMembers();
+                console.log(`Mitglied ${memberUsername} entfernt`);
+                
+            } catch (error) {
+                console.error('Fehler beim Entfernen des Mitglieds:', error);
+                alert('Fehler beim Entfernen des Mitglieds: ' + error.message);
+            }
+        }
+
+        function formatTime(timestamp) {
+            try {
+                const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+                return date.toLocaleTimeString('de-DE', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+            } catch {
+                return 'Unbekannt';
+            }
+        }
+
+        function getCurrentUsername() {
+            // Methode 1: Aus URL-Parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const usernameFromUrl = urlParams.get('username');
+            if (usernameFromUrl) return usernameFromUrl;
+            
+            // Methode 2: Aus localStorage
+            const usernameFromStorage = localStorage.getItem('currentUsername');
+            if (usernameFromStorage) return usernameFromStorage;
+            
+            // Methode 3: Aus sessionStorage
+            const usernameFromSession = sessionStorage.getItem('currentUsername');
+            if (usernameFromSession) return usernameFromSession;
+            
+            return null;
+        }
+
+        function showError(message) {
+            document.getElementById('welcome-message').textContent = message;
+            document.getElementById('welcome-message').style.color = '#ef4444';
+        }
+
+        // Cleanup beim Verlassen der Seite
+        window.addEventListener('beforeunload', () => {
+            if (chatUnsubscribe) chatUnsubscribe();
+            if (membersUnsubscribe) membersUnsubscribe();
+        });
+    </script>
+</body>
+</html>
