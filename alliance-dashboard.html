@@ -1765,17 +1765,10 @@
                         <div class="action-cell">
                             ${!isCurrentUser ? `
                                 <div class="action-buttons">
-                                    ${member !== currentAlliance.admin ? `
-                                        <button class="btn small success" 
-                                                onclick="setAllianceAdmin('${member}')"
-                                                ${!isAdmin ? 'disabled' : ''}
-                                                title="Als Allianzadmin setzen">
-                                            Admin
-                                        </button>
-                                    ` : '<span class="admin-badge">Admin</span>'}
                                     <button class="btn small danger" 
                                             onclick="removeMember('${member}')"
-                                            ${!isAdmin ? 'disabled' : ''}>
+                                            ${!isAdmin ? 'disabled' : ''}
+                                            title="Mitglied aus der Allianz entfernen">
                                         Entfernen
                                     </button>
                                 </div>

@@ -63,13 +63,13 @@ class AlliancePermissionManager {
                 const permissionsData = permissionsDoc.data();
                 this.permissions = new Map(Object.entries(permissionsData));
             } else {
-                // Erstelle Standard-Berechtigungen
+                // Erstelle Standard-Berechtigungen in der gewünschten Reihenfolge
                 this.permissions = new Map([
                     ['alliance_admin', { enabled: false, description: 'Allianzadmin' }],
-                    ['chat_write', { enabled: true, description: 'Chat schreiben' }],
-                    ['chat_read', { enabled: true, description: 'Chat lesen' }],
-                    ['member_approval', { enabled: false, description: 'Mitglieder bestätigen' }],
                     ['permission_manage', { enabled: false, description: 'Berechtigungen verwalten' }],
+                    ['chat_read', { enabled: true, description: 'Chat lesen' }],
+                    ['chat_write', { enabled: true, description: 'Chat schreiben' }],
+                    ['member_approval', { enabled: false, description: 'Mitglieder bestätigen' }],
                     ['spy_database_admin', { enabled: false, description: 'Spionage-Datenbank Admin' }],
                     ['spy_database_user', { enabled: false, description: 'Spionage-Datenbank User' }]
                 ]);
@@ -108,10 +108,10 @@ class AlliancePermissionManager {
         this.isAdmin = true; // Für lokale Entwicklung
         this.permissions = new Map([
             ['alliance_admin', { enabled: true, description: 'Allianzadmin' }],
-            ['chat_write', { enabled: true, description: 'Chat schreiben' }],
-            ['chat_read', { enabled: true, description: 'Chat lesen' }],
-            ['member_approval', { enabled: true, description: 'Mitglieder bestätigen' }],
             ['permission_manage', { enabled: true, description: 'Berechtigungen verwalten' }],
+            ['chat_read', { enabled: true, description: 'Chat lesen' }],
+            ['chat_write', { enabled: true, description: 'Chat schreiben' }],
+            ['member_approval', { enabled: true, description: 'Mitglieder bestätigen' }],
             ['spy_database_admin', { enabled: true, description: 'Spionage-Datenbank Admin' }],
             ['spy_database_user', { enabled: true, description: 'Spionage-Datenbank User' }]
         ]);
@@ -121,13 +121,13 @@ class AlliancePermissionManager {
     }
     
     setLocalAdminPermissions() {
-        // Setze lokale Admin-Berechtigungen
+        // Setze lokale Admin-Berechtigungen in der gewünschten Reihenfolge
         const adminPerms = {
             'alliance_admin': true,
-            'chat_write': true,
-            'chat_read': true,
-            'member_approval': true,
             'permission_manage': true,
+            'chat_read': true,
+            'chat_write': true,
+            'member_approval': true,
             'spy_database_admin': true,
             'spy_database_user': true
         };
@@ -383,23 +383,23 @@ class AlliancePermissionManager {
         try {
             console.log('👑 Setze Admin-Berechtigungen für:', this.currentUser);
             
-            // Setze alle Berechtigungen für den Admin auf true
+            // Setze alle Berechtigungen für den Admin auf true in der gewünschten Reihenfolge
             const adminPermissions = {
                 'alliance_admin': true,
-                'chat_write': true,
-                'chat_read': true,
-                'member_approval': true,
                 'permission_manage': true,
+                'chat_read': true,
+                'chat_write': true,
+                'member_approval': true,
                 'spy_database_admin': true,
                 'spy_database_user': true
             };
             
-            // Speichere Admin-Berechtigungen
+            // Speichere Admin-Berechtigungen in der gewünschten Reihenfolge
             await this.setMemberPermission(this.currentUser, 'alliance_admin', true);
-            await this.setMemberPermission(this.currentUser, 'chat_write', true);
-            await this.setMemberPermission(this.currentUser, 'chat_read', true);
-            await this.setMemberPermission(this.currentUser, 'member_approval', true);
             await this.setMemberPermission(this.currentUser, 'permission_manage', true);
+            await this.setMemberPermission(this.currentUser, 'chat_read', true);
+            await this.setMemberPermission(this.currentUser, 'chat_write', true);
+            await this.setMemberPermission(this.currentUser, 'member_approval', true);
             await this.setMemberPermission(this.currentUser, 'spy_database_admin', true);
             await this.setMemberPermission(this.currentUser, 'spy_database_user', true);
             
