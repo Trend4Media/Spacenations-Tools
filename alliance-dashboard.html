@@ -1696,6 +1696,9 @@
             const permissions = permissionManager.getPermissionList();
             const container = document.getElementById('member-management');
             
+            console.log('🔍 Berechtigungen für UI:', permissions);
+            console.log('👥 Mitglieder für UI:', members);
+            
             // Erstelle Tabellen-Header
             let html = `
                 <div class="permission-table">
@@ -1729,13 +1732,25 @@
                             const isEnabled = memberPerm ? memberPerm.enabled : perm.enabled;
                             const isCustom = memberPerm ? memberPerm.isCustom : false;
                             
+                            // Admin hat immer alle Berechtigungen
+                            const isAdminUser = member === currentAlliance.admin || member === currentAlliance.founder;
+                            const finalEnabled = isAdminUser ? true : isEnabled;
+                            
                             const canEdit = isAdmin && !isCurrentUser;
+                            
+                            console.log(`🔍 Berechtigung ${perm.id} für ${member}:`, {
+                                memberPerm: memberPerm,
+                                isEnabled: isEnabled,
+                                isAdminUser: isAdminUser,
+                                finalEnabled: finalEnabled,
+                                canEdit: canEdit
+                            });
                             
                             return `
                                 <div class="permission-cell">
                                     <label class="toggle-switch" style="cursor: ${canEdit ? 'pointer' : 'not-allowed'};">
                                         <input type="checkbox" 
-                                               ${isEnabled ? 'checked' : ''} 
+                                               ${finalEnabled ? 'checked' : ''} 
                                                ${!canEdit ? 'disabled' : ''}
                                                onchange="handlePermissionToggle('${member}', '${perm.id}', this.checked, this)"
                                                data-member="${member}" 
@@ -1743,6 +1758,7 @@
                                         <span class="toggle-slider"></span>
                                     </label>
                                     ${isCustom ? '<span class="custom-indicator" title="Individuelle Berechtigung">*</span>' : ''}
+                                    ${isAdminUser ? '<span class="admin-indicator" title="Allianz-Admin" style="color: #FFD700; font-weight: bold; margin-left: 5px;">👑</span>' : ''}
                                 </div>
                             `;
                         }).join('')}
@@ -1995,6 +2011,15 @@
                 console.warn('⚠️ Du kannst deine eigenen Berechtigungen nicht ändern');
                 element.checked = !enabled; // Toggle zurück
                 showError('Du kannst deine eigenen Berechtigungen nicht ändern');
+                return;
+            }
+            
+            // Prüfe ob es ein Admin-User ist (kann nicht geändert werden)
+            const isAdminUser = member === currentAlliance.admin || member === currentAlliance.founder;
+            if (isAdminUser) {
+                console.warn('⚠️ Admin-Berechtigungen können nicht geändert werden');
+                element.checked = true; // Immer auf true setzen für Admins
+                showError('Admin-Berechtigungen können nicht geändert werden');
                 return;
             }
             

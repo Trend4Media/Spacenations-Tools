@@ -49,6 +49,11 @@ class AlliancePermissionManager {
 
             this.isAdmin = allianceData.admin === this.currentUser || allianceData.founder === this.currentUser;
             
+            // Setze Admin-Berechtigungen automatisch
+            if (this.isAdmin) {
+                await this.setAdminPermissions();
+            }
+            
             // Lade Berechtigungen für die Allianz
             const permissionsDoc = await db.collection('alliancePermissions')
                 .doc(this.currentAlliance)
@@ -102,14 +107,33 @@ class AlliancePermissionManager {
         // Fallback für lokale Entwicklung
         this.isAdmin = true; // Für lokale Entwicklung
         this.permissions = new Map([
-            ['alliance_admin', { enabled: false, description: 'Allianzadmin' }],
+            ['alliance_admin', { enabled: true, description: 'Allianzadmin' }],
             ['chat_write', { enabled: true, description: 'Chat schreiben' }],
             ['chat_read', { enabled: true, description: 'Chat lesen' }],
-            ['member_approval', { enabled: false, description: 'Mitglieder bestätigen' }],
-            ['permission_manage', { enabled: false, description: 'Berechtigungen verwalten' }],
-            ['spy_database_admin', { enabled: false, description: 'Spionage-Datenbank Admin' }],
-            ['spy_database_user', { enabled: false, description: 'Spionage-Datenbank User' }]
+            ['member_approval', { enabled: true, description: 'Mitglieder bestätigen' }],
+            ['permission_manage', { enabled: true, description: 'Berechtigungen verwalten' }],
+            ['spy_database_admin', { enabled: true, description: 'Spionage-Datenbank Admin' }],
+            ['spy_database_user', { enabled: true, description: 'Spionage-Datenbank User' }]
         ]);
+        
+        // Setze lokale Admin-Berechtigungen
+        this.setLocalAdminPermissions();
+    }
+    
+    setLocalAdminPermissions() {
+        // Setze lokale Admin-Berechtigungen
+        const adminPerms = {
+            'alliance_admin': true,
+            'chat_write': true,
+            'chat_read': true,
+            'member_approval': true,
+            'permission_manage': true,
+            'spy_database_admin': true,
+            'spy_database_user': true
+        };
+        
+        this.memberPermissions.set(this.currentUser, adminPerms);
+        console.log('✅ Lokale Admin-Berechtigungen gesetzt');
     }
 
     async saveAlliancePermissions() {
@@ -353,6 +377,37 @@ class AlliancePermissionManager {
             description: value.description,
             isCustom: memberPerms[key] !== undefined
         }));
+    }
+
+    async setAdminPermissions() {
+        try {
+            console.log('👑 Setze Admin-Berechtigungen für:', this.currentUser);
+            
+            // Setze alle Berechtigungen für den Admin auf true
+            const adminPermissions = {
+                'alliance_admin': true,
+                'chat_write': true,
+                'chat_read': true,
+                'member_approval': true,
+                'permission_manage': true,
+                'spy_database_admin': true,
+                'spy_database_user': true
+            };
+            
+            // Speichere Admin-Berechtigungen
+            await this.setMemberPermission(this.currentUser, 'alliance_admin', true);
+            await this.setMemberPermission(this.currentUser, 'chat_write', true);
+            await this.setMemberPermission(this.currentUser, 'chat_read', true);
+            await this.setMemberPermission(this.currentUser, 'member_approval', true);
+            await this.setMemberPermission(this.currentUser, 'permission_manage', true);
+            await this.setMemberPermission(this.currentUser, 'spy_database_admin', true);
+            await this.setMemberPermission(this.currentUser, 'spy_database_user', true);
+            
+            console.log('✅ Admin-Berechtigungen gesetzt');
+            
+        } catch (error) {
+            console.error('Fehler beim Setzen der Admin-Berechtigungen:', error);
+        }
     }
 
     async updateAlliancePermission(permission, enabled) {
