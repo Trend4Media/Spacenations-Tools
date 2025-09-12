@@ -38,8 +38,10 @@
             background: var(--bg-gradient);
             color: var(--text-primary);
             min-height: 100vh;
-            padding: 20px;
+            padding: 20px 20px 0 20px;
             transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
         }
         
         .container {
@@ -52,6 +54,7 @@
             box-shadow: 0 0 20px var(--border-shadow);
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
+            flex: 1;
         }
         
         .header {

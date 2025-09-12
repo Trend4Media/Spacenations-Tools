@@ -57,15 +57,19 @@ class AutoGlobalFooterLoader {
                 padding: 60px 48px 40px;
                 margin-top: 80px;
                 margin-left: 280px;
+                margin-right: 0;
+                margin-bottom: 0;
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
                 position: relative;
                 overflow: hidden;
                 transition: margin-left 0.3s ease;
+                width: calc(100% - 280px);
             }
             
             @media (max-width: 768px) {
                 .global-footer {
                     margin-left: 0;
+                    width: 100%;
                 }
             }
             
