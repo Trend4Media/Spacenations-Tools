@@ -145,8 +145,10 @@
         <h1>🔄 User Database Migration</h1>
         <p>Standardisiert die User-Struktur in der Firebase-Datenbank</p>
         
+        <button class="btn" onclick="testFirebaseConnection()">🔗 Firebase testen</button>
         <button class="btn" onclick="analyzeUsers()">📊 User analysieren</button>
         <button class="btn" onclick="migrateUsers()" id="migrate-btn" disabled>🚀 Migration starten</button>
+        <button class="btn" onclick="migrateAllUsers()" id="migrate-all-btn">🔥 Alle User migrieren</button>
         <button class="btn" onclick="createSampleUsers()">👥 Beispiel-User erstellen</button>
         
         <div id="status" class="status" style="display: none;"></div>
@@ -235,7 +237,7 @@
         
         async function migrateUsers() {
             try {
-                showStatus('Starte Migration...', 'info');
+                showStatus('Starte Migration in Firebase...', 'info');
                 const migrateBtn = document.getElementById('migrate-btn');
                 migrateBtn.disabled = true;
                 migrateBtn.textContent = 'Migration läuft...';
@@ -243,26 +245,72 @@
                 migrationResults = [];
                 let migratedCount = 0;
                 let errorCount = 0;
+                let skippedCount = 0;
+                
+                // Batch-Update für bessere Performance
+                const batch = db.batch();
+                let batchCount = 0;
+                const BATCH_SIZE = 500; // Firebase Batch-Limit
                 
                 for (const user of users) {
                     if (!user.needsMigration) {
                         migrationResults.push({ username: user.username || user.id, status: 'skipped', message: 'Bereits aktuell' });
+                        skippedCount++;
                         continue;
                     }
                     
                     try {
-                        await migrateUser(user);
-                        migrationResults.push({ username: user.username || user.id, status: 'success', message: 'Erfolgreich migriert' });
-                        migratedCount++;
+                        const userRef = db.collection('users').doc(user.id);
+                        const updates = getMigrationUpdates(user);
+                        
+                        if (Object.keys(updates).length > 0) {
+                            batch.update(userRef, updates);
+                            batchCount++;
+                            
+                            // Führe Batch aus wenn Limit erreicht
+                            if (batchCount >= BATCH_SIZE) {
+                                await batch.commit();
+                                console.log(`Batch mit ${batchCount} Updates ausgeführt`);
+                                batchCount = 0;
+                            }
+                            
+                            migrationResults.push({ 
+                                username: user.username || user.id, 
+                                status: 'success', 
+                                message: `${Object.keys(updates).length} Felder aktualisiert` 
+                            });
+                            migratedCount++;
+                        } else {
+                            migrationResults.push({ 
+                                username: user.username || user.id, 
+                                status: 'skipped', 
+                                message: 'Keine Updates nötig' 
+                            });
+                            skippedCount++;
+                        }
+                        
                     } catch (error) {
-                        migrationResults.push({ username: user.username || user.id, status: 'error', message: error.message });
+                        migrationResults.push({ 
+                            username: user.username || user.id, 
+                            status: 'error', 
+                            message: error.message 
+                        });
                         errorCount++;
                     }
                 }
                 
+                // Führe verbleibende Updates aus
+                if (batchCount > 0) {
+                    await batch.commit();
+                    console.log(`Finaler Batch mit ${batchCount} Updates ausgeführt`);
+                }
+                
                 displayMigrationResults();
-                showStatus(`Migration abgeschlossen: ${migratedCount} erfolgreich, ${errorCount} Fehler`, 
+                showStatus(`Migration abgeschlossen: ${migratedCount} migriert, ${skippedCount} übersprungen, ${errorCount} Fehler`, 
                           errorCount > 0 ? 'warning' : 'success');
+                
+                // Aktualisiere User-Liste
+                await analyzeUsers();
                 
             } catch (error) {
                 console.error('Fehler bei der Migration:', error);
@@ -274,7 +322,7 @@
             }
         }
         
-        async function migrateUser(user) {
+        function getMigrationUpdates(user) {
             const updates = {};
             
             // Füge fehlende Felder hinzu
@@ -298,12 +346,19 @@
                 updates.createdAt = firebase.firestore.FieldValue.serverTimestamp();
             }
             
+            // Standardisierte Felder hinzufügen
+            if (!user.profile) {
+                updates.profile = {
+                    displayName: user.username || user.id,
+                    bio: `Migrierter ${user.systemRole || 'user'} Benutzer`
+                };
+            }
+            
+            // Aktualisiere Zeitstempel
             updates.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
             updates.updatedBy = 'migration-script';
             
-            if (Object.keys(updates).length > 0) {
-                await db.collection('users').doc(user.id).update(updates);
-            }
+            return updates;
         }
         
         function getDefaultPermissions(systemRole) {
@@ -349,6 +404,104 @@
             `).join('');
         }
         
+        async function migrateAllUsers() {
+            try {
+                if (!confirm('ALLE User in Firebase migrieren? Dies kann nicht rückgängig gemacht werden!')) {
+                    return;
+                }
+                
+                showStatus('Starte vollständige Migration aller User in Firebase...', 'warning');
+                const migrateAllBtn = document.getElementById('migrate-all-btn');
+                migrateAllBtn.disabled = true;
+                migrateAllBtn.textContent = 'Migration läuft...';
+                
+                // Lade alle User aus Firebase
+                const usersSnapshot = await db.collection('users').get();
+                const allUsers = [];
+                
+                usersSnapshot.forEach(doc => {
+                    const userData = doc.data();
+                    allUsers.push({
+                        id: doc.id,
+                        ...userData,
+                        needsMigration: needsMigration(userData)
+                    });
+                });
+                
+                migrationResults = [];
+                let migratedCount = 0;
+                let errorCount = 0;
+                let skippedCount = 0;
+                
+                // Batch-Update für bessere Performance
+                const batch = db.batch();
+                let batchCount = 0;
+                const BATCH_SIZE = 500;
+                
+                for (const user of allUsers) {
+                    try {
+                        const userRef = db.collection('users').doc(user.id);
+                        const updates = getMigrationUpdates(user);
+                        
+                        if (Object.keys(updates).length > 0) {
+                            batch.update(userRef, updates);
+                            batchCount++;
+                            
+                            // Führe Batch aus wenn Limit erreicht
+                            if (batchCount >= BATCH_SIZE) {
+                                await batch.commit();
+                                console.log(`Batch mit ${batchCount} Updates ausgeführt`);
+                                batchCount = 0;
+                            }
+                            
+                            migrationResults.push({ 
+                                username: user.username || user.id, 
+                                status: 'success', 
+                                message: `${Object.keys(updates).length} Felder aktualisiert` 
+                            });
+                            migratedCount++;
+                        } else {
+                            migrationResults.push({ 
+                                username: user.username || user.id, 
+                                status: 'skipped', 
+                                message: 'Bereits aktuell' 
+                            });
+                            skippedCount++;
+                        }
+                        
+                    } catch (error) {
+                        migrationResults.push({ 
+                            username: user.username || user.id, 
+                            status: 'error', 
+                            message: error.message 
+                        });
+                        errorCount++;
+                    }
+                }
+                
+                // Führe verbleibende Updates aus
+                if (batchCount > 0) {
+                    await batch.commit();
+                    console.log(`Finaler Batch mit ${batchCount} Updates ausgeführt`);
+                }
+                
+                displayMigrationResults();
+                showStatus(`Vollständige Migration abgeschlossen: ${migratedCount} migriert, ${skippedCount} übersprungen, ${errorCount} Fehler`, 
+                          errorCount > 0 ? 'warning' : 'success');
+                
+                // Aktualisiere User-Liste
+                await analyzeUsers();
+                
+            } catch (error) {
+                console.error('Fehler bei der vollständigen Migration:', error);
+                showStatus('Fehler bei der Migration: ' + error.message, 'error');
+            } finally {
+                const migrateAllBtn = document.getElementById('migrate-all-btn');
+                migrateAllBtn.disabled = false;
+                migrateAllBtn.textContent = '🔥 Alle User migrieren';
+            }
+        }
+
         async function createSampleUsers() {
             try {
                 showStatus('Erstelle Beispiel-User...', 'info');
@@ -419,9 +572,40 @@
             }, 5000);
         }
         
-        // Beim Laden der Seite User analysieren
+        async function testFirebaseConnection() {
+            try {
+                showStatus('Teste Firebase-Verbindung...', 'info');
+                
+                // Teste Verbindung durch einfache Abfrage
+                const testQuery = await db.collection('users').limit(1).get();
+                
+                if (testQuery.empty) {
+                    showStatus('Firebase verbunden, aber keine User gefunden', 'warning');
+                } else {
+                    showStatus(`Firebase verbunden! ${testQuery.size} Test-Dokument gefunden`, 'success');
+                }
+                
+                // Teste Schreibzugriff
+                const testDoc = db.collection('_test').doc('connection-test');
+                await testDoc.set({
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    test: 'connection'
+                });
+                
+                // Lösche Test-Dokument
+                await testDoc.delete();
+                
+                showStatus('Firebase vollständig funktionsfähig! Schreib- und Lesezugriff OK', 'success');
+                
+            } catch (error) {
+                console.error('Firebase-Verbindungstest fehlgeschlagen:', error);
+                showStatus('Firebase-Verbindung fehlgeschlagen: ' + error.message, 'error');
+            }
+        }
+
+        // Beim Laden der Seite Firebase testen
         document.addEventListener('DOMContentLoaded', () => {
-            analyzeUsers();
+            testFirebaseConnection();
         });
     </script>
 </body>
