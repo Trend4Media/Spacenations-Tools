@@ -294,6 +294,35 @@
             box-shadow: var(--glow-green);
         }
         
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            font-size: 1rem;
+        }
+        
+        .tool-card.public {
+            border-color: var(--razer-gray);
+        }
+        
+        .tool-card.public:hover {
+            border-color: var(--razer-gray-light);
+        }
+        
+        .tool-card.personal {
+            border-color: var(--razer-green);
+            background: linear-gradient(135deg, var(--bg-card), rgba(0, 255, 136, 0.05));
+        }
+        
+        .tool-card.personal:hover {
+            border-color: var(--razer-green-light);
+            background: linear-gradient(135deg, var(--bg-card), rgba(0, 255, 136, 0.1));
+        }
+        
+        .tool-card.personal .tool-title {
+            color: var(--razer-green);
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .nav {
@@ -343,80 +372,65 @@
     <div class="container">
         <!-- Welcome Section -->
         <section class="welcome-section">
-            <h1 class="welcome-title">🎮 User Dashboard</h1>
-            <p class="welcome-subtitle">Willkommen in Ihrem persönlichen Spacenations Tools Bereich</p>
+            <h1 class="welcome-title">🎮 Dein Dashboard</h1>
+            <p class="welcome-subtitle" id="welcome-message">Willkommen in Ihrem persönlichen Spacenations Tools Bereich</p>
         </section>
 
-        <!-- User Info -->
-        <section class="user-info">
-            <h3>👤 Benutzerinformationen</h3>
-            <div class="info-grid">
-                <div class="info-item">
-                    <div class="info-label">Benutzername</div>
-                    <div class="info-value">Demo User</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">E-Mail</div>
-                    <div class="info-value">demo@spacenations.eu</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Mitglied seit</div>
-                    <div class="info-value">2024</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Status</div>
-                    <div class="info-value" style="color: var(--razer-green);">Aktiv</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Tools Section -->
+        <!-- Public Tools Section -->
         <section class="tools-section">
-            <h2 class="section-title">🛠️ Verfügbare Tools</h2>
+            <h2 class="section-title">🌐 Öffentliche Tools</h2>
+            <p class="section-subtitle">Diese Tools sind für alle Benutzer verfügbar</p>
             <div class="tools-grid">
-                <div class="tool-card">
-                    <div class="tool-icon">⚔️</div>
-                    <h3 class="tool-title">AS Counter</h3>
-                    <p class="tool-description">
-                        Berechnen Sie die optimale Anzahl von Angriffsschiffen für Ihre Raids und Kämpfe.
-                    </p>
-                    <a href="as-counter.html" class="tool-link">Tool öffnen</a>
-                </div>
-                
-                <div class="tool-card">
-                    <div class="tool-icon">🧮</div>
-                    <h3 class="tool-title">Battle Counter</h3>
-                    <p class="tool-description">
-                        Strategische Planung Ihrer Schlachten mit präzisen Berechnungen.
-                    </p>
-                    <a href="battle-counter.html" class="tool-link">Tool öffnen</a>
-                </div>
-                
-                <div class="tool-card">
-                    <div class="tool-icon">🏴‍☠️</div>
-                    <h3 class="tool-title">Raid Counter</h3>
-                    <p class="tool-description">
-                        Optimieren Sie Ihre Raid-Strategien mit detaillierten Berechnungen.
-                    </p>
-                    <a href="raid-counter.html" class="tool-link">Tool öffnen</a>
-                </div>
-                
-                <div class="tool-card">
-                    <div class="tool-icon">💣</div>
-                    <h3 class="tool-title">Sabo Counter</h3>
-                    <p class="tool-description">
-                        Planen Sie Sabotage-Aktionen mit präzisen Schadensberechnungen.
-                    </p>
-                    <a href="sabo-counter.html" class="tool-link">Tool öffnen</a>
-                </div>
-                
-                <div class="tool-card">
+                <div class="tool-card public">
                     <div class="tool-icon">🌌</div>
                     <h3 class="tool-title">ProximaDB</h3>
                     <p class="tool-description">
                         Zugriff auf die Proxima-Datenbank mit aktuellen Spielinformationen.
                     </p>
                     <a href="ProximaDB.html" class="tool-link">Tool öffnen</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Personal Counter Tools Section -->
+        <section class="tools-section">
+            <h2 class="section-title">📊 Deine persönlichen Counter</h2>
+            <p class="section-subtitle">Diese Tools speichern deine Erfolge und bieten individuelle Statistiken</p>
+            <div class="tools-grid">
+                <div class="tool-card personal">
+                    <div class="tool-icon">⚔️</div>
+                    <h3 class="tool-title">AS Counter</h3>
+                    <p class="tool-description">
+                        Dein persönlicher Angriffsschiff-Counter mit Erfolgsstatistiken und gespeicherten Berechnungen.
+                    </p>
+                    <a href="dashboard-as-counter.html" class="tool-link">Mein AS Counter</a>
+                </div>
+                
+                <div class="tool-card personal">
+                    <div class="tool-icon">🧮</div>
+                    <h3 class="tool-title">Battle Counter</h3>
+                    <p class="tool-description">
+                        Persönliche Schlacht-Statistiken und gespeicherte Kampfstrategien.
+                    </p>
+                    <a href="battle-counter.html" class="tool-link">Mein Battle Counter</a>
+                </div>
+                
+                <div class="tool-card personal">
+                    <div class="tool-icon">🏴‍☠️</div>
+                    <h3 class="tool-title">Raid Counter</h3>
+                    <p class="tool-description">
+                        Individuelle Raid-Erfolge und gespeicherte Raid-Strategien in der Datenbank.
+                    </p>
+                    <a href="dashboard-raid-counter.html" class="tool-link">Mein Raid Counter</a>
+                </div>
+                
+                <div class="tool-card personal">
+                    <div class="tool-icon">💣</div>
+                    <h3 class="tool-title">Sabo Counter</h3>
+                    <p class="tool-description">
+                        Persönliche Sabotage-Statistiken und gespeicherte Sabotage-Pläne.
+                    </p>
+                    <a href="dashboard-sabo-counter.html" class="tool-link">Mein Sabo Counter</a>
                 </div>
             </div>
         </section>
@@ -427,14 +441,53 @@
         document.addEventListener('DOMContentLoaded', () => {
             console.log('User Dashboard loaded');
             
-            // Hier könnte später echte Benutzerdaten geladen werden
-            // z.B. aus localStorage oder einer API
+            // Persönliche Begrüßung basierend auf Login-Daten
+            updateWelcomeMessage();
             
-            // Demo: Zeige Willkommensnachricht
-            setTimeout(() => {
-                console.log('User Dashboard bereit');
-            }, 500);
+            // Hier könnte später echte Benutzerdaten aus der Datenbank geladen werden
+            // z.B. aus localStorage, Firebase oder einer API
         });
+        
+        function updateWelcomeMessage() {
+            const welcomeElement = document.getElementById('welcome-message');
+            
+            // Versuche Benutzernamen aus verschiedenen Quellen zu holen
+            let username = getCurrentUsername();
+            
+            if (username) {
+                welcomeElement.textContent = `Willkommen zurück, ${username}!`;
+                welcomeElement.style.color = 'var(--razer-green)';
+                console.log(`User Dashboard für ${username} geladen`);
+            } else {
+                // Fallback falls kein Benutzername gefunden wird
+                welcomeElement.textContent = 'Willkommen in Ihrem persönlichen Spacenations Tools Bereich';
+            }
+        }
+        
+        function getCurrentUsername() {
+            // Methode 1: Aus URL-Parameter (falls beim Login weitergegeben)
+            const urlParams = new URLSearchParams(window.location.search);
+            const usernameFromUrl = urlParams.get('username');
+            if (usernameFromUrl) {
+                return usernameFromUrl;
+            }
+            
+            // Methode 2: Aus localStorage (falls beim Login gespeichert)
+            const usernameFromStorage = localStorage.getItem('currentUsername');
+            if (usernameFromStorage) {
+                return usernameFromStorage;
+            }
+            
+            // Methode 3: Aus sessionStorage
+            const usernameFromSession = sessionStorage.getItem('currentUsername');
+            if (usernameFromSession) {
+                return usernameFromSession;
+            }
+            
+            // Methode 4: Demo-Fallback für Entwicklung
+            // In der echten Implementierung würde hier Firebase Auth verwendet
+            return 'Demo User';
+        }
     </script>
 </body>
 </html>
