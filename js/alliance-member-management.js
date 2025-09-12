@@ -127,7 +127,7 @@ class AllianceMemberManager {
             
             // Füge Mitglied zur Allianz hinzu
             await db.collection('alliances').doc(this.currentAlliance).update({
-                members: window.FirebaseConfig.getFieldValue().arrayUnion(username),
+                members: firebase.firestore.FieldValue.arrayUnion(username),
                 lastUpdated: window.FirebaseConfig.getServerTimestamp()
             });
 
@@ -247,7 +247,7 @@ class AllianceMemberManager {
             
             // Entferne Mitglied aus der Allianz
             await db.collection('alliances').doc(this.currentAlliance).update({
-                members: window.FirebaseConfig.getFieldValue().arrayRemove(username),
+                members: firebase.firestore.FieldValue.arrayRemove(username),
                 lastUpdated: window.FirebaseConfig.getServerTimestamp()
             });
 
@@ -305,8 +305,8 @@ class AllianceMemberManager {
             
             // Füge Mitglied zur Allianz hinzu und entferne aus Warteliste
             await db.collection('alliances').doc(this.currentAlliance).update({
-                members: window.FirebaseConfig.getFieldValue().arrayUnion(username),
-                pendingMembers: window.FirebaseConfig.getFieldValue().arrayRemove(username),
+                members: firebase.firestore.FieldValue.arrayUnion(username),
+                pendingMembers: firebase.firestore.FieldValue.arrayRemove(username),
                 lastUpdated: window.FirebaseConfig.getServerTimestamp()
             });
 

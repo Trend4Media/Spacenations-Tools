@@ -252,8 +252,8 @@ class AlliancePermissionManager {
             
             // Füge Mitglied zur Allianz hinzu
             await db.collection('alliances').doc(this.currentAlliance).update({
-                members: window.FirebaseConfig.getFieldValue().arrayUnion(memberUsername),
-                approvedMembers: window.FirebaseConfig.getFieldValue().arrayUnion(memberUsername)
+                members: firebase.firestore.FieldValue.arrayUnion(memberUsername),
+                approvedMembers: firebase.firestore.FieldValue.arrayUnion(memberUsername)
             });
 
             // Log Aktivität
@@ -289,8 +289,8 @@ class AlliancePermissionManager {
             
             // Entferne Mitglied aus der Allianz
             await db.collection('alliances').doc(this.currentAlliance).update({
-                members: window.FirebaseConfig.getFieldValue().arrayRemove(memberUsername),
-                approvedMembers: window.FirebaseConfig.getFieldValue().arrayRemove(memberUsername)
+                members: firebase.firestore.FieldValue.arrayRemove(memberUsername),
+                approvedMembers: firebase.firestore.FieldValue.arrayRemove(memberUsername)
             });
 
             // Entferne alle Berechtigungen des Mitglieds
