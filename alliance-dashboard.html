@@ -616,6 +616,7 @@
             opacity: 0;
             width: 0;
             height: 0;
+            position: absolute;
         }
 
         .toggle-slider {
@@ -628,22 +629,29 @@
             background-color: var(--razer-gray-light);
             transition: .4s;
             border-radius: 24px;
+            border: 2px solid var(--razer-gray);
         }
 
         .toggle-slider:before {
             position: absolute;
             content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
             background-color: white;
             transition: .4s;
             border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .toggle-switch:hover .toggle-slider {
+            box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
         }
 
         input:checked + .toggle-slider {
             background-color: var(--razer-green);
+            border-color: var(--razer-green);
         }
 
         input:checked + .toggle-slider:before {
@@ -653,6 +661,11 @@
         input:disabled + .toggle-slider {
             opacity: 0.5;
             cursor: not-allowed;
+            background-color: var(--razer-gray);
+        }
+
+        input:disabled + .toggle-slider:before {
+            background-color: #ccc;
         }
 
         .custom-indicator {
@@ -1716,13 +1729,15 @@
                             const isEnabled = memberPerm ? memberPerm.enabled : perm.enabled;
                             const isCustom = memberPerm ? memberPerm.isCustom : false;
                             
+                            const canEdit = isAdmin && !isCurrentUser;
+                            
                             return `
                                 <div class="permission-cell">
-                                    <label class="toggle-switch">
+                                    <label class="toggle-switch" style="cursor: ${canEdit ? 'pointer' : 'not-allowed'};">
                                         <input type="checkbox" 
                                                ${isEnabled ? 'checked' : ''} 
-                                               ${!isAdmin || isCurrentUser ? 'disabled' : ''}
-                                               onchange="toggleMemberPermission('${member}', '${perm.id}', this.checked)"
+                                               ${!canEdit ? 'disabled' : ''}
+                                               onchange="handlePermissionToggle('${member}', '${perm.id}', this.checked, this)"
                                                data-member="${member}" 
                                                data-permission="${perm.id}">
                                         <span class="toggle-slider"></span>
@@ -1771,6 +1786,20 @@
 
             container.innerHTML = html;
             console.log('✅ Mitglieder-Verwaltung HTML generiert und angezeigt');
+            
+            // Debug: Teste Toggle-Switches
+            setTimeout(() => {
+                const toggles = container.querySelectorAll('.toggle-switch input');
+                console.log('🔍 Gefundene Toggle-Switches:', toggles.length);
+                toggles.forEach((toggle, index) => {
+                    console.log(`Toggle ${index}:`, {
+                        member: toggle.dataset.member,
+                        permission: toggle.dataset.permission,
+                        checked: toggle.checked,
+                        disabled: toggle.disabled
+                    });
+                });
+            }, 100);
         }
 
         function setupEventListeners() {
@@ -1950,14 +1979,50 @@
             }
         }
 
-        async function toggleMemberPermission(member, permission, enabled) {
-            try {
-                await permissionManager.setMemberPermission(member, permission, enabled);
-                console.log(`Berechtigung ${permission} für ${member} auf ${enabled} gesetzt`);
-            } catch (error) {
-                console.error('Fehler beim Setzen der Berechtigung:', error);
-                showError('Fehler beim Setzen der Berechtigung: ' + error.message);
+        async function handlePermissionToggle(member, permission, enabled, element) {
+            console.log('🔄 Toggle geklickt:', { member, permission, enabled });
+            
+            // Prüfe ob der User Admin ist
+            if (!isAdmin) {
+                console.warn('⚠️ Nur Admins können Berechtigungen ändern');
+                element.checked = !enabled; // Toggle zurück
+                showError('Nur Allianz-Admins können Berechtigungen ändern');
+                return;
             }
+            
+            // Prüfe ob es der aktuelle User ist
+            if (member === getCurrentUsername()) {
+                console.warn('⚠️ Du kannst deine eigenen Berechtigungen nicht ändern');
+                element.checked = !enabled; // Toggle zurück
+                showError('Du kannst deine eigenen Berechtigungen nicht ändern');
+                return;
+            }
+            
+            try {
+                // Zeige Loading-Status
+                element.disabled = true;
+                element.style.opacity = '0.5';
+                
+                await permissionManager.setMemberPermission(member, permission, enabled);
+                console.log(`✅ Berechtigung ${permission} für ${member} auf ${enabled} gesetzt`);
+                
+                // Erfolgsmeldung
+                showSuccess(`Berechtigung "${permission}" für ${member} ${enabled ? 'aktiviert' : 'deaktiviert'}`);
+                
+            } catch (error) {
+                console.error('❌ Fehler beim Setzen der Berechtigung:', error);
+                element.checked = !enabled; // Toggle zurück bei Fehler
+                showError('Fehler beim Setzen der Berechtigung: ' + error.message);
+            } finally {
+                // Reaktiviere Element
+                element.disabled = false;
+                element.style.opacity = '1';
+            }
+        }
+
+        async function toggleMemberPermission(member, permission, enabled) {
+            // Legacy-Funktion für Rückwärtskompatibilität
+            return handlePermissionToggle(member, permission, enabled, null);
         }
 
         async function setAllianceAdmin(username) {
@@ -2156,8 +2221,51 @@
                 clearBtn.style.cursor = 'pointer';
                 clearBtn.onclick = clearAllianceData;
                 document.body.appendChild(clearBtn);
+                
+                // Test Toggle Button
+                const toggleTestBtn = document.createElement('button');
+                toggleTestBtn.textContent = '🔄 Test Toggle';
+                toggleTestBtn.style.position = 'fixed';
+                toggleTestBtn.style.top = '50px';
+                toggleTestBtn.style.right = '10px';
+                toggleTestBtn.style.zIndex = '9999';
+                toggleTestBtn.style.background = '#2196F3';
+                toggleTestBtn.style.color = 'white';
+                toggleTestBtn.style.border = 'none';
+                toggleTestBtn.style.padding = '10px';
+                toggleTestBtn.style.borderRadius = '5px';
+                toggleTestBtn.style.cursor = 'pointer';
+                toggleTestBtn.onclick = testToggleFunctionality;
+                document.body.appendChild(toggleTestBtn);
             }
         });
+        
+        // Test-Funktion für Toggle-Funktionalität
+        function testToggleFunctionality() {
+            console.log('🧪 Teste Toggle-Funktionalität...');
+            
+            const toggles = document.querySelectorAll('.toggle-switch input');
+            console.log('Gefundene Toggles:', toggles.length);
+            
+            if (toggles.length === 0) {
+                alert('Keine Toggle-Switches gefunden!');
+                return;
+            }
+            
+            // Teste den ersten verfügbaren Toggle
+            const firstToggle = Array.from(toggles).find(t => !t.disabled);
+            if (firstToggle) {
+                console.log('Teste Toggle:', firstToggle);
+                const member = firstToggle.dataset.member;
+                const permission = firstToggle.dataset.permission;
+                const newState = !firstToggle.checked;
+                
+                console.log(`Simuliere Toggle für ${member}, ${permission}, ${newState}`);
+                handlePermissionToggle(member, permission, newState, firstToggle);
+            } else {
+                alert('Alle Toggle-Switches sind deaktiviert!');
+            }
+        }
     </script>
 </body>
 </html>
