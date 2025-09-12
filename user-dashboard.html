@@ -323,27 +323,6 @@
             color: var(--razer-green);
         }
         
-        .user-info-box {
-            background: var(--bg-secondary);
-            border: 1px solid var(--razer-green);
-            border-radius: 8px;
-            padding: 16px;
-            margin-top: 20px;
-            text-align: center;
-            max-width: 400px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        .user-info-box p {
-            margin: 8px 0;
-            color: var(--text-primary);
-        }
-        
-        .user-info-box strong {
-            color: var(--razer-green);
-        }
-        
         /* Responsive */
         @media (max-width: 768px) {
             .nav {
@@ -395,31 +374,11 @@
         <section class="welcome-section">
             <h1 class="welcome-title">🎮 Dein Dashboard</h1>
             <p class="welcome-subtitle" id="welcome-message">Willkommen in Ihrem persönlichen Spacenations Tools Bereich</p>
-            <div id="user-info" class="user-info-box" style="display: none;">
-                <p><strong>Eingeloggt als:</strong> <span id="current-user-display"></span></p>
-                <p><strong>E-Mail:</strong> <span id="current-email-display"></span></p>
-            </div>
-        </section>
-
-        <!-- Public Tools Section -->
-        <section class="tools-section">
-            <h2 class="section-title">🌐 Öffentliche Tools</h2>
-            <p class="section-subtitle">Diese Tools sind für alle Benutzer verfügbar</p>
-            <div class="tools-grid">
-                <div class="tool-card public">
-                    <div class="tool-icon">🌌</div>
-                    <h3 class="tool-title">ProximaDB</h3>
-                    <p class="tool-description">
-                        Zugriff auf die Proxima-Datenbank mit aktuellen Spielinformationen.
-                    </p>
-                    <a href="ProximaDB.html" class="tool-link">Tool öffnen</a>
-                </div>
-            </div>
         </section>
 
         <!-- Personal Counter Tools Section -->
         <section class="tools-section">
-            <h2 class="section-title">📊 Deine persönlichen Counter</h2>
+            <h2 class="section-title">📊 Deine persönlichen Tools</h2>
             <p class="section-subtitle">Diese Tools speichern deine Erfolge und bieten individuelle Statistiken</p>
             <div class="tools-grid">
                 <div class="tool-card personal">
@@ -457,6 +416,15 @@
                     </p>
                     <a href="dashboard-sabo-counter.html" class="tool-link">Mein Sabo Counter</a>
                 </div>
+                
+                <div class="tool-card personal">
+                    <div class="tool-icon">🌌</div>
+                    <h3 class="tool-title">ProximaDB</h3>
+                    <p class="tool-description">
+                        Persönlicher Zugriff auf die Proxima-Datenbank mit deinen individuellen Spielinformationen.
+                    </p>
+                    <a href="ProximaDB.html" class="tool-link">Meine ProximaDB</a>
+                </div>
             </div>
         </section>
     </div>
@@ -483,28 +451,17 @@
         
         function updateWelcomeMessage() {
             const welcomeElement = document.getElementById('welcome-message');
-            const userInfoBox = document.getElementById('user-info');
-            const currentUserDisplay = document.getElementById('current-user-display');
-            const currentEmailDisplay = document.getElementById('current-email-display');
             
-            // Versuche Benutzernamen und E-Mail aus verschiedenen Quellen zu holen
+            // Versuche Benutzernamen aus verschiedenen Quellen zu holen
             let username = getCurrentUsername();
-            let email = getCurrentUserEmail();
             
             if (username) {
                 welcomeElement.textContent = `Willkommen zurück, ${username}!`;
                 welcomeElement.style.color = 'var(--razer-green)';
-                
-                // User-Info-Box anzeigen und füllen
-                userInfoBox.style.display = 'block';
-                currentUserDisplay.textContent = username;
-                currentEmailDisplay.textContent = email || 'Nicht verfügbar';
-                
                 console.log(`User Dashboard für ${username} geladen`);
             } else {
                 // Fallback falls kein Benutzername gefunden wird
                 welcomeElement.textContent = 'Willkommen in Ihrem persönlichen Spacenations Tools Bereich';
-                userInfoBox.style.display = 'none';
             }
         }
         
