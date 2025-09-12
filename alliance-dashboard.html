@@ -690,19 +690,24 @@
             
             // Lade Allianz-Daten basierend auf URL-Parameter
             const urlParams = new URLSearchParams(window.location.search);
+            const allianceId = urlParams.get('id');
             const allianceTag = urlParams.get('alliance');
             const username = urlParams.get('username');
             
             console.log('🔍 URL-Parameter Debug:', {
                 url: window.location.href,
                 search: window.location.search,
+                allianceId: allianceId,
                 allianceTag: allianceTag,
                 username: username,
                 allParams: Object.fromEntries(urlParams.entries())
             });
             
-            if (allianceTag && username) {
-                console.log('✅ Allianz-Parameter gefunden, lade individuelle Daten:', { allianceTag, username });
+            if (allianceId && username) {
+                console.log('✅ Individuelle Allianz-ID gefunden, lade spezifische Daten:', { allianceId, username });
+                loadIndividualAllianceDataById(allianceId, username);
+            } else if (allianceTag && username) {
+                console.log('✅ Allianz-Tag gefunden, lade individuelle Daten:', { allianceTag, username });
                 loadIndividualAllianceData(allianceTag, username);
             } else {
                 console.log('⚠️ Keine Allianz-Parameter gefunden, versuche localStorage-Daten zu laden');
@@ -800,6 +805,77 @@
                 
             } catch (error) {
                 console.error('❌ Fehler beim Laden der Allianz-Daten aus localStorage:', error);
+                showError('Fehler beim Laden der Allianz-Daten: ' + error.message);
+            }
+        }
+
+        async function loadIndividualAllianceDataById(allianceId, username) {
+            try {
+                console.log('🚀 Lade individuelle Allianz-Daten nach ID...');
+                
+                // Initialisiere Firebase
+                await initializeFirebaseForAlliance();
+                
+                const db = window.FirebaseConfig.getDB();
+                
+                // Lade Allianz-Daten direkt nach ID
+                const allianceDoc = await db.collection('alliances').doc(allianceId).get();
+                
+                if (!allianceDoc.exists) {
+                    throw new Error(`Allianz mit ID "${allianceId}" nicht gefunden`);
+                }
+                
+                currentAlliance = {
+                    id: allianceDoc.id,
+                    ...allianceDoc.data()
+                };
+                
+                console.log('✅ Allianz gefunden:', currentAlliance.name);
+                
+                // Prüfe ob User Mitglied ist
+                if (!currentAlliance.members || !currentAlliance.members.includes(username)) {
+                    throw new Error(`Du bist kein Mitglied der Allianz "${currentAlliance.name}"`);
+                }
+                
+                // Prüfe ob User Admin ist
+                isAdmin = currentAlliance.admin === username || currentAlliance.founder === username;
+                console.log('👑 Admin-Status:', isAdmin);
+                
+                // Prüfe Allianz-Status
+                if (currentAlliance.status !== 'approved') {
+                    showError(`Deine Allianz wurde noch nicht genehmigt. Status: ${currentAlliance.status}`);
+                    if (currentAlliance.status === 'pending') {
+                        showError('Deine Allianz wartet auf Genehmigung durch einen Super-Admin. Bitte warte auf die Bestätigung.');
+                    } else if (currentAlliance.status === 'rejected') {
+                        showError('Deine Allianz wurde abgelehnt. Kontaktiere einen Super-Admin für weitere Informationen.');
+                    }
+                    return;
+                }
+                
+                // Lade Dashboard-Daten
+                displayAllianceInfo();
+                
+                // Versuche Firebase zu initialisieren für erweiterte Features
+                try {
+                    await initializeFirebaseForAlliance();
+                    console.log('✅ Firebase initialisiert, lade erweiterte Features...');
+                    loadActiveMembers();
+                    loadChatMessages();
+                } catch (error) {
+                    console.warn('⚠️ Firebase nicht verfügbar, verwende lokale Features:', error.message);
+                    loadActiveMembersLocal();
+                    loadChatMessagesLocal();
+                }
+                
+                // Initialisiere Permission Manager
+                await initializePermissionManager();
+                loadPermissions();
+                loadMemberManagement();
+                
+                console.log('🎉 Individuelles Allianz-Dashboard (ID) erfolgreich geladen');
+                
+            } catch (error) {
+                console.error('❌ Fehler beim Laden der individuellen Allianz-Daten (ID):', error);
                 showError('Fehler beim Laden der Allianz-Daten: ' + error.message);
             }
         }

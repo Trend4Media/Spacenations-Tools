@@ -1159,19 +1159,24 @@
             });
         }
         
-        // Redirect-Funktion für Allianz-Dashboard
-        function redirectToAllianceDashboard() {
+        // Redirect-Funktion für individuelles Allianz-Dashboard
+        async function redirectToAllianceDashboard() {
             try {
-                console.log('🚀 Leite zum Allianz-Dashboard weiter...');
+                console.log('🚀 Leite zum individuellen Allianz-Dashboard weiter...');
                 
                 // Lade aktuelle Allianz-Daten
                 const storedAlliance = localStorage.getItem('currentAlliance');
                 const storedUsername = localStorage.getItem('currentUsername');
                 
                 if (storedAlliance && storedUsername) {
-                    console.log('✅ Allianz-Daten gefunden, speichere für Dashboard');
-                    // Daten sind bereits in localStorage, weiterleiten
-                    window.location.href = 'alliance-dashboard.html';
+                    const allianceData = JSON.parse(storedAlliance);
+                    console.log('✅ Allianz-Daten gefunden:', allianceData.name);
+                    
+                    // Verwende individuelles Dashboard mit Allianz-ID
+                    const individualDashboardUrl = `alliance-dashboard.html?id=${allianceData.id}&username=${encodeURIComponent(storedUsername)}`;
+                    console.log('🏰 Weiterleitung zu individuellem Dashboard:', individualDashboardUrl);
+                    
+                    window.location.href = individualDashboardUrl;
                 } else {
                     console.log('⚠️ Keine Allianz-Daten gefunden, verwende Redirect-System');
                     // Fallback: Verwende das Redirect-System
