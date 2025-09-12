@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kompletter Logout - Spacenations Tools</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e0e0e0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .logout-container {
+            background: rgba(0,0,0,0.8);
+            border: 2px solid #ef4444;
+            border-radius: 14px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(239,68,68,0.3);
+        }
+        
+        h1 {
+            color: #ef4444;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+        
+        .warning {
+            background: rgba(239,68,68,0.1);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn.danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        .btn.danger:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            transform: translateY(-2px);
+        }
+        
+        .btn.primary {
+            background: linear-gradient(135deg, #3a5998, #4a90e2);
+            color: white;
+        }
+        
+        .btn.primary:hover {
+            background: linear-gradient(135deg, #4a90e2, #5ba0f2);
+            transform: translateY(-2px);
+        }
+        
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .status.info {
+            background: rgba(59,130,246,0.1);
+            border: 1px solid #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .status.success {
+            background: rgba(34,197,94,0.1);
+            border: 1px solid #22c55e;
+            color: #22c55e;
+        }
+        
+        .status.error {
+            background: rgba(239,68,68,0.1);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+        
+        .steps {
+            text-align: left;
+            margin: 20px 0;
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .steps h3 {
+            color: #ff8c42;
+            margin-bottom: 15px;
+        }
+        
+        .steps ol {
+            color: #b0b0b0;
+            line-height: 1.6;
+        }
+        
+        .current-user {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="logout-container">
+        <h1>🚪 Kompletter Logout</h1>
+        
+        <div class="warning">
+            <strong>⚠️ Achtung:</strong> Dies wird Sie von allen Spacenations Tools abmelden und alle gespeicherten Daten löschen.
+        </div>
+        
+        <div id="current-user-info" class="current-user" style="display: none;">
+            <h3>👤 Aktuell angemeldet:</h3>
+            <div id="user-details"></div>
+        </div>
+        
+        <div id="status"></div>
+        
+        <div>
+            <button class="btn danger" onclick="performCompleteLogout()">
+                🚪 Komplett abmelden
+            </button>
+            <button class="btn primary" onclick="goToHome()">
+                🏠 Zur Startseite
+            </button>
+        </div>
+        
+        <div class="steps">
+            <h3>📋 Was passiert beim Logout:</h3>
+            <ol>
+                <li>Firebase Auth Session wird beendet</li>
+                <li>Alle lokalen Speicherdaten werden gelöscht</li>
+                <li>Session Storage wird geleert</li>
+                <li>Local Storage wird geleert</li>
+                <li>Cookies werden entfernt</li>
+                <li>Automatische Weiterleitung zur Startseite</li>
+            </ol>
+        </div>
+        
+        <div style="margin-top: 30px; font-size: 0.9rem; color: #b0b0b0;">
+            <p><strong>Hinweis:</strong> Falls Sie Probleme haben, können Sie auch:</p>
+            <ul style="text-align: left; margin-top: 10px;">
+                <li>Browser komplett schließen und neu öffnen</li>
+                <li>Inkognito/Privat-Modus verwenden</li>
+                <li>Browser-Daten manuell löschen</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth-manager.js"></script>
+
+    <script>
+        let currentUser = null;
+
+        // Initialize and check current user
+        async function init() {
+            try {
+                await window.FirebaseConfig.waitForReady();
+                
+                const user = window.AuthAPI.getCurrentUser();
+                const userData = window.AuthAPI.getUserData();
+                
+                if (user) {
+                    currentUser = user;
+                    showCurrentUser(user, userData);
+                    showStatus('Benutzer erkannt. Bereit für Logout.', 'info');
+                } else {
+                    showStatus('Kein Benutzer angemeldet.', 'info');
+                }
+                
+            } catch (error) {
+                console.error('Init error:', error);
+                showStatus('Fehler beim Initialisieren: ' + error.message, 'error');
+            }
+        }
+
+        // Show current user info
+        function showCurrentUser(user, userData) {
+            const userInfoDiv = document.getElementById('current-user-info');
+            const userDetailsDiv = document.getElementById('user-details');
+            
+            userDetailsDiv.innerHTML = `
+                <div><strong>E-Mail:</strong> ${user.email}</div>
+                <div><strong>Super-Admin:</strong> ${userData?.isSuperAdmin === true ? '✅ Ja' : '❌ Nein'}</div>
+                <div><strong>Alliance-Admin:</strong> ${userData?.isAllianceAdmin === true ? '✅ Ja' : '❌ Nein'}</div>
+                <div><strong>UID:</strong> ${user.uid}</div>
+            `;
+            
+            userInfoDiv.style.display = 'block';
+        }
+
+        // Perform complete logout
+        async function performCompleteLogout() {
+            try {
+                showStatus('🚪 Logout wird durchgeführt...', 'info');
+                
+                // Step 1: Firebase Auth Logout
+                if (currentUser) {
+                    await window.AuthAPI.logout();
+                    console.log('✅ Firebase Auth Logout erfolgreich');
+                }
+                
+                // Step 2: Clear all storage
+                clearAllStorage();
+                
+                // Step 3: Clear cookies
+                clearCookies();
+                
+                // Step 4: Clear session data
+                clearSessionData();
+                
+                showStatus('✅ Kompletter Logout erfolgreich! Weiterleitung in 3 Sekunden...', 'success');
+                
+                // Redirect after 3 seconds
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Logout error:', error);
+                showStatus('❌ Fehler beim Logout: ' + error.message, 'error');
+                
+                // Even if Firebase logout fails, clear local data
+                clearAllStorage();
+                clearCookies();
+                clearSessionData();
+                
+                showStatus('⚠️ Firebase Logout fehlgeschlagen, aber lokale Daten wurden gelöscht. Seite wird neu geladen...', 'error');
+                
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            }
+        }
+
+        // Clear all browser storage
+        function clearAllStorage() {
+            try {
+                // Clear localStorage
+                localStorage.clear();
+                console.log('✅ localStorage geleert');
+                
+                // Clear sessionStorage
+                sessionStorage.clear();
+                console.log('✅ sessionStorage geleert');
+                
+                // Clear IndexedDB (if available)
+                if ('indexedDB' in window) {
+                    indexedDB.databases().then(databases => {
+                        databases.forEach(db => {
+                            indexedDB.deleteDatabase(db.name);
+                        });
+                    }).catch(() => {
+                        console.warn('⚠️ IndexedDB konnte nicht geleert werden');
+                    });
+                }
+                
+            } catch (error) {
+                console.warn('⚠️ Fehler beim Leeren des Speichers:', error);
+            }
+        }
+
+        // Clear cookies
+        function clearCookies() {
+            try {
+                // Get all cookies
+                const cookies = document.cookie.split(";");
+                
+                // Clear each cookie
+                cookies.forEach(cookie => {
+                    const eqPos = cookie.indexOf("=");
+                    const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+                    
+                    // Clear cookie for current domain
+                    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+                    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=" + window.location.hostname;
+                    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=." + window.location.hostname;
+                });
+                
+                console.log('✅ Cookies geleert');
+                
+            } catch (error) {
+                console.warn('⚠️ Fehler beim Leeren der Cookies:', error);
+            }
+        }
+
+        // Clear session data
+        function clearSessionData() {
+            try {
+                // Clear any cached data
+                if ('caches' in window) {
+                    caches.keys().then(names => {
+                        names.forEach(name => {
+                            caches.delete(name);
+                        });
+                    }).catch(() => {
+                        console.warn('⚠️ Cache konnte nicht geleert werden');
+                    });
+                }
+                
+                // Clear service worker registrations
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.getRegistrations().then(registrations => {
+                        registrations.forEach(registration => {
+                            registration.unregister();
+                        });
+                    }).catch(() => {
+                        console.warn('⚠️ Service Workers konnten nicht entfernt werden');
+                    });
+                }
+                
+                console.log('✅ Session-Daten geleert');
+                
+            } catch (error) {
+                console.warn('⚠️ Fehler beim Leeren der Session-Daten:', error);
+            }
+        }
+
+        // Show status message
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = message;
+            statusDiv.className = `status ${type}`;
+        }
+
+        // Go to home page
+        function goToHome() {
+            window.location.href = 'index.html';
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
