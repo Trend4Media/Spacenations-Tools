@@ -48,7 +48,30 @@ class AllianceMemberManager {
                 throw new Error('Allianz nicht gefunden');
             }
 
-            this.isAdmin = allianceData.admin === this.currentUser || allianceData.founder === this.currentUser;
+            // Prüfe Admin-Status aus Alliance-Daten
+            let adminFromAlliance = allianceData.admin === this.currentUser || allianceData.founder === this.currentUser;
+            
+            // Prüfe zusätzlich User-Datenbank für allianceRole
+            let adminFromUserData = false;
+            try {
+                const userDoc = await db.collection('users').doc(this.currentUser).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    adminFromUserData = userData.allianceRole === 'admin' || userData.allianceRole === 'founder';
+                }
+            } catch (error) {
+                console.warn('⚠️ Konnte User-Daten nicht laden:', error);
+            }
+            
+            // User ist Admin wenn er in Alliance-Daten ODER User-Daten als Admin markiert ist
+            this.isAdmin = adminFromAlliance || adminFromUserData;
+            
+            console.log('👑 MemberManager Admin-Status:', {
+                currentUser: this.currentUser,
+                adminFromAlliance: adminFromAlliance,
+                adminFromUserData: adminFromUserData,
+                finalStatus: this.isAdmin
+            });
             
             // Setze Allianzadmin-Berechtigung für den Admin
             if (this.isAdmin && this.permissionManager) {

@@ -875,6 +875,36 @@
         let permissionManager = null;
         let memberManager = null;
 
+        // Funktion zur korrekten Admin-Status-Prüfung
+        async function checkAdminStatus(username) {
+            // Prüfe zuerst Alliance-Daten
+            let adminFromAlliance = currentAlliance.admin === username || currentAlliance.founder === username;
+            
+            // Prüfe zusätzlich User-Datenbank für allianceRole
+            let adminFromUserData = false;
+            try {
+                const userDoc = await db.collection('users').doc(username).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    adminFromUserData = userData.allianceRole === 'admin' || userData.allianceRole === 'founder';
+                }
+            } catch (error) {
+                console.warn('⚠️ Konnte User-Daten nicht laden:', error);
+            }
+            
+            // User ist Admin wenn er in Alliance-Daten ODER User-Daten als Admin markiert ist
+            const isUserAdmin = adminFromAlliance || adminFromUserData;
+            
+            console.log('👑 Admin-Status-Prüfung:', {
+                username: username,
+                adminFromAlliance: adminFromAlliance,
+                adminFromUserData: adminFromUserData,
+                finalStatus: isUserAdmin
+            });
+            
+            return isUserAdmin;
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             console.log('Alliance Dashboard loaded');
             
@@ -957,7 +987,7 @@
                 }
                 
                 // Prüfe ob User Admin ist
-                isAdmin = currentAlliance.admin === username || currentAlliance.founder === username;
+                isAdmin = await checkAdminStatus(username);
                 console.log('👑 Admin-Status:', isAdmin);
                 
                 // Prüfe Allianz-Status
@@ -1029,7 +1059,7 @@
                 }
                 
                 // Prüfe ob User Admin ist
-                isAdmin = currentAlliance.admin === username || currentAlliance.founder === username;
+                isAdmin = await checkAdminStatus(username);
                 console.log('👑 Admin-Status:', isAdmin);
                 
                 // Prüfe Allianz-Status
@@ -1111,7 +1141,7 @@
                 }
                 
                 // Prüfe ob User Admin ist
-                isAdmin = currentAlliance.admin === username || currentAlliance.founder === username;
+                isAdmin = await checkAdminStatus(username);
                 console.log('👑 Admin-Status:', isAdmin);
                 
                 // Prüfe Allianz-Status
@@ -1252,7 +1282,7 @@
                 }
 
                 // Prüfe ob User Admin ist
-                isAdmin = currentAlliance.admin === username;
+                isAdmin = await checkAdminStatus(username);
 
                 displayAllianceInfo();
                 loadActiveMembers();
@@ -1275,7 +1305,8 @@
             const localAlliance = localStorage.getItem('userAlliance');
             if (localAlliance) {
                 currentAlliance = JSON.parse(localAlliance);
-                isAdmin = true; // Für lokale Entwicklung
+                const username = localStorage.getItem('currentUsername') || 'TestUser';
+                isAdmin = await checkAdminStatus(username);
                 displayAllianceInfo();
                 loadActiveMembersLocal();
                 loadChatMessagesLocal();
