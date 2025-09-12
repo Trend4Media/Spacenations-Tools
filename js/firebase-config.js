@@ -12,10 +12,28 @@ function checkFirebaseAvailability() {
     console.log('✅ Firebase SDK erfolgreich geladen');
 }
 
+// Check for browser extension conflicts
+function checkBrowserExtensions() {
+    // Check for common problematic extensions
+    const userAgent = navigator.userAgent.toLowerCase();
+    const hasExtensions = document.querySelector('script[src*="3agents"]') || 
+                         document.querySelector('script[src*="extension"]') ||
+                         window.chrome?.runtime;
+    
+    if (hasExtensions) {
+        console.warn('🔍 Browser-Extensions erkannt - verwende kompatiblen Modus');
+        return true;
+    }
+    return false;
+}
+
 // Firebase initialisieren
 function initializeFirebase() {
     try {
         checkFirebaseAvailability();
+        
+        // Check for browser extension conflicts
+        const hasExtensions = checkBrowserExtensions();
         
         // Ihre Firebase-Konfiguration
         const firebaseConfig = {
@@ -80,6 +98,9 @@ function waitForFirebase() {
 // Auto-Initialisierung wenn DOM geladen ist
 document.addEventListener('DOMContentLoaded', async () => {
     try {
+        // Wait a bit to avoid browser extension conflicts
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         await waitForFirebase();
         console.log('🚀 Firebase bereit für andere Module');
         
@@ -96,6 +117,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.dispatchEvent(new CustomEvent('firebaseError', { 
             detail: { error: error.message } 
         }));
+    }
+});
+
+// Additional initialization with retry mechanism
+window.addEventListener('load', async () => {
+    // Retry Firebase initialization if not ready
+    if (!window.firebaseServices?.initialized) {
+        console.log('🔄 Retry Firebase initialization...');
+        try {
+            await waitForFirebase();
+            console.log('🚀 Firebase Retry erfolgreich');
+            document.dispatchEvent(new CustomEvent('firebaseReady'));
+        } catch (error) {
+            console.error('❌ Firebase Retry fehlgeschlagen:', error);
+            handleFirebaseInitError(error);
+        }
     }
 });
 

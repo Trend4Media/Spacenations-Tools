@@ -921,10 +921,33 @@ ${state.proximaData.length > 10 ? `\n... und ${state.proximaData.length - 10} we
         }
     }
 
-    // Initialize dashboard
+    // Initialize dashboard with retry mechanism
     async function gateAndInit(){
         try {
-            await window.AdminAuth.requireSuperAdmin();
+            // Show loading state
+            document.getElementById('admin-user-info').innerHTML = '🔄 Firebase wird initialisiert...';
+            
+            // Wait for Firebase with retry
+            let retryCount = 0;
+            const maxRetries = 3;
+            
+            while (retryCount < maxRetries) {
+                try {
+                    await window.AdminAuth.requireSuperAdmin();
+                    break; // Success
+                } catch (error) {
+                    retryCount++;
+                    console.warn(`⚠️ Versuch ${retryCount}/${maxRetries} fehlgeschlagen:`, error);
+                    
+                    if (retryCount < maxRetries) {
+                        document.getElementById('admin-user-info').innerHTML = `🔄 Retry ${retryCount}/${maxRetries}...`;
+                        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+                    } else {
+                        throw error; // Final attempt failed
+                    }
+                }
+            }
+            
             document.getElementById('access-ok').style.display = 'block';
             
             // Update admin user info with current status
@@ -942,7 +965,20 @@ ${state.proximaData.length > 10 ? `\n... und ${state.proximaData.length - 10} we
         } catch (e){
             console.warn('Access denied', e);
             document.getElementById('access-denied').style.display = 'block';
-            setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+            
+            // Show detailed error message
+            const errorDiv = document.getElementById('access-denied');
+            errorDiv.innerHTML = `
+                <strong>Zugriff verweigert: Nur Super-Admins</strong><br><br>
+                <strong>Fehler:</strong> ${e.message}<br><br>
+                <strong>Lösungen:</strong><br>
+                1. Verwenden Sie das Setup-Tool: <a href="setup-super-admin.html" style="color: #ff8c42;">Setup-Tool öffnen</a><br>
+                2. Seite neu laden (F5)<br>
+                3. Browser-Extensions temporär deaktivieren<br><br>
+                <strong>Debugging:</strong> Öffnen Sie die Browser-Konsole (F12) für weitere Details.
+            `;
+            
+            setTimeout(() => { window.location.href = 'index.html'; }, 5000);
         }
     }
 

@@ -27,7 +27,19 @@
         }
 
         async requireSuperAdmin(){
-            await window.AuthAPI.waitForInit();
+            try {
+                await window.AuthAPI.waitForInit();
+            } catch (error) {
+                console.warn('⚠️ AuthAPI nicht bereit, versuche direkte Firebase-Initialisierung...');
+                // Try direct Firebase initialization
+                try {
+                    await window.FirebaseConfig.waitForReady();
+                } catch (firebaseError) {
+                    console.error('❌ Firebase-Initialisierung fehlgeschlagen:', firebaseError);
+                    throw new Error('Firebase-Verbindung fehlgeschlagen. Bitte Seite neu laden.');
+                }
+            }
+            
             const user = window.AuthAPI.getCurrentUser();
             
             if (!user) {
