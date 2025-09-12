@@ -687,8 +687,147 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             console.log('Alliance Dashboard loaded');
-            initializeAllianceDashboard();
+            
+            // Lade Allianz-Daten basierend auf URL-Parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const allianceTag = urlParams.get('alliance');
+            const username = urlParams.get('username');
+            
+            if (allianceTag && username) {
+                console.log('🔍 Lade individuelle Allianz-Daten:', { allianceTag, username });
+                loadIndividualAllianceData(allianceTag, username);
+            } else {
+                console.log('⚠️ Keine Allianz-Parameter gefunden, verwende Standard-Initialisierung');
+                initializeAllianceDashboard();
+            }
         });
+
+        async function loadIndividualAllianceData(allianceTag, username) {
+            try {
+                console.log('🚀 Lade individuelle Allianz-Daten...');
+                
+                // Initialisiere Firebase
+                await initializeFirebaseForAlliance();
+                
+                const db = window.FirebaseConfig.getDB();
+                
+                // Suche Allianz nach Tag oder ID
+                let allianceQuery = await db.collection('alliances')
+                    .where('tag', '==', allianceTag)
+                    .get();
+                
+                if (allianceQuery.empty) {
+                    // Fallback: Suche nach ID
+                    allianceQuery = await db.collection('alliances')
+                        .where('__name__', '==', allianceTag)
+                        .get();
+                }
+                
+                if (allianceQuery.empty) {
+                    throw new Error(`Allianz mit Tag/ID "${allianceTag}" nicht gefunden`);
+                }
+                
+                const allianceDoc = allianceQuery.docs[0];
+                currentAlliance = {
+                    id: allianceDoc.id,
+                    ...allianceDoc.data()
+                };
+                
+                console.log('✅ Allianz gefunden:', currentAlliance.name);
+                
+                // Prüfe ob User Mitglied ist
+                if (!currentAlliance.members || !currentAlliance.members.includes(username)) {
+                    throw new Error(`Du bist kein Mitglied der Allianz "${currentAlliance.name}"`);
+                }
+                
+                // Prüfe ob User Admin ist
+                isAdmin = currentAlliance.admin === username || currentAlliance.founder === username;
+                console.log('👑 Admin-Status:', isAdmin);
+                
+                // Prüfe Allianz-Status
+                if (currentAlliance.status !== 'approved') {
+                    showError(`Deine Allianz wurde noch nicht genehmigt. Status: ${currentAlliance.status}`);
+                    if (currentAlliance.status === 'pending') {
+                        showError('Deine Allianz wartet auf Genehmigung durch einen Super-Admin. Bitte warte auf die Bestätigung.');
+                    } else if (currentAlliance.status === 'rejected') {
+                        showError('Deine Allianz wurde abgelehnt. Kontaktiere einen Super-Admin für weitere Informationen.');
+                    }
+                    return;
+                }
+                
+                // Lade Dashboard-Daten
+                displayAllianceInfo();
+                loadActiveMembers();
+                loadChatMessages();
+                
+                // Initialisiere Permission Manager
+                initializePermissionManager().then(() => {
+                    loadPermissions();
+                    loadMemberManagement();
+                });
+                
+                console.log('🎉 Individuelles Allianz-Dashboard erfolgreich geladen');
+                
+            } catch (error) {
+                console.error('❌ Fehler beim Laden der individuellen Allianz-Daten:', error);
+                showError('Fehler beim Laden der Allianz-Daten: ' + error.message);
+            }
+        }
+        
+        async function initializeFirebaseForAlliance() {
+            try {
+                console.log('🔥 Initialisiere Firebase für Allianz-Dashboard...');
+                
+                // Prüfe ob Firebase bereits initialisiert ist
+                if (typeof window.FirebaseConfig !== 'undefined' && window.FirebaseConfig.isReady()) {
+                    console.log('✅ Firebase bereits initialisiert');
+                    return;
+                }
+                
+                // Prüfe ob Firebase verfügbar ist
+                if (typeof firebase === 'undefined') {
+                    throw new Error('Firebase-Scripts nicht geladen');
+                }
+                
+                // Initialisiere Firebase
+                const firebaseConfig = {
+                    apiKey: 'AIzaSyDr4-ap_EubUn0UdP7hkEpS2jkzLIVgvyc',
+                    authDomain: 'spacenations-tools.firebaseapp.com',
+                    projectId: 'spacenations-tools',
+                    storageBucket: 'spacenations-tools.firebasestorage.app',
+                    messagingSenderId: '651338201276',
+                    appId: '1:651338201276:web:89e7d9c19dbd2611d3f8b9',
+                    measurementId: 'G-SKWJWH2ERX'
+                };
+                
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                
+                // Teste die Verbindung
+                const db = firebase.firestore();
+                await db.collection('_test').doc('connection').set({
+                    test: true,
+                    timestamp: new Date()
+                });
+                await db.collection('_test').doc('connection').delete();
+                
+                // Erstelle FirebaseConfig Mock
+                window.FirebaseConfig = {
+                    isReady: () => true,
+                    getAuth: () => firebase.auth(),
+                    getDB: () => firebase.firestore(),
+                    getServerTimestamp: () => firebase.firestore.FieldValue.serverTimestamp(),
+                    waitForInit: () => Promise.resolve()
+                };
+                
+                console.log('✅ Firebase erfolgreich initialisiert');
+                
+            } catch (error) {
+                console.error('❌ Firebase-Initialisierung fehlgeschlagen:', error);
+                throw error;
+            }
+        }
 
         async function initializeAllianceDashboard() {
             try {
@@ -770,9 +909,10 @@
                 displayAllianceInfo();
                 loadActiveMembersLocal();
                 loadChatMessagesLocal();
-                await initializePermissionManager();
-                loadPermissions();
-                loadMemberManagement();
+                initializePermissionManager().then(() => {
+                    loadPermissions();
+                    loadMemberManagement();
+                });
             } else {
                 showError('Keine Allianzdaten gefunden');
             }

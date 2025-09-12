@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Allianz-Dashboard - Spacenations Tools</title>
+    
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Razer Color Scheme */
+            --razer-green: #00FF88;
+            --razer-green-dark: #00CC6A;
+            --razer-green-light: #44FF99;
+            --razer-black: #0A0A0A;
+            --razer-dark: #111111;
+            --razer-gray: #1A1A1A;
+            --razer-gray-light: #2A2A2A;
+            --razer-white: #FFFFFF;
+            --razer-silver: #C0C0C0;
+            
+            --text-primary: var(--razer-white);
+            --text-secondary: var(--razer-silver);
+            --text-accent: var(--razer-green);
+            
+            --bg-primary: var(--razer-black);
+            --bg-secondary: var(--razer-dark);
+            --bg-tertiary: var(--razer-gray);
+            --bg-card: var(--razer-gray-light);
+            
+            --glow-green: 0 0 20px rgba(0, 255, 136, 0.5);
+            --glow-green-strong: 0 0 30px rgba(0, 255, 136, 0.8);
+            --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.6);
+            
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            --font-gaming: 'Orbitron', monospace;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-primary);
+            background: linear-gradient(135deg, var(--razer-black) 0%, var(--razer-dark) 50%, var(--razer-gray) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .loading-container {
+            text-align: center;
+            max-width: 600px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow-dark);
+        }
+        
+        .loading-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        .loading-title {
+            font-family: var(--font-gaming);
+            font-size: 2rem;
+            color: var(--razer-green);
+            margin-bottom: 20px;
+            text-shadow: var(--glow-green);
+        }
+        
+        .loading-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+        
+        .loading-steps {
+            text-align: left;
+            margin-bottom: 30px;
+        }
+        
+        .loading-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border-left: 4px solid var(--razer-gray);
+            transition: all 0.3s ease;
+        }
+        
+        .loading-step.active {
+            border-left-color: var(--razer-green);
+            background: rgba(0, 255, 136, 0.1);
+        }
+        
+        .loading-step.completed {
+            border-left-color: var(--razer-green);
+            background: rgba(0, 255, 136, 0.2);
+        }
+        
+        .loading-step-icon {
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .loading-step-text {
+            flex: 1;
+        }
+        
+        .loading-progress {
+            width: 100%;
+            height: 6px;
+            background: var(--razer-gray);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .loading-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--razer-green), var(--razer-green-light));
+            width: 0%;
+            transition: width 0.5s ease;
+            box-shadow: var(--glow-green);
+        }
+        
+        .loading-error {
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            color: #f44336;
+        }
+        
+        .loading-success {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            color: #4CAF50;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--razer-gray);
+            border-radius: 50%;
+            border-top-color: var(--razer-green);
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <div class="loading-icon">🏰</div>
+        <h1 class="loading-title">Allianz-Dashboard</h1>
+        <p class="loading-subtitle">Lade deine Allianz-Informationen...</p>
+        
+        <div class="loading-progress">
+            <div class="loading-progress-bar" id="progress-bar"></div>
+        </div>
+        
+        <div class="loading-steps">
+            <div class="loading-step" id="step-1">
+                <div class="loading-step-icon">🔍</div>
+                <div class="loading-step-text">Benutzer identifizieren</div>
+            </div>
+            <div class="loading-step" id="step-2">
+                <div class="loading-step-icon">🔥</div>
+                <div class="loading-step-text">Firebase verbinden</div>
+            </div>
+            <div class="loading-step" id="step-3">
+                <div class="loading-step-icon">🏰</div>
+                <div class="loading-step-text">Allianz suchen</div>
+            </div>
+            <div class="loading-step" id="step-4">
+                <div class="loading-step-icon">🚀</div>
+                <div class="loading-step-text">Weiterleitung vorbereiten</div>
+            </div>
+        </div>
+        
+        <div id="status-message" class="loading-subtitle"></div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Alliance Redirect Script -->
+    <script src="js/alliance-redirect.js"></script>
+    
+    <script>
+        // Loading-Animation
+        let currentStep = 0;
+        const steps = ['step-1', 'step-2', 'step-3', 'step-4'];
+        const messages = [
+            'Identifiziere Benutzer...',
+            'Verbinde mit Firebase...',
+            'Suche Allianz-Informationen...',
+            'Bereite Weiterleitung vor...'
+        ];
+        
+        function updateStep(stepIndex, status = 'active') {
+            // Alle Schritte zurücksetzen
+            steps.forEach((stepId, index) => {
+                const step = document.getElementById(stepId);
+                step.className = 'loading-step';
+                if (index < stepIndex) {
+                    step.className = 'loading-step completed';
+                } else if (index === stepIndex) {
+                    step.className = `loading-step ${status}`;
+                }
+            });
+            
+            // Progress Bar aktualisieren
+            const progress = ((stepIndex + 1) / steps.length) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+            
+            // Status-Message aktualisieren
+            if (stepIndex < messages.length) {
+                document.getElementById('status-message').textContent = messages[stepIndex];
+            }
+        }
+        
+        function showError(message) {
+            const statusDiv = document.getElementById('status-message');
+            statusDiv.innerHTML = `<div class="loading-error">❌ ${message}</div>`;
+        }
+        
+        function showSuccess(message) {
+            const statusDiv = document.getElementById('status-message');
+            statusDiv.innerHTML = `<div class="loading-success">✅ ${message}</div>`;
+        }
+        
+        // Override der AllianceRedirectManager Methoden für bessere UX
+        const originalInitialize = window.AllianceRedirectManager.prototype.initialize;
+        window.AllianceRedirectManager.prototype.initialize = async function() {
+            try {
+                updateStep(0);
+                
+                // Benutzer identifizieren
+                this.currentUsername = this.getCurrentUsername();
+                if (!this.currentUsername) {
+                    showError('Kein Benutzername gefunden. Bitte melde dich an.');
+                    setTimeout(() => this.redirectToLogin(), 2000);
+                    return;
+                }
+                
+                updateStep(1);
+                
+                // Firebase initialisieren
+                await this.initializeFirebase();
+                
+                updateStep(2);
+                
+                // User-Allianz laden
+                await this.loadUserAlliance();
+                
+                updateStep(3);
+                
+                // Weiterleitung
+                if (this.userAlliance) {
+                    showSuccess(`Weiterleitung zu ${this.userAlliance.name}...`);
+                    setTimeout(() => this.redirectToAllianceDashboard(), 1000);
+                } else {
+                    showError('Du gehörst keiner Allianz an.');
+                    setTimeout(() => this.redirectToUserDashboard(), 2000);
+                }
+                
+            } catch (error) {
+                console.error('Fehler:', error);
+                showError('Fehler beim Laden: ' + error.message);
+                setTimeout(() => this.redirectToUserDashboard(), 2000);
+            }
+        };
+        
+        // Starte den Redirect-Prozess
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStep(0);
+        });
+    </script>
+</body>
+</html>

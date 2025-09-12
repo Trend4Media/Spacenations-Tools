@@ -791,7 +791,7 @@
                     titleElement.textContent = `👑 ${alliance.name} [${alliance.tag}] (Gründer)`;
                     descriptionElement.textContent = `Du hast die Allianz "${alliance.name}" erstellt. Status: ${alliance.status === 'approved' ? 'Genehmigt' : 'Wartet auf Genehmigung'}`;
                     if (alliance.status === 'approved') {
-                        actionsElement.innerHTML = '<a href="alliance-dashboard.html" class="tool-link">Zum Allianzdashboard</a>';
+                        actionsElement.innerHTML = '<a href="alliance-dashboard-redirect.html" class="tool-link">Zum Allianzdashboard</a>';
                     } else {
                         actionsElement.innerHTML = '<span class="tool-link" style="opacity: 0.7;">Wartet auf Genehmigung...</span>';
                     }
