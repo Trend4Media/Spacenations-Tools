@@ -714,6 +714,15 @@
                     
                     console.log('🏰 Allianz gefunden:', alliance.name, 'Status:', alliance.status);
                     
+                    // Speichere Allianz-Daten in localStorage für Dashboard-Zugriff
+                    const allianceData = {
+                        id: allianceId,
+                        ...alliance
+                    };
+                    localStorage.setItem('currentAlliance', JSON.stringify(allianceData));
+                    localStorage.setItem('currentUsername', username);
+                    console.log('💾 Allianz-Daten in localStorage gespeichert');
+                    
                     if (alliance.status === 'approved') {
                         showAllianceStatus('member', alliance, allianceId);
                     } else if (alliance.status === 'pending') {
@@ -734,6 +743,16 @@
                         const alliance = createdAlliancesQuery.docs[0].data();
                         const allianceId = createdAlliancesQuery.docs[0].id;
                         console.log('🏗️ Erstellte Allianz gefunden:', alliance.name, 'Status:', alliance.status);
+                        
+                        // Speichere Allianz-Daten in localStorage für Dashboard-Zugriff
+                        const allianceData = {
+                            id: allianceId,
+                            ...alliance
+                        };
+                        localStorage.setItem('currentAlliance', JSON.stringify(allianceData));
+                        localStorage.setItem('currentUsername', username);
+                        console.log('💾 Erstellte Allianz-Daten in localStorage gespeichert');
+                        
                         showAllianceStatus('founder', alliance, allianceId);
                     } else {
                         console.log('❌ Keine Allianz gefunden');
@@ -800,7 +819,7 @@
                 case 'member':
                     titleElement.textContent = `🤝 ${alliance.name} [${alliance.tag}]`;
                     descriptionElement.textContent = `Du bist Mitglied der Allianz "${alliance.name}".`;
-                    actionsElement.innerHTML = '<a href="alliance-dashboard.html" class="tool-link">Zum Allianzdashboard</a>';
+                    actionsElement.innerHTML = '<a href="alliance-dashboard.html" class="tool-link" onclick="redirectToAllianceDashboard()">Zum Allianzdashboard</a>';
                     break;
                     
                 case 'error':
@@ -1138,6 +1157,31 @@
                 auth: typeof firebase !== 'undefined' && typeof firebase.auth === 'function',
                 firestore: typeof firebase !== 'undefined' && typeof firebase.firestore === 'function'
             });
+        }
+        
+        // Redirect-Funktion für Allianz-Dashboard
+        function redirectToAllianceDashboard() {
+            try {
+                console.log('🚀 Leite zum Allianz-Dashboard weiter...');
+                
+                // Lade aktuelle Allianz-Daten
+                const storedAlliance = localStorage.getItem('currentAlliance');
+                const storedUsername = localStorage.getItem('currentUsername');
+                
+                if (storedAlliance && storedUsername) {
+                    console.log('✅ Allianz-Daten gefunden, speichere für Dashboard');
+                    // Daten sind bereits in localStorage, weiterleiten
+                    window.location.href = 'alliance-dashboard.html';
+                } else {
+                    console.log('⚠️ Keine Allianz-Daten gefunden, verwende Redirect-System');
+                    // Fallback: Verwende das Redirect-System
+                    window.location.href = 'alliance-dashboard-redirect.html';
+                }
+                
+            } catch (error) {
+                console.error('❌ Fehler beim Weiterleiten zum Allianz-Dashboard:', error);
+                alert('Fehler beim Weiterleiten zum Allianz-Dashboard: ' + error.message);
+            }
         }
         
         // Debug-Button hinzufügen (nur für Entwicklung)

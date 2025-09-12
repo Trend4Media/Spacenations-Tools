@@ -705,11 +705,78 @@
                 console.log('✅ Allianz-Parameter gefunden, lade individuelle Daten:', { allianceTag, username });
                 loadIndividualAllianceData(allianceTag, username);
             } else {
-                console.log('⚠️ Keine Allianz-Parameter gefunden, verwende Standard-Initialisierung');
-                console.log('💡 Tipp: Gehe über das User-Dashboard zum Allianz-Dashboard');
-                initializeAllianceDashboard();
+                console.log('⚠️ Keine Allianz-Parameter gefunden, versuche localStorage-Daten zu laden');
+                
+                // Versuche Allianz-Daten aus localStorage zu laden
+                const storedAlliance = localStorage.getItem('currentAlliance');
+                const storedUsername = localStorage.getItem('currentUsername');
+                
+                if (storedAlliance && storedUsername) {
+                    console.log('✅ Allianz-Daten aus localStorage gefunden:', { 
+                        alliance: JSON.parse(storedAlliance).name,
+                        username: storedUsername 
+                    });
+                    loadAllianceFromLocalStorage(storedAlliance, storedUsername);
+                } else {
+                    console.log('❌ Keine Allianz-Daten gefunden, verwende Standard-Initialisierung');
+                    console.log('💡 Tipp: Gehe über das User-Dashboard zum Allianz-Dashboard');
+                    initializeAllianceDashboard();
+                }
             }
         });
+
+        async function loadAllianceFromLocalStorage(storedAlliance, storedUsername) {
+            try {
+                console.log('🚀 Lade Allianz-Daten aus localStorage...');
+                
+                // Parse Allianz-Daten
+                currentAlliance = JSON.parse(storedAlliance);
+                const username = storedUsername;
+                
+                console.log('✅ Allianz-Daten geladen:', {
+                    name: currentAlliance.name,
+                    tag: currentAlliance.tag,
+                    status: currentAlliance.status,
+                    members: currentAlliance.members
+                });
+                
+                // Prüfe ob User Mitglied ist
+                if (!currentAlliance.members || !currentAlliance.members.includes(username)) {
+                    throw new Error(`Du bist kein Mitglied der Allianz "${currentAlliance.name}"`);
+                }
+                
+                // Prüfe ob User Admin ist
+                isAdmin = currentAlliance.admin === username || currentAlliance.founder === username;
+                console.log('👑 Admin-Status:', isAdmin);
+                
+                // Prüfe Allianz-Status
+                if (currentAlliance.status !== 'approved') {
+                    showError(`Deine Allianz wurde noch nicht genehmigt. Status: ${currentAlliance.status}`);
+                    if (currentAlliance.status === 'pending') {
+                        showError('Deine Allianz wartet auf Genehmigung durch einen Super-Admin. Bitte warte auf die Bestätigung.');
+                    } else if (currentAlliance.status === 'rejected') {
+                        showError('Deine Allianz wurde abgelehnt. Kontaktiere einen Super-Admin für weitere Informationen.');
+                    }
+                    return;
+                }
+                
+                // Lade Dashboard-Daten
+                displayAllianceInfo();
+                loadActiveMembers();
+                loadChatMessages();
+                
+                // Initialisiere Permission Manager
+                await initializePermissionManager();
+                loadPermissions();
+                loadMemberManagement();
+                
+                console.log('🎉 Allianz-Dashboard aus localStorage erfolgreich geladen');
+                
+            } catch (error) {
+                console.error('❌ Fehler beim Laden der Allianz-Daten aus localStorage:', error);
+                showError('Fehler beim Laden der Allianz-Daten: ' + error.message);
+            }
+        }
 
         async function loadIndividualAllianceData(allianceTag, username) {
             try {
