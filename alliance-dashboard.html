@@ -778,8 +778,18 @@
                 
                 // Lade Dashboard-Daten
                 displayAllianceInfo();
-                loadActiveMembers();
-                loadChatMessages();
+                
+                // Versuche Firebase zu initialisieren für erweiterte Features
+                try {
+                    await initializeFirebaseForAlliance();
+                    console.log('✅ Firebase initialisiert, lade erweiterte Features...');
+                    loadActiveMembers();
+                    loadChatMessages();
+                } catch (error) {
+                    console.warn('⚠️ Firebase nicht verfügbar, verwende lokale Features:', error.message);
+                    loadActiveMembersLocal();
+                    loadChatMessagesLocal();
+                }
                 
                 // Initialisiere Permission Manager
                 await initializePermissionManager();
@@ -1024,6 +1034,13 @@
 
         async function loadActiveMembers() {
             try {
+                // Prüfe ob Firebase verfügbar ist
+                if (typeof window.FirebaseConfig === 'undefined' || !window.FirebaseConfig.isReady()) {
+                    console.log('⚠️ Firebase nicht verfügbar, verwende lokale Mitglieder-Daten');
+                    loadActiveMembersLocal();
+                    return;
+                }
+                
                 const db = window.FirebaseConfig.getDB();
                 
                 // Simuliere aktive Mitglieder (in einer echten App würde man Online-Status tracken)
@@ -1095,6 +1112,13 @@
 
         async function loadChatMessages() {
             try {
+                // Prüfe ob Firebase verfügbar ist
+                if (typeof window.FirebaseConfig === 'undefined' || !window.FirebaseConfig.isReady()) {
+                    console.log('⚠️ Firebase nicht verfügbar, verwende lokale Chat-Daten');
+                    loadChatMessagesLocal();
+                    return;
+                }
+                
                 const db = window.FirebaseConfig.getDB();
                 
                 // Lade Chat-Nachrichten
