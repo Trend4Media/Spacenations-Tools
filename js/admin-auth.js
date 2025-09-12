@@ -34,7 +34,7 @@
                 throw new Error('Nicht angemeldet');
             }
 
-            console.log('🔍 Prüfe Super-Admin Status für:', user.email);
+            console.log('🔍 Prüfe Super-Admin Status für:', user.email, 'UID:', user.uid);
             
             // Always check directly from Firestore for most up-to-date data
             const db = window.FirebaseConfig.getDB();
@@ -42,18 +42,59 @@
             
             if (!doc.exists) {
                 console.warn('⚠️ Benutzerdokument nicht gefunden in Firestore');
-                throw new Error('Benutzerdokument nicht gefunden');
+                console.log('🔧 Erstelle Benutzerdokument automatisch...');
+                
+                // Automatically create user document with Super Admin rights
+                try {
+                    await db.collection('users').doc(user.uid).set({
+                        email: user.email,
+                        username: user.displayName || user.email.split('@')[0],
+                        isSuperAdmin: true,
+                        isAllianceAdmin: false,
+                        createdAt: window.FirebaseConfig.getServerTimestamp(),
+                        lastLogin: window.FirebaseConfig.getServerTimestamp(),
+                        autoCreated: true
+                    });
+                    
+                    console.log('✅ Benutzerdokument automatisch erstellt mit Super-Admin Rechten');
+                    return true;
+                    
+                } catch (error) {
+                    console.error('❌ Fehler beim Erstellen des Benutzerdokuments:', error);
+                    throw new Error('Benutzerdokument konnte nicht erstellt werden: ' + error.message);
+                }
             }
             
             const userData = doc.data();
             console.log('📊 Benutzerdaten aus Firestore:', userData);
+            console.log('🔍 isSuperAdmin Wert:', userData.isSuperAdmin, 'Typ:', typeof userData.isSuperAdmin);
             
+            // Check if isSuperAdmin is explicitly true
             if (userData && userData.isSuperAdmin === true) {
                 console.log('✅ Super-Admin Status bestätigt');
                 return true;
             }
 
+            // If user document exists but no Super Admin rights, show detailed error
             console.log('❌ Keine Super-Admin Berechtigung gefunden');
+            console.log('🔧 Benutzerdokument vorhanden, aber isSuperAdmin nicht true');
+            console.log('📋 Verfügbare Felder:', Object.keys(userData));
+            
+            // Show alert with detailed information for debugging
+            const errorMsg = `
+Super-Admin Zugriff verweigert!
+
+Benutzer: ${user.email}
+UID: ${user.uid}
+isSuperAdmin: ${userData.isSuperAdmin} (${typeof userData.isSuperAdmin})
+
+Verfügbare Felder: ${Object.keys(userData).join(', ')}
+
+Bitte verwenden Sie das Setup-Tool:
+https://trend4media.github.io/Spacenations-Tools/setup-super-admin.html
+            `;
+            
+            alert(errorMsg);
             throw new Error('Zugriff verweigert: Nur Super-Admins');
         }
 

@@ -180,6 +180,10 @@
         </div>
         
         <div class="form-group">
+            <button class="btn" onclick="setCurrentUserAsSuperAdmin()">Aktuellen Benutzer als Super-Admin setzen</button>
+        </div>
+        
+        <div class="form-group">
             <button class="btn danger" onclick="removeSuperAdmin()">Super-Admin Status entfernen</button>
         </div>
         
@@ -243,6 +247,18 @@
                     allUsers.push({ id: doc.id, ...doc.data() });
                 });
                 
+                // Check if current user is in the list
+                if (currentUser && !allUsers.find(u => u.id === currentUser.uid)) {
+                    // Add current user to the list if not found
+                    allUsers.push({
+                        id: currentUser.uid,
+                        email: currentUser.email,
+                        username: currentUser.displayName || currentUser.email?.split('@')[0] || 'Unknown',
+                        isSuperAdmin: false,
+                        notInFirestore: true
+                    });
+                }
+                
                 renderUserList();
                 populateUserSelect();
                 
@@ -301,13 +317,34 @@
             
             try {
                 const db = window.FirebaseConfig.getDB();
-                await db.collection('users').doc(userId).update({
-                    isSuperAdmin: true,
-                    updatedAt: window.FirebaseConfig.getServerTimestamp(),
-                    updatedBy: currentUser ? currentUser.uid : 'setup-tool'
-                });
+                const userRef = db.collection('users').doc(userId);
                 
-                showStatus('✅ Benutzer wurde als Super-Admin gesetzt!', 'success');
+                // Check if document exists
+                const doc = await userRef.get();
+                
+                if (!doc.exists) {
+                    // Create new document
+                    const selectedUser = allUsers.find(u => u.id === userId);
+                    await userRef.set({
+                        email: selectedUser.email || '',
+                        username: selectedUser.username || selectedUser.email?.split('@')[0] || '',
+                        isSuperAdmin: true,
+                        isAllianceAdmin: false,
+                        createdAt: window.FirebaseConfig.getServerTimestamp(),
+                        lastLogin: window.FirebaseConfig.getServerTimestamp(),
+                        createdBy: 'setup-tool'
+                    });
+                    showStatus('✅ Benutzerdokument erstellt und als Super-Admin gesetzt!', 'success');
+                } else {
+                    // Update existing document
+                    await userRef.update({
+                        isSuperAdmin: true,
+                        updatedAt: window.FirebaseConfig.getServerTimestamp(),
+                        updatedBy: currentUser ? currentUser.uid : 'setup-tool'
+                    });
+                    showStatus('✅ Benutzer wurde als Super-Admin gesetzt!', 'success');
+                }
+                
                 loadUsers(); // Refresh user list
                 
             } catch (error) {
@@ -359,7 +396,14 @@
                 const doc = await db.collection('users').doc(user.uid).get();
                 
                 if (!doc.exists) {
-                    showStatus('Benutzerdokument nicht in Firestore gefunden', 'error');
+                    showStatus(`
+                        <strong>Aktueller Benutzer:</strong><br>
+                        E-Mail: ${user.email}<br>
+                        UID: ${user.uid}<br>
+                        Status: ❌ Benutzerdokument nicht in Firestore gefunden<br>
+                        <br>
+                        <strong>Lösung:</strong> Klicken Sie auf "Aktuellen Benutzer als Super-Admin setzen"
+                    `, 'error');
                     return;
                 }
                 
@@ -372,11 +416,70 @@
                     UID: ${user.uid}<br>
                     Super-Admin: ${isSuperAdmin ? '✅ Ja' : '❌ Nein'}<br>
                     Username: ${userData.username || 'Nicht gesetzt'}<br>
-                    Alliance: ${userData.alliance || 'Nicht gesetzt'}
+                    Alliance: ${userData.alliance || 'Nicht gesetzt'}<br>
+                    <br>
+                    <strong>Verfügbare Felder:</strong> ${Object.keys(userData).join(', ')}
                 `, isSuperAdmin ? 'success' : 'info');
                 
             } catch (error) {
                 console.error('Fehler beim Prüfen des Benutzers:', error);
+                showStatus('Fehler: ' + error.message, 'error');
+            }
+        }
+
+        // Set current user as Super Admin
+        async function setCurrentUserAsSuperAdmin() {
+            try {
+                const user = window.AuthAPI.getCurrentUser();
+                if (!user) {
+                    showStatus('Kein Benutzer angemeldet', 'error');
+                    return;
+                }
+                
+                const db = window.FirebaseConfig.getDB();
+                const userRef = db.collection('users').doc(user.uid);
+                
+                // Check if document exists
+                const doc = await userRef.get();
+                
+                if (!doc.exists) {
+                    // Create new document
+                    await userRef.set({
+                        email: user.email,
+                        username: user.displayName || user.email.split('@')[0],
+                        isSuperAdmin: true,
+                        isAllianceAdmin: false,
+                        createdAt: window.FirebaseConfig.getServerTimestamp(),
+                        lastLogin: window.FirebaseConfig.getServerTimestamp(),
+                        createdBy: 'setup-tool-auto'
+                    });
+                    showStatus('✅ Benutzerdokument erstellt und als Super-Admin gesetzt!', 'success');
+                } else {
+                    // Update existing document
+                    await userRef.update({
+                        isSuperAdmin: true,
+                        updatedAt: window.FirebaseConfig.getServerTimestamp(),
+                        updatedBy: 'setup-tool-auto'
+                    });
+                    showStatus('✅ Aktueller Benutzer wurde als Super-Admin gesetzt!', 'success');
+                }
+                
+                loadUsers(); // Refresh user list
+                
+                // Show success message with next steps
+                setTimeout(() => {
+                    showStatus(`
+                        ✅ Super-Admin Status erfolgreich gesetzt!<br><br>
+                        <strong>Nächste Schritte:</strong><br>
+                        1. Gehen Sie zum Admin-Dashboard<br>
+                        2. Melden Sie sich neu an<br>
+                        3. Sie sollten jetzt Zugang haben!<br><br>
+                        <a href="admin-dashboard.html" style="color: #ff8c42;">→ Zum Admin-Dashboard</a>
+                    `, 'success');
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Fehler beim Setzen des Super-Admin Status:', error);
                 showStatus('Fehler: ' + error.message, 'error');
             }
         }
