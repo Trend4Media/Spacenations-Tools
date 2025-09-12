@@ -579,27 +579,42 @@
         }
         
         function getCurrentUsername() {
+            console.log('🔍 Suche Benutzername...');
+            
             // Methode 1: Aus URL-Parameter (beim Login weitergegeben)
             const urlParams = new URLSearchParams(window.location.search);
             const usernameFromUrl = urlParams.get('username');
             if (usernameFromUrl) {
+                console.log('✅ Username aus URL gefunden:', usernameFromUrl);
                 return usernameFromUrl;
             }
             
             // Methode 2: Aus localStorage (beim Login gespeichert)
             const usernameFromStorage = localStorage.getItem('currentUsername');
             if (usernameFromStorage) {
+                console.log('✅ Username aus localStorage gefunden:', usernameFromStorage);
                 return usernameFromStorage;
             }
             
             // Methode 3: Aus sessionStorage
             const usernameFromSession = sessionStorage.getItem('currentUsername');
             if (usernameFromSession) {
+                console.log('✅ Username aus sessionStorage gefunden:', usernameFromSession);
                 return usernameFromSession;
             }
             
-            // Methode 4: Fallback falls kein Benutzername gefunden wird
-            return null;
+            // Methode 4: Aus URL-String extrahieren (falls URL-Parameter nicht richtig geparst wurden)
+            const url = window.location.href;
+            const usernameMatch = url.match(/[?&]username=([^&]+)/);
+            if (usernameMatch) {
+                const decodedUsername = decodeURIComponent(usernameMatch[1]);
+                console.log('✅ Username aus URL-String gefunden:', decodedUsername);
+                return decodedUsername;
+            }
+            
+            // Methode 5: Fallback - verwende 'guest' wenn nichts gefunden wird
+            console.log('⚠️ Kein Username gefunden - verwende Fallback');
+            return 'guest';
         }
         
         function getCurrentUserEmail() {
@@ -806,10 +821,12 @@
             const description = document.getElementById('alliance-description').value.trim();
             const username = getCurrentUsername();
             
+            console.log('🔍 Debug - Username:', username, 'Type:', typeof username);
+            
             console.log('Allianz-Erstellung gestartet:', { name, tag, username });
             
-            if (!username) {
-                alert('Bitte melde dich an, um eine Allianz zu erstellen.');
+            if (!username || username === 'guest') {
+                alert('Bitte melde dich an, um eine Allianz zu erstellen.\n\nAktueller Username: ' + (username || 'undefined'));
                 return;
             }
             
@@ -1033,6 +1050,40 @@
                     modal.style.display = 'none';
                 }
             });
+        });
+        
+        // Debug-Funktion für Username-Problem
+        function debugUsername() {
+            console.log('🔍 DEBUG USERNAME:');
+            console.log('URL:', window.location.href);
+            console.log('URL Search:', window.location.search);
+            console.log('URL Params:', new URLSearchParams(window.location.search));
+            console.log('localStorage currentUsername:', localStorage.getItem('currentUsername'));
+            console.log('sessionStorage currentUsername:', sessionStorage.getItem('currentUsername'));
+            console.log('getCurrentUsername() result:', getCurrentUsername());
+            console.log('getCurrentUsername() type:', typeof getCurrentUsername());
+        }
+        
+        // Debug-Button hinzufügen (nur für Entwicklung)
+        document.addEventListener('DOMContentLoaded', () => {
+            // Füge Debug-Button hinzu (nur sichtbar wenn ?debug=true in URL)
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('debug') === 'true') {
+                const debugBtn = document.createElement('button');
+                debugBtn.textContent = '🔍 Debug Username';
+                debugBtn.style.position = 'fixed';
+                debugBtn.style.top = '10px';
+                debugBtn.style.right = '10px';
+                debugBtn.style.zIndex = '9999';
+                debugBtn.style.background = '#ff9800';
+                debugBtn.style.color = 'white';
+                debugBtn.style.border = 'none';
+                debugBtn.style.padding = '10px';
+                debugBtn.style.borderRadius = '5px';
+                debugBtn.style.cursor = 'pointer';
+                debugBtn.onclick = debugUsername;
+                document.body.appendChild(debugBtn);
+            }
         });
     </script>
     
