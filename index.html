@@ -978,6 +978,7 @@
         
         // Simulierte Benutzerdatenbank für Demo
         const userDatabase = {
+            't.o@trend4media.de': { username: 'Daikin', password: '123456' },
             'daikin@spacenations.eu': { username: 'Daikin', password: '123456' },
             'admin@spacenations.eu': { username: 'Admin', password: 'admin123' },
             'test@spacenations.eu': { username: 'TestUser', password: 'test123' },
@@ -1023,12 +1024,17 @@
         
         function authenticateUser(email, password) {
             // Simuliert Benutzerauthentifizierung
-            const user = userDatabase[email.toLowerCase()];
+            const normalizedEmail = email.toLowerCase().trim();
+            console.log('Suche Benutzer für E-Mail:', normalizedEmail);
+            
+            const user = userDatabase[normalizedEmail];
             
             if (user && user.password === password) {
+                console.log('Benutzer gefunden:', user);
                 return user;
             }
             
+            console.log('Benutzer nicht gefunden oder falsches Passwort');
             return null;
         }
         

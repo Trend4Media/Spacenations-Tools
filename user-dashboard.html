@@ -470,6 +470,9 @@
             const username = getCurrentUsername();
             const email = getCurrentUserEmail();
             console.log('Erkannte Benutzerdaten:', { username, email });
+            console.log('URL-Parameter:', window.location.search);
+            console.log('localStorage:', localStorage.getItem('currentUsername'));
+            console.log('sessionStorage:', sessionStorage.getItem('currentUsername'));
             
             // Persönliche Begrüßung basierend auf Login-Daten
             updateWelcomeMessage();
