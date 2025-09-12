@@ -825,7 +825,8 @@
             submitBtn.disabled = true;
             
             try {
-                console.log('Versuche Firebase-Verbindung...');
+                console.log('🚀 Starte Allianz-Erstellung...');
+                console.log('📋 Daten:', { name, tag, description, username });
                 
                 // Versuche Firebase zu verwenden
                 let allianceId;
@@ -835,6 +836,7 @@
                 } else {
                     console.log('⚠️ Firebase nicht bereit - initialisiere Firebase...');
                     await initializeFirebaseForAlliance();
+                    console.log('🔄 Firebase initialisiert - erstelle Allianz...');
                     allianceId = await createAllianceFirebase(name, tag, description, username);
                 }
                 
@@ -860,12 +862,17 @@
         
         async function initializeFirebaseForAlliance() {
             try {
-                console.log('Initialisiere Firebase für Allianz-Erstellung...');
+                console.log('🚀 Initialisiere Firebase für Allianz-Erstellung...');
                 
                 // Prüfe ob Firebase bereits initialisiert ist
                 if (typeof window.FirebaseConfig !== 'undefined' && window.FirebaseConfig.isReady()) {
-                    console.log('Firebase bereits initialisiert');
+                    console.log('✅ Firebase bereits initialisiert');
                     return true;
+                }
+                
+                // Prüfe ob Firebase verfügbar ist
+                if (typeof firebase === 'undefined') {
+                    throw new Error('Firebase-Scripts nicht geladen. Bitte lade die Seite neu.');
                 }
                 
                 // Initialisiere Firebase direkt
@@ -879,9 +886,20 @@
                     measurementId: 'G-SKWJWH2ERX'
                 };
 
+                console.log('📝 Initialisiere Firebase App...');
                 if (!firebase.apps.length) {
                     firebase.initializeApp(firebaseConfig);
                 }
+
+                // Teste die Verbindung
+                console.log('🔍 Teste Firebase-Verbindung...');
+                const db = firebase.firestore();
+                await db.collection('_test').doc('connection').set({
+                    test: true,
+                    timestamp: new Date()
+                });
+                await db.collection('_test').doc('connection').delete();
+                console.log('✅ Firebase-Verbindung erfolgreich getestet');
 
                 // Erstelle FirebaseConfig Mock
                 window.FirebaseConfig = {
@@ -892,7 +910,7 @@
                     waitForInit: () => Promise.resolve()
                 };
 
-                console.log('✅ Firebase erfolgreich initialisiert');
+                console.log('🎉 Firebase erfolgreich initialisiert und getestet');
                 return true;
                 
             } catch (error) {
@@ -1017,6 +1035,11 @@
             });
         });
     </script>
+    
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     
     <!-- Firebase Migration Script -->
     <script src="js/firebase-migration.js"></script>
