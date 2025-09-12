@@ -537,8 +537,25 @@
                 admin: allianceData.founder // Setze Gründer als Admin
             });
 
+            // Finde das User-Dokument des Gründers
+            let founderDocRef = null;
+            
+            // Versuche zuerst mit Benutzername
+            const founderByUsername = await db.collection('users').doc(allianceData.founder).get();
+            if (founderByUsername.exists) {
+                founderDocRef = db.collection('users').doc(allianceData.founder);
+            } else {
+                // Suche nach User mit diesem Benutzernamen
+                const founderQuery = await db.collection('users').where('username', '==', allianceData.founder).get();
+                if (!founderQuery.empty) {
+                    founderDocRef = founderQuery.docs[0].ref;
+                } else {
+                    throw new Error(`Gründer "${allianceData.founder}" nicht gefunden`);
+                }
+            }
+            
             // Aktualisiere User-Dokument mit Admin-Rolle
-            await db.collection('users').doc(allianceData.founder).update({
+            await founderDocRef.update({
                 alliance: allianceData.name, // Verwende Allianz-Namen statt ID
                 allianceTag: allianceData.tag, // Füge Allianz-Tag hinzu
                 allianceRole: 'admin',
@@ -587,8 +604,25 @@
                 adminSetBy: window.AuthAPI.getCurrentUser().uid
             });
 
+            // Finde das User-Dokument (kann mit Username oder UID sein)
+            let userDocRef = null;
+            
+            // Versuche zuerst mit Benutzername
+            const userByUsername = await db.collection('users').doc(newAdmin).get();
+            if (userByUsername.exists) {
+                userDocRef = db.collection('users').doc(newAdmin);
+            } else {
+                // Suche nach User mit diesem Benutzernamen
+                const userQuery = await db.collection('users').where('username', '==', newAdmin).get();
+                if (!userQuery.empty) {
+                    userDocRef = userQuery.docs[0].ref;
+                } else {
+                    throw new Error(`User "${newAdmin}" nicht gefunden`);
+                }
+            }
+            
             // Aktualisiere User-Dokument mit Admin-Rolle
-            await db.collection('users').doc(newAdmin).update({
+            await userDocRef.update({
                 alliance: allianceData.name, // Verwende Allianz-Namen statt ID
                 allianceTag: allianceData.tag, // Füge Allianz-Tag hinzu
                 allianceRole: 'admin',
@@ -597,10 +631,27 @@
 
             // Entferne Admin-Rolle vom vorherigen Admin (falls vorhanden)
             if (allianceData.admin && allianceData.admin !== newAdmin) {
-                await db.collection('users').doc(allianceData.admin).update({
-                    allianceRole: 'member',
-                    lastUpdated: window.FirebaseConfig.getServerTimestamp()
-                });
+                // Finde das User-Dokument des vorherigen Admins
+                let previousAdminDocRef = null;
+                
+                // Versuche zuerst mit Benutzername
+                const prevUserByUsername = await db.collection('users').doc(allianceData.admin).get();
+                if (prevUserByUsername.exists) {
+                    previousAdminDocRef = db.collection('users').doc(allianceData.admin);
+                } else {
+                    // Suche nach User mit diesem Benutzernamen
+                    const prevUserQuery = await db.collection('users').where('username', '==', allianceData.admin).get();
+                    if (!prevUserQuery.empty) {
+                        previousAdminDocRef = prevUserQuery.docs[0].ref;
+                    }
+                }
+                
+                if (previousAdminDocRef) {
+                    await previousAdminDocRef.update({
+                        allianceRole: 'member',
+                        lastUpdated: window.FirebaseConfig.getServerTimestamp()
+                    });
+                }
             }
 
             // Log activity
