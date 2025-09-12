@@ -653,45 +653,67 @@
         
         async function loadAllianceStatus() {
             try {
+                console.log('🔍 Lade Allianz-Status...');
+                
+                // Prüfe ob Firebase verfügbar ist
+                if (typeof window.FirebaseConfig === 'undefined' || !window.FirebaseConfig.isReady()) {
+                    console.log('⚠️ Firebase nicht verfügbar - initialisiere...');
+                    await initializeFirebaseForAlliance();
+                }
+                
                 const db = window.FirebaseConfig.getDB();
                 const username = getCurrentUsername();
                 
                 if (!username) {
+                    console.log('❌ Kein Benutzername gefunden');
                     showAllianceStatus('no-user', 'Bitte melde dich an, um Allianz-Features zu nutzen.');
                     return;
                 }
+                
+                console.log('👤 Suche Allianzen für Benutzer:', username);
                 
                 // Suche nach Allianzen, in denen der User Mitglied ist
                 const userAlliancesQuery = await db.collection('alliances')
                     .where('members', 'array-contains', username)
                     .get();
                 
+                console.log('📊 Gefundene Allianzen als Mitglied:', userAlliancesQuery.size);
+                
                 if (!userAlliancesQuery.empty) {
                     const alliance = userAlliancesQuery.docs[0].data();
                     const allianceId = userAlliancesQuery.docs[0].id;
+                    
+                    console.log('🏰 Allianz gefunden:', alliance.name, 'Status:', alliance.status);
                     
                     if (alliance.status === 'approved') {
                         showAllianceStatus('member', alliance, allianceId);
                     } else if (alliance.status === 'pending') {
                         showAllianceStatus('pending', alliance, allianceId);
+                    } else if (alliance.status === 'rejected') {
+                        showAllianceStatus('rejected', alliance, allianceId);
                     }
                 } else {
                     // Prüfe ob User bereits eine Allianz erstellt hat (als Gründer)
+                    console.log('🔍 Suche nach erstellten Allianzen...');
                     const createdAlliancesQuery = await db.collection('alliances')
                         .where('founder', '==', username)
                         .get();
                     
+                    console.log('📊 Gefundene erstellte Allianzen:', createdAlliancesQuery.size);
+                    
                     if (!createdAlliancesQuery.empty) {
                         const alliance = createdAlliancesQuery.docs[0].data();
                         const allianceId = createdAlliancesQuery.docs[0].id;
+                        console.log('🏗️ Erstellte Allianz gefunden:', alliance.name, 'Status:', alliance.status);
                         showAllianceStatus('founder', alliance, allianceId);
                     } else {
+                        console.log('❌ Keine Allianz gefunden');
                         showAllianceStatus('none', null);
                     }
                 }
             } catch (error) {
-                console.error('Fehler beim Laden der Allianz-Status:', error);
-                showAllianceStatus('error', 'Fehler beim Laden der Allianz-Informationen.');
+                console.error('❌ Fehler beim Laden der Allianz-Status:', error);
+                showAllianceStatus('error', 'Fehler beim Laden der Allianz-Informationen: ' + error.message);
             }
         }
         
@@ -728,6 +750,12 @@
                     titleElement.textContent = `⏳ ${alliance.name} [${alliance.tag}]`;
                     descriptionElement.textContent = `Deine Allianz "${alliance.name}" wartet auf Genehmigung durch einen Super-Admin.`;
                     actionsElement.innerHTML = '<span class="tool-link" style="opacity: 0.7;">Wartet auf Genehmigung...</span>';
+                    break;
+                    
+                case 'rejected':
+                    titleElement.textContent = `❌ ${alliance.name} [${alliance.tag}]`;
+                    descriptionElement.textContent = `Deine Allianz "${alliance.name}" wurde abgelehnt. Kontaktiere einen Super-Admin für weitere Informationen.`;
+                    actionsElement.innerHTML = '<button class="tool-link" onclick="openCreateAllianceModal()">Neue Allianz erstellen</button>';
                     break;
                     
                 case 'founder':
@@ -797,13 +825,17 @@
             submitBtn.disabled = true;
             
             try {
+                console.log('Versuche Firebase-Verbindung...');
+                
+                // Versuche Firebase zu verwenden
                 let allianceId;
                 if (typeof window.FirebaseConfig !== 'undefined' && window.FirebaseConfig.isReady()) {
-                    console.log('Verwende Firebase für Allianz-Erstellung');
+                    console.log('✅ Firebase bereit - verwende Firebase');
                     allianceId = await createAllianceFirebase(name, tag, description, username);
                 } else {
-                    console.log('Verwende lokale Speicherung für Allianz-Erstellung');
-                    createAllianceLocal(name, tag, description, username);
+                    console.log('⚠️ Firebase nicht bereit - initialisiere Firebase...');
+                    await initializeFirebaseForAlliance();
+                    allianceId = await createAllianceFirebase(name, tag, description, username);
                 }
                 
                 // Formular zurücksetzen
@@ -814,11 +846,11 @@
                 await loadAllianceStatus();
                 
                 // Erfolgsmeldung
-                alert(`Allianz "${name}" erfolgreich erstellt! Sie wartet auf Genehmigung durch einen Super-Admin.`);
+                alert(`✅ Allianz "${name}" erfolgreich erstellt!\n\nSie wurde in der Datenbank gespeichert und wartet auf Genehmigung durch einen Super-Admin.\n\nDu kannst den Status im Admin-Dashboard überprüfen.`);
                 
             } catch (error) {
-                console.error('Fehler beim Erstellen der Allianz:', error);
-                alert('Fehler beim Erstellen der Allianz: ' + error.message);
+                console.error('❌ Fehler beim Erstellen der Allianz:', error);
+                alert('❌ Fehler beim Erstellen der Allianz:\n\n' + error.message + '\n\nBitte stelle sicher, dass die Firebase-Datenbank initialisiert ist.');
             } finally {
                 // Button zurücksetzen
                 submitBtn.textContent = originalText;
@@ -826,9 +858,52 @@
             }
         }
         
+        async function initializeFirebaseForAlliance() {
+            try {
+                console.log('Initialisiere Firebase für Allianz-Erstellung...');
+                
+                // Prüfe ob Firebase bereits initialisiert ist
+                if (typeof window.FirebaseConfig !== 'undefined' && window.FirebaseConfig.isReady()) {
+                    console.log('Firebase bereits initialisiert');
+                    return true;
+                }
+                
+                // Initialisiere Firebase direkt
+                const firebaseConfig = {
+                    apiKey: 'AIzaSyDr4-ap_EubUn0UdP7hkEpS2jkzLIVgvyc',
+                    authDomain: 'spacenations-tools.firebaseapp.com',
+                    projectId: 'spacenations-tools',
+                    storageBucket: 'spacenations-tools.firebasestorage.app',
+                    messagingSenderId: '651338201276',
+                    appId: '1:651338201276:web:89e7d9c19dbd2611d3f8b9',
+                    measurementId: 'G-SKWJWH2ERX'
+                };
+
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+
+                // Erstelle FirebaseConfig Mock
+                window.FirebaseConfig = {
+                    isReady: () => true,
+                    getAuth: () => firebase.auth(),
+                    getDB: () => firebase.firestore(),
+                    getServerTimestamp: () => firebase.firestore.FieldValue.serverTimestamp(),
+                    waitForInit: () => Promise.resolve()
+                };
+
+                console.log('✅ Firebase erfolgreich initialisiert');
+                return true;
+                
+            } catch (error) {
+                console.error('❌ Firebase-Initialisierung fehlgeschlagen:', error);
+                throw new Error('Firebase konnte nicht initialisiert werden: ' + error.message);
+            }
+        }
+
         async function createAllianceFirebase(name, tag, description, founder) {
             try {
-                console.log('Erstelle Allianz in Firebase:', { name, tag, founder });
+                console.log('🚀 Erstelle Allianz in Firebase:', { name, tag, founder });
                 
                 const db = window.FirebaseConfig.getDB();
                 if (!db) {
@@ -836,17 +911,17 @@
                 }
                 
                 // Prüfe ob Tag bereits existiert
-                console.log('Prüfe ob Tag bereits existiert...');
+                console.log('🔍 Prüfe ob Tag bereits existiert...');
                 const existingTagQuery = await db.collection('alliances')
                     .where('tag', '==', tag)
                     .get();
                 
                 if (!existingTagQuery.empty) {
-                    throw new Error('Dieser Allianz-Tag ist bereits vergeben.');
+                    throw new Error('Dieser Allianz-Tag ist bereits vergeben. Bitte wähle einen anderen Tag.');
                 }
                 
                 // Erstelle Allianz
-                console.log('Erstelle Allianz-Dokument...');
+                console.log('📝 Erstelle Allianz-Dokument...');
                 const allianceData = {
                     name: name,
                     tag: tag,
@@ -855,14 +930,17 @@
                     members: [founder],
                     status: 'pending', // Wartet auf Super-Admin Genehmigung
                     createdAt: window.FirebaseConfig.getServerTimestamp(),
-                    admin: null // Wird vom Super-Admin gesetzt
+                    admin: null, // Wird vom Super-Admin gesetzt
+                    createdBy: founder,
+                    lastUpdated: window.FirebaseConfig.getServerTimestamp()
                 };
                 
                 const docRef = await db.collection('alliances').add(allianceData);
-                console.log('Allianz erfolgreich erstellt mit ID:', docRef.id);
+                console.log('✅ Allianz erfolgreich erstellt mit ID:', docRef.id);
                 
                 // Erstelle Standard-Berechtigungen
                 try {
+                    console.log('🔐 Erstelle Standard-Berechtigungen...');
                     await db.collection('alliancePermissions').doc(docRef.id).set({
                         chat_read: { enabled: true, description: "Chat lesen" },
                         chat_write: { enabled: true, description: "Chat schreiben" },
@@ -870,14 +948,38 @@
                         member_approval: { enabled: false, description: "Mitglieder bestätigen" },
                         permission_manage: { enabled: false, description: "Berechtigungen verwalten" }
                     });
-                    console.log('Standard-Berechtigungen erstellt');
+                    console.log('✅ Standard-Berechtigungen erstellt');
                 } catch (permError) {
-                    console.warn('Fehler beim Erstellen der Berechtigungen:', permError);
+                    console.warn('⚠️ Fehler beim Erstellen der Berechtigungen:', permError);
+                    // Nicht kritisch - Allianz wurde trotzdem erstellt
                 }
                 
+                // Erstelle Aktivitäts-Log
+                try {
+                    console.log('📊 Erstelle Aktivitäts-Log...');
+                    await db.collection('allianceActivities').add({
+                        allianceId: docRef.id,
+                        type: 'alliance_created',
+                        member: founder,
+                        performedBy: founder,
+                        timestamp: window.FirebaseConfig.getServerTimestamp(),
+                        details: {
+                            allianceName: name,
+                            allianceTag: tag,
+                            message: `Allianz "${name}" wurde erstellt und wartet auf Genehmigung`
+                        }
+                    });
+                    console.log('✅ Aktivitäts-Log erstellt');
+                } catch (activityError) {
+                    console.warn('⚠️ Fehler beim Erstellen des Aktivitäts-Logs:', activityError);
+                    // Nicht kritisch
+                }
+                
+                console.log('🎉 Allianz-Erstellung vollständig abgeschlossen!');
                 return docRef.id;
+                
             } catch (error) {
-                console.error('Fehler beim Erstellen der Allianz in Firebase:', error);
+                console.error('❌ Fehler beim Erstellen der Allianz in Firebase:', error);
                 throw error;
             }
         }
