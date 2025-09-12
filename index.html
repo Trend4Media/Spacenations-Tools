@@ -541,13 +541,29 @@
             padding: 24px;
             box-shadow: var(--shadow-dark), var(--glow-green);
             backdrop-filter: blur(10px);
-            z-index: 100;
+            z-index: 1000;
             transition: all 0.3s ease;
+            /* Sicherstellen dass es nicht scrollt */
+            position: fixed !important;
+            will-change: transform;
         }
         
         .login-area:hover {
             box-shadow: var(--shadow-dark), var(--glow-green-strong);
             border-color: var(--razer-green-light);
+        }
+        
+        /* Sicherstellen dass Login-Bereich immer sichtbar und fest ist */
+        .login-area {
+            /* Höhere z-index für bessere Sichtbarkeit */
+            z-index: 1000 !important;
+            /* Verhindern von Scroll-Verhalten */
+            position: fixed !important;
+            /* Optimierung für bessere Performance */
+            transform: translateY(-50%) translateZ(0);
+            /* Sicherstellen dass es immer sichtbar bleibt */
+            visibility: visible !important;
+            opacity: 1 !important;
         }
         
         .login-title {
@@ -995,6 +1011,33 @@
             const loginForm = document.getElementById('login-form');
             if (loginForm) {
                 loginForm.addEventListener('submit', handleLogin);
+            }
+            
+            // Sicherstellen dass Login-Bereich fest bleibt
+            const loginArea = document.querySelector('.login-area');
+            if (loginArea) {
+                // CSS-Eigenschaften per JavaScript setzen für maximale Sicherheit
+                loginArea.style.position = 'fixed';
+                loginArea.style.top = '50%';
+                loginArea.style.right = '20px';
+                loginArea.style.transform = 'translateY(-50%)';
+                loginArea.style.zIndex = '1000';
+                
+                // Event Listener für Scroll-Events um Position zu erhalten
+                window.addEventListener('scroll', () => {
+                    loginArea.style.position = 'fixed';
+                    loginArea.style.top = '50%';
+                    loginArea.style.right = '20px';
+                    loginArea.style.transform = 'translateY(-50%)';
+                });
+                
+                // Event Listener für Resize-Events
+                window.addEventListener('resize', () => {
+                    loginArea.style.position = 'fixed';
+                    loginArea.style.top = '50%';
+                    loginArea.style.right = '20px';
+                    loginArea.style.transform = 'translateY(-50%)';
+                });
             }
         });
     </script>
