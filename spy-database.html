@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Spy-Datenbank - Spacenations Tools</title>
-    <meta name="cache-bust" content="v5">
+    <meta name="cache-bust" content="v6">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -531,27 +531,27 @@
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('🕵️ Spy Database Grid initialisiert');
             
-            // Warten auf APIs
-            if (!await waitForAPIs()) {
-                showMessage('Fehler beim Initialisieren der APIs', 'error');
-                return false;
-            }
-            
-            setupEventListeners();
-            
-            // Sofort Demo-Daten laden, dann versuchen Firebase zu verbinden
+            // Sofort Demo-Daten laden (nicht auf APIs warten)
             console.log('🚀 Lade sofort Demo-Daten...');
             currentReports = getDemoReports();
             await displayReports(currentReports);
             currentStatistics = getDemoStatistics();
             displayStatistics(currentStatistics);
-            showMessage('Demo-Modus aktiv: Zeige Beispieldaten. Versuche Firebase-Verbindung...', 'info');
+            showMessage('🚀 Spy-Datenbank geladen! Demo-Modus aktiv. Versuche Firebase-Verbindung...', 'info');
             
             // Zeige Retry-Button
             document.getElementById('retry-btn').style.display = 'inline-flex';
             
-            // Versuche Firebase im Hintergrund zu verbinden
+            // Warten auf APIs im Hintergrund
             setTimeout(async () => {
+                if (!await waitForAPIs()) {
+                    console.log('⚠️ APIs nicht verfügbar, bleibe im Demo-Modus');
+                    return;
+                }
+                
+                setupEventListeners();
+                
+                // Versuche Firebase im Hintergrund zu verbinden
                 try {
                     const firebaseReady = await waitForFirebaseQuick();
                     if (firebaseReady) {
@@ -561,7 +561,7 @@
                 } catch (error) {
                     console.log('⚠️ Firebase-Verbindung fehlgeschlagen, bleibe im Demo-Modus');
                 }
-            }, 2000);
+            }, 1000);
         });
         
         // Debug: Firebase-Status überwachen
@@ -678,7 +678,7 @@
         }
         
         async function waitForAPIs() {
-            const maxWait = 10000; // 10 Sekunden
+            const maxWait = 5000; // 5 Sekunden (reduziert)
             const startTime = Date.now();
             
             while (Date.now() - startTime < maxWait) {
@@ -689,7 +689,7 @@
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
             
-            console.error('❌ APIs nicht verfügbar nach 10 Sekunden');
+            console.warn('⚠️ APIs nicht verfügbar nach 5 Sekunden - verwende Demo-Modus');
             return false;
         }
         
