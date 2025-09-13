@@ -194,10 +194,9 @@ class SpyDatabaseManager {
             
             console.log('📋 Lade Spy-Reports für Allianz:', alliance);
             
-            // Vereinfachte Query ohne komplexe Filter um Index-Probleme zu vermeiden
+            // Einfachste Query ohne orderBy um Index-Probleme komplett zu vermeiden
             let query = this.db.collection('allianceSpyReports')
-                .where('allianceName', '==', alliance)
-                .orderBy('createdAt', 'desc');
+                .where('allianceName', '==', alliance);
             
             // Limit
             if (options.limit) {
@@ -212,6 +211,13 @@ class SpyDatabaseManager {
                     id: doc.id,
                     ...doc.data()
                 });
+            });
+            
+            // Client-seitige Sortierung nach createdAt (neueste zuerst)
+            reports.sort((a, b) => {
+                const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+                const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+                return dateB - dateA; // Absteigend (neueste zuerst)
             });
             
             console.log(`✅ ${reports.length} Spy-Reports geladen`);
