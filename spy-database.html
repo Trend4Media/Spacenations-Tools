@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <title>🕵️ Spacenations Spy Database</title>
     <meta name="description" content="Advanced spy intelligence database for Spacenations strategy game. Track players, planets, buildings, and military units.">
-    <meta name="cache-bust" content="v20&force=1">
+    <meta name="cache-bust" content="v21&force=2">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -63,6 +63,7 @@
 
         .dashboard {
             display: flex;
+            flex-direction: column;
             height: 100vh;
         }
 
@@ -76,7 +77,19 @@
             padding: 16px;
             border-bottom: 1px solid var(--border);
             display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .header-top {
+            display: flex;
             justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-bottom {
+            display: flex;
+            gap: 16px;
             align-items: center;
         }
 
@@ -137,36 +150,22 @@
             overflow: auto;
         }
 
-        .sidebar {
-            width: 320px;
-            background: var(--sidebar-bg);
-            border-left: 1px solid var(--border);
-            padding: 16px;
+        .search-container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search-group {
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 4px;
         }
 
-        .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .card-header {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .card-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--foreground);
-        }
-
-        .card-content {
-            padding: 16px;
+        .search-label {
+            font-size: 11px;
+            color: var(--muted-foreground);
+            font-weight: 500;
         }
 
         .form-group {
@@ -370,23 +369,43 @@
         <div class="main-content">
             <!-- Header -->
             <div class="header">
-                <div class="header-left">
-                    <h1 class="title">🕵️ Spy Database</h1>
-                    <div class="header-buttons">
-                        <button class="btn btn-primary" onclick="addNewReport()">
-                            ➕ Neuer Bericht
-                        </button>
-                        <button class="btn" onclick="retryFirebaseConnection()" id="retry-btn" style="display: none;">
-                            🔄 Firebase retry
-                        </button>
-                        <button class="btn" onclick="goToDashboard()">
-                            ← Dashboard
-                        </button>
+                <div class="header-top">
+                    <div class="header-left">
+                        <h1 class="title">🕵️ Spy Database</h1>
+                        <div class="header-buttons">
+                            <button class="btn btn-primary" onclick="addNewReport()">
+                                ➕ Neuer Bericht
+                            </button>
+                            <button class="btn" onclick="retryFirebaseConnection()" id="retry-btn" style="display: none;">
+                                🔄 Firebase retry
+                            </button>
+                            <button class="btn" onclick="goToDashboard()">
+                                ← Dashboard
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="status-badge" id="status-badge">
-                    ✅ Echte Daten geladen! Firebase-Verbindung erfolgreich.
+                <div class="header-bottom">
+                    <div class="search-container">
+                        <div class="search-group">
+                            <label class="search-label">Spieler suchen:</label>
+                            <input type="text" class="form-input" placeholder="Spielername eingeben..." id="playerSearch" style="width: 200px;">
+                        </div>
+                        <div class="search-group">
+                            <label class="search-label">Planet suchen:</label>
+                            <input type="text" class="form-input" placeholder="Planetenname eingeben..." id="planetSearch" style="width: 200px;">
+                        </div>
+                        <button class="btn btn-primary" onclick="performSearch()">
+                            🔍 Suchen
+                        </button>
+                        <button class="btn" onclick="clearSearch()">
+                            🗑️ Leeren
+                        </button>
+                        <button class="btn" onclick="refreshData()">
+                            📊 Aktualisieren
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -428,64 +447,9 @@
             </div>
         </div>
 
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <!-- Search Section -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">🔍 SUCHE</div>
-                </div>
-                <div class="card-content">
-                    <div class="form-group">
-                        <label class="form-label">Spieler:</label>
-                        <input type="text" class="form-input" placeholder="Spielername..." id="playerSearch">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Planet:</label>
-                        <input type="text" class="form-input" placeholder="Planetenname..." id="planetSearch">
-                    </div>
-                    <button class="btn btn-primary btn-full" onclick="performSearch()">
-                        🔍 Suchen
-                    </button>
-                    <div class="button-group" style="margin-top: 12px;">
-                        <button class="btn btn-flex" onclick="clearSearch()">🗑️ Leeren</button>
-                        <button class="btn btn-flex" onclick="refreshData()">📊 Aktualisieren</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Statistics Panel -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">📊 STATISTIKEN</div>
-                </div>
-                <div class="card-content">
-                    <div class="stats-item">
-                        <div class="stats-label">📊 Gesamt Berichte:</div>
-                        <div class="stats-value" id="totalReports">0</div>
-                    </div>
-                    <div class="stats-item">
-                        <div class="stats-label">👥 Eindeutige Spieler:</div>
-                        <div class="stats-value" id="uniquePlayers">0</div>
-                    </div>
-                    <div class="stats-item">
-                        <div class="stats-label">🌍 Eindeutige Planeten:</div>
-                        <div class="stats-value" id="uniquePlanets">0</div>
-                    </div>
-                    <div class="stats-item">
-                        <div class="stats-label">🎯 Gesamt Angriffsstärke:</div>
-                        <div class="stats-value" id="totalAttack">0</div>
-                    </div>
-                    <div class="stats-item">
-                        <div class="stats-label">⚗️ Forschungslevel:</div>
-                        <div class="stats-value" id="researchLevel">0</div>
-                    </div>
-                    <div class="stats-item">
-                        <div class="stats-label">🏗️ Gebäudelevel:</div>
-                        <div class="stats-value" id="buildingLevel">0</div>
-                    </div>
-                </div>
-            </div>
+        <!-- Status Message (bottom) -->
+        <div id="status-message" style="position: fixed; bottom: 20px; right: 20px; background: var(--gaming-success); color: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000; display: none;">
+            ✅ Echte Daten geladen! Firebase-Verbindung erfolgreich.
         </div>
     </div>
 
@@ -514,7 +478,7 @@
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', async () => {
-            console.log('🕵️ Spy Database Grid initialisiert - Version v20');
+            console.log('🕵️ Spy Database Grid initialisiert - Version v21');
             
             // Load demo data immediately
             console.log('🚀 Lade sofort Demo-Daten...');
@@ -658,14 +622,10 @@
             `).join('');
         }
 
-        // Display statistics
+        // Display statistics (simplified)
         function displayStatistics(stats) {
-            document.getElementById('totalReports').textContent = stats.totalReports || 0;
-            document.getElementById('uniquePlayers').textContent = stats.uniquePlayers || 0;
-            document.getElementById('uniquePlanets').textContent = stats.uniquePlanets || 0;
-            document.getElementById('totalAttack').textContent = stats.totalAttack || 0;
-            document.getElementById('researchLevel').textContent = stats.researchLevel || 0;
-            document.getElementById('buildingLevel').textContent = stats.buildingLevel || 0;
+            // Statistics display removed - no longer needed
+            console.log('📊 Statistiken geladen:', stats);
         }
 
         // Search functionality
@@ -782,12 +742,18 @@
         function showMessage(message, type) {
             console.log(`${type.toUpperCase()}: ${message}`);
             
-            const statusBadge = document.getElementById('status-badge');
-            if (statusBadge) {
-                statusBadge.textContent = message;
-                statusBadge.style.background = type === 'success' ? 'var(--gaming-success)' : 
-                                               type === 'error' ? 'var(--danger)' : 
-                                               'var(--warning)';
+            const statusMessage = document.getElementById('status-message');
+            if (statusMessage) {
+                statusMessage.textContent = message;
+                statusMessage.style.background = type === 'success' ? 'var(--gaming-success)' : 
+                                                type === 'error' ? 'var(--danger)' : 
+                                                'var(--warning)';
+                statusMessage.style.display = 'block';
+                
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    statusMessage.style.display = 'none';
+                }, 5000);
             }
         }
 
