@@ -186,7 +186,7 @@ function handleFirebaseInitError(error) {
                     update: () => Promise.resolve(),
                     set: () => Promise.resolve()
                 }),
-                add: () => Promise.resolve(),
+                add: () => Promise.resolve({ id: 'mock-id-' + Date.now() }),
                 where: () => ({
                     orderBy: () => ({
                         get: () => Promise.resolve({ docs: [] })
@@ -200,6 +200,9 @@ function handleFirebaseInitError(error) {
     };
     
     console.log('🔧 Firebase-Fallback-Services aktiviert');
+    
+    // Dispatch ready event auch im Fallback-Modus
+    document.dispatchEvent(new CustomEvent('firebaseReady'));
 }
 
 // Hilfsfunktionen für andere Module

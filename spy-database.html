@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Spy-Datenbank - Spacenations Tools</title>
-    <meta name="cache-bust" content="v2">
+    <meta name="cache-bust" content="v3">
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -465,12 +465,12 @@
     </div>
 
     <!-- Firebase Scripts -->
-    <script src="js/firebase-config.js?v=2"></script>
+    <script src="js/firebase-config.js?v=3"></script>
     <script src="js/session-manager.js"></script>
     <script src="js/auth-manager.js"></script>
     <script src="js/firebase-sync.js"></script>
     <script src="js/spy-report-parser.js?v=2"></script>
-    <script src="js/spy-database-manager.js?v=13"></script>
+    <script src="js/spy-database-manager.js?v=14"></script>
 
     <script>
         let currentReports = [];
@@ -526,6 +526,108 @@
                 });
             }
         }, 5000);
+        
+        // Demo-Daten für Offline-Modus
+        function getDemoReports() {
+            return [
+                {
+                    id: 'demo-1',
+                    playerName: 'DemoSpieler1',
+                    planetName: 'DemoPlanet Alpha',
+                    planetCoordinates: '[1:1:1]',
+                    player: {
+                        name: 'DemoSpieler1',
+                        allianceName: 'DemoAllianz'
+                    },
+                    planet: {
+                        name: 'DemoPlanet Alpha',
+                        coordinates: '[1:1:1]'
+                    },
+                    buildings: [
+                        { name: 'Planetenzentrale', level: 15 },
+                        { name: 'Raumhafen', level: 12 },
+                        { name: 'Eisenmine', level: 18 },
+                        { name: 'Siliziumraffinerie', level: 16 },
+                        { name: 'Kohlenstoffgewinnungsanlage', level: 14 },
+                        { name: 'Schiffsfabrik', level: 10 },
+                        { name: 'Waffenfabrik', level: 8 },
+                        { name: 'Forschungszentrum', level: 20 }
+                    ],
+                    research: [
+                        { name: 'Spionageeinheit', level: 5 },
+                        { name: 'Tarneinheit', level: 3 },
+                        { name: 'Invasionseinheit', level: 4 },
+                        { name: 'Plündereinheit', level: 2 },
+                        { name: 'Sabotageeinheit', level: 1 }
+                    ],
+                    statistics: {
+                        threatLevel: 'Mittel',
+                        totalAttackPower: 15000,
+                        totalDefensePower: 12000,
+                        totalResources: 50000,
+                        researchLevel: 3,
+                        buildingLevel: 14
+                    },
+                    createdAt: new Date(Date.now() - 86400000), // 1 Tag alt
+                    originalUrl: 'https://example.com/demo-report-1'
+                },
+                {
+                    id: 'demo-2',
+                    playerName: 'DemoSpieler2',
+                    planetName: 'DemoPlanet Beta',
+                    planetCoordinates: '[2:2:2]',
+                    player: {
+                        name: 'DemoSpieler2',
+                        allianceName: 'DemoAllianz'
+                    },
+                    planet: {
+                        name: 'DemoPlanet Beta',
+                        coordinates: '[2:2:2]'
+                    },
+                    buildings: [
+                        { name: 'Planetenzentrale', level: 20 },
+                        { name: 'Raumhafen', level: 18 },
+                        { name: 'Eisenmine', level: 22 },
+                        { name: 'Siliziumraffinerie', level: 19 },
+                        { name: 'Kohlenstoffgewinnungsanlage', level: 17 },
+                        { name: 'Schiffsfabrik', level: 15 },
+                        { name: 'Waffenfabrik', level: 12 },
+                        { name: 'Forschungszentrum', level: 25 }
+                    ],
+                    research: [
+                        { name: 'Spionageeinheit', level: 8 },
+                        { name: 'Tarneinheit', level: 6 },
+                        { name: 'Invasionseinheit', level: 7 },
+                        { name: 'Plündereinheit', level: 5 },
+                        { name: 'Sabotageeinheit', level: 4 }
+                    ],
+                    statistics: {
+                        threatLevel: 'Hoch',
+                        totalAttackPower: 25000,
+                        totalDefensePower: 20000,
+                        totalResources: 80000,
+                        researchLevel: 6,
+                        buildingLevel: 18
+                    },
+                    createdAt: new Date(Date.now() - 172800000), // 2 Tage alt
+                    originalUrl: 'https://example.com/demo-report-2'
+                }
+            ];
+        }
+        
+        // Demo-Statistiken für Offline-Modus
+        function getDemoStatistics() {
+            return {
+                totalReports: 2,
+                uniquePlayers: 2,
+                uniquePlanets: 2,
+                totalAttackPower: 40000,
+                totalDefensePower: 32000,
+                totalResources: 130000,
+                averageResearchLevel: 4.5,
+                averageBuildingLevel: 16
+            };
+        }
         
         async function waitForAPIs() {
             const maxWait = 10000; // 10 Sekunden
@@ -623,11 +725,12 @@
                     // Verstecke Retry-Button wenn Firebase funktioniert
                     document.getElementById('retry-btn').style.display = 'none';
                 } else {
-                    // Firebase nicht verfügbar - zeige leere Datenbank
-                    console.log('🔄 Firebase nicht verfügbar, zeige leere Datenbank...');
-                    currentReports = [];
-                    await displayReports([]);
-                    showMessage('Datenbank wird geladen... Firebase noch nicht bereit.', 'info');
+                    // Firebase nicht verfügbar - zeige leere Datenbank mit Demo-Daten
+                    console.log('🔄 Firebase nicht verfügbar, zeige Demo-Datenbank...');
+                    currentReports = getDemoReports();
+                    await displayReports(currentReports);
+                    await loadStatistics();
+                    showMessage('Demo-Modus: Firebase nicht verfügbar. Zeige Beispieldaten.', 'info');
                     
                     // Zeige Retry-Button
                     document.getElementById('retry-btn').style.display = 'inline-flex';
@@ -636,12 +739,13 @@
             } catch (error) {
                 console.error('❌ Fehler beim Laden der Spy-Reports:', error);
                 
-                // Zeige leere Reports an, falls Firebase nicht bereit
+                // Zeige Demo-Daten an, falls Firebase nicht bereit
                 if (error.message.includes('Firebase nicht initialisiert') || error.message.includes('Firebase-Initialisierung fehlgeschlagen')) {
-                    console.log('🔄 Firebase noch nicht bereit, zeige leere Datenbank...');
-                    currentReports = [];
-                    await displayReports([]);
-                    showMessage('Datenbank wird geladen... Firebase noch nicht bereit.', 'info');
+                    console.log('🔄 Firebase noch nicht bereit, zeige Demo-Daten...');
+                    currentReports = getDemoReports();
+                    await displayReports(currentReports);
+                    await loadStatistics();
+                    showMessage('Demo-Modus: Firebase nicht verfügbar. Zeige Beispieldaten.', 'info');
                     
                     // Zeige Retry-Button
                     document.getElementById('retry-btn').style.display = 'inline-flex';
@@ -662,13 +766,16 @@
                     displayStatistics(currentStatistics);
                     console.log('✅ Statistiken geladen');
                 } else {
-                    // Zeige leere Statistiken
-                    displayStatistics(null);
+                    // Zeige Demo-Statistiken
+                    console.log('📊 Zeige Demo-Statistiken...');
+                    currentStatistics = getDemoStatistics();
+                    displayStatistics(currentStatistics);
                 }
                 
             } catch (error) {
                 console.error('❌ Fehler beim Laden der Statistiken:', error);
-                displayStatistics(null);
+                currentStatistics = getDemoStatistics();
+                displayStatistics(currentStatistics);
             }
         }
         
@@ -921,32 +1028,54 @@
                 // Firebase-Bereitschaft prüfen (schnell)
                 const firebaseReady = await waitForFirebaseQuick();
                 
-                if (!firebaseReady) {
-                    showMessage('Firebase nicht verfügbar. Suche nicht möglich.', 'error');
-                    return;
-                }
-                
                 showLoading();
                 
-                const searchCriteria = {
-                    playerName: document.getElementById('search-player').value.trim(),
-                    planetName: document.getElementById('search-planet').value.trim(),
-                    limit: 100
-                };
-                
-                // Leere Felder entfernen
-                Object.keys(searchCriteria).forEach(key => {
-                    if (searchCriteria[key] === '' || searchCriteria[key] === undefined) {
-                        delete searchCriteria[key];
+                if (firebaseReady) {
+                    const searchCriteria = {
+                        playerName: document.getElementById('search-player').value.trim(),
+                        planetName: document.getElementById('search-planet').value.trim(),
+                        limit: 100
+                    };
+                    
+                    // Leere Felder entfernen
+                    Object.keys(searchCriteria).forEach(key => {
+                        if (searchCriteria[key] === '' || searchCriteria[key] === undefined) {
+                            delete searchCriteria[key];
+                        }
+                    });
+                    
+                    console.log('🔍 Suche mit Kriterien:', searchCriteria);
+                    
+                    currentReports = await window.SpyDatabaseAPI.searchReports(searchCriteria);
+                    await displayReports(currentReports);
+                    
+                    console.log(`✅ ${currentReports.length} Spy-Reports gefunden`);
+                } else {
+                    // Offline-Suche in Demo-Daten
+                    console.log('🔍 Offline-Suche in Demo-Daten...');
+                    const searchPlayer = document.getElementById('search-player').value.trim().toLowerCase();
+                    const searchPlanet = document.getElementById('search-planet').value.trim().toLowerCase();
+                    
+                    let filteredReports = getDemoReports();
+                    
+                    if (searchPlayer) {
+                        filteredReports = filteredReports.filter(report => 
+                            report.playerName.toLowerCase().includes(searchPlayer)
+                        );
                     }
-                });
-                
-                console.log('🔍 Suche mit Kriterien:', searchCriteria);
-                
-                currentReports = await window.SpyDatabaseAPI.searchReports(searchCriteria);
-                await displayReports(currentReports);
-                
-                console.log(`✅ ${currentReports.length} Spy-Reports gefunden`);
+                    
+                    if (searchPlanet) {
+                        filteredReports = filteredReports.filter(report => 
+                            report.planetName.toLowerCase().includes(searchPlanet)
+                        );
+                    }
+                    
+                    currentReports = filteredReports;
+                    await displayReports(currentReports);
+                    
+                    console.log(`✅ ${currentReports.length} Demo-Reports gefunden`);
+                    showMessage('Demo-Modus: Suche in Beispieldaten.', 'info');
+                }
                 
             } catch (error) {
                 console.error('❌ Fehler bei der Suche:', error);
@@ -958,18 +1087,30 @@
             document.getElementById('search-player').value = '';
             document.getElementById('search-planet').value = '';
             
-            // Alle Reports laden
+            // Alle Reports laden (mit Demo-Daten falls Firebase nicht verfügbar)
             loadReports();
         }
         
         async function viewReport(reportId) {
             try {
-                const report = await window.SpyDatabaseAPI.getReport(reportId);
-                if (report) {
-                    // Öffne Details in neuem Tab
-                    window.open(`spy-report-detail.html?id=${reportId}`, '_blank');
+                const firebaseReady = await waitForFirebaseQuick();
+                
+                if (firebaseReady) {
+                    const report = await window.SpyDatabaseAPI.getReport(reportId);
+                    if (report) {
+                        // Öffne Details in neuem Tab
+                        window.open(`spy-report-detail.html?id=${reportId}`, '_blank');
+                    } else {
+                        showMessage('Bericht nicht gefunden', 'error');
+                    }
                 } else {
-                    showMessage('Bericht nicht gefunden', 'error');
+                    // Offline-Modus: Suche in Demo-Daten
+                    const report = currentReports.find(r => r.id === reportId);
+                    if (report) {
+                        showMessage(`Demo-Bericht: ${report.playerName} - ${report.planetName}`, 'info');
+                    } else {
+                        showMessage('Demo-Bericht nicht gefunden', 'error');
+                    }
                 }
             } catch (error) {
                 console.error('❌ Fehler beim Anzeigen des Berichts:', error);
