@@ -1155,6 +1155,32 @@
         }
 
         // Spy Database Functions
+        async function initializeSpyDatabaseAfterFirebase() {
+            try {
+                if (!currentAlliance) {
+                    console.warn('⚠️ Keine Allianz-Daten für Spy-Datenbank-Initialisierung');
+                    showSpyDatabaseUnavailable();
+                    return;
+                }
+                
+                if (!window.SpyDatabaseAPI) {
+                    console.warn('⚠️ SpyDatabaseAPI nicht verfügbar');
+                    showSpyDatabaseUnavailable();
+                    return;
+                }
+                
+                // Warte kurz, damit Firebase vollständig initialisiert ist
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                console.log('🕵️ Initialisiere Spy-Datenbank nach Firebase-Bereitschaft...');
+                await loadSpyStatistics();
+                await loadRecentReports();
+                
+            } catch (error) {
+                console.error('❌ Fehler beim Initialisieren der Spy-Datenbank nach Firebase:', error);
+                showSpyDatabaseUnavailable();
+            }
+        }
 
         async function loadSpyStatistics() {
             try {
@@ -1339,9 +1365,7 @@
                     members: currentAlliance.members
                 });
                 
-                // Spy-Datenbank nach dem Laden der Allianz-Daten initialisieren
-                await loadSpyStatistics();
-                await loadRecentReports();
+                // Spy-Datenbank wird später nach Firebase-Initialisierung aufgerufen
                 
                 // Prüfe ob User Mitglied ist
                 if (!currentAlliance.members || !currentAlliance.members.includes(username)) {
@@ -1624,13 +1648,19 @@
             try {
                 // Prüfe ob Firebase verfügbar ist
                 if (typeof window.FirebaseConfig === 'undefined') {
-                    console.log('Firebase nicht verfügbar, verwende lokale Daten');
-                    await loadAllianceDataLocal();
-                    return;
+                console.log('Firebase nicht verfügbar, verwende lokale Daten');
+                await loadAllianceDataLocal();
+                
+                // Spy-Datenbank auch für lokale Daten versuchen
+                await initializeSpyDatabaseAfterFirebase();
+                return;
                 }
 
                 await window.FirebaseConfig.waitForInit();
                 await loadAllianceData();
+                
+                // Spy-Datenbank nach Firebase-Initialisierung laden
+                await initializeSpyDatabaseAfterFirebase();
             } catch (error) {
                 console.error('Fehler beim Initialisieren des Allianzdashboards:', error);
                 showError('Fehler beim Laden des Allianzdashboards');
