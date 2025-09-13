@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Spy-Datenbank - Spacenations Tools</title>
-    <meta name="cache-bust" content="v16">
+    <meta name="cache-bust" content="v17">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -492,7 +492,7 @@
     </div>
 
     <!-- Firebase Scripts -->
-    <script src="js/firebase-config.js?v=9&t=1734567892"></script>
+    <script src="js/firebase-config.js?v=10&t=1734567893"></script>
     <script src="js/session-manager.js"></script>
     <script src="js/auth-manager.js"></script>
     <script src="js/firebase-sync.js"></script>
@@ -587,6 +587,12 @@
                 if (status.isReady && !status.isOffline && status.hasDB && !currentReports.some(r => r.id.startsWith('demo-'))) {
                     console.log('🔥 Firebase bereit, lade echte Daten...');
                     loadReports();
+                } else if (status.isOffline && currentReports.length === 0) {
+                    console.log('🔄 Firebase im Offline-Modus, lade Demo-Daten...');
+                    currentReports = getDemoReports();
+                    displayReports(currentReports);
+                    currentStatistics = getDemoStatistics();
+                    displayStatistics(currentStatistics);
                 }
             }
         }, 5000);
@@ -820,6 +826,13 @@
                 if (firebaseReady) {
                     console.log('📋 Lade Spy-Reports...');
                     currentReports = await window.SpyDatabaseAPI.getAllianceReports();
+                    
+                    // Wenn keine echten Daten vorhanden sind, zeige Demo-Daten
+                    if (currentReports.length === 0) {
+                        console.log('🔄 Keine echten Daten gefunden, zeige Demo-Daten...');
+                        currentReports = getDemoReports();
+                        showMessage('Demo-Modus: Keine echten Daten gefunden. Zeige Beispieldaten.', 'info');
+                    }
                     
                     await displayReports(currentReports);
                     await loadStatistics();
