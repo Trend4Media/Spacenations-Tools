@@ -468,7 +468,7 @@
     <script src="js/auth-manager.js"></script>
     <script src="js/firebase-sync.js"></script>
     <script src="js/spy-report-parser.js?v=2"></script>
-    <script src="js/spy-database-manager.js?v=11"></script>
+    <script src="js/spy-database-manager.js?v=12"></script>
 
     <script>
         let currentReports = [];
@@ -510,8 +510,7 @@
             
             setupEventListeners();
             
-            // Warten auf Firebase-Initialisierung
-            await waitForFirebase();
+            // Direkt versuchen, Reports zu laden (mit Error-Handling)
             await loadReports();
         });
         
@@ -529,6 +528,33 @@
             
             console.error('❌ APIs nicht verfügbar nach 10 Sekunden');
             return false;
+        }
+        
+        async function waitForFirebaseQuick() {
+            const maxWait = 5000; // Nur 5 Sekunden
+            const startTime = Date.now();
+            
+            console.log('⏳ Schneller Firebase-Check...');
+            
+            while (Date.now() - startTime < maxWait) {
+                try {
+                    // Prüfe ob FirebaseConfig existiert und DB verfügbar ist
+                    if (window.FirebaseConfig && window.FirebaseConfig.getDB) {
+                        const db = window.FirebaseConfig.getDB();
+                        if (db) {
+                            console.log('🔥 Firebase DB verfügbar');
+                            return true;
+                        }
+                    }
+                } catch (error) {
+                    // Firebase noch nicht bereit, das ist OK
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 200));
+            }
+            
+            console.log('⏳ Firebase noch nicht bereit, versuche trotzdem...');
+            return false; // Nicht blockieren
         }
         
         async function waitForFirebase() {
@@ -601,10 +627,10 @@
         
         async function loadReports() {
             try {
-                // Firebase-Bereitschaft prüfen
-                await waitForFirebase();
-                
                 showLoading();
+                
+                // Versuche Firebase zu warten, aber nicht blockieren
+                await waitForFirebaseQuick();
                 
                 console.log('📋 Lade Spy-Reports...');
                 currentReports = await window.SpyDatabaseAPI.getAllianceReports();
@@ -615,14 +641,22 @@
                 
             } catch (error) {
                 console.error('❌ Fehler beim Laden der Spy-Reports:', error);
-                showError('Fehler beim Laden der Spy-Reports: ' + error.message);
+                
+                // Zeige leere Reports an, falls Firebase nicht bereit
+                if (error.message.includes('Firebase nicht initialisiert')) {
+                    console.log('🔄 Firebase noch nicht bereit, zeige leere Datenbank...');
+                    await displayReports([]);
+                    showMessage('Datenbank wird geladen... Firebase noch nicht bereit.', 'info');
+                } else {
+                    showError('Fehler beim Laden der Spy-Reports: ' + error.message);
+                }
             }
         }
         
         async function loadStatistics() {
             try {
-                // Firebase-Bereitschaft prüfen
-                await waitForFirebase();
+                // Firebase-Bereitschaft prüfen (schnell)
+                await waitForFirebaseQuick();
                 
                 console.log('📊 Lade Statistiken...');
                 currentStatistics = await window.SpyDatabaseAPI.getStatistics();
@@ -865,8 +899,8 @@
         
         async function searchReports() {
             try {
-                // Firebase-Bereitschaft prüfen
-                await waitForFirebase();
+                // Firebase-Bereitschaft prüfen (schnell)
+                await waitForFirebaseQuick();
                 
                 showLoading();
                 
