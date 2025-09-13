@@ -106,6 +106,14 @@ function initializeFirebase() {
             });
         }
         
+        // Debug: Zeige Firebase-Status
+        console.log('🔍 Firebase-Status nach Initialisierung:', {
+            initialized: window.firebaseServices.initialized,
+            auth: !!window.firebaseServices.auth,
+            db: !!window.firebaseServices.db,
+            offline: window.firebaseServices.offline
+        });
+        
         // Dispatch ready event sofort
         document.dispatchEvent(new CustomEvent('firebaseReady'));
         console.log('🚀 Firebase bereit für andere Module');
@@ -242,7 +250,7 @@ function handleFirebaseInitError(error) {
 window.FirebaseConfig = {
     isReady: () => {
         const ready = window.firebaseServices?.initialized || false;
-        console.log('🔍 FirebaseConfig.isReady():', ready, 'firebaseServices:', !!window.firebaseServices);
+        console.log('🔍 FirebaseConfig.isReady():', ready, 'firebaseServices:', !!window.firebaseServices, 'auth:', !!window.firebaseServices?.auth, 'db:', !!window.firebaseServices?.db);
         return ready;
     },
     isOffline: () => window.firebaseServices?.offline || false,
