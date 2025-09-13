@@ -557,7 +557,7 @@
                 console.log('📋 Lade Spy-Reports...');
                 currentReports = await window.SpyDatabaseAPI.getAllianceReports();
                 
-                displayReports(currentReports);
+                await displayReports(currentReports);
                 console.log(`✅ ${currentReports.length} Spy-Reports geladen`);
                 
             } catch (error) {
@@ -615,7 +615,7 @@
             `;
         }
         
-        function displayReports(reports) {
+        async function displayReports(reports) {
             const container = document.getElementById('reports-container');
             
             if (reports.length === 0) {
@@ -628,6 +628,9 @@
                 `;
                 return;
             }
+            
+            // Admin-Status prüfen
+            const userIsAdmin = await isAdmin();
             
             const reportsHtml = reports.map(report => {
                 const threatLevel = window.SpyReportAPI.formatThreatLevel(report.threatLevel);
@@ -685,7 +688,7 @@
                                 📋 URL kopieren
                             </button>
                             
-                            ${await isAdmin() ? `
+                            ${userIsAdmin ? `
                                 <button class="btn btn-small danger" onclick="deleteReport('${report.id}', '${report.playerName}')">
                                     🗑️ Löschen
                                 </button>
@@ -726,7 +729,7 @@
                 console.log('🔍 Suche mit Kriterien:', searchCriteria);
                 
                 currentReports = await window.SpyDatabaseAPI.searchReports(searchCriteria);
-                displayReports(currentReports);
+                await displayReports(currentReports);
                 
                 console.log(`✅ ${currentReports.length} Spy-Reports gefunden`);
                 
