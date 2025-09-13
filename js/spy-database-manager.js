@@ -31,6 +31,12 @@ class SpyDatabaseManager {
                 });
             }
             
+            // Allianz-Daten aus SessionAPI laden (Fallback)
+            if (window.SessionAPI && !this.currentAlliance) {
+                this.currentAlliance = window.SessionAPI.getCurrentAlliance();
+                console.log('📋 Allianz aus SessionAPI geladen:', this.currentAlliance);
+            }
+            
             console.log('🗄️ Spy Database Manager initialisiert');
             
         } catch (error) {
@@ -50,9 +56,35 @@ class SpyDatabaseManager {
                 throw new Error('Firebase nicht initialisiert');
             }
             
-            const alliance = allianceName || this.currentAlliance;
+            let alliance = allianceName || this.currentAlliance;
+            
+            // Fallback: Versuche Allianz-Daten aus verschiedenen Quellen zu laden
             if (!alliance) {
-                throw new Error('Keine Allianz zugeordnet');
+                console.warn('⚠️ Keine Allianz-Daten gefunden, versuche Fallback...');
+                
+                // 1. Versuche SessionAPI
+                if (window.SessionAPI) {
+                    alliance = window.SessionAPI.getCurrentAlliance();
+                    console.log('📋 Allianz aus SessionAPI (Fallback):', alliance);
+                }
+                
+                // 2. Versuche localStorage
+                if (!alliance) {
+                    const storedAlliance = localStorage.getItem('currentAlliance');
+                    if (storedAlliance) {
+                        try {
+                            const allianceData = JSON.parse(storedAlliance);
+                            alliance = allianceData.name || allianceData;
+                            console.log('📋 Allianz aus localStorage (Fallback):', alliance);
+                        } catch (error) {
+                            console.warn('⚠️ Fehler beim Parsen der localStorage Allianz-Daten:', error);
+                        }
+                    }
+                }
+                
+                if (!alliance) {
+                    throw new Error('Keine Allianz zugeordnet. Bitte melde dich über das User-Dashboard an.');
+                }
             }
             
             console.log('💾 Speichere Spy-Report für Allianz:', alliance);
@@ -126,9 +158,35 @@ class SpyDatabaseManager {
                 throw new Error('Firebase nicht initialisiert');
             }
             
-            const alliance = allianceName || this.currentAlliance;
+            let alliance = allianceName || this.currentAlliance;
+            
+            // Fallback: Versuche Allianz-Daten aus verschiedenen Quellen zu laden
             if (!alliance) {
-                throw new Error('Keine Allianz zugeordnet');
+                console.warn('⚠️ Keine Allianz-Daten gefunden, versuche Fallback...');
+                
+                // 1. Versuche SessionAPI
+                if (window.SessionAPI) {
+                    alliance = window.SessionAPI.getCurrentAlliance();
+                    console.log('📋 Allianz aus SessionAPI (Fallback):', alliance);
+                }
+                
+                // 2. Versuche localStorage
+                if (!alliance) {
+                    const storedAlliance = localStorage.getItem('currentAlliance');
+                    if (storedAlliance) {
+                        try {
+                            const allianceData = JSON.parse(storedAlliance);
+                            alliance = allianceData.name || allianceData;
+                            console.log('📋 Allianz aus localStorage (Fallback):', alliance);
+                        } catch (error) {
+                            console.warn('⚠️ Fehler beim Parsen der localStorage Allianz-Daten:', error);
+                        }
+                    }
+                }
+                
+                if (!alliance) {
+                    throw new Error('Keine Allianz zugeordnet. Bitte melde dich über das User-Dashboard an.');
+                }
             }
             
             console.log('📋 Lade Spy-Reports für Allianz:', alliance);
@@ -346,9 +404,35 @@ class SpyDatabaseManager {
                 throw new Error('Firebase nicht initialisiert');
             }
             
-            const alliance = allianceName || this.currentAlliance;
+            let alliance = allianceName || this.currentAlliance;
+            
+            // Fallback: Versuche Allianz-Daten aus verschiedenen Quellen zu laden
             if (!alliance) {
-                throw new Error('Keine Allianz zugeordnet');
+                console.warn('⚠️ Keine Allianz-Daten gefunden, versuche Fallback...');
+                
+                // 1. Versuche SessionAPI
+                if (window.SessionAPI) {
+                    alliance = window.SessionAPI.getCurrentAlliance();
+                    console.log('📋 Allianz aus SessionAPI (Fallback):', alliance);
+                }
+                
+                // 2. Versuche localStorage
+                if (!alliance) {
+                    const storedAlliance = localStorage.getItem('currentAlliance');
+                    if (storedAlliance) {
+                        try {
+                            const allianceData = JSON.parse(storedAlliance);
+                            alliance = allianceData.name || allianceData;
+                            console.log('📋 Allianz aus localStorage (Fallback):', alliance);
+                        } catch (error) {
+                            console.warn('⚠️ Fehler beim Parsen der localStorage Allianz-Daten:', error);
+                        }
+                    }
+                }
+                
+                if (!alliance) {
+                    throw new Error('Keine Allianz zugeordnet. Bitte melde dich über das User-Dashboard an.');
+                }
             }
             
             console.log('📊 Lade Allianz-Statistiken für:', alliance);
