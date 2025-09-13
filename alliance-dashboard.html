@@ -1294,6 +1294,9 @@
             // Event Listeners sofort einrichten
             setupEventListeners();
             
+            // Hauptinitialisierung starten
+            await initializeAllianceDashboard();
+            
             // Lade Allianz-Daten basierend auf URL-Parameter
             const urlParams = new URLSearchParams(window.location.search);
             const allianceId = urlParams.get('id');
@@ -1656,7 +1659,7 @@
                 return;
                 }
 
-                await window.FirebaseConfig.waitForInit();
+                await window.FirebaseConfig.waitForReady();
                 await loadAllianceData();
                 
                 // Spy-Datenbank nach Firebase-Initialisierung laden
