@@ -232,19 +232,59 @@ function handleFirebaseInitError(error) {
             }
         },
         db: {
-            collection: () => ({
-                doc: () => ({
-                    get: () => Promise.resolve({ exists: false }),
-                    update: () => Promise.resolve(),
-                    set: () => Promise.resolve()
-                }),
-                add: () => Promise.resolve({ id: 'mock-id-' + Date.now() }),
-                where: () => ({
-                    orderBy: () => ({
-                        get: () => Promise.resolve({ docs: [] })
-                    })
-                })
-            })
+            collection: (collectionName) => {
+                console.log('🔧 Mock Firestore collection:', collectionName);
+                return {
+                    doc: (docId) => ({
+                        get: () => Promise.resolve({ exists: false }),
+                        update: () => Promise.resolve(),
+                        set: () => Promise.resolve()
+                    }),
+                    add: (data) => Promise.resolve({ id: 'mock-id-' + Date.now() }),
+                    where: (field, operator, value) => {
+                        console.log('🔧 Mock Firestore where:', field, operator, value);
+                        return {
+                            orderBy: (orderField, direction = 'desc') => {
+                                console.log('🔧 Mock Firestore orderBy:', orderField, direction);
+                                return {
+                                    limit: (limitCount) => {
+                                        console.log('🔧 Mock Firestore limit:', limitCount);
+                                        return {
+                                            get: () => {
+                                                console.log('🔧 Mock Firestore query.get() - returning empty results');
+                                                return Promise.resolve({ 
+                                                    docs: [],
+                                                    forEach: (callback) => {
+                                                        // Empty forEach for mock
+                                                    }
+                                                });
+                                            }
+                                        };
+                                    },
+                                    get: () => {
+                                        console.log('🔧 Mock Firestore query.get() - returning empty results');
+                                        return Promise.resolve({ 
+                                            docs: [],
+                                            forEach: (callback) => {
+                                                // Empty forEach for mock
+                                            }
+                                        });
+                                    }
+                                };
+                            },
+                            get: () => {
+                                console.log('🔧 Mock Firestore query.get() - returning empty results');
+                                return Promise.resolve({ 
+                                    docs: [],
+                                    forEach: (callback) => {
+                                        // Empty forEach for mock
+                                    }
+                                });
+                            }
+                        };
+                    }
+                };
+            }
         },
         serverTimestamp: () => new Date(),
         initialized: true,
