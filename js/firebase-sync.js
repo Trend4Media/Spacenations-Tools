@@ -150,7 +150,11 @@ class FirebaseSync {
                 console.log('✅ Dashboard-Logout erfolgreich');
                 
                 // Erfolgsmeldung für Index-Seite setzen
-                sessionStorage.setItem('logoutSuccess', 'true');
+                if (window.SessionAPI) {
+                    window.SessionAPI.setLogoutSuccess('Sie wurden erfolgreich abgemeldet.');
+                } else {
+                    sessionStorage.setItem('logoutSuccess', 'true');
+                }
                 
                 // Weiterleitung zur Startseite
                 setTimeout(() => {
@@ -216,23 +220,42 @@ class FirebaseSync {
     
     // Logout-Success Message prüfen
     checkLogoutSuccessMessage() {
-        if (this.currentPage === 'index' && sessionStorage.getItem('logoutSuccess')) {
-            // Erfolgsmeldung anzeigen
-            setTimeout(() => {
-                if (typeof showLoginSuccess === 'function') {
-                    showLoginSuccess('Sie wurden erfolgreich abgemeldet.');
+        if (this.currentPage === 'index') {
+            // Prüfe SessionAPI für Logout-Message
+            if (window.SessionAPI) {
+                const logoutMessage = window.SessionAPI.getLogoutSuccess();
+                if (logoutMessage) {
+                    setTimeout(() => {
+                        if (typeof showLoginSuccess === 'function') {
+                            showLoginSuccess(logoutMessage);
+                        }
+                        
+                        // Message nach 5 Sekunden verstecken
+                        setTimeout(() => {
+                            if (typeof hideLoginMessages === 'function') {
+                                hideLoginMessages();
+                            }
+                        }, 5000);
+                    }, 500);
                 }
-                
-                // Message nach 5 Sekunden verstecken
-                setTimeout(() => {
-                    if (typeof hideLoginMessages === 'function') {
-                        hideLoginMessages();
-                    }
-                }, 5000);
-            }, 500);
+            }
             
-            // Flag entfernen
-            sessionStorage.removeItem('logoutSuccess');
+            // Legacy: Prüfe sessionStorage
+            if (sessionStorage.getItem('logoutSuccess')) {
+                setTimeout(() => {
+                    if (typeof showLoginSuccess === 'function') {
+                        showLoginSuccess('Sie wurden erfolgreich abgemeldet.');
+                    }
+                    
+                    setTimeout(() => {
+                        if (typeof hideLoginMessages === 'function') {
+                            hideLoginMessages();
+                        }
+                    }, 5000);
+                }, 500);
+                
+                sessionStorage.removeItem('logoutSuccess');
+            }
         }
     }
     

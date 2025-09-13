@@ -44,6 +44,12 @@ class AuthManager {
                     this.userData = await this.loadUserData(user.uid);
                     console.log('📂 Benutzerdaten geladen:', this.userData?.username);
                     
+                    // Session-Daten aktualisieren
+                    if (window.SessionAPI) {
+                        window.SessionAPI.setUserData(user, this.userData);
+                        window.SessionAPI.setSessionActive(true);
+                    }
+                    
                     // LastLogin aktualisieren
                     await this.updateLastLogin(user.uid);
                     
@@ -52,6 +58,11 @@ class AuthManager {
                 }
             } else {
                 this.userData = null;
+                
+                // Session-Daten löschen
+                if (window.SessionAPI) {
+                    window.SessionAPI.clearUserData();
+                }
             }
             
             // Alle registrierten Callbacks aufrufen
@@ -96,6 +107,11 @@ class AuthManager {
             // Aktivität hinzufügen
             this.addActivity('🔐', 'Erfolgreich angemeldet');
             
+            // Login-Success Message setzen
+            if (window.SessionAPI) {
+                window.SessionAPI.setLoginSuccess('Login erfolgreich! Willkommen zurück.');
+            }
+            
             return { success: true, user: userCredential.user };
             
         } catch (error) {
@@ -133,6 +149,11 @@ class AuthManager {
             // Aktivität hinzufügen bevor logout
             if (this.currentUser) {
                 await this.addActivity('🚪', 'Abgemeldet');
+            }
+            
+            // Logout-Success Message setzen
+            if (window.SessionAPI) {
+                window.SessionAPI.setLogoutSuccess('Erfolgreich abgemeldet.');
             }
             
             await this.auth.signOut();

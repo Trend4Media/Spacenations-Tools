@@ -576,7 +576,20 @@
         function getCurrentUsername() {
             console.log('🔍 Suche Benutzername...');
             
-            // Methode 1: Aus URL-Parameter (beim Login weitergegeben)
+            // Methode 1: Aus SessionAPI (neue Standard-Methode)
+            if (window.SessionAPI) {
+                const sessionData = window.SessionAPI.getUserData();
+                if (sessionData.username) {
+                    console.log('✅ Username aus SessionAPI gefunden:', sessionData.username);
+                    return sessionData.username;
+                }
+                if (sessionData.email) {
+                    console.log('✅ Email aus SessionAPI gefunden:', sessionData.email);
+                    return sessionData.email;
+                }
+            }
+            
+            // Methode 2: Aus URL-Parameter (beim Login weitergegeben)
             const urlParams = new URLSearchParams(window.location.search);
             const usernameFromUrl = urlParams.get('username');
             if (usernameFromUrl) {
@@ -584,21 +597,21 @@
                 return usernameFromUrl;
             }
             
-            // Methode 2: Aus localStorage (beim Login gespeichert)
+            // Methode 3: Aus localStorage (Legacy)
             const usernameFromStorage = localStorage.getItem('currentUsername');
             if (usernameFromStorage) {
                 console.log('✅ Username aus localStorage gefunden:', usernameFromStorage);
                 return usernameFromStorage;
             }
             
-            // Methode 3: Aus sessionStorage
+            // Methode 4: Aus sessionStorage (Legacy)
             const usernameFromSession = sessionStorage.getItem('currentUsername');
             if (usernameFromSession) {
                 console.log('✅ Username aus sessionStorage gefunden:', usernameFromSession);
                 return usernameFromSession;
             }
             
-            // Methode 4: Aus URL-String extrahieren (falls URL-Parameter nicht richtig geparst wurden)
+            // Methode 5: Aus URL-String extrahieren (falls URL-Parameter nicht richtig geparst wurden)
             const url = window.location.href;
             const usernameMatch = url.match(/[?&]username=([^&]+)/);
             if (usernameMatch) {
@@ -607,24 +620,36 @@
                 return decodedUsername;
             }
             
-            // Methode 5: Fallback - verwende 'guest' wenn nichts gefunden wird
+            // Methode 6: Fallback - verwende 'guest' wenn nichts gefunden wird
             console.log('⚠️ Kein Username gefunden - verwende Fallback');
             return 'guest';
         }
         
         function getCurrentUserEmail() {
             // E-Mail-Adresse des eingeloggten Benutzers holen
+            
+            // Methode 1: Aus SessionAPI (neue Standard-Methode)
+            if (window.SessionAPI) {
+                const sessionData = window.SessionAPI.getUserData();
+                if (sessionData.email) {
+                    return sessionData.email;
+                }
+            }
+            
+            // Methode 2: Aus URL-Parameter
             const urlParams = new URLSearchParams(window.location.search);
             const emailFromUrl = urlParams.get('email');
             if (emailFromUrl) {
                 return emailFromUrl;
             }
             
+            // Methode 3: Aus localStorage (Legacy)
             const emailFromStorage = localStorage.getItem('currentUserEmail');
             if (emailFromStorage) {
                 return emailFromStorage;
             }
             
+            // Methode 4: Aus sessionStorage (Legacy)
             const emailFromSession = sessionStorage.getItem('currentUserEmail');
             if (emailFromSession) {
                 return emailFromSession;
@@ -1307,6 +1332,12 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Session Management Scripts -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/session-manager.js"></script>
+    <script src="js/auth-manager.js"></script>
+    <script src="js/firebase-sync.js"></script>
     
     <!-- Firebase Migration Script -->
     <script src="js/firebase-migration.js"></script>

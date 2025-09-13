@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Spacenations Tools</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Session Management Scripts -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth-manager.js"></script>
+    <script src="js/firebase-sync.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e0e0e0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .dashboard-redirect-container {
+            background: rgba(0,0,0,0.8);
+            border: 2px solid #00FF88;
+            border-radius: 14px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+        
+        .logo {
+            font-size: 3rem;
+            color: #00FF88;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+        
+        h1 {
+            color: #00FF88;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+        
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .status.info {
+            background: rgba(59,130,246,0.1);
+            border: 1px solid #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .status.success {
+            background: rgba(34,197,94,0.1);
+            border: 1px solid #22c55e;
+            color: #22c55e;
+        }
+        
+        .status.error {
+            background: rgba(239,68,68,0.1);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #333;
+            border-top: 4px solid #00FF88;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .user-info {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #333;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn.primary {
+            background: linear-gradient(135deg, #00FF88, #44FF99);
+            color: #000;
+        }
+        
+        .btn.primary:hover {
+            background: linear-gradient(135deg, #44FF99, #88FFBB);
+            transform: translateY(-2px);
+        }
+        
+        .btn.secondary {
+            background: linear-gradient(135deg, #3a5998, #4a90e2);
+            color: white;
+        }
+        
+        .btn.secondary:hover {
+            background: linear-gradient(135deg, #4a90e2, #5ba0f2);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-redirect-container">
+        <div class="logo">🚀</div>
+        <h1>Spacenations Dashboard</h1>
+        
+        <div id="status" class="status info">
+            <div class="spinner"></div>
+            <div>Initialisiere Session...</div>
+        </div>
+        
+        <div id="user-info" class="user-info" style="display: none;">
+            <h3>👤 Willkommen zurück!</h3>
+            <div id="user-details"></div>
+        </div>
+        
+        <div id="actions" style="display: none;">
+            <a href="user-dashboard.html" class="btn primary" id="dashboard-btn">
+                🏠 Zum Dashboard
+            </a>
+            <a href="index.html" class="btn secondary">
+                🏠 Zur Startseite
+            </a>
+        </div>
+        
+        <div id="error-actions" style="display: none;">
+            <a href="index.html" class="btn primary">
+                🔐 Anmelden
+            </a>
+            <a href="register.html" class="btn secondary">
+                📝 Registrieren
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let userData = null;
+
+        // Dashboard Redirect Manager
+        class DashboardRedirectManager {
+            constructor() {
+                this.init();
+            }
+            
+            async init() {
+                try {
+                    console.log('🚀 Dashboard Redirect Manager initialisiert');
+                    
+                    // Warte auf Firebase und AuthManager
+                    await window.FirebaseConfig.waitForReady();
+                    await window.AuthAPI.waitForInit();
+                    
+                    console.log('✅ Firebase und AuthManager bereit');
+                    
+                    // Prüfe aktuellen User
+                    this.checkCurrentUser();
+                    
+                    // Auth State Changes überwachen
+                    window.AuthAPI.onAuthStateChange((user, userData) => {
+                        this.handleAuthStateChange(user, userData);
+                    });
+                    
+                } catch (error) {
+                    console.error('❌ Dashboard Redirect Manager Fehler:', error);
+                    this.showError('Fehler beim Initialisieren: ' + error.message);
+                }
+            }
+            
+            checkCurrentUser() {
+                const user = window.AuthAPI.getCurrentUser();
+                const userData = window.AuthAPI.getUserData();
+                
+                if (user && userData) {
+                    this.handleAuthStateChange(user, userData);
+                } else {
+                    this.showError('Kein Benutzer angemeldet');
+                }
+            }
+            
+            handleAuthStateChange(user, userData) {
+                currentUser = user;
+                userData = userData;
+                
+                if (user && userData) {
+                    this.showSuccess(user, userData);
+                } else {
+                    this.showError('Kein Benutzer angemeldet');
+                }
+            }
+            
+            showSuccess(user, userData) {
+                const statusDiv = document.getElementById('status');
+                const userInfoDiv = document.getElementById('user-info');
+                const userDetailsDiv = document.getElementById('user-details');
+                const actionsDiv = document.getElementById('actions');
+                const errorActionsDiv = document.getElementById('error-actions');
+                
+                // Status aktualisieren
+                statusDiv.className = 'status success';
+                statusDiv.innerHTML = '✅ Session erfolgreich initialisiert';
+                
+                // User-Info anzeigen
+                const displayName = userData.username || userData.email || 'User';
+                userDetailsDiv.innerHTML = `
+                    <div><strong>Benutzer:</strong> ${displayName}</div>
+                    <div><strong>E-Mail:</strong> ${user.email}</div>
+                    <div><strong>Super-Admin:</strong> ${userData.isSuperAdmin === true ? '✅ Ja' : '❌ Nein'}</div>
+                    <div><strong>Alliance-Admin:</strong> ${userData.isAllianceAdmin === true ? '✅ Ja' : '❌ Nein'}</div>
+                `;
+                userInfoDiv.style.display = 'block';
+                
+                // Actions anzeigen
+                actionsDiv.style.display = 'block';
+                errorActionsDiv.style.display = 'none';
+                
+                // Dashboard-Button mit User-Daten verlinken
+                const dashboardBtn = document.getElementById('dashboard-btn');
+                const urlParams = new URLSearchParams(window.location.search);
+                const redirectUrl = `user-dashboard.html?username=${encodeURIComponent(displayName)}&email=${encodeURIComponent(user.email)}`;
+                dashboardBtn.href = redirectUrl;
+                
+                console.log('✅ Dashboard bereit für:', displayName);
+                
+                // Automatische Weiterleitung nach 3 Sekunden
+                setTimeout(() => {
+                    window.location.href = redirectUrl;
+                }, 3000);
+            }
+            
+            showError(message) {
+                const statusDiv = document.getElementById('status');
+                const userInfoDiv = document.getElementById('user-info');
+                const actionsDiv = document.getElementById('actions');
+                const errorActionsDiv = document.getElementById('error-actions');
+                
+                // Status aktualisieren
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = `❌ ${message}`;
+                
+                // User-Info verstecken
+                userInfoDiv.style.display = 'none';
+                
+                // Error Actions anzeigen
+                actionsDiv.style.display = 'none';
+                errorActionsDiv.style.display = 'block';
+                
+                console.log('❌ Dashboard Fehler:', message);
+                
+                // Automatische Weiterleitung zur Startseite nach 5 Sekunden
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 5000);
+            }
+        }
+
+        // Dashboard Redirect Manager starten
+        document.addEventListener('DOMContentLoaded', () => {
+            window.dashboardRedirectManager = new DashboardRedirectManager();
+        });
+    </script>
+</body>
+</html>
