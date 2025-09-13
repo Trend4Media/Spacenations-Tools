@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Spy-Datenbank - Spacenations Tools</title>
-    <meta name="cache-bust" content="v4">
+    <meta name="cache-bust" content="v5">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -26,8 +26,8 @@
         
         body {
             font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-            background: #0a0a0a;
-            color: #ffffff;
+            background: #071118;
+            color: #a5f3fc;
             min-height: 100vh;
             padding: 0;
             overflow-x: auto;
@@ -46,7 +46,7 @@
             grid-template-rows: 80px 1fr;
             height: 100vh;
             gap: 1px;
-            background: #1a1a1a;
+            background: #071118;
         }
         
         /* Header mit vertikalen Texten */
@@ -127,16 +127,20 @@
         
         /* Hauptgrid (mittlere Spalte) */
         .main-grid {
-            background: #0a0a0a;
+            background: #071118;
             overflow: auto;
             position: relative;
         }
         
         .grid-container {
             display: grid;
-            gap: 1px;
-            background: #1a1a1a;
+            gap: 0;
+            background: #071118;
             min-width: max-content;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.2);
         }
         
         /* Kategorien Header (vertikaler Text) */
@@ -145,96 +149,116 @@
         }
         
         .category-header {
-            background: #111111;
-            border-bottom: 2px solid #333;
+            background: rgba(6, 182, 212, 0.1);
+            border-bottom: 1px solid rgba(6, 182, 212, 0.4);
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 15px 10px;
+            padding: 8px 4px;
             writing-mode: vertical-rl;
             text-orientation: mixed;
             font-weight: 600;
-            color: #888;
-            font-size: 0.9rem;
+            color: #a5f3fc;
+            font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            min-height: 120px;
+            letter-spacing: 0.05em;
+            min-height: 80px;
+            min-width: 3rem;
             transition: all 0.2s ease;
+            position: relative;
         }
         
         .category-header:hover {
-            background: #1a1a1a;
+            background: rgba(6, 182, 212, 0.15);
             color: #ffffff;
+        }
+        
+        .category-header.left {
+            background: rgba(6, 182, 212, 0.1);
+        }
+        
+        .category-header.build {
+            background: rgba(16, 185, 129, 0.05);
+        }
+        
+        .category-header.res {
+            background: rgba(236, 72, 153, 0.05);
+        }
+        
+        .category-header.units {
+            background: rgba(245, 158, 11, 0.05);
         }
         
         /* Grid Zellen */
         .grid-cell {
-            background: #0a0a0a;
-            border: 1px solid #222;
-            min-height: 60px;
+            background: #071118;
+            border-bottom: 1px solid rgba(6, 182, 212, 0.1);
+            min-height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: all 0.2s ease;
             position: relative;
+            padding: 8px;
         }
         
         .grid-cell:hover {
-            background: #1a1a1a;
-            border-color: #333;
-            transform: scale(1.02);
-            z-index: 10;
+            background: rgba(6, 182, 212, 0.05);
+            border-color: rgba(6, 182, 212, 0.3);
         }
         
         .grid-cell.has-data {
-            background: #0d1421;
-            border-color: #007acc;
+            background: rgba(6, 182, 212, 0.03);
+            border-color: rgba(6, 182, 212, 0.2);
         }
         
         .grid-cell.has-data:hover {
-            background: #1a2332;
-            border-color: #0099ff;
+            background: rgba(6, 182, 212, 0.08);
+            border-color: rgba(6, 182, 212, 0.4);
         }
         
         .grid-cell.separator-cell {
-            background: #1a1a1a;
-            border-color: #444;
+            background: rgba(6, 182, 212, 0.02);
+            border-color: rgba(6, 182, 212, 0.1);
             cursor: default;
         }
         
         .grid-cell.separator-cell:hover {
-            background: #1a1a1a;
+            background: rgba(6, 182, 212, 0.02);
             transform: none;
         }
         
         .cell-content {
             text-align: center;
-            color: #888;
-            font-size: 0.85rem;
+            color: #a5f3fc;
+            font-size: 0.875rem;
             font-weight: 500;
         }
         
         .cell-content.has-data {
-            color: #007acc;
+            color: #06b6d4;
             font-weight: 600;
         }
         
         .cell-content.separator {
-            color: #666;
+            color: rgba(165, 243, 252, 0.6);
             font-weight: 400;
-            letter-spacing: 0.2em;
+            letter-spacing: 0.1em;
         }
         
         .cell-link {
-            color: #007acc;
-            text-decoration: none;
+            color: #06b6d4;
+            text-decoration: underline;
+            text-decoration-color: rgba(6, 182, 212, 0.3);
+            text-underline-offset: 2px;
             font-weight: 600;
+            transition: all 0.2s ease;
         }
         
         .cell-link:hover {
-            color: #0099ff;
-            text-decoration: underline;
+            color: #0891b2;
+            text-decoration-color: rgba(6, 182, 212, 0.6);
         }
         
         /* Sidebar (rechte Spalte) */
@@ -482,25 +506,25 @@
         
         // Detaillierte Kategorien für das Grid (wie im Bild gezeigt)
         const categories = [
-            'Planet',
-            'Koordinaten', 
-            'Allianz',
-            'Planetenzentrale',
-            'Raumhafen',
-            'Eisenmine',
-            'Siliziumraffinerie',
-            'Kohlenstoffgewinnungsanlage',
-            'Schiffsfabrik',
-            'Waffenfabrik',
-            'Forschungszentrum',
-            'Forschung',
-            'Spionageeinheit',
-            'Tarneinheit',
-            'Invasionseinheit',
-            'Plündereinheit',
-            'Sabotageeinheit',
-            'Datum',
-            'Link'
+            { name: 'Planet', group: 'left' },
+            { name: 'Koordinaten', group: 'left' },
+            { name: 'Allianz', group: 'left' },
+            { name: 'Planetenzentrale', group: 'build' },
+            { name: 'Raumhafen', group: 'build' },
+            { name: 'Eisenmine', group: 'build' },
+            { name: 'Siliziumraffinerie', group: 'build' },
+            { name: 'Kohlenstoffgewinnungsanlage', group: 'build' },
+            { name: 'Schiffsfabrik', group: 'build' },
+            { name: 'Waffenfabrik', group: 'build' },
+            { name: 'Forschungszentrum', group: 'build' },
+            { name: 'Forschung', group: 'res' },
+            { name: 'Spionageeinheit', group: 'units' },
+            { name: 'Tarneinheit', group: 'units' },
+            { name: 'Invasionseinheit', group: 'units' },
+            { name: 'Plündereinheit', group: 'units' },
+            { name: 'Sabotageeinheit', group: 'units' },
+            { name: 'Datum', group: 'units' },
+            { name: 'Link', group: 'units' }
         ];
         
         // Initialisierung
@@ -556,57 +580,57 @@
             return [
                 {
                     id: 'demo-1',
-                    playerName: 'DemoSpieler1',
-                    planetName: 'DemoPlanet Alpha',
-                    planetCoordinates: '[1:1:1]',
+                    playerName: 'AstraX',
+                    planetName: 'Vega Prime',
+                    planetCoordinates: '[2:144:7]',
                     player: {
-                        name: 'DemoSpieler1',
-                        allianceName: 'DemoAllianz'
+                        name: 'AstraX',
+                        allianceName: 'NOVA'
                     },
                     planet: {
-                        name: 'DemoPlanet Alpha',
-                        coordinates: '[1:1:1]'
+                        name: 'Vega Prime',
+                        coordinates: '[2:144:7]'
                     },
                     buildings: [
-                        { name: 'Planetenzentrale', level: 15 },
-                        { name: 'Raumhafen', level: 12 },
+                        { name: 'Planetenzentrale', level: 12 },
+                        { name: 'Raumhafen', level: 9 },
                         { name: 'Eisenmine', level: 18 },
                         { name: 'Siliziumraffinerie', level: 16 },
-                        { name: 'Kohlenstoffgewinnungsanlage', level: 14 },
+                        { name: 'Kohlenstoffgewinnungsanlage', level: 15 },
                         { name: 'Schiffsfabrik', level: 10 },
                         { name: 'Waffenfabrik', level: 8 },
-                        { name: 'Forschungszentrum', level: 20 }
+                        { name: 'Forschungszentrum', level: 11 }
                     ],
                     research: [
-                        { name: 'Spionageeinheit', level: 5 },
-                        { name: 'Tarneinheit', level: 3 },
-                        { name: 'Invasionseinheit', level: 4 },
-                        { name: 'Plündereinheit', level: 2 },
+                        { name: 'Spionageeinheit', level: 20 },
+                        { name: 'Tarneinheit', level: 5 },
+                        { name: 'Invasionseinheit', level: 2 },
+                        { name: 'Plündereinheit', level: 7 },
                         { name: 'Sabotageeinheit', level: 1 }
                     ],
                     statistics: {
-                        threatLevel: 'Mittel',
-                        totalAttackPower: 15000,
-                        totalDefensePower: 12000,
-                        totalResources: 50000,
-                        researchLevel: 3,
-                        buildingLevel: 14
+                        threatLevel: 'Hoch',
+                        totalAttackPower: 25000,
+                        totalDefensePower: 20000,
+                        totalResources: 80000,
+                        researchLevel: 6,
+                        buildingLevel: 18
                     },
                     createdAt: new Date(Date.now() - 86400000), // 1 Tag alt
                     originalUrl: 'https://example.com/demo-report-1'
                 },
                 {
                     id: 'demo-2',
-                    playerName: 'DemoSpieler2',
-                    planetName: 'DemoPlanet Beta',
-                    planetCoordinates: '[2:2:2]',
+                    playerName: 'NexusCommander',
+                    planetName: 'Alpha Centauri',
+                    planetCoordinates: '[3:201:12]',
                     player: {
-                        name: 'DemoSpieler2',
-                        allianceName: 'DemoAllianz'
+                        name: 'NexusCommander',
+                        allianceName: 'STELLAR'
                     },
                     planet: {
-                        name: 'DemoPlanet Beta',
-                        coordinates: '[2:2:2]'
+                        name: 'Alpha Centauri',
+                        coordinates: '[3:201:12]'
                     },
                     buildings: [
                         { name: 'Planetenzentrale', level: 20 },
@@ -626,12 +650,12 @@
                         { name: 'Sabotageeinheit', level: 4 }
                     ],
                     statistics: {
-                        threatLevel: 'Hoch',
-                        totalAttackPower: 25000,
-                        totalDefensePower: 20000,
-                        totalResources: 80000,
-                        researchLevel: 6,
-                        buildingLevel: 18
+                        threatLevel: 'Sehr Hoch',
+                        totalAttackPower: 35000,
+                        totalDefensePower: 28000,
+                        totalResources: 120000,
+                        researchLevel: 8,
+                        buildingLevel: 20
                     },
                     createdAt: new Date(Date.now() - 172800000), // 2 Tage alt
                     originalUrl: 'https://example.com/demo-report-2'
@@ -871,7 +895,7 @@
             const gridHTML = `
                 <div class="categories-header">
                     ${categories.map(category => `
-                        <div class="category-header">${category}</div>
+                        <div class="category-header ${category.group}">${category.name}</div>
                     `).join('')}
                 </div>
                 ${reports.map((report, index) => `
@@ -881,10 +905,10 @@
                         </div>
                     </div>
                     ${categories.map(category => {
-                        const content = getCellContent(report, category);
+                        const content = getCellContent(report, category.name);
                         const hasData = content !== '–' && content !== '';
-                        const isLink = category === 'Link' && content === '📋';
-                        const isSeparator = category === 'Forschung';
+                        const isLink = category.name === 'Link' && content === '📋';
+                        const isSeparator = category.name === 'Forschung';
                         
                         let onclickAction = '';
                         if (isLink && report.originalUrl) {
