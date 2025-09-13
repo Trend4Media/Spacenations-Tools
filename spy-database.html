@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <title>🕵️ Spacenations Spy Database</title>
     <meta name="description" content="Advanced spy intelligence database for Spacenations strategy game. Track players, planets, buildings, and military units.">
-    <meta name="cache-bust" content="v21&force=2">
+    <meta name="cache-bust" content="v22&force=3">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -254,6 +254,7 @@
             color: var(--muted-foreground);
             border-right: 1px solid var(--border);
             white-space: nowrap;
+            min-width: 60px;
         }
 
         .table td {
@@ -274,11 +275,14 @@
         .header-rotated {
             writing-mode: vertical-rl;
             text-orientation: mixed;
-            height: 120px;
-            min-width: 24px;
+            height: 140px;
+            min-width: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1.2;
         }
 
         .player-name {
@@ -424,7 +428,7 @@
                                     <th><div class="header-rotated">RAUMHAFEN</div></th>
                                     <th><div class="header-rotated">EISENMINE</div></th>
                                     <th><div class="header-rotated">SILIZIUMRAFFINERIE</div></th>
-                                    <th><div class="header-rotated">KOHLENSTOFFGEWINNUNGSANLAGE</div></th>
+                                    <th><div class="header-rotated">KOHLENSTOFF<br>GEWINNUNGSANLAGE</div></th>
                                     <th><div class="header-rotated">SCHIFFSFABRIK</div></th>
                                     <th><div class="header-rotated">WAFFENFABRIK</div></th>
                                     <th><div class="header-rotated">FORSCHUNGSZENTRUM</div></th>
@@ -433,7 +437,7 @@
                                     <th><div class="header-rotated">TARNEINHEIT</div></th>
                                     <th><div class="header-rotated">INVASIONSEINHEIT</div></th>
                                     <th><div class="header-rotated">PLÜNDEREINHEIT</div></th>
-                                    <th><div class="header-rotated">SABOTAGEEINHEIT</div></th>
+                                    <th><div class="header-rotated">SABOTAGE<br>EINHEIT</div></th>
                                     <th>DATUM</th>
                                     <th>LINK</th>
                                 </tr>
@@ -478,7 +482,7 @@
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', async () => {
-            console.log('🕵️ Spy Database Grid initialisiert - Version v21');
+            console.log('🕵️ Spy Database Grid initialisiert - Version v22');
             
             // Load demo data immediately
             console.log('🚀 Lade sofort Demo-Daten...');
