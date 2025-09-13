@@ -864,7 +864,10 @@
                     titleElement.textContent = `👑 ${alliance.name} [${alliance.tag}] (Gründer)`;
                     descriptionElement.textContent = `Du hast die Allianz "${alliance.name}" erstellt. Status: ${alliance.status === 'approved' ? 'Genehmigt' : 'Wartet auf Genehmigung'}`;
                     if (alliance.status === 'approved') {
-                        actionsElement.innerHTML = '<a href="alliance-dashboard-redirect.html" class="tool-link">Zum Allianzdashboard</a>';
+                        actionsElement.innerHTML = `
+                            <a href="alliance-dashboard-redirect.html" class="tool-link">Zum Allianzdashboard</a>
+                            <a href="spy-database.html" class="tool-link">🕵️ Spy-Datenbank</a>
+                        `;
                     } else {
                         actionsElement.innerHTML = '<span class="tool-link" style="opacity: 0.7;">Wartet auf Genehmigung...</span>';
                     }
@@ -873,7 +876,10 @@
                 case 'member':
                     titleElement.textContent = `🤝 ${alliance.name} [${alliance.tag}]`;
                     descriptionElement.textContent = `Du bist Mitglied der Allianz "${alliance.name}".`;
-                    actionsElement.innerHTML = '<a href="alliance-dashboard.html" class="tool-link" onclick="redirectToAllianceDashboard()">Zum Allianzdashboard</a>';
+                    actionsElement.innerHTML = `
+                        <a href="alliance-dashboard.html" class="tool-link" onclick="redirectToAllianceDashboard()">Zum Allianzdashboard</a>
+                        <a href="spy-database.html" class="tool-link">🕵️ Spy-Datenbank</a>
+                    `;
                     break;
                     
                 case 'error':
@@ -917,6 +923,13 @@
                         navLink.textContent = `👑 ${alliance.name}`;
                         navLink.href = 'alliance-dashboard-redirect.html';
                         navLink.onclick = null;
+                        
+                        // Füge Spy-Database-Link zur Navigation hinzu
+                        const spyNavLink = document.createElement('a');
+                        spyNavLink.href = 'spy-database.html';
+                        spyNavLink.textContent = '🕵️ Spy-Datenbank';
+                        spyNavLink.className = 'nav-link';
+                        navLink.parentNode.insertBefore(spyNavLink, navLink.nextSibling);
                     } else {
                         navLink.textContent = `⏳ ${alliance.name}`;
                         navLink.href = '#';
@@ -928,6 +941,13 @@
                     navLink.textContent = `🤝 ${alliance.name}`;
                     navLink.href = 'alliance-dashboard.html';
                     navLink.onclick = () => redirectToAllianceDashboard();
+                    
+                    // Füge Spy-Database-Link zur Navigation hinzu
+                    const spyNavLink = document.createElement('a');
+                    spyNavLink.href = 'spy-database.html';
+                    spyNavLink.textContent = '🕵️ Spy-Datenbank';
+                    spyNavLink.className = 'nav-link';
+                    navLink.parentNode.insertBefore(spyNavLink, navLink.nextSibling);
                     break;
                     
                 case 'error':
