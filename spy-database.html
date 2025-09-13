@@ -6,8 +6,9 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Spy-Datenbank - Spacenations Tools</title>
-    <meta name="cache-bust" content="v18">
+    <title>🕵️ Spacenations Spy Database</title>
+    <meta name="description" content="Advanced spy intelligence database for Spacenations strategy game. Track players, planets, buildings, and military units.">
+    <meta name="cache-bust" content="v19">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -23,505 +24,465 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
+        :root {
+            /* Gaming Dark Theme */
+            --background: hsl(217, 33%, 8%);
+            --foreground: hsl(185, 100%, 85%);
+            --card: hsl(217, 33%, 10%);
+            --card-foreground: hsl(185, 100%, 88%);
+            --primary: hsl(184, 100%, 40%);
+            --primary-foreground: hsl(217, 33%, 8%);
+            --secondary: hsl(217, 33%, 15%);
+            --secondary-foreground: hsl(185, 100%, 85%);
+            --muted: hsl(217, 33%, 12%);
+            --muted-foreground: hsl(185, 30%, 65%);
+            --accent: hsl(184, 100%, 35%);
+            --border: hsl(217, 33%, 18%);
+            --input: hsl(217, 33%, 18%);
+            --success: hsl(142, 76%, 36%);
+            --warning: hsl(43, 89%, 55%);
+            --danger: hsl(0, 72%, 51%);
+            --gaming-cyan: hsl(184, 100%, 40%);
+            --gaming-cyan-light: hsl(184, 100%, 60%);
+            --gaming-success: hsl(142, 76%, 36%);
+            --gaming-warning: hsl(43, 89%, 55%);
+            --table-header: hsl(217, 33%, 12%);
+            --table-row: hsl(217, 33%, 10%);
+            --table-row-hover: hsl(217, 33%, 15%);
+            --sidebar-bg: hsl(217, 33%, 6%);
+        }
+
         body {
-            font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-            background: #071118;
-            color: #a5f3fc;
-            min-height: 100vh;
-            padding: 0;
-            overflow-x: auto;
-        }
-        
-        .container {
-            max-width: 100vw;
-            margin: 0;
-            padding: 0;
-        }
-        
-        /* Modern Grid Layout */
-        .spy-database-grid {
-            display: grid;
-            grid-template-columns: 200px 1fr 250px;
-            grid-template-rows: 80px 1fr;
+            font-family: 'Courier New', monospace;
+            background-color: var(--background);
+            color: var(--foreground);
             height: 100vh;
-            gap: 1px;
-            background: #071118;
-        }
-        
-        /* Header mit vertikalen Texten */
-        .grid-header {
-            grid-column: 1 / -1;
-            background: #111111;
-            border-bottom: 2px solid #333;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 30px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        
-        .header-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #ffffff;
-            letter-spacing: -0.02em;
-        }
-        
-        .header-actions {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-        
-        /* User Liste (erste Spalte) */
-        .users-column {
-            background: #111111;
-            border-right: 1px solid #333;
-            overflow-y: auto;
-            max-height: calc(100vh - 80px);
-        }
-        
-        .users-header {
-            padding: 20px 15px;
-            background: #1a1a1a;
-            border-bottom: 1px solid #333;
-            font-weight: 600;
-            color: #666;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        
-        .user-item {
-            padding: 15px;
-            border-bottom: 1px solid #222;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-        }
-        
-        .user-item:hover {
-            background: #1a1a1a;
-            border-left: 3px solid #007acc;
-        }
-        
-        .user-item.active {
-            background: #1a1a1a;
-            border-left: 3px solid #007acc;
-            color: #007acc;
-        }
-        
-        .user-name {
-            font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 3px;
-        }
-        
-        .user-planet {
-            font-size: 0.8rem;
-            color: #888;
-        }
-        
-        /* Hauptgrid (mittlere Spalte) */
-        .main-grid {
-            background: #071118;
-            overflow: auto;
-            position: relative;
-        }
-        
-        .grid-container {
-            display: grid;
-            grid-template-columns: minmax(12rem,16rem) repeat(27, minmax(3rem, 1fr));
-            gap: 0;
-            background: #071118;
-            min-width: max-content;
-            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(6, 182, 212, 0.1);
-            border: 1px solid rgba(6, 182, 212, 0.2);
         }
-        
-        /* Kategorien Header (vertikaler Text) */
-        .categories-header {
-            display: contents;
-        }
-        
-        .category-header {
-            background: rgba(6, 182, 212, 0.1);
-            border-bottom: 1px solid rgba(6, 182, 212, 0.4);
+
+        .dashboard {
             display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            padding: 8px 4px;
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-            font-weight: 600;
-            color: #a5f3fc;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            min-height: 60px;
-            min-width: 3rem;
-            transition: all 0.2s ease;
-            position: relative;
-            white-space: nowrap;
+            height: 100vh;
         }
-        
-        .category-header:hover {
-            background: rgba(6, 182, 212, 0.15);
-            color: #ffffff;
-        }
-        
-        .category-header.left {
-            background: rgba(6, 182, 212, 0.1);
-        }
-        
-        .category-header.build {
-            background: rgba(16, 185, 129, 0.05);
-        }
-        
-        .category-header.res {
-            background: rgba(236, 72, 153, 0.05);
-        }
-        
-        .category-header.units {
-            background: rgba(245, 158, 11, 0.05);
-        }
-        
-        /* Sticky Header für Spieler-Spalte */
-        .sticky-left-header {
-            position: sticky;
-            left: 0;
-            z-index: 20;
-            background: rgba(8, 20, 29, 0.95);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(6, 182, 212, 0.4);
-            padding: 8px 12px;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #a5f3fc;
-            font-weight: 600;
+
+        .main-content {
+            flex: 1;
             display: flex;
-            align-items: flex-end;
-            justify-content: flex-start;
-            min-height: 60px;
+            flex-direction: column;
         }
-        
-        .sticky-left-cell {
-            position: sticky;
-            left: 0;
-            z-index: 10;
-            background: rgba(8, 20, 29, 0.95);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(6, 182, 212, 0.1);
-            padding: 8px 12px;
-            font-weight: 500;
-            color: #a7f3d0;
+
+        .header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
             display: flex;
             align-items: center;
-            min-height: 40px;
+            gap: 16px;
         }
-        
-        /* Grid Zellen */
-        .grid-cell {
-            background: #071118;
-            border-bottom: 1px solid rgba(6, 182, 212, 0.1);
-            min-height: 48px;
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--foreground);
+        }
+
+        .header-buttons {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            padding: 8px;
+            gap: 8px;
         }
-        
-        .grid-cell:hover {
-            background: rgba(6, 182, 212, 0.05);
-            border-color: rgba(6, 182, 212, 0.3);
-        }
-        
-        .grid-cell.has-data {
-            background: rgba(6, 182, 212, 0.03);
-            border-color: rgba(6, 182, 212, 0.2);
-        }
-        
-        .grid-cell.has-data:hover {
-            background: rgba(6, 182, 212, 0.08);
-            border-color: rgba(6, 182, 212, 0.4);
-        }
-        
-        .grid-cell.separator-cell {
-            background: rgba(6, 182, 212, 0.02);
-            border-color: rgba(6, 182, 212, 0.1);
-            cursor: default;
-        }
-        
-        .grid-cell.separator-cell:hover {
-            background: rgba(6, 182, 212, 0.02);
-            transform: none;
-        }
-        
-        .cell-content {
-            text-align: center;
-            color: #a5f3fc;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-        
-        .cell-content.has-data {
-            color: #06b6d4;
-            font-weight: 600;
-        }
-        
-        .cell-content.separator {
-            color: rgba(165, 243, 252, 0.6);
-            font-weight: 400;
-            letter-spacing: 0.1em;
-        }
-        
-        .cell-link {
-            color: #06b6d4;
-            text-decoration: underline;
-            text-decoration-color: rgba(6, 182, 212, 0.3);
-            text-underline-offset: 2px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-        
-        .cell-link:hover {
-            color: #0891b2;
-            text-decoration-color: rgba(6, 182, 212, 0.6);
-        }
-        
-        /* Sidebar (rechte Spalte) */
-        .sidebar {
-            background: #111111;
-            border-left: 1px solid #333;
-            overflow-y: auto;
-            max-height: calc(100vh - 80px);
-        }
-        
-        .sidebar-section {
-            padding: 20px 15px;
-            border-bottom: 1px solid #222;
-        }
-        
-        .sidebar-section h3 {
-            color: #ffffff;
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        
-        /* Buttons */
+
         .btn {
-            padding: 8px 16px;
-            border: none;
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--foreground);
             border-radius: 6px;
-            font-weight: 500;
             cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
+            font-size: 12px;
+            font-family: inherit;
+            display: flex;
             align-items: center;
             gap: 6px;
-            transition: all 0.2s ease;
-            font-size: 0.9rem;
+            transition: all 0.2s;
         }
-        
-        .btn.primary {
-            background: #007acc;
+
+        .btn:hover {
+            background: var(--secondary);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--primary-foreground);
+            box-shadow: 0 0 10px hsla(184, 100%, 40%, 0.3);
+        }
+
+        .status-badge {
+            background: var(--gaming-success);
             color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            box-shadow: 0 0 8px hsla(142, 76%, 36%, 0.4);
         }
-        
-        .btn.primary:hover {
-            background: #0099ff;
+
+        .content {
+            flex: 1;
+            padding: 16px;
+            overflow: auto;
         }
-        
-        .btn.secondary {
-            background: #333;
-            color: #ccc;
-            border: 1px solid #555;
+
+        .sidebar {
+            width: 320px;
+            background: var(--sidebar-bg);
+            border-left: 1px solid var(--border);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
         }
-        
-        .btn.secondary:hover {
-            background: #444;
-            border-color: #666;
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
         }
-        
-        /* Form Elements */
+
+        .card-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--foreground);
+        }
+
+        .card-content {
+            padding: 16px;
+        }
+
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
-        
-        .form-group label {
+
+        .form-label {
             display: block;
-            color: #ccc;
-            margin-bottom: 5px;
-            font-size: 0.85rem;
-            font-weight: 500;
+            font-size: 11px;
+            color: var(--muted-foreground);
+            margin-bottom: 4px;
         }
-        
-        .form-group input {
+
+        .form-input {
             width: 100%;
             padding: 8px 12px;
-            border: 1px solid #444;
-            border-radius: 4px;
-            background: #1a1a1a;
-            color: #fff;
-            font-size: 0.9rem;
+            background: var(--input);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--foreground);
+            font-family: inherit;
+            font-size: 14px;
         }
-        
-        .form-group input:focus {
-            outline: none;
-            border-color: #007acc;
+
+        .form-input::placeholder {
+            color: var(--muted-foreground);
         }
-        
-        /* Loading States */
-        .loading {
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .btn-flex {
+            flex: 1;
+        }
+
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .stats-label {
+            font-size: 11px;
+            color: var(--muted-foreground);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stats-value {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--gaming-cyan);
+        }
+
+        .table-container {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow-x: auto;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .table th {
+            background: var(--table-header);
+            padding: 12px 8px;
             text-align: center;
-            padding: 40px;
-            color: #888;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--muted-foreground);
+            border-right: 1px solid var(--border);
+            white-space: nowrap;
         }
-        
+
+        .table td {
+            padding: 12px 8px;
+            text-align: center;
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table tr:nth-child(even) {
+            background: var(--table-row);
+        }
+
+        .table tr:hover {
+            background: var(--table-row-hover);
+        }
+
+        .header-rotated {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            height: 120px;
+            min-width: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .player-name {
+            color: var(--gaming-cyan);
+            font-weight: bold;
+        }
+
+        .coordinates {
+            color: var(--gaming-cyan);
+            font-family: 'Courier New', monospace;
+        }
+
+        .alliance {
+            color: var(--gaming-cyan);
+            font-weight: bold;
+        }
+
+        .building-value {
+            color: var(--gaming-cyan-light);
+            font-weight: bold;
+        }
+
+        .unit-value {
+            color: var(--gaming-warning);
+            font-weight: bold;
+        }
+
+        .research-value {
+            color: var(--muted-foreground);
+            font-family: 'Courier New', monospace;
+        }
+
+        .copy-btn {
+            padding: 4px 8px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--foreground);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            box-shadow: 0 0 10px hsla(184, 100%, 40%, 0.3);
+        }
+
+        .copy-btn:hover {
+            background: var(--secondary);
+        }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: var(--muted-foreground);
+        }
+
         .spinner {
-            width: 32px;
-            height: 32px;
-            border: 3px solid #333;
-            border-top: 3px solid #007acc;
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
+            margin-bottom: 16px;
         }
-        
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
+
         .empty-state {
             text-align: center;
             padding: 40px;
-            color: #888;
+            color: var(--muted-foreground);
         }
-        
-        .empty-state h3 {
-            color: #ccc;
-            margin-bottom: 10px;
-        }
-        
-        /* Stats Display */
-        .stat-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            padding: 5px 0;
-            border-bottom: 1px solid #222;
-        }
-        
-        .stat-label {
-            color: #888;
-            font-size: 0.85rem;
-        }
-        
-        .stat-value {
-            color: #007acc;
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-        
-        /* Responsive */
-        @media (max-width: 1200px) {
-            .spy-database-grid {
-                grid-template-columns: 1fr;
-                grid-template-rows: 80px auto auto 1fr;
-            }
-            
-            .users-column {
-                grid-row: 2;
-                max-height: 200px;
-                border-right: none;
-                border-bottom: 1px solid #333;
-            }
-            
+
+        @media (max-width: 1024px) {
             .sidebar {
-                grid-row: 3;
-                max-height: 300px;
-                border-left: none;
-                border-bottom: 1px solid #333;
-            }
-            
-            .main-grid {
-                grid-row: 4;
+                display: none;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Modern Grid Layout -->
-        <div class="spy-database-grid">
+    <div class="dashboard">
+        <!-- Main Content -->
+        <div class="main-content">
             <!-- Header -->
-            <div class="grid-header">
-                <div class="header-title">🕵️ Spy Database</div>
-                <div class="header-actions">
-                    <button class="btn primary" onclick="window.open('spy-report-input.html', '_blank')">+ Neuer Bericht</button>
-                    <button class="btn secondary" onclick="retryFirebaseConnection()" id="retry-btn" style="display: none;">🔄 Firebase retry</button>
-                    <button class="btn secondary" onclick="window.location.href='user-dashboard.html'">← Dashboard</button>
-                </div>
-            </div>
-            
-            <!-- User Liste (links) -->
-            <div class="users-column">
-                <div class="users-header">Spieler</div>
-                <div id="users-list">
-                    <div class="loading">
-                        <div class="spinner"></div>
-                        <p>Lade Spieler...</p>
+            <div class="header">
+                <div class="header-left">
+                    <h1 class="title">🕵️ Spy Database</h1>
+                    <div class="header-buttons">
+                        <button class="btn btn-primary" onclick="addNewReport()">
+                            ➕ Neuer Bericht
+                        </button>
+                        <button class="btn" onclick="retryFirebaseConnection()" id="retry-btn" style="display: none;">
+                            🔄 Firebase retry
+                        </button>
+                        <button class="btn" onclick="goToDashboard()">
+                            ← Dashboard
+                        </button>
                     </div>
-                </div>
-            </div>
-            
-            <!-- Hauptgrid (mitte) -->
-            <div class="main-grid">
-                <div id="grid-container" class="grid-container">
-                    <div class="loading">
-                        <div class="spinner"></div>
-                        <p>Lade Spy-Reports...</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Sidebar (rechts) -->
-            <div class="sidebar">
-                <div class="sidebar-section">
-                    <h3>🔍 Suche</h3>
-                    <div class="form-group">
-                        <label for="search-player">Spieler:</label>
-                        <input type="text" id="search-player" placeholder="Spielername...">
-                    </div>
-                    <div class="form-group">
-                        <label for="search-planet">Planet:</label>
-                        <input type="text" id="search-planet" placeholder="Planetname...">
-                    </div>
-                    <button class="btn primary" onclick="searchReports()" style="width: 100%; margin-bottom: 10px;">🔍 Suchen</button>
-                    <button class="btn secondary" onclick="clearFilters()" style="width: 100%; margin-bottom: 10px;">🗑️ Leeren</button>
-                    <button class="btn secondary" onclick="loadReports()" style="width: 100%;">🔄 Aktualisieren</button>
                 </div>
                 
-                <div class="sidebar-section">
-                    <h3>📊 Statistiken</h3>
-                    <div id="stats-display">
-                        <div class="loading">
-                            <div class="spinner"></div>
-                            <p>Lade Statistiken...</p>
-                        </div>
+                <div class="status-badge" id="status-badge">
+                    ✅ Echte Daten geladen! Firebase-Verbindung erfolgreich.
+                </div>
+            </div>
+
+            <!-- Data Table -->
+            <div class="content">
+                <div class="table-container">
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>SPIELER</th>
+                                    <th>PLANET</th>
+                                    <th>KOORDINATEN</th>
+                                    <th>ALLIANZ</th>
+                                    <th><div class="header-rotated">PLANETENZENTRALE</div></th>
+                                    <th><div class="header-rotated">RAUMHAFEN</div></th>
+                                    <th><div class="header-rotated">EISENMINE</div></th>
+                                    <th><div class="header-rotated">SILIZIUMRAFFINERIE</div></th>
+                                    <th><div class="header-rotated">KOHLENSTOFFGEWINNUNGSANLAGE</div></th>
+                                    <th><div class="header-rotated">SCHIFFSFABRIK</div></th>
+                                    <th><div class="header-rotated">WAFFENFABRIK</div></th>
+                                    <th><div class="header-rotated">FORSCHUNGSZENTRUM</div></th>
+                                    <th><div class="header-rotated">FORSCHUNG</div></th>
+                                    <th><div class="header-rotated">SPIONAGEEINHEIT</div></th>
+                                    <th><div class="header-rotated">TARNEINHEIT</div></th>
+                                    <th><div class="header-rotated">INVASIONSEINHEIT</div></th>
+                                    <th><div class="header-rotated">PLÜNDEREINHEIT</div></th>
+                                    <th><div class="header-rotated">SABOTAGEEINHEIT</div></th>
+                                    <th>DATUM</th>
+                                    <th>LINK</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataTable">
+                                <!-- Data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Search Section -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🔍 SUCHE</div>
+                </div>
+                <div class="card-content">
+                    <div class="form-group">
+                        <label class="form-label">Spieler:</label>
+                        <input type="text" class="form-input" placeholder="Spielername..." id="playerSearch">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Planet:</label>
+                        <input type="text" class="form-input" placeholder="Planetenname..." id="planetSearch">
+                    </div>
+                    <button class="btn btn-primary btn-full" onclick="performSearch()">
+                        🔍 Suchen
+                    </button>
+                    <div class="button-group" style="margin-top: 12px;">
+                        <button class="btn btn-flex" onclick="clearSearch()">🗑️ Leeren</button>
+                        <button class="btn btn-flex" onclick="refreshData()">📊 Aktualisieren</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Panel -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📊 STATISTIKEN</div>
+                </div>
+                <div class="card-content">
+                    <div class="stats-item">
+                        <div class="stats-label">📊 Gesamt Berichte:</div>
+                        <div class="stats-value" id="totalReports">0</div>
+                    </div>
+                    <div class="stats-item">
+                        <div class="stats-label">👥 Eindeutige Spieler:</div>
+                        <div class="stats-value" id="uniquePlayers">0</div>
+                    </div>
+                    <div class="stats-item">
+                        <div class="stats-label">🌍 Eindeutige Planeten:</div>
+                        <div class="stats-value" id="uniquePlanets">0</div>
+                    </div>
+                    <div class="stats-item">
+                        <div class="stats-label">🎯 Gesamt Angriffsstärke:</div>
+                        <div class="stats-value" id="totalAttack">0</div>
+                    </div>
+                    <div class="stats-item">
+                        <div class="stats-label">⚗️ Forschungslevel:</div>
+                        <div class="stats-value" id="researchLevel">0</div>
+                    </div>
+                    <div class="stats-item">
+                        <div class="stats-label">🏗️ Gebäudelevel:</div>
+                        <div class="stats-value" id="buildingLevel">0</div>
                     </div>
                 </div>
             </div>
@@ -537,834 +498,293 @@
     <script src="js/spy-database-manager.js?v=15"></script>
 
     <script>
+        // Global variables
         let currentReports = [];
-        let currentStatistics = null;
-        let selectedUser = null;
-        
-        // Detaillierte Kategorien für das Grid (wie im Bild gezeigt)
-        const categories = [
-            { name: 'Planet', group: 'left' },
-            { name: 'Koordinaten', group: 'left' },
-            { name: 'Allianz', group: 'left' },
-            { name: 'Planetenzentrale', group: 'build' },
-            { name: 'Raumhafen', group: 'build' },
-            { name: 'Eisenmine', group: 'build' },
-            { name: 'Siliziumraffinerie', group: 'build' },
-            { name: 'Kohlenstoffgewinnungsanlage', group: 'build' },
-            { name: 'Schiffsfabrik', group: 'build' },
-            { name: 'Waffenfabrik', group: 'build' },
-            { name: 'Forschungszentrum', group: 'build' },
-            { name: 'Forschung', group: 'res' },
-            { name: 'Spionageeinheit', group: 'units' },
-            { name: 'Tarneinheit', group: 'units' },
-            { name: 'Invasionseinheit', group: 'units' },
-            { name: 'Plündereinheit', group: 'units' },
-            { name: 'Sabotageeinheit', group: 'units' },
-            { name: 'Datum', group: 'units' },
-            { name: 'Link', group: 'units' }
-        ];
-        
-        // Initialisierung
+        let currentStatistics = {};
+        let filteredReports = [];
+
+        // Initialize the application
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('🕵️ Spy Database Grid initialisiert');
             
-            // Sofort Demo-Daten laden (nicht auf APIs warten)
+            // Load demo data immediately
             console.log('🚀 Lade sofort Demo-Daten...');
             currentReports = getDemoReports();
+            filteredReports = [...currentReports];
             await displayReports(currentReports);
             currentStatistics = getDemoStatistics();
             displayStatistics(currentStatistics);
             showMessage('🚀 Spy-Datenbank geladen! Demo-Modus aktiv. Versuche Firebase-Verbindung...', 'info');
             
-            // Zeige Retry-Button
+            // Show retry button
             document.getElementById('retry-btn').style.display = 'inline-flex';
             
-            // Warten auf APIs im Hintergrund
+            // Try Firebase connection in background
             setTimeout(async () => {
-                if (!await waitForAPIs()) {
-                    console.log('⚠️ APIs nicht verfügbar, bleibe im Demo-Modus');
-                    return;
-                }
-                
-                setupEventListeners();
-                
-                // Versuche Firebase im Hintergrund zu verbinden
                 try {
                     const firebaseReady = await waitForFirebaseQuick();
                     if (firebaseReady) {
                         console.log('🔥 Firebase verbunden! Lade echte Daten...');
                         await loadReports();
                         
-                        // Verstecke Retry-Button wenn echte Daten geladen wurden
+                        // Hide retry button when real data is loaded
                         document.getElementById('retry-btn').style.display = 'none';
                         showMessage('✅ Echte Daten geladen! Firebase-Verbindung erfolgreich.', 'success');
-                } else {
-                    console.log('⚠️ Firebase nicht verfügbar, bleibe im Demo-Modus');
-                    showMessage('Demo-Modus: Firebase nicht verfügbar. Zeige Beispieldaten. Sie können trotzdem alle Funktionen nutzen!', 'info');
-                }
+                    } else {
+                        console.log('⚠️ Firebase nicht verfügbar, bleibe im Demo-Modus');
+                        showMessage('Demo-Modus: Firebase nicht verfügbar. Zeige Beispieldaten. Sie können trotzdem alle Funktionen nutzen!', 'info');
+                    }
                 } catch (error) {
                     console.log('⚠️ Firebase-Verbindung fehlgeschlagen, bleibe im Demo-Modus:', error.message);
                     showMessage('Demo-Modus: Firebase-Verbindung fehlgeschlagen. Zeige Beispieldaten. Sie können trotzdem alle Funktionen nutzen!', 'info');
                 }
             }, 1000);
         });
-        
-        // Debug: Firebase-Status überwachen
-        setInterval(() => {
-            if (window.FirebaseConfig) {
-                const status = {
-                    isReady: window.FirebaseConfig.isReady(),
-                    isOffline: window.FirebaseConfig.isOffline(),
-                    hasDB: !!window.FirebaseConfig.getDB(),
-                    hasAuth: !!window.FirebaseConfig.getAuth()
-                };
-                console.log('🔍 Firebase Status:', status);
-                
-                // Wenn Firebase bereit ist, versuche echte Daten zu laden
-                if (status.isReady && !status.isOffline && status.hasDB && !currentReports.some(r => r.id.startsWith('demo-'))) {
-                    console.log('🔥 Firebase bereit, lade echte Daten...');
-                    loadReports();
-                } else if (status.isOffline && currentReports.length === 0) {
-                    console.log('🔄 Firebase im Offline-Modus, lade Demo-Daten...');
-                    currentReports = getDemoReports();
-                    displayReports(currentReports);
-                    currentStatistics = getDemoStatistics();
-                    displayStatistics(currentStatistics);
-                }
-            }
-        }, 5000);
-        
-        // Demo-Daten für Offline-Modus
+
+        // Demo data for offline mode
         function getDemoReports() {
             return [
                 {
                     id: 'demo-1',
-                    playerName: 'AstraX',
-                    planetName: 'Vega Prime',
-                    planetCoordinates: '[2:144:7]',
-                    player: {
-                        name: 'AstraX',
-                        allianceName: 'NOVA'
-                    },
-                    planet: {
-                        name: 'Vega Prime',
-                        coordinates: '[2:144:7]'
-                    },
-                    buildings: [
-                        { name: 'Planetenzentrale', level: 12 },
-                        { name: 'Raumhafen', level: 9 },
-                        { name: 'Eisenmine', level: 18 },
-                        { name: 'Siliziumraffinerie', level: 16 },
-                        { name: 'Kohlenstoffgewinnungsanlage', level: 15 },
-                        { name: 'Schiffsfabrik', level: 10 },
-                        { name: 'Waffenfabrik', level: 8 },
-                        { name: 'Forschungszentrum', level: 11 }
-                    ],
-                    research: [
-                        { name: 'Spionageeinheit', level: 20 },
-                        { name: 'Tarneinheit', level: 5 },
-                        { name: 'Invasionseinheit', level: 2 },
-                        { name: 'Plündereinheit', level: 7 },
-                        { name: 'Sabotageeinheit', level: 1 }
-                    ],
-                    statistics: {
-                        threatLevel: 'Hoch',
-                        totalAttackPower: 25000,
-                        totalDefensePower: 20000,
-                        totalResources: 80000,
-                        researchLevel: 6,
-                        buildingLevel: 18
-                    },
-                    createdAt: new Date(Date.now() - 86400000), // 1 Tag alt
-                    originalUrl: 'https://example.com/demo-report-1'
+                    player: 'AstraX',
+                    planet: 'Vega Prime',
+                    coordinates: '[2:144:7]',
+                    alliance: 'NOVA',
+                    planetenzentrale: 12,
+                    raumhafen: 9,
+                    eisenmine: 18,
+                    siliziumraffinerie: 16,
+                    kohlenstoffgewinnungsanlage: 15,
+                    schiffsfabrik: 10,
+                    waffenfabrik: 8,
+                    forschungszentrum: 11,
+                    spionageeinheit: 20,
+                    tarneinheit: 5,
+                    invasionseinheit: 2,
+                    pluendereinheit: 7,
+                    sabotageeinheit: 1,
+                    datum: '12.9.2025',
+                    originalUrl: 'https://example.com/report/1'
                 },
                 {
                     id: 'demo-2',
-                    playerName: 'NexusCommander',
-                    planetName: 'Alpha Centauri',
-                    planetCoordinates: '[3:201:12]',
-                    player: {
-                        name: 'NexusCommander',
-                        allianceName: 'STELLAR'
-                    },
-                    planet: {
-                        name: 'Alpha Centauri',
-                        coordinates: '[3:201:12]'
-                    },
-                    buildings: [
-                        { name: 'Planetenzentrale', level: 20 },
-                        { name: 'Raumhafen', level: 18 },
-                        { name: 'Eisenmine', level: 22 },
-                        { name: 'Siliziumraffinerie', level: 19 },
-                        { name: 'Kohlenstoffgewinnungsanlage', level: 17 },
-                        { name: 'Schiffsfabrik', level: 15 },
-                        { name: 'Waffenfabrik', level: 12 },
-                        { name: 'Forschungszentrum', level: 25 }
-                    ],
-                    research: [
-                        { name: 'Spionageeinheit', level: 8 },
-                        { name: 'Tarneinheit', level: 6 },
-                        { name: 'Invasionseinheit', level: 7 },
-                        { name: 'Plündereinheit', level: 5 },
-                        { name: 'Sabotageeinheit', level: 4 }
-                    ],
-                    statistics: {
-                        threatLevel: 'Sehr Hoch',
-                        totalAttackPower: 35000,
-                        totalDefensePower: 28000,
-                        totalResources: 120000,
-                        researchLevel: 8,
-                        buildingLevel: 20
-                    },
-                    createdAt: new Date(Date.now() - 172800000), // 2 Tage alt
-                    originalUrl: 'https://example.com/demo-report-2'
+                    player: 'NexusCommander',
+                    planet: 'Alpha Centauri',
+                    coordinates: '[3:201:12]',
+                    alliance: 'STELLAR',
+                    planetenzentrale: 20,
+                    raumhafen: 18,
+                    eisenmine: 22,
+                    siliziumraffinerie: 19,
+                    kohlenstoffgewinnungsanlage: 17,
+                    schiffsfabrik: 15,
+                    waffenfabrik: 12,
+                    forschungszentrum: 25,
+                    spionageeinheit: 8,
+                    tarneinheit: 6,
+                    invasionseinheit: 7,
+                    pluendereinheit: 5,
+                    sabotageeinheit: 4,
+                    datum: '11.9.2025',
+                    originalUrl: 'https://example.com/report/2'
                 }
             ];
         }
-        
-        // Demo-Statistiken für Offline-Modus
+
         function getDemoStatistics() {
             return {
                 totalReports: 2,
                 uniquePlayers: 2,
                 uniquePlanets: 2,
-                totalAttackPower: 40000,
-                totalDefensePower: 32000,
-                totalResources: 130000,
-                averageResearchLevel: 4.5,
-                averageBuildingLevel: 16
+                totalAttack: 40000,
+                researchLevel: 5,
+                buildingLevel: 16
             };
         }
-        
-        async function waitForAPIs() {
-            const maxWait = 5000; // 5 Sekunden (reduziert)
-            const startTime = Date.now();
+
+        // Display reports in table
+        async function displayReports(reports) {
+            const tbody = document.getElementById('dataTable');
             
-            while (Date.now() - startTime < maxWait) {
-                if (window.SpyDatabaseAPI && window.SpyReportAPI) {
-                    console.log('✅ Alle APIs bereit');
-                    return true;
-                }
-                await new Promise(resolve => setTimeout(resolve, 100));
+            if (reports.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="20" class="empty-state">
+                            <p>Keine Berichte gefunden</p>
+                            <small style="color: var(--muted-foreground);">Firebase nicht verfügbar oder keine Daten</small>
+                        </td>
+                    </tr>
+                `;
+                return;
             }
             
-            console.warn('⚠️ APIs nicht verfügbar nach 5 Sekunden - verwende Demo-Modus');
-            return false;
+            tbody.innerHTML = reports.map(report => `
+                <tr>
+                    <td class="player-name">${report.player}</td>
+                    <td>${report.planet}</td>
+                    <td class="coordinates">${report.coordinates}</td>
+                    <td class="alliance">${report.alliance || '—'}</td>
+                    <td class="building-value">${report.planetenzentrale || '—'}</td>
+                    <td class="building-value">${report.raumhafen || '—'}</td>
+                    <td class="building-value">${report.eisenmine || '—'}</td>
+                    <td class="building-value">${report.siliziumraffinerie || '—'}</td>
+                    <td class="building-value">${report.kohlenstoffgewinnungsanlage || '—'}</td>
+                    <td class="building-value">${report.schiffsfabrik || '—'}</td>
+                    <td class="building-value">${report.waffenfabrik || '—'}</td>
+                    <td class="building-value">${report.forschungszentrum || '—'}</td>
+                    <td class="research-value">───────</td>
+                    <td class="unit-value">${report.spionageeinheit || '—'}</td>
+                    <td class="unit-value">${report.tarneinheit || '—'}</td>
+                    <td class="unit-value">${report.invasionseinheit || '—'}</td>
+                    <td class="unit-value">${report.pluendereinheit || '—'}</td>
+                    <td class="unit-value">${report.sabotageeinheit || '—'}</td>
+                    <td>${report.datum || '—'}</td>
+                    <td>
+                        ${report.originalUrl ? 
+                            `<button class="copy-btn" onclick="copyToClipboard('${report.coordinates}')">📋</button>` : 
+                            '—'
+                        }
+                    </td>
+                </tr>
+            `).join('');
         }
-        
+
+        // Display statistics
+        function displayStatistics(stats) {
+            document.getElementById('totalReports').textContent = stats.totalReports || 0;
+            document.getElementById('uniquePlayers').textContent = stats.uniquePlayers || 0;
+            document.getElementById('uniquePlanets').textContent = stats.uniquePlanets || 0;
+            document.getElementById('totalAttack').textContent = stats.totalAttack || 0;
+            document.getElementById('researchLevel').textContent = stats.researchLevel || 0;
+            document.getElementById('buildingLevel').textContent = stats.buildingLevel || 0;
+        }
+
+        // Search functionality
+        function performSearch() {
+            const playerSearch = document.getElementById('playerSearch').value.toLowerCase();
+            const planetSearch = document.getElementById('planetSearch').value.toLowerCase();
+
+            filteredReports = currentReports.filter(report => 
+                report.player.toLowerCase().includes(playerSearch) ||
+                report.planet.toLowerCase().includes(planetSearch) ||
+                (report.alliance && report.alliance.toLowerCase().includes(playerSearch))
+            );
+
+            displayReports(filteredReports);
+        }
+
+        function clearSearch() {
+            document.getElementById('playerSearch').value = '';
+            document.getElementById('planetSearch').value = '';
+            filteredReports = [...currentReports];
+            displayReports(filteredReports);
+        }
+
+        function refreshData() {
+            console.log('Refreshing data...');
+            loadReports();
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                console.log('Copied to clipboard:', text);
+                showMessage(`Koordinaten ${text} in Zwischenablage kopiert!`, 'success');
+            });
+        }
+
+        function addNewReport() {
+            showMessage('Neuer Bericht Funktion wird implementiert...', 'info');
+        }
+
+        function goToDashboard() {
+            window.location.href = 'user-dashboard.html';
+        }
+
+        async function retryFirebaseConnection() {
+            console.log('Retrying Firebase connection...');
+            try {
+                await loadReports();
+                showMessage('Firebase-Verbindung erfolgreich!', 'success');
+            } catch (error) {
+                showMessage('Firebase-Verbindung fehlgeschlagen. Bleibe im Demo-Modus.', 'info');
+            }
+        }
+
+        // Firebase functions (simplified)
         async function waitForFirebaseQuick() {
-            console.log('⏳ Schneller Firebase-Check...');
-            
             try {
-                // Prüfe ob FirebaseConfig verfügbar ist
-                if (!window.FirebaseConfig) {
-                    console.log('⏳ FirebaseConfig noch nicht verfügbar...');
-                    return false;
-                }
-                
-                // Prüfe ob Firebase bereits bereit ist
-                if (window.FirebaseConfig.isReady()) {
-                    console.log('🔥 Firebase bereits bereit');
+                if (window.FirebaseConfig && window.FirebaseConfig.isReady()) {
                     return true;
                 }
-                
-                // Prüfe ob Firebase im Offline-Modus ist (dann nicht verwenden)
-                if (window.FirebaseConfig.isOffline()) {
-                    console.log('⚠️ Firebase im Offline-Modus, verwende Demo-Daten');
-                    return false;
-                }
-                
-                // Warte aktiv auf Firebase-Initialisierung (kürzerer Timeout)
-                let attempts = 0;
-                const maxAttempts = 6; // 3 Sekunden bei 500ms Intervallen
-                
-                while (attempts < maxAttempts) {
-                    if (window.FirebaseConfig && window.FirebaseConfig.isReady()) {
-                        console.log('🔥 Firebase DB verfügbar');
-                        return true;
-                    }
-                    
-                    console.log(`⏳ Schneller Firebase-Check ${attempts + 1}/${maxAttempts}...`);
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                    attempts++;
-                }
-                
-                console.log('⚠️ Firebase nicht bereit nach 3 Sekunden');
                 return false;
             } catch (error) {
-                console.log('⏳ Firebase noch nicht bereit, versuche trotzdem...', error.message);
-                return false; // Nicht blockieren
-            }
-        }
-        
-        async function waitForFirebase() {
-            console.log('⏳ Warte auf Firebase-Initialisierung...');
-            
-            try {
-                // Prüfe ob FirebaseConfig verfügbar ist
-                if (!window.FirebaseConfig) {
-                    console.log('⚠️ FirebaseConfig nicht verfügbar');
-                    return false;
-                }
-                
-                // Prüfe ob Firebase bereits bereit ist
-                if (window.FirebaseConfig.isReady()) {
-                    console.log('🔥 Firebase bereits bereit');
-                    return true;
-                }
-                
-                // Prüfe ob Firebase im Offline-Modus ist (dann nicht verwenden)
-                if (window.FirebaseConfig.isOffline()) {
-                    console.log('⚠️ Firebase im Offline-Modus, verwende Demo-Daten');
-                    return false;
-                }
-                
-                // Warte aktiv auf Firebase-Initialisierung
-                let attempts = 0;
-                const maxAttempts = 20; // 10 Sekunden bei 500ms Intervallen
-                
-                while (attempts < maxAttempts) {
-                    if (window.FirebaseConfig && window.FirebaseConfig.isReady()) {
-                        console.log('🔥 Firebase DB verfügbar für Spy-Database');
-                        return true;
-                    }
-                    
-                    console.log(`⏳ Firebase-Check ${attempts + 1}/${maxAttempts}...`);
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                    attempts++;
-                }
-                
-                console.log('⚠️ Firebase nicht bereit nach 10 Sekunden');
                 return false;
-            } catch (error) {
-                console.log('⚠️ Firebase nicht verfügbar nach 10 Sekunden:', error.message);
-                return false; // Nicht werfen, sondern false zurückgeben
             }
         }
-        
-        function setupEventListeners() {
-            // Enter-Key Support für Suchfelder
-            document.getElementById('search-player').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') searchReports();
-            });
-            
-            document.getElementById('search-planet').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') searchReports();
-            });
-        }
-        
+
         async function loadReports() {
             try {
-                showLoading();
+                console.log('📋 Lade Spy-Reports...');
                 
-                // Prüfe ob Firebase verfügbar ist
-                const firebaseReady = await waitForFirebaseQuick();
-                
-                if (firebaseReady) {
-                    console.log('📋 Lade Spy-Reports...');
-                    currentReports = await window.SpyDatabaseAPI.getAllianceReports();
-                    
-                    // Wenn keine echten Daten vorhanden sind, zeige Demo-Daten
-                    if (currentReports.length === 0) {
-                        console.log('🔄 Keine echten Daten gefunden, zeige Demo-Daten...');
-                        currentReports = getDemoReports();
-                        showMessage('Demo-Modus: Keine echten Daten gefunden. Zeige Beispieldaten.', 'info');
+                if (window.SpyDatabaseAPI) {
+                    const reports = await window.SpyDatabaseAPI.getAllianceReports();
+                    if (reports.length > 0) {
+                        currentReports = reports;
+                        filteredReports = [...currentReports];
+                        await displayReports(currentReports);
+                        await loadStatistics();
+                        console.log(`✅ ${currentReports.length} Spy-Reports geladen`);
+                        return;
                     }
-                    
-                    await displayReports(currentReports);
-                    await loadStatistics();
-                    console.log(`✅ ${currentReports.length} Spy-Reports geladen`);
-                    
-                    // Verstecke Retry-Button wenn Firebase funktioniert
-                    document.getElementById('retry-btn').style.display = 'none';
-                } else {
-                    // Firebase nicht verfügbar - zeige Demo-Daten
-                    console.log('🔄 Firebase nicht verfügbar, zeige Demo-Daten...');
-                    currentReports = getDemoReports();
-                    await displayReports(currentReports);
-                    await loadStatistics();
-                    showMessage('Demo-Modus: Firebase nicht verfügbar. Zeige Beispieldaten.', 'info');
-                    
-                    // Zeige Retry-Button
-                    document.getElementById('retry-btn').style.display = 'inline-flex';
                 }
+                
+                // Fallback to demo data
+                console.log('🔄 Keine echten Daten gefunden, zeige Demo-Daten...');
+                currentReports = getDemoReports();
+                filteredReports = [...currentReports];
+                await displayReports(currentReports);
+                currentStatistics = getDemoStatistics();
+                displayStatistics(currentStatistics);
+                showMessage('Demo-Modus: Keine echten Daten gefunden. Zeige Beispieldaten.', 'info');
                 
             } catch (error) {
                 console.error('❌ Fehler beim Laden der Spy-Reports:', error);
-                
-                // Immer Demo-Daten anzeigen bei Fehlern
-                console.log('🔄 Fehler beim Laden, zeige Demo-Daten...');
                 currentReports = getDemoReports();
+                filteredReports = [...currentReports];
                 await displayReports(currentReports);
-                await loadStatistics();
+                currentStatistics = getDemoStatistics();
+                displayStatistics(currentStatistics);
                 showMessage('Demo-Modus: Fehler beim Laden. Zeige Beispieldaten.', 'info');
-                
-                // Zeige Retry-Button
-                document.getElementById('retry-btn').style.display = 'inline-flex';
             }
         }
-        
+
         async function loadStatistics() {
             try {
-                // Firebase-Bereitschaft prüfen (schnell)
-                const firebaseReady = await waitForFirebaseQuick();
-                
-                if (firebaseReady) {
-                    console.log('📊 Lade Statistiken...');
-                    currentStatistics = await window.SpyDatabaseAPI.getStatistics();
-                    displayStatistics(currentStatistics);
-                    console.log('✅ Statistiken geladen');
-                } else {
-                    // Zeige Demo-Statistiken
-                    console.log('📊 Zeige Demo-Statistiken...');
-                    currentStatistics = getDemoStatistics();
+                if (window.SpyDatabaseAPI) {
+                    const stats = await window.SpyDatabaseAPI.getStatistics();
+                    currentStatistics = stats;
                     displayStatistics(currentStatistics);
                 }
-                
             } catch (error) {
                 console.error('❌ Fehler beim Laden der Statistiken:', error);
-                currentStatistics = getDemoStatistics();
-                displayStatistics(currentStatistics);
             }
         }
-        
-        function displayReports(reports) {
-            // User Liste erstellen
-            const users = [...new Set(reports.map(r => r.playerName || r.player?.name).filter(Boolean))];
-            displayUsers(users);
-            
-            // Grid erstellen
-            createGrid(reports);
-        }
-        
-        function displayUsers(users) {
-            const container = document.getElementById('users-list');
-            
-            if (users.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <p>Keine Spieler gefunden</p>
-                        <small style="color: #666;">Firebase nicht verfügbar oder keine Daten</small>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = users.map(user => {
-                const userReports = currentReports.filter(r => (r.playerName || r.player?.name) === user);
-                const firstReport = userReports[0];
-                
-                return `
-                    <div class="user-item" onclick="selectUser('${user}')">
-                        <div class="user-name">${user}</div>
-                        <div class="user-planet">${firstReport?.planetName || firstReport?.planet?.name || 'Unbekannt'}</div>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        function selectUser(userName) {
-            selectedUser = userName;
-            
-            // UI aktualisieren
-            document.querySelectorAll('.user-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            event.target.closest('.user-item').classList.add('active');
-            
-            // Grid für diesen User aktualisieren
-            const userReports = currentReports.filter(r => (r.playerName || r.player?.name) === userName);
-            createGrid(userReports);
-        }
-        
-        function createGrid(reports) {
-            const container = document.getElementById('grid-container');
-            
-            if (reports.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <p>Keine Berichte gefunden</p>
-                        <small style="color: #666;">Firebase nicht verfügbar oder keine Daten</small>
-                        <button class="btn primary" onclick="loadReports()" style="margin-top: 10px;">🔄 Erneut versuchen</button>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Grid-Struktur erstellen
-            const gridHTML = `
-                <div class="categories-header">
-                    ${categories.map(category => `
-                        <div class="category-header ${category.group}">${category.name}</div>
-                    `).join('')}
-                </div>
-                ${reports.map((report, index) => `
-                    <div class="grid-cell">
-                        <div class="cell-content">
-                            <div class="user-name">${report.playerName || report.player?.name || 'Unbekannt'}</div>
-                        </div>
-                    </div>
-                    ${categories.map(category => {
-                        const content = getCellContent(report, category.name);
-                        const hasData = content !== '–' && content !== '';
-                        const isLink = category.name === 'Link' && content === '📋';
-                        const isSeparator = category.name === 'Forschung';
-                        
-                        let onclickAction = '';
-                        if (isLink && report.originalUrl) {
-                            onclickAction = `window.open('${report.originalUrl}', '_blank')`;
-                        } else if (hasData && !isLink && !isSeparator) {
-                            onclickAction = `viewReport('${report.id}')`;
-                        }
-                        
-                        let cellClass = '';
-                        if (hasData) cellClass += 'has-data';
-                        if (isSeparator) cellClass += ' separator-cell';
-                        
-                        let contentClass = '';
-                        if (hasData && !isSeparator) contentClass += 'has-data';
-                        if (isSeparator) contentClass += 'separator';
-                        
-                        return `
-                            <div class="grid-cell ${cellClass}" ${onclickAction ? `onclick="${onclickAction}"` : ''}>
-                                <div class="cell-content ${contentClass}">
-                                    ${hasData && !isSeparator ? `<span class="cell-link">${content}</span>` : content}
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
-                `).join('')}
-            `;
-            
-            container.innerHTML = gridHTML;
-        }
-        
-        function getCellContent(report, category) {
-            switch (category) {
-                case 'Planet':
-                    return report.planetName || report.planet?.name || '–';
-                case 'Koordinaten':
-                    return report.planetCoordinates || report.planet?.coordinates || '–';
-                case 'Allianz':
-                    return report.player?.allianceName || 'Keine';
-                    
-                // Gebäude-Level
-                case 'Planetenzentrale':
-                    return getBuildingLevel(report, 'Planetenzentrale') || '–';
-                case 'Raumhafen':
-                    return getBuildingLevel(report, 'Raumhafen') || '–';
-                case 'Eisenmine':
-                    return getBuildingLevel(report, 'Eisenmine') || '–';
-                case 'Siliziumraffinerie':
-                    return getBuildingLevel(report, 'Siliziumraffinerie') || '–';
-                case 'Kohlenstoffgewinnungsanlage':
-                    return getBuildingLevel(report, 'Kohlenstoffgewinnungsanlage') || '–';
-                case 'Schiffsfabrik':
-                    return getBuildingLevel(report, 'Schiffsfabrik') || '–';
-                case 'Waffenfabrik':
-                    return getBuildingLevel(report, 'Waffenfabrik') || '–';
-                case 'Forschungszentrum':
-                    return getBuildingLevel(report, 'Forschungszentrum') || '–';
-                    
-                // Forschung-Trenner
-                case 'Forschung':
-                    return '───────';
-                    
-                // Einheiten-Forschung (nur die 5 spezifischen)
-                case 'Spionageeinheit':
-                    return getResearchLevel(report, 'Spionageeinheit') || '–';
-                case 'Tarneinheit':
-                    return getResearchLevel(report, 'Tarneinheit') || '–';
-                case 'Invasionseinheit':
-                    return getResearchLevel(report, 'Invasionseinheit') || '–';
-                case 'Plündereinheit':
-                    return getResearchLevel(report, 'Plündereinheit') || '–';
-                case 'Sabotageeinheit':
-                    return getResearchLevel(report, 'Sabotageeinheit') || '–';
-                    
-                case 'Datum':
-                    const date = report.createdAt?.toDate ? 
-                        report.createdAt.toDate() : 
-                        new Date(report.createdAt || report.timestamp);
-                    return date.toLocaleDateString('de-DE');
-                case 'Link':
-                    return report.originalUrl ? '📋' : '–';
-                default:
-                    return '–';
-            }
-        }
-        
-        function getBuildingLevel(report, buildingName) {
-            const buildings = report.buildings;
-            if (!buildings) return null;
-            
-            if (Array.isArray(buildings)) {
-                const building = buildings.find(b => 
-                    b.name && b.name.toLowerCase().includes(buildingName.toLowerCase())
-                );
-                return building ? building.level : null;
-            } else {
-                // Falls buildings ein Objekt ist, suche nach passendem Schlüssel
-                const key = Object.keys(buildings).find(k => 
-                    k.toLowerCase().includes(buildingName.toLowerCase())
-                );
-                return key ? buildings[key] : null;
-            }
-        }
-        
-        function getResearchLevel(report, researchName) {
-            const research = report.research || report.player?.research;
-            if (!research) return null;
-            
-            if (Array.isArray(research)) {
-                const researchItem = research.find(r => 
-                    r.name && r.name.toLowerCase().includes(researchName.toLowerCase())
-                );
-                return researchItem ? researchItem.level : null;
-            } else {
-                // Falls research ein Objekt ist, suche nach passendem Schlüssel
-                const key = Object.keys(research).find(k => 
-                    k.toLowerCase().includes(researchName.toLowerCase())
-                );
-                return key ? research[key] : null;
-            }
-        }
-        
-        function displayStatistics(stats) {
-            const container = document.getElementById('stats-display');
-            
-            if (!stats) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <p>Keine Statistiken verfügbar</p>
-                        <small style="color: #666;">Firebase nicht verfügbar</small>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = `
-                <div class="stat-item">
-                    <span class="stat-label">Gesamte Berichte:</span>
-                    <span class="stat-value">${stats.totalReports || 0}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Eindeutige Spieler:</span>
-                    <span class="stat-value">${stats.uniquePlayers || 0}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Eindeutige Planeten:</span>
-                    <span class="stat-value">${stats.uniquePlanets || 0}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Gesamt Angriffsstärke:</span>
-                    <span class="stat-value">${Math.round(stats.totalAttackPower || 0).toLocaleString()}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Ø Forschungslevel:</span>
-                    <span class="stat-value">${Math.round(stats.averageResearchLevel || 0)}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Ø Gebäudelevel:</span>
-                    <span class="stat-value">${Math.round(stats.averageBuildingLevel || 0)}</span>
-                </div>
-            `;
-        }
-        
-        async function searchReports() {
-            try {
-                // Firebase-Bereitschaft prüfen (schnell)
-                const firebaseReady = await waitForFirebaseQuick();
-                
-                showLoading();
-                
-                if (firebaseReady) {
-                    const searchCriteria = {
-                        playerName: document.getElementById('search-player').value.trim(),
-                        planetName: document.getElementById('search-planet').value.trim(),
-                        limit: 100
-                    };
-                    
-                    // Leere Felder entfernen
-                    Object.keys(searchCriteria).forEach(key => {
-                        if (searchCriteria[key] === '' || searchCriteria[key] === undefined) {
-                            delete searchCriteria[key];
-                        }
-                    });
-                    
-                    console.log('🔍 Suche mit Kriterien:', searchCriteria);
-                    
-                    currentReports = await window.SpyDatabaseAPI.searchReports(searchCriteria);
-                    await displayReports(currentReports);
-                    
-                    console.log(`✅ ${currentReports.length} Spy-Reports gefunden`);
-                } else {
-                    // Offline-Suche in Demo-Daten
-                    console.log('🔍 Offline-Suche in Demo-Daten...');
-                    const searchPlayer = document.getElementById('search-player').value.trim().toLowerCase();
-                    const searchPlanet = document.getElementById('search-planet').value.trim().toLowerCase();
-                    
-                    let filteredReports = getDemoReports();
-                    
-                    if (searchPlayer) {
-                        filteredReports = filteredReports.filter(report => 
-                            report.playerName.toLowerCase().includes(searchPlayer)
-                        );
-                    }
-                    
-                    if (searchPlanet) {
-                        filteredReports = filteredReports.filter(report => 
-                            report.planetName.toLowerCase().includes(searchPlanet)
-                        );
-                    }
-                    
-                    currentReports = filteredReports;
-                    await displayReports(currentReports);
-                    
-                    console.log(`✅ ${currentReports.length} Demo-Reports gefunden`);
-                    showMessage('Demo-Modus: Suche in Beispieldaten.', 'info');
-                }
-                
-            } catch (error) {
-                console.error('❌ Fehler bei der Suche:', error);
-                showError('Fehler bei der Suche: ' + error.message);
-            }
-        }
-        
-        function clearFilters() {
-            document.getElementById('search-player').value = '';
-            document.getElementById('search-planet').value = '';
-            
-            // Alle Reports laden (mit Demo-Daten falls Firebase nicht verfügbar)
-            loadReports();
-        }
-        
-        async function viewReport(reportId) {
-            try {
-                const firebaseReady = await waitForFirebaseQuick();
-                
-                if (firebaseReady) {
-                    const report = await window.SpyDatabaseAPI.getReport(reportId);
-                    if (report) {
-                        // Öffne Details in neuem Tab
-                        window.open(`spy-report-detail.html?id=${reportId}`, '_blank');
-                    } else {
-                        showMessage('Bericht nicht gefunden', 'error');
-                    }
-                } else {
-                    // Offline-Modus: Suche in Demo-Daten
-                    const report = currentReports.find(r => r.id === reportId);
-                    if (report) {
-                        showMessage(`Demo-Bericht: ${report.playerName} - ${report.planetName}`, 'info');
-                    } else {
-                        showMessage('Demo-Bericht nicht gefunden', 'error');
-                    }
-                }
-            } catch (error) {
-                console.error('❌ Fehler beim Anzeigen des Berichts:', error);
-                showMessage('Fehler beim Laden des Berichts', 'error');
-            }
-        }
-        
-        function showLoading() {
-            document.getElementById('users-list').innerHTML = `
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>Lade...</p>
-                </div>
-            `;
-            
-            document.getElementById('grid-container').innerHTML = `
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>Lade...</p>
-                </div>
-            `;
-        }
-        
-        function showError(message) {
-            document.getElementById('grid-container').innerHTML = `
-                <div class="empty-state">
-                    <h3>❌ Fehler</h3>
-                    <p>${message}</p>
-                    <button class="btn primary" onclick="loadReports()">🔄 Erneut versuchen</button>
-                </div>
-            `;
-        }
-        
+
         function showMessage(message, type) {
-            // Einfache Nachrichten-Anzeige
             console.log(`${type.toUpperCase()}: ${message}`);
             
-            // Zeige auch visuell für wichtige Nachrichten
-            if (type === 'success') {
-                // Temporäre grüne Nachricht anzeigen
-                const messageDiv = document.createElement('div');
-                messageDiv.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: #10b981;
-                    color: white;
-                    padding: 12px 20px;
-                    border-radius: 8px;
-                    font-weight: 600;
-                    z-index: 1000;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                `;
-                messageDiv.textContent = message;
-                document.body.appendChild(messageDiv);
-                
-                // Nach 3 Sekunden entfernen
-                setTimeout(() => {
-                    if (messageDiv.parentNode) {
-                        messageDiv.parentNode.removeChild(messageDiv);
-                    }
-                }, 3000);
+            const statusBadge = document.getElementById('status-badge');
+            if (statusBadge) {
+                statusBadge.textContent = message;
+                statusBadge.style.background = type === 'success' ? 'var(--gaming-success)' : 
+                                               type === 'error' ? 'var(--danger)' : 
+                                               'var(--warning)';
             }
         }
-        
-        async function retryFirebaseConnection() {
-            console.log('🔄 Versuche Firebase-Verbindung erneut...');
-            
-            // Verstecke Retry-Button
-            document.getElementById('retry-btn').style.display = 'none';
-            
-            // Zeige Loading
-            showLoading();
-            
-            try {
-                // Warte auf Firebase mit längerem Timeout
-                const firebaseReady = await waitForFirebase();
-                
-                if (firebaseReady) {
-                    // Lade Reports erneut
-                    await loadReports();
-                    console.log('✅ Firebase-Verbindung erfolgreich wiederhergestellt');
-                } else {
-                    // Firebase nicht verfügbar - zeige Demo-Daten
-                    console.log('⚠️ Firebase nicht verfügbar, zeige Demo-Daten');
-                    currentReports = getDemoReports();
-                    await displayReports(currentReports);
-                    currentStatistics = getDemoStatistics();
-                    displayStatistics(currentStatistics);
-                    showMessage('Demo-Modus: Firebase nicht verfügbar. Zeige Beispieldaten.', 'info');
-                    document.getElementById('retry-btn').style.display = 'inline-flex';
-                }
-                
-            } catch (error) {
-                console.error('❌ Firebase-Retry fehlgeschlagen:', error);
-                
-                // Zeige Demo-Daten und Retry-Button
-                currentReports = getDemoReports();
-                await displayReports(currentReports);
-                currentStatistics = getDemoStatistics();
-                displayStatistics(currentStatistics);
-                document.getElementById('retry-btn').style.display = 'inline-flex';
-                showMessage('Demo-Modus: Firebase-Verbindung fehlgeschlagen. Zeige Beispieldaten.', 'info');
-            }
-        }
+
+        // Add event listeners for real-time search
+        document.getElementById('playerSearch').addEventListener('input', performSearch);
+        document.getElementById('planetSearch').addEventListener('input', performSearch);
     </script>
 </body>
 </html>
