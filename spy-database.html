@@ -190,6 +190,17 @@
             border-color: #0099ff;
         }
         
+        .grid-cell.separator-cell {
+            background: #1a1a1a;
+            border-color: #444;
+            cursor: default;
+        }
+        
+        .grid-cell.separator-cell:hover {
+            background: #1a1a1a;
+            transform: none;
+        }
+        
         .cell-content {
             text-align: center;
             color: #888;
@@ -200,6 +211,12 @@
         .cell-content.has-data {
             color: #007acc;
             font-weight: 600;
+        }
+        
+        .cell-content.separator {
+            color: #666;
+            font-weight: 400;
+            letter-spacing: 0.2em;
         }
         
         .cell-link {
@@ -455,19 +472,36 @@
         let currentStatistics = null;
         let selectedUser = null;
         
-        // Kategorien für das Grid
+        // Detaillierte Kategorien für das Grid (wie im Bild gezeigt)
         const categories = [
             'Planet',
             'Koordinaten', 
             'Allianz',
-            'Ressourcen',
-            'Gebäude',
+            'Planetenzentrale',
+            'Raumhafen',
+            'Eisenmine',
+            'Siliziumraffinerie',
+            'Kohlenstoffgewinnungsanlage',
+            'Schiffsfabrik',
+            'Waffenfabrik',
+            'Forschungszentrum',
             'Forschung',
-            'Schiffe',
-            'Angriffsstärke',
-            'Verteidigung',
-            'Bedrohung',
-            'Datum'
+            'Schiffsbasiselement',
+            'Lagerraum',
+            'Schiffspanzerung',
+            'Verbrennungsantrieb',
+            'Fusionsantrieb',
+            'Zeitverzerrungsantrieb',
+            'Raketengeschosse',
+            'Laserkanonen',
+            'Plasmawerfer',
+            'Spionageeinheit',
+            'Tarneinheit',
+            'Invasionseinheit',
+            'Plündereinheit',
+            'Sabotageeinheit',
+            'Datum',
+            'Link'
         ];
         
         // Initialisierung
@@ -610,11 +644,28 @@
                     ${categories.map(category => {
                         const content = getCellContent(report, category);
                         const hasData = content !== '–' && content !== '';
+                        const isLink = category === 'Link' && content === '📋';
+                        const isSeparator = category === 'Forschung';
+                        
+                        let onclickAction = '';
+                        if (isLink && report.originalUrl) {
+                            onclickAction = `window.open('${report.originalUrl}', '_blank')`;
+                        } else if (hasData && !isLink && !isSeparator) {
+                            onclickAction = `viewReport('${report.id}')`;
+                        }
+                        
+                        let cellClass = '';
+                        if (hasData) cellClass += 'has-data';
+                        if (isSeparator) cellClass += ' separator-cell';
+                        
+                        let contentClass = '';
+                        if (hasData && !isSeparator) contentClass += 'has-data';
+                        if (isSeparator) contentClass += 'separator';
                         
                         return `
-                            <div class="grid-cell ${hasData ? 'has-data' : ''}" onclick="${hasData ? `viewReport('${report.id}')` : ''}">
-                                <div class="cell-content ${hasData ? 'has-data' : ''}">
-                                    ${hasData ? `<span class="cell-link">${content}</span>` : content}
+                            <div class="grid-cell ${cellClass}" ${onclickAction ? `onclick="${onclickAction}"` : ''}>
+                                <div class="cell-content ${contentClass}">
+                                    ${hasData && !isSeparator ? `<span class="cell-link">${content}</span>` : content}
                                 </div>
                             </div>
                         `;
@@ -633,43 +684,104 @@
                     return report.planetCoordinates || report.planet?.coordinates || '–';
                 case 'Allianz':
                     return report.player?.allianceName || 'Keine';
-                case 'Ressourcen':
-                    const resources = report.resources;
-                    if (!resources) return '–';
-                    const totalRes = (resources.fe?.amount || 0) + (resources.si?.amount || 0) + (resources.c?.amount || 0);
-                    return totalRes > 0 ? Math.round(totalRes).toLocaleString() : '–';
-                case 'Gebäude':
-                    const buildings = report.buildings;
-                    if (!buildings) return '–';
-                    const buildingCount = Array.isArray(buildings) ? buildings.length : Object.keys(buildings).length;
-                    return buildingCount > 0 ? `${buildingCount} Gebäude` : '–';
+                    
+                // Gebäude-Level
+                case 'Planetenzentrale':
+                    return getBuildingLevel(report, 'Planetenzentrale') || '–';
+                case 'Raumhafen':
+                    return getBuildingLevel(report, 'Raumhafen') || '–';
+                case 'Eisenmine':
+                    return getBuildingLevel(report, 'Eisenmine') || '–';
+                case 'Siliziumraffinerie':
+                    return getBuildingLevel(report, 'Siliziumraffinerie') || '–';
+                case 'Kohlenstoffgewinnungsanlage':
+                    return getBuildingLevel(report, 'Kohlenstoffgewinnungsanlage') || '–';
+                case 'Schiffsfabrik':
+                    return getBuildingLevel(report, 'Schiffsfabrik') || '–';
+                case 'Waffenfabrik':
+                    return getBuildingLevel(report, 'Waffenfabrik') || '–';
+                case 'Forschungszentrum':
+                    return getBuildingLevel(report, 'Forschungszentrum') || '–';
+                    
+                // Forschung-Trenner
                 case 'Forschung':
-                    const research = report.research || report.player?.research;
-                    if (!research) return '–';
-                    const researchCount = Array.isArray(research) ? research.length : Object.keys(research).length;
-                    return researchCount > 0 ? `${researchCount} Forschungen` : '–';
-                case 'Schiffe':
-                    const ships = report.shipTypes || report.player?.shipTypes;
-                    if (!ships) return '–';
-                    const shipCount = Array.isArray(ships) ? ships.length : 0;
-                    return shipCount > 0 ? `${shipCount} Typen` : '–';
-                case 'Angriffsstärke':
-                    return report.totalAttackPower ? Math.round(report.totalAttackPower).toLocaleString() : '–';
-                case 'Verteidigung':
-                    return report.totalDefensePower ? Math.round(report.totalDefensePower).toLocaleString() : '–';
-                case 'Bedrohung':
-                    if (!report.threatLevel) return '–';
-                    const threat = window.SpyReportAPI?.formatThreatLevel ? 
-                        window.SpyReportAPI.formatThreatLevel(report.threatLevel) : 
-                        { icon: '⚠️', text: report.threatLevel };
-                    return `${threat.icon} ${threat.text}`;
+                    return '───────';
+                    
+                // Forschung-Level
+                case 'Schiffsbasiselement':
+                    return getResearchLevel(report, 'Schiffsbasiselement') || '–';
+                case 'Lagerraum':
+                    return getResearchLevel(report, 'Lagerraum') || '–';
+                case 'Schiffspanzerung':
+                    return getResearchLevel(report, 'Schiffspanzerung') || '–';
+                case 'Verbrennungsantrieb':
+                    return getResearchLevel(report, 'Verbrennungsantrieb') || '–';
+                case 'Fusionsantrieb':
+                    return getResearchLevel(report, 'Fusionsantrieb') || '–';
+                case 'Zeitverzerrungsantrieb':
+                    return getResearchLevel(report, 'Zeitverzerrungsantrieb') || '–';
+                case 'Raketengeschosse':
+                    return getResearchLevel(report, 'Raketengeschosse') || '–';
+                case 'Laserkanonen':
+                    return getResearchLevel(report, 'Laserkanonen') || '–';
+                case 'Plasmawerfer':
+                    return getResearchLevel(report, 'Plasmawerfer') || '–';
+                case 'Spionageeinheit':
+                    return getResearchLevel(report, 'Spionageeinheit') || '–';
+                case 'Tarneinheit':
+                    return getResearchLevel(report, 'Tarneinheit') || '–';
+                case 'Invasionseinheit':
+                    return getResearchLevel(report, 'Invasionseinheit') || '–';
+                case 'Plündereinheit':
+                    return getResearchLevel(report, 'Plündereinheit') || '–';
+                case 'Sabotageeinheit':
+                    return getResearchLevel(report, 'Sabotageeinheit') || '–';
+                    
                 case 'Datum':
                     const date = report.createdAt?.toDate ? 
                         report.createdAt.toDate() : 
                         new Date(report.createdAt || report.timestamp);
                     return date.toLocaleDateString('de-DE');
+                case 'Link':
+                    return report.originalUrl ? '📋' : '–';
                 default:
                     return '–';
+            }
+        }
+        
+        function getBuildingLevel(report, buildingName) {
+            const buildings = report.buildings;
+            if (!buildings) return null;
+            
+            if (Array.isArray(buildings)) {
+                const building = buildings.find(b => 
+                    b.name && b.name.toLowerCase().includes(buildingName.toLowerCase())
+                );
+                return building ? building.level : null;
+            } else {
+                // Falls buildings ein Objekt ist, suche nach passendem Schlüssel
+                const key = Object.keys(buildings).find(k => 
+                    k.toLowerCase().includes(buildingName.toLowerCase())
+                );
+                return key ? buildings[key] : null;
+            }
+        }
+        
+        function getResearchLevel(report, researchName) {
+            const research = report.research || report.player?.research;
+            if (!research) return null;
+            
+            if (Array.isArray(research)) {
+                const researchItem = research.find(r => 
+                    r.name && r.name.toLowerCase().includes(researchName.toLowerCase())
+                );
+                return researchItem ? researchItem.level : null;
+            } else {
+                // Falls research ein Objekt ist, suche nach passendem Schlüssel
+                const key = Object.keys(research).find(k => 
+                    k.toLowerCase().includes(researchName.toLowerCase())
+                );
+                return key ? research[key] : null;
             }
         }
         
