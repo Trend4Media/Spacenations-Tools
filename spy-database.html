@@ -486,15 +486,6 @@
             'Waffenfabrik',
             'Forschungszentrum',
             'Forschung',
-            'Schiffsbasiselement',
-            'Lagerraum',
-            'Schiffspanzerung',
-            'Verbrennungsantrieb',
-            'Fusionsantrieb',
-            'Zeitverzerrungsantrieb',
-            'Raketengeschosse',
-            'Laserkanonen',
-            'Plasmawerfer',
             'Spionageeinheit',
             'Tarneinheit',
             'Invasionseinheit',
@@ -707,25 +698,7 @@
                 case 'Forschung':
                     return '───────';
                     
-                // Forschung-Level
-                case 'Schiffsbasiselement':
-                    return getResearchLevel(report, 'Schiffsbasiselement') || '–';
-                case 'Lagerraum':
-                    return getResearchLevel(report, 'Lagerraum') || '–';
-                case 'Schiffspanzerung':
-                    return getResearchLevel(report, 'Schiffspanzerung') || '–';
-                case 'Verbrennungsantrieb':
-                    return getResearchLevel(report, 'Verbrennungsantrieb') || '–';
-                case 'Fusionsantrieb':
-                    return getResearchLevel(report, 'Fusionsantrieb') || '–';
-                case 'Zeitverzerrungsantrieb':
-                    return getResearchLevel(report, 'Zeitverzerrungsantrieb') || '–';
-                case 'Raketengeschosse':
-                    return getResearchLevel(report, 'Raketengeschosse') || '–';
-                case 'Laserkanonen':
-                    return getResearchLevel(report, 'Laserkanonen') || '–';
-                case 'Plasmawerfer':
-                    return getResearchLevel(report, 'Plasmawerfer') || '–';
+                // Einheiten-Forschung (nur die 5 spezifischen)
                 case 'Spionageeinheit':
                     return getResearchLevel(report, 'Spionageeinheit') || '–';
                 case 'Tarneinheit':
