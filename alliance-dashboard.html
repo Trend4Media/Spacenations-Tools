@@ -1155,24 +1155,6 @@
         }
 
         // Spy Database Functions
-        async function initializeSpyDatabase() {
-            try {
-                console.log('🕵️ Initialisiere Spy-Datenbank...');
-                
-                // Warte auf APIs
-                if (window.SpyDatabaseAPI) {
-                    await loadSpyStatistics();
-                    await loadRecentReports();
-                } else {
-                    console.warn('⚠️ SpyDatabaseAPI nicht verfügbar');
-                    showSpyDatabaseUnavailable();
-                }
-                
-            } catch (error) {
-                console.error('❌ Fehler beim Initialisieren der Spy-Datenbank:', error);
-                showSpyDatabaseUnavailable();
-            }
-        }
 
         async function loadSpyStatistics() {
             try {
@@ -1286,9 +1268,6 @@
             // Event Listeners sofort einrichten
             setupEventListeners();
             
-            // Spy-Datenbank initialisieren
-            await initializeSpyDatabase();
-            
             // Lade Allianz-Daten basierend auf URL-Parameter
             const urlParams = new URLSearchParams(window.location.search);
             const allianceId = urlParams.get('id');
@@ -1359,6 +1338,10 @@
                     status: currentAlliance.status,
                     members: currentAlliance.members
                 });
+                
+                // Spy-Datenbank nach dem Laden der Allianz-Daten initialisieren
+                await loadSpyStatistics();
+                await loadRecentReports();
                 
                 // Prüfe ob User Mitglied ist
                 if (!currentAlliance.members || !currentAlliance.members.includes(username)) {

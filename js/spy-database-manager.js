@@ -16,7 +16,7 @@ class SpyDatabaseManager {
             // Warte auf Firebase-Initialisierung
             if (window.FirebaseConfig) {
                 await window.FirebaseConfig.waitForReady();
-                this.db = window.FirebaseConfig.getFirestore();
+                this.db = window.FirebaseConfig.getDB();
             }
             
             // Warte auf AuthManager
