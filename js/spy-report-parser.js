@@ -98,42 +98,66 @@ class SpyReportParser {
                 // Metadaten
                 timestamp: new Date(timestamp),
                 reportId: this.extractReportIdFromData(rawData),
+                originalUrl: '', // Wird später gesetzt
                 
-                // Planet-Daten
+                // Planet-Daten (Name & Koordinaten)
                 planet: {
-                    coordinates: report.planet?.coordinates || 'Unbekannt',
                     name: report.planet?.name || 'Unbekannter Planet',
+                    coordinates: report.planet?.coordinates || 'Unbekannt',
                     levels: report.planet?.levels || {},
                     recycling: report.planet?.recycling || {}
                 },
                 
-                // Spieler-Daten
+                // Besitzer/Spielername
                 player: {
                     name: report.player?.name || 'Unbekannter Spieler',
                     allianceName: report.player?.allianceName || null,
-                    metaName: report.player?.metaName || null,
-                    research: report.player?.research || {},
-                    shipTypes: report.player?.shipTypes || []
+                    metaName: report.player?.metaName || null
                 },
                 
-                // Gebäude
-                buildings: report.buildings || {},
+                // Ressourcen - Einzelauflistung
+                resources: {
+                    fe: this.parseResourceAmount(report.resources?.fe),
+                    si: this.parseResourceAmount(report.resources?.si),
+                    c: this.parseResourceAmount(report.resources?.c),
+                    water: this.parseResourceAmount(report.resources?.water),
+                    oxygen: this.parseResourceAmount(report.resources?.oxygen),
+                    hydrogen: this.parseResourceAmount(report.resources?.hydrogen),
+                    // Zusätzliche Ressourcen falls vorhanden
+                    additional: this.parseAdditionalResources(report.resources)
+                },
                 
-                // Ressourcen
-                resources: report.resources || {},
+                // Gebäude - Einzelauflistung Name + Stufe
+                buildings: this.parseBuildings(report.buildings || {}),
                 
-                // Verteidigung
-                defense: report.defense || [],
+                // Forschung - Einzelauflistung Name + Stufe
+                research: this.parseResearch(report.player?.research || {}),
                 
-                // Flotten
+                // Schiffstypen - Auflistung Name + Eigenschaften
+                shipTypes: this.parseShipTypes(report.player?.shipTypes || []),
+                
+                // Flotten-Details
                 fleets: {
                     stationed: report.stationedShips || [],
                     uncloaked: report.uncloakedFleets || [],
                     cloaked: report.cloakedFleets || {}
                 },
                 
+                // Verteidigung
+                defense: report.defense || [],
+                
                 // Fleet-Daten (für die spionierte Flotte)
-                fleet: report.fleet || {}
+                fleet: report.fleet || {},
+                
+                // Legacy-Daten für Kompatibilität
+                legacy: {
+                    buildings: report.buildings || {},
+                    resources: report.resources || {},
+                    player: {
+                        research: report.player?.research || {},
+                        shipTypes: report.player?.shipTypes || []
+                    }
+                }
             };
             
             // Berechne zusätzliche Statistiken
@@ -165,6 +189,218 @@ class SpyReportParser {
     }
     
     /**
+     * Parst Ressourcen-Mengen in einheitliches Format
+     * @param {*} resource - Die Ressource (Zahl, String oder Objekt)
+     * @returns {Object} - Formatierte Ressourcen-Daten
+     */
+    parseResourceAmount(resource) {
+        if (typeof resource === 'number') {
+            return {
+                amount: resource,
+                formatted: this.formatNumber(resource)
+            };
+        } else if (typeof resource === 'string') {
+            const amount = parseFloat(resource) || 0;
+            return {
+                amount: amount,
+                formatted: this.formatNumber(amount)
+            };
+        } else if (resource && typeof resource === 'object') {
+            return {
+                amount: resource.amount || resource.value || 0,
+                formatted: this.formatNumber(resource.amount || resource.value || 0)
+            };
+        }
+        return {
+            amount: 0,
+            formatted: '0'
+        };
+    }
+    
+    /**
+     * Parst zusätzliche Ressourcen
+     * @param {Object} resources - Die Ressourcen-Daten
+     * @returns {Array} - Liste der zusätzlichen Ressourcen
+     */
+    parseAdditionalResources(resources) {
+        const additional = [];
+        const standardResources = ['fe', 'si', 'c', 'water', 'oxygen', 'hydrogen'];
+        
+        for (const [key, value] of Object.entries(resources)) {
+            if (!standardResources.includes(key) && value !== undefined && value !== null) {
+                additional.push({
+                    name: key,
+                    amount: this.parseResourceAmount(value).amount,
+                    formatted: this.parseResourceAmount(value).formatted
+                });
+            }
+        }
+        
+        return additional;
+    }
+    
+    /**
+     * Parst Gebäude-Daten in strukturiertes Format
+     * @param {Object} buildings - Die Gebäude-Daten
+     * @returns {Array} - Liste der Gebäude mit Namen und Stufen
+     */
+    parseBuildings(buildings) {
+        const buildingList = [];
+        
+        for (const [buildingName, level] of Object.entries(buildings)) {
+            if (level !== undefined && level !== null && level > 0) {
+                buildingList.push({
+                    name: this.formatBuildingName(buildingName),
+                    level: level,
+                    rawName: buildingName
+                });
+            }
+        }
+        
+        // Sortiere nach Stufe (absteigend)
+        return buildingList.sort((a, b) => b.level - a.level);
+    }
+    
+    /**
+     * Parst Forschungs-Daten in strukturiertes Format
+     * @param {Object} research - Die Forschungs-Daten
+     * @returns {Array} - Liste der Forschungen mit Namen und Stufen
+     */
+    parseResearch(research) {
+        const researchList = [];
+        
+        for (const [researchName, level] of Object.entries(research)) {
+            if (level !== undefined && level !== null && level > 0) {
+                researchList.push({
+                    name: this.formatResearchName(researchName),
+                    level: level,
+                    rawName: researchName
+                });
+            }
+        }
+        
+        // Sortiere nach Stufe (absteigend)
+        return researchList.sort((a, b) => b.level - a.level);
+    }
+    
+    /**
+     * Parst Schiffstypen-Daten in strukturiertes Format
+     * @param {Array} shipTypes - Die Schiffstypen-Daten
+     * @returns {Array} - Liste der Schiffstypen mit Eigenschaften
+     */
+    parseShipTypes(shipTypes) {
+        if (!Array.isArray(shipTypes)) return [];
+        
+        return shipTypes.map(ship => ({
+            name: ship.name || 'Unbekanntes Schiff',
+            type: ship.type || 'unknown',
+            count: ship.count || 0,
+            properties: {
+                attack: ship.attack || 0,
+                defense: ship.defense || 0,
+                speed: ship.speed || 0,
+                capacity: ship.capacity || 0,
+                fuel: ship.fuel || 0
+            },
+            raw: ship
+        }));
+    }
+    
+    /**
+     * Formatiert Zahlen für bessere Lesbarkeit
+     * @param {number} num - Die zu formatierende Zahl
+     * @returns {string} - Formatierte Zahl
+     */
+    formatNumber(num) {
+        if (num >= 1000000000) {
+            return (num / 1000000000).toFixed(1) + 'B';
+        } else if (num >= 1000000) {
+            return (num / 1000000).toFixed(1) + 'M';
+        } else if (num >= 1000) {
+            return (num / 1000).toFixed(1) + 'K';
+        }
+        return num.toString();
+    }
+    
+    /**
+     * Formatiert Gebäude-Namen für bessere Lesbarkeit
+     * @param {string} name - Der rohe Gebäude-Name
+     * @returns {string} - Formatierter Name
+     */
+    formatBuildingName(name) {
+        const buildingNames = {
+            'metalMine': 'Metall-Mine',
+            'crystalMine': 'Kristall-Mine',
+            'deuteriumMine': 'Deuterium-Mine',
+            'solarPlant': 'Solarkraftwerk',
+            'fusionPlant': 'Fusionskraftwerk',
+            'metalStorage': 'Metall-Lager',
+            'crystalStorage': 'Kristall-Lager',
+            'deuteriumStorage': 'Deuterium-Lager',
+            'researchLab': 'Forschungslabor',
+            'shipyard': 'Raumwerft',
+            'defenseStation': 'Verteidigungsstation',
+            'missileSilo': 'Raketensilo',
+            'naniteFactory': 'Naniten-Fabrik',
+            'terraformer': 'Terraformer',
+            'spaceDock': 'Weltraumdock'
+        };
+        
+        return buildingNames[name] || name.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+    }
+    
+    /**
+     * Formatiert Forschungs-Namen für bessere Lesbarkeit
+     * @param {string} name - Der rohe Forschungs-Name
+     * @returns {string} - Formatierter Name
+     */
+    formatResearchName(name) {
+        const researchNames = {
+            'energy': 'Energietechnik',
+            'laser': 'Lasertechnik',
+            'ion': 'Ionentechnik',
+            'hyperspace': 'Hyperraumtechnik',
+            'plasma': 'Plasmatechnik',
+            'combustion': 'Verbrennungstriebwerk',
+            'impulse': 'Impulstriebwerk',
+            'hyperspaceEngine': 'Hyperraumtriebwerk',
+            'spy': 'Spionagetechnik',
+            'computer': 'Computertechnik',
+            'astrophysics': 'Astrophysik',
+            'intergalactic': 'Intergalaktisches Forschungsnetzwerk',
+            'graviton': 'Gravitontechnik',
+            'weapon': 'Waffentechnik',
+            'shield': 'Schildtechnik',
+            'armor': 'Panzerungstechnik'
+        };
+        
+        return researchNames[name] || name.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+    }
+    
+    /**
+     * Bestimmt die Bedrohungsstufe basierend auf den Statistiken
+     * @param {Object} stats - Die Statistiken
+     * @returns {string} - Die Bedrohungsstufe
+     */
+    determineThreatLevel(stats) {
+        const { totalAttackPower, totalDefensePower, researchLevel, buildingLevel } = stats;
+        
+        // Gewichtete Bewertung
+        const attackScore = Math.min(totalAttackPower / 100000, 10); // Max 10 Punkte
+        const defenseScore = Math.min(totalDefensePower / 50000, 10); // Max 10 Punkte
+        const researchScore = Math.min(researchLevel / 5, 10); // Max 10 Punkte
+        const buildingScore = Math.min(buildingLevel / 5, 10); // Max 10 Punkte
+        
+        const totalScore = attackScore + defenseScore + researchScore + buildingScore;
+        
+        if (totalScore >= 35) return 'very_high';
+        if (totalScore >= 25) return 'high';
+        if (totalScore >= 15) return 'medium';
+        if (totalScore >= 5) return 'low';
+        return 'very_low';
+    }
+    
+    /**
      * Berechnet zusätzliche Statistiken aus den Report-Daten
      * @param {Object} data - Die geparsten Daten
      * @returns {Object} - Berechnete Statistiken
@@ -177,7 +413,12 @@ class SpyReportParser {
             researchLevel: 0,
             buildingLevel: 0,
             fleetCount: 0,
-            threatLevel: 'unknown'
+            threatLevel: 'unknown',
+            // Neue Statistiken für detaillierte Berichte
+            resourceBreakdown: {},
+            buildingCount: 0,
+            researchCount: 0,
+            shipTypeCount: 0
         };
         
         try {
@@ -195,24 +436,47 @@ class SpyReportParser {
                 });
             }
             
-            // Gesamtressourcen berechnen
+            // Gesamtressourcen berechnen (neue Struktur)
             if (data.resources) {
-                const resourceKeys = ['fe', 'si', 'c', 'h2o', 'o2', 'h'];
-                resourceKeys.forEach(key => {
-                    stats.totalResources += data.resources[key] || 0;
+                const resourceTypes = ['fe', 'si', 'c', 'water', 'oxygen', 'hydrogen'];
+                resourceTypes.forEach(type => {
+                    if (data.resources[type]) {
+                        const amount = data.resources[type].amount || 0;
+                        stats.totalResources += amount;
+                        stats.resourceBreakdown[type] = {
+                            amount: amount,
+                            formatted: data.resources[type].formatted
+                        };
+                    }
                 });
+                
+                // Zusätzliche Ressourcen
+                if (data.resources.additional) {
+                    data.resources.additional.forEach(resource => {
+                        stats.totalResources += resource.amount;
+                        stats.resourceBreakdown[resource.name] = {
+                            amount: resource.amount,
+                            formatted: resource.formatted
+                        };
+                    });
+                }
             }
             
-            // Forschungslevel berechnen (Durchschnitt)
-            if (data.player.research) {
-                const researchValues = Object.values(data.player.research);
-                stats.researchLevel = researchValues.reduce((sum, val) => sum + val, 0) / researchValues.length;
+            // Forschungslevel berechnen (neue Struktur)
+            if (data.research) {
+                stats.researchCount = data.research.length;
+                stats.researchLevel = data.research.reduce((sum, research) => sum + research.level, 0);
             }
             
-            // Gebäudelevel berechnen (Durchschnitt)
+            // Gebäudelevel berechnen (neue Struktur)
             if (data.buildings) {
-                const buildingValues = Object.values(data.buildings);
-                stats.buildingLevel = buildingValues.reduce((sum, val) => sum + val, 0) / buildingValues.length;
+                stats.buildingCount = data.buildings.length;
+                stats.buildingLevel = data.buildings.reduce((sum, building) => sum + building.level, 0);
+            }
+            
+            // Schiffstypen zählen
+            if (data.shipTypes) {
+                stats.shipTypeCount = data.shipTypes.length;
             }
             
             // Flottenanzahl
