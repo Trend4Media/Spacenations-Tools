@@ -194,26 +194,10 @@ class SpyDatabaseManager {
             
             console.log('📋 Lade Spy-Reports für Allianz:', alliance);
             
+            // Vereinfachte Query ohne komplexe Filter um Index-Probleme zu vermeiden
             let query = this.db.collection('allianceSpyReports')
-                .where('allianceName', '==', alliance);
-            
-            // Filter anwenden
-            if (options.playerName) {
-                query = query.where('playerName', '==', options.playerName);
-            }
-            
-            if (options.minAttackPower) {
-                query = query.where('totalAttackPower', '>=', options.minAttackPower);
-            }
-            
-            if (options.threatLevel) {
-                query = query.where('threatLevel', '==', options.threatLevel);
-            }
-            
-            // Sortierung
-            const sortField = options.sortBy || 'createdAt';
-            const sortDirection = options.sortDirection || 'desc';
-            query = query.orderBy(sortField, sortDirection);
+                .where('allianceName', '==', alliance)
+                .orderBy('createdAt', 'desc');
             
             // Limit
             if (options.limit) {
