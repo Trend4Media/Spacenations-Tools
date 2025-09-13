@@ -70,6 +70,7 @@ class AlliancePermissionManager {
                     ['chat_read', { enabled: true, description: 'Chat lesen' }],
                     ['chat_write', { enabled: true, description: 'Chat schreiben' }],
                     ['member_approval', { enabled: false, description: 'Mitglieder bestätigen' }],
+                    ['spy_database', { enabled: false, description: 'Spy-Datenbank' }],
                 ]);
                 
                 await this.saveAlliancePermissions();
@@ -110,6 +111,7 @@ class AlliancePermissionManager {
             ['chat_read', { enabled: true, description: 'Chat lesen' }],
             ['chat_write', { enabled: true, description: 'Chat schreiben' }],
             ['member_approval', { enabled: true, description: 'Mitglieder bestätigen' }],
+            ['spy_database', { enabled: true, description: 'Spy-Datenbank' }],
         ]);
         
         // Setze lokale Admin-Berechtigungen
@@ -124,6 +126,7 @@ class AlliancePermissionManager {
             'chat_read': true,
             'chat_write': true,
             'member_approval': true,
+            'spy_database': true,
         };
         
         this.memberPermissions.set(this.currentUser, adminPerms);
@@ -202,7 +205,9 @@ class AlliancePermissionManager {
         return this.permissions.get(permission)?.enabled || false;
     }
 
-    // Spionage-Datenbank Funktionen entfernt - System wird neu aufgebaut
+    canAccessSpyDatabase(memberUsername = null) {
+        return this.hasPermission('spy_database', memberUsername);
+    }
 
     isAllianceAdmin(memberUsername = null) {
         return this.hasPermission('alliance_admin', memberUsername);
@@ -386,6 +391,7 @@ class AlliancePermissionManager {
             await this.setMemberPermission(this.currentUser, 'chat_read', true);
             await this.setMemberPermission(this.currentUser, 'chat_write', true);
             await this.setMemberPermission(this.currentUser, 'member_approval', true);
+            await this.setMemberPermission(this.currentUser, 'spy_database', true);
             
             console.log('✅ Admin-Berechtigungen gesetzt');
             

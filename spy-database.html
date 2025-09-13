@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spy-Datenbank - Spacenations Tools</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            color: #00FF88;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+        
+        .header p {
+            color: #b0b0b0;
+            font-size: 1.1rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: rgba(0,0,0,0.8);
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .stat-card.active {
+            border-color: #00FF88;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #00FF88;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #b0b0b0;
+            font-size: 1rem;
+        }
+        
+        .controls-section {
+            background: rgba(0,0,0,0.8);
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .controls-section h2 {
+            color: #00FF88;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #e0e0e0;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #444;
+            border-radius: 6px;
+            background: rgba(0,0,0,0.5);
+            color: #e0e0e0;
+            font-size: 0.95rem;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #00FF88;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn.primary {
+            background: linear-gradient(135deg, #00FF88, #44FF99);
+            color: #000;
+        }
+        
+        .btn.primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, #44FF99, #88FFBB);
+            transform: translateY(-2px);
+        }
+        
+        .btn.secondary {
+            background: linear-gradient(135deg, #3a5998, #4a90e2);
+            color: white;
+        }
+        
+        .btn.secondary:hover {
+            background: linear-gradient(135deg, #4a90e2, #5ba0f2);
+            transform: translateY(-2px);
+        }
+        
+        .btn.danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        .btn.danger:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .reports-section {
+            background: rgba(0,0,0,0.8);
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 30px;
+        }
+        
+        .reports-section h2 {
+            color: #00FF88;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        
+        .report-card {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .report-card:hover {
+            border-color: #00FF88;
+            transform: translateY(-2px);
+        }
+        
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .report-title {
+            color: #ff8c42;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .report-date {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+        
+        .report-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .report-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .report-item:last-child {
+            border-bottom: none;
+        }
+        
+        .report-label {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+        
+        .report-value {
+            color: #e0e0e0;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .threat-level {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .threat-level.very_low {
+            background: rgba(76,175,80,0.2);
+            color: #4CAF50;
+        }
+        
+        .threat-level.low {
+            background: rgba(139,195,74,0.2);
+            color: #8BC34A;
+        }
+        
+        .threat-level.medium {
+            background: rgba(255,152,0,0.2);
+            color: #FF9800;
+        }
+        
+        .threat-level.high {
+            background: rgba(244,67,54,0.2);
+            color: #F44336;
+        }
+        
+        .threat-level.very_high {
+            background: rgba(156,39,176,0.2);
+            color: #9C27B0;
+        }
+        
+        .report-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #b0b0b0;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #333;
+            border-top: 4px solid #00FF88;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #b0b0b0;
+        }
+        
+        .empty-state h3 {
+            color: #ff8c42;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .empty-state p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+        
+        .status-message.success {
+            background: rgba(34,197,94,0.1);
+            border: 1px solid #22c55e;
+            color: #22c55e;
+        }
+        
+        .status-message.error {
+            background: rgba(239,68,68,0.1);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+        
+        .status-message.info {
+            background: rgba(59,130,246,0.1);
+            border: 1px solid #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .navigation {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .back-link {
+            color: #00FF88;
+            text-decoration: none;
+            font-weight: 600;
+            margin-right: 20px;
+        }
+        
+        .back-link:hover {
+            color: #44FF99;
+            text-decoration: underline;
+        }
+        
+        .add-report-link {
+            color: #ff8c42;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .add-report-link:hover {
+            color: #ffb366;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <div class="navigation">
+            <a href="alliance-dashboard.html" class="back-link">← Allianz-Dashboard</a>
+            <a href="spy-report-input.html" class="add-report-link">+ Neuen Bericht hinzufügen</a>
+        </div>
+        
+        <div class="header">
+            <h1>🕵️ Spy-Datenbank</h1>
+            <p>Übersicht aller Spionage-Berichte deiner Allianz</p>
+        </div>
+        
+        <!-- Status Messages -->
+        <div id="status-message" class="status-message" style="display: none;"></div>
+        
+        <!-- Statistics -->
+        <div class="stats-grid" id="stats-grid">
+            <!-- Statistics werden hier eingefügt -->
+        </div>
+        
+        <!-- Controls -->
+        <div class="controls-section">
+            <h2>🔍 Filter & Suche</h2>
+            
+            <div class="controls-grid">
+                <div class="form-group">
+                    <label for="search-player">Spieler suchen:</label>
+                    <input type="text" id="search-player" placeholder="Spielername eingeben...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="search-planet">Planet suchen:</label>
+                    <input type="text" id="search-planet" placeholder="Planetname oder Koordinaten...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="filter-threat">Bedrohungsstufe:</label>
+                    <select id="filter-threat">
+                        <option value="">Alle Stufen</option>
+                        <option value="very_low">Sehr Niedrig</option>
+                        <option value="low">Niedrig</option>
+                        <option value="medium">Mittel</option>
+                        <option value="high">Hoch</option>
+                        <option value="very_high">Sehr Hoch</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="min-attack">Min. Angriffsstärke:</label>
+                    <input type="number" id="min-attack" placeholder="0" min="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="sort-by">Sortieren nach:</label>
+                    <select id="sort-by">
+                        <option value="createdAt">Datum (neueste zuerst)</option>
+                        <option value="playerName">Spielername</option>
+                        <option value="totalAttackPower">Angriffsstärke</option>
+                        <option value="threatLevel">Bedrohungsstufe</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sort-direction">Sortierrichtung:</label>
+                    <select id="sort-direction">
+                        <option value="desc">Absteigend</option>
+                        <option value="asc">Aufsteigend</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="btn primary" onclick="searchReports()">🔍 Suchen</button>
+                <button class="btn secondary" onclick="clearFilters()">🗑️ Filter leeren</button>
+                <button class="btn secondary" onclick="loadReports()">🔄 Aktualisieren</button>
+            </div>
+        </div>
+        
+        <!-- Reports -->
+        <div class="reports-section">
+            <h2>📋 Spy-Reports</h2>
+            <div id="reports-container">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Lade Spy-Reports...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/session-manager.js"></script>
+    <script src="js/auth-manager.js"></script>
+    <script src="js/firebase-sync.js"></script>
+    <script src="js/spy-report-parser.js"></script>
+    <script src="js/spy-database-manager.js"></script>
+
+    <script>
+        let currentReports = [];
+        let currentStatistics = null;
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🕵️ Spy Database Page geladen');
+            
+            // Warte auf APIs
+            await waitForAPIs();
+            
+            // Event Listeners für Filter
+            setupEventListeners();
+            
+            // Initiale Daten laden
+            await loadReports();
+            await loadStatistics();
+        });
+        
+        async function waitForAPIs() {
+            try {
+                // Warte auf Firebase
+                if (window.FirebaseConfig) {
+                    await window.FirebaseConfig.waitForReady();
+                }
+                
+                // Warte auf AuthManager
+                if (window.AuthAPI) {
+                    await window.AuthAPI.waitForInit();
+                }
+                
+                // Warte auf Spy APIs
+                if (window.SpyReportAPI && window.SpyDatabaseAPI) {
+                    console.log('✅ Alle APIs bereit');
+                    return true;
+                }
+                
+                throw new Error('Spy APIs nicht verfügbar');
+                
+            } catch (error) {
+                console.error('❌ API-Initialisierung fehlgeschlagen:', error);
+                showMessage('Fehler beim Initialisieren der APIs', 'error');
+                return false;
+            }
+        }
+        
+        function setupEventListeners() {
+            // Enter-Key Support für Suchfelder
+            document.getElementById('search-player').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') searchReports();
+            });
+            
+            document.getElementById('search-planet').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') searchReports();
+            });
+            
+            // Auto-Search bei Änderungen
+            document.getElementById('filter-threat').addEventListener('change', searchReports);
+            document.getElementById('sort-by').addEventListener('change', searchReports);
+            document.getElementById('sort-direction').addEventListener('change', searchReports);
+        }
+        
+        async function loadReports() {
+            try {
+                showLoading();
+                
+                console.log('📋 Lade Spy-Reports...');
+                currentReports = await window.SpyDatabaseAPI.getAllianceReports();
+                
+                displayReports(currentReports);
+                console.log(`✅ ${currentReports.length} Spy-Reports geladen`);
+                
+            } catch (error) {
+                console.error('❌ Fehler beim Laden der Spy-Reports:', error);
+                showError('Fehler beim Laden der Spy-Reports: ' + error.message);
+            }
+        }
+        
+        async function loadStatistics() {
+            try {
+                console.log('📊 Lade Statistiken...');
+                currentStatistics = await window.SpyDatabaseAPI.getStatistics();
+                
+                displayStatistics(currentStatistics);
+                console.log('✅ Statistiken geladen');
+                
+            } catch (error) {
+                console.error('❌ Fehler beim Laden der Statistiken:', error);
+            }
+        }
+        
+        function displayStatistics(stats) {
+            const statsGrid = document.getElementById('stats-grid');
+            
+            statsGrid.innerHTML = `
+                <div class="stat-card active">
+                    <div class="stat-value">${stats.totalReports}</div>
+                    <div class="stat-label">Gesamte Berichte</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value">${stats.uniquePlayers}</div>
+                    <div class="stat-label">Eindeutige Spieler</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value">${stats.uniquePlanets}</div>
+                    <div class="stat-label">Eindeutige Planeten</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value">${Math.round(stats.totalAttackPower).toLocaleString()}</div>
+                    <div class="stat-label">Gesamt Angriffsstärke</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value">${Math.round(stats.averageResearchLevel)}</div>
+                    <div class="stat-label">Ø Forschungslevel</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value">${Math.round(stats.averageBuildingLevel)}</div>
+                    <div class="stat-label">Ø Gebäudelevel</div>
+                </div>
+            `;
+        }
+        
+        function displayReports(reports) {
+            const container = document.getElementById('reports-container');
+            
+            if (reports.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>📭 Keine Spy-Reports gefunden</h3>
+                        <p>Es wurden noch keine Spionage-Berichte zu deiner Allianz hinzugefügt.</p>
+                        <a href="spy-report-input.html" class="btn primary">+ Ersten Bericht hinzufügen</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            const reportsHtml = reports.map(report => {
+                const threatLevel = window.SpyReportAPI.formatThreatLevel(report.threatLevel);
+                const date = new Date(report.createdAt.toDate()).toLocaleDateString('de-DE');
+                
+                return `
+                    <div class="report-card">
+                        <div class="report-header">
+                            <div class="report-title">${report.playerName}</div>
+                            <div class="report-date">${date}</div>
+                        </div>
+                        
+                        <div class="report-info">
+                            <div>
+                                <div class="report-item">
+                                    <span class="report-label">Planet:</span>
+                                    <span class="report-value">${report.planetName}</span>
+                                </div>
+                                <div class="report-item">
+                                    <span class="report-label">Koordinaten:</span>
+                                    <span class="report-value">${report.planetCoordinates}</span>
+                                </div>
+                                <div class="report-item">
+                                    <span class="report-label">Allianz:</span>
+                                    <span class="report-value">${report.player.allianceName || 'Keine'}</span>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="report-item">
+                                    <span class="report-label">Angriffsstärke:</span>
+                                    <span class="report-value">${Math.round(report.totalAttackPower || 0).toLocaleString()}</span>
+                                </div>
+                                <div class="report-item">
+                                    <span class="report-label">Verteidigung:</span>
+                                    <span class="report-value">${Math.round(report.totalDefensePower || 0).toLocaleString()}</span>
+                                </div>
+                                <div class="report-item">
+                                    <span class="report-label">Bedrohung:</span>
+                                    <span class="report-value">
+                                        <span class="threat-level ${report.threatLevel}">
+                                            ${threatLevel.icon} ${threatLevel.text}
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="report-actions">
+                            <button class="btn btn-small secondary" onclick="viewReport('${report.id}')">
+                                👁️ Details
+                            </button>
+                            
+                            <button class="btn btn-small secondary" onclick="copyReportUrl('${report.originalUrl}')">
+                                📋 URL kopieren
+                            </button>
+                            
+                            ${await isAdmin() ? `
+                                <button class="btn btn-small danger" onclick="deleteReport('${report.id}', '${report.playerName}')">
+                                    🗑️ Löschen
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = `
+                <div class="reports-grid">
+                    ${reportsHtml}
+                </div>
+            `;
+        }
+        
+        async function searchReports() {
+            try {
+                showLoading();
+                
+                const searchCriteria = {
+                    playerName: document.getElementById('search-player').value.trim(),
+                    planetName: document.getElementById('search-planet').value.trim(),
+                    threatLevel: document.getElementById('filter-threat').value,
+                    minAttackPower: parseInt(document.getElementById('min-attack').value) || undefined,
+                    sortBy: document.getElementById('sort-by').value,
+                    sortDirection: document.getElementById('sort-direction').value,
+                    limit: 100
+                };
+                
+                // Leere Felder entfernen
+                Object.keys(searchCriteria).forEach(key => {
+                    if (searchCriteria[key] === '' || searchCriteria[key] === undefined) {
+                        delete searchCriteria[key];
+                    }
+                });
+                
+                console.log('🔍 Suche mit Kriterien:', searchCriteria);
+                
+                currentReports = await window.SpyDatabaseAPI.searchReports(searchCriteria);
+                displayReports(currentReports);
+                
+                console.log(`✅ ${currentReports.length} Spy-Reports gefunden`);
+                
+            } catch (error) {
+                console.error('❌ Fehler bei der Suche:', error);
+                showError('Fehler bei der Suche: ' + error.message);
+            }
+        }
+        
+        function clearFilters() {
+            document.getElementById('search-player').value = '';
+            document.getElementById('search-planet').value = '';
+            document.getElementById('filter-threat').value = '';
+            document.getElementById('min-attack').value = '';
+            document.getElementById('sort-by').value = 'createdAt';
+            document.getElementById('sort-direction').value = 'desc';
+            
+            loadReports();
+        }
+        
+        async function viewReport(reportId) {
+            try {
+                const report = await window.SpyDatabaseAPI.getReport(reportId);
+                if (report) {
+                    // Öffne Details in neuem Tab oder Modal
+                    window.open(`spy-report-detail.html?id=${reportId}`, '_blank');
+                } else {
+                    showMessage('Bericht nicht gefunden', 'error');
+                }
+            } catch (error) {
+                console.error('❌ Fehler beim Anzeigen des Berichts:', error);
+                showMessage('Fehler beim Laden des Berichts', 'error');
+            }
+        }
+        
+        function copyReportUrl(url) {
+            navigator.clipboard.writeText(url).then(() => {
+                showMessage('URL in Zwischenablage kopiert', 'success');
+            }).catch(() => {
+                showMessage('Fehler beim Kopieren der URL', 'error');
+            });
+        }
+        
+        async function deleteReport(reportId, playerName) {
+            if (!confirm(`Möchtest du den Spy-Report für "${playerName}" wirklich löschen?`)) {
+                return;
+            }
+            
+            try {
+                await window.SpyDatabaseAPI.deleteReport(reportId);
+                showMessage('Spy-Report erfolgreich gelöscht', 'success');
+                
+                // Reports neu laden
+                await loadReports();
+                await loadStatistics();
+                
+            } catch (error) {
+                console.error('❌ Fehler beim Löschen des Berichts:', error);
+                showMessage('Fehler beim Löschen: ' + error.message, 'error');
+            }
+        }
+        
+        async function isAdmin() {
+            try {
+                return await window.SpyDatabaseAPI.isAdmin();
+            } catch (error) {
+                return false;
+            }
+        }
+        
+        function showLoading() {
+            document.getElementById('reports-container').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Lade Spy-Reports...</p>
+                </div>
+            `;
+        }
+        
+        function showError(message) {
+            document.getElementById('reports-container').innerHTML = `
+                <div class="empty-state">
+                    <h3>❌ Fehler</h3>
+                    <p>${message}</p>
+                    <button class="btn primary" onclick="loadReports()">🔄 Erneut versuchen</button>
+                </div>
+            `;
+        }
+        
+        function showMessage(message, type) {
+            const messageEl = document.getElementById('status-message');
+            messageEl.textContent = message;
+            messageEl.className = `status-message ${type}`;
+            messageEl.style.display = 'block';
+            
+            // Auto-hide nach 3 Sekunden
+            setTimeout(() => {
+                hideMessage();
+            }, 3000);
+        }
+        
+        function hideMessage() {
+            document.getElementById('status-message').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
