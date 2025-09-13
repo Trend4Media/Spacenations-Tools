@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Spy-Datenbank - Spacenations Tools</title>
-    <meta name="cache-bust" content="v9">
+    <meta name="cache-bust" content="v10">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -561,13 +561,13 @@
                         // Verstecke Retry-Button wenn echte Daten geladen wurden
                         document.getElementById('retry-btn').style.display = 'none';
                         showMessage('✅ Echte Daten geladen! Firebase-Verbindung erfolgreich.', 'success');
-                    } else {
-                        console.log('⚠️ Firebase nicht verfügbar, bleibe im Demo-Modus');
-                        showMessage('Demo-Modus: Firebase nicht verfügbar. Zeige Beispieldaten.', 'info');
-                    }
+                } else {
+                    console.log('⚠️ Firebase nicht verfügbar, bleibe im Demo-Modus');
+                    showMessage('Demo-Modus: Firebase nicht verfügbar. Zeige Beispieldaten. Sie können trotzdem alle Funktionen nutzen!', 'info');
+                }
                 } catch (error) {
                     console.log('⚠️ Firebase-Verbindung fehlgeschlagen, bleibe im Demo-Modus:', error.message);
-                    showMessage('Demo-Modus: Firebase-Verbindung fehlgeschlagen. Zeige Beispieldaten.', 'info');
+                    showMessage('Demo-Modus: Firebase-Verbindung fehlgeschlagen. Zeige Beispieldaten. Sie können trotzdem alle Funktionen nutzen!', 'info');
                 }
             }, 1000);
         });
