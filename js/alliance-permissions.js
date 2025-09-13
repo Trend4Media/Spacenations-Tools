@@ -1,7 +1,7 @@
 /**
  * Alliance Permission System
  * - Chat permissions management
- * - Spy database access control
+ * - Alliance management access control
  * - Member approval system
  * - Real-time permission updates
  */
@@ -70,8 +70,6 @@ class AlliancePermissionManager {
                     ['chat_read', { enabled: true, description: 'Chat lesen' }],
                     ['chat_write', { enabled: true, description: 'Chat schreiben' }],
                     ['member_approval', { enabled: false, description: 'Mitglieder bestätigen' }],
-                    ['spy_database_admin', { enabled: false, description: 'Spionage-Datenbank Admin' }],
-                    ['spy_database_user', { enabled: false, description: 'Spionage-Datenbank User' }]
                 ]);
                 
                 await this.saveAlliancePermissions();
@@ -112,8 +110,6 @@ class AlliancePermissionManager {
             ['chat_read', { enabled: true, description: 'Chat lesen' }],
             ['chat_write', { enabled: true, description: 'Chat schreiben' }],
             ['member_approval', { enabled: true, description: 'Mitglieder bestätigen' }],
-            ['spy_database_admin', { enabled: true, description: 'Spionage-Datenbank Admin' }],
-            ['spy_database_user', { enabled: true, description: 'Spionage-Datenbank User' }]
         ]);
         
         // Setze lokale Admin-Berechtigungen
@@ -128,8 +124,6 @@ class AlliancePermissionManager {
             'chat_read': true,
             'chat_write': true,
             'member_approval': true,
-            'spy_database_admin': true,
-            'spy_database_user': true
         };
         
         this.memberPermissions.set(this.currentUser, adminPerms);
@@ -208,13 +202,7 @@ class AlliancePermissionManager {
         return this.permissions.get(permission)?.enabled || false;
     }
 
-    canAccessSpyDatabase(memberUsername = null) {
-        return this.hasPermission('spy_database_user', memberUsername) || this.hasPermission('spy_database_admin', memberUsername);
-    }
-
-    canAccessSpyDatabaseAdmin(memberUsername = null) {
-        return this.hasPermission('spy_database_admin', memberUsername);
-    }
+    // Spionage-Datenbank Funktionen entfernt - System wird neu aufgebaut
 
     isAllianceAdmin(memberUsername = null) {
         return this.hasPermission('alliance_admin', memberUsername);
@@ -390,8 +378,6 @@ class AlliancePermissionManager {
                 'chat_read': true,
                 'chat_write': true,
                 'member_approval': true,
-                'spy_database_admin': true,
-                'spy_database_user': true
             };
             
             // Speichere Admin-Berechtigungen in der gewünschten Reihenfolge
@@ -400,8 +386,6 @@ class AlliancePermissionManager {
             await this.setMemberPermission(this.currentUser, 'chat_read', true);
             await this.setMemberPermission(this.currentUser, 'chat_write', true);
             await this.setMemberPermission(this.currentUser, 'member_approval', true);
-            await this.setMemberPermission(this.currentUser, 'spy_database_admin', true);
-            await this.setMemberPermission(this.currentUser, 'spy_database_user', true);
             
             console.log('✅ Admin-Berechtigungen gesetzt');
             

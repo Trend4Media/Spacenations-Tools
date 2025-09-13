@@ -1134,7 +1134,6 @@
                     await db.collection('alliancePermissions').doc(docRef.id).set({
                         chat_read: { enabled: true, description: "Chat lesen" },
                         chat_write: { enabled: true, description: "Chat schreiben" },
-                        spy_database: { enabled: false, description: "Spionage-Datenbank" },
                         member_approval: { enabled: false, description: "Mitglieder bestätigen" },
                         permission_manage: { enabled: false, description: "Berechtigungen verwalten" }
                     });

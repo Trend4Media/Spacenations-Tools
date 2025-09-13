@@ -16,7 +16,7 @@ class EnhancedNavigation {
         this.addLoadingStates();
         this.addTouchFeedback();
         this.improveAccessibility();
-        this.injectSpyDbNav();
+        // Spionage-Datenbank Navigation entfernt
         
         console.log('🚀 Enhanced Navigation initialized for:', this.currentPage);
     }
@@ -55,22 +55,7 @@ class EnhancedNavigation {
         });
     }
 
-    injectSpyDbNav() {
-        // Nur auf Dashboard-Seiten in die linke Nav einfügen
-        if (!this.currentPage.startsWith('dashboard')) return;
-        const navList = document.querySelector('.nav .nav-list');
-        if (!navList) return;
-        if (navList.querySelector('a[href*="spy-database.html"]')) return;
-        
-        const li = document.createElement('li');
-        li.className = 'nav-item';
-        const a = document.createElement('a');
-        a.href = 'spy-database.html';
-        a.className = 'nav-link';
-        a.innerHTML = '<span class="nav-icon">📡</span>Spionage-Datenbank';
-        li.appendChild(a);
-        navList.appendChild(li);
-    }
+    // Spionage-Datenbank Navigation entfernt - System wird neu aufgebaut
 
     enhanceClickability() {
         // Add ripple effect to clickable elements
