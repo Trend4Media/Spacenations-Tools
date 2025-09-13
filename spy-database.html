@@ -658,7 +658,11 @@
                                 </div>
                                 <div class="report-item">
                                     <span class="report-label">Allianz:</span>
-                                    <span class="report-value">${report.player.allianceName || 'Keine'}</span>
+                                    <span class="report-value">${report.player?.allianceName || 'Keine'}</span>
+                                </div>
+                                <div class="report-item">
+                                    <span class="report-label">Gebäude:</span>
+                                    <span class="report-value">${report.buildings?.length || 0} Gebäude</span>
                                 </div>
                             </div>
                             
@@ -670,6 +674,10 @@
                                 <div class="report-item">
                                     <span class="report-label">Verteidigung:</span>
                                     <span class="report-value">${Math.round(report.totalDefensePower || 0).toLocaleString()}</span>
+                                </div>
+                                <div class="report-item">
+                                    <span class="report-label">Schiffe:</span>
+                                    <span class="report-value">${report.shipTypes?.length || 0} Typen</span>
                                 </div>
                                 <div class="report-item">
                                     <span class="report-label">Bedrohung:</span>
