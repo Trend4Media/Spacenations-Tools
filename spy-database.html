@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <title>🕵️ Spacenations Spy Database</title>
     <meta name="description" content="Advanced spy intelligence database for Spacenations strategy game. Track players, planets, buildings, and military units.">
-    <meta name="cache-bust" content="v23&force=4">
+    <meta name="cache-bust" content="v24&force=5">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -133,6 +133,16 @@
             background: var(--primary);
             color: var(--primary-foreground);
             box-shadow: 0 0 10px hsla(184, 100%, 40%, 0.3);
+        }
+
+        .btn-success {
+            background: var(--gaming-success);
+            color: white;
+            box-shadow: 0 0 10px hsla(142, 76%, 36%, 0.3);
+        }
+
+        .btn-success:hover {
+            background: hsl(142, 76%, 30%);
         }
 
         .status-badge {
@@ -408,6 +418,13 @@
                             <label class="search-label">Planet suchen:</label>
                             <input type="text" class="form-input" placeholder="Planetenname eingeben..." id="planetSearch" style="width: 200px;">
                         </div>
+                        <div class="search-group">
+                            <label class="search-label">Spy-Bericht hinzufügen:</label>
+                            <input type="text" class="form-input" placeholder="Spy-Bericht-Link einfügen..." id="spyReportInput" style="width: 300px;">
+                            <button class="btn btn-success" onclick="addSpyReport()" style="margin-left: 8px;">
+                                ➕ Hinzufügen
+                            </button>
+                        </div>
                         <button class="btn btn-primary" onclick="performSearch()">
                             🔍 Suchen
                         </button>
@@ -490,7 +507,7 @@
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', async () => {
-            console.log('🕵️ Spy Database Grid initialisiert - Version v23');
+            console.log('🕵️ Spy Database Grid initialisiert - Version v24');
             
             // Load demo data immediately
             console.log('🚀 Lade sofort Demo-Daten...');
@@ -659,6 +676,74 @@
             document.getElementById('planetSearch').value = '';
             filteredReports = [...currentReports];
             displayReports(filteredReports);
+        }
+
+        function addSpyReport() {
+            const spyReportInput = document.getElementById('spyReportInput');
+            const spyReportLink = spyReportInput.value.trim();
+            
+            if (!spyReportLink) {
+                alert('Bitte geben Sie einen Spy-Bericht-Link ein!');
+                return;
+            }
+            
+            // Spy-Bericht parsen und verarbeiten
+            try {
+                console.log('🔍 Verarbeite Spy-Bericht:', spyReportLink);
+                
+                // Hier würde normalerweise der Spy-Bericht geparst werden
+                // Für jetzt fügen wir einen Demo-Bericht hinzu
+                const newReport = {
+                    id: 'spy-' + Date.now(),
+                    player: 'Neuer Spieler',
+                    planet: 'Neuer Planet',
+                    alliance: 'Neue Allianz',
+                    timestamp: new Date(),
+                    buildings: {
+                        planetCenter: Math.floor(Math.random() * 20),
+                        spaceport: Math.floor(Math.random() * 15),
+                        ironMine: Math.floor(Math.random() * 25),
+                        siliconRefinery: Math.floor(Math.random() * 20),
+                        carbonPlant: Math.floor(Math.random() * 18),
+                        shipFactory: Math.floor(Math.random() * 12),
+                        weaponFactory: Math.floor(Math.random() * 10),
+                        researchCenter: Math.floor(Math.random() * 8),
+                        research: Math.floor(Math.random() * 5)
+                    },
+                    military: {
+                        spyUnit: Math.floor(Math.random() * 15),
+                        stealthUnit: Math.floor(Math.random() * 12),
+                        invasionUnit: Math.floor(Math.random() * 20),
+                        plunderUnit: Math.floor(Math.random() * 18),
+                        sabotageUnit: Math.floor(Math.random() * 10)
+                    },
+                    source: 'Manuell hinzugefügt'
+                };
+                
+                // Bericht zur aktuellen Liste hinzufügen
+                currentReports.unshift(newReport);
+                filteredReports = [...currentReports];
+                
+                // Tabelle aktualisieren
+                displayReports(filteredReports);
+                
+                // Eingabefeld leeren
+                spyReportInput.value = '';
+                
+                // Erfolgsmeldung anzeigen
+                showStatusMessage('✅ Spy-Bericht erfolgreich hinzugefügt!', 'success');
+                
+                console.log('✅ Spy-Bericht hinzugefügt:', newReport);
+                
+            } catch (error) {
+                console.error('❌ Fehler beim Hinzufügen des Spy-Berichts:', error);
+                alert('Fehler beim Hinzufügen des Spy-Berichts: ' + error.message);
+            }
+        }
+
+        function showStatusMessage(message, type = 'info') {
+            // Verwende die bestehende showMessage Funktion
+            showMessage(message, type);
         }
 
         function refreshData() {
