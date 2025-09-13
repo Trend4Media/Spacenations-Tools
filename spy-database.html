@@ -18,340 +18,301 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
-            color: #e0e0e0;
+            font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
             min-height: 100vh;
-            padding: 20px;
+            padding: 0;
+            overflow-x: auto;
         }
         
         .container {
-            max-width: 1400px;
-            margin: 0 auto;
+            max-width: 100vw;
+            margin: 0;
+            padding: 0;
         }
         
-        .main-layout {
+        /* Modern Grid Layout */
+        .spy-database-grid {
             display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 30px;
-            margin-top: 20px;
+            grid-template-columns: 200px 1fr 250px;
+            grid-template-rows: 80px 1fr;
+            height: 100vh;
+            gap: 1px;
+            background: #1a1a1a;
         }
         
-        .main-content {
-            min-width: 0; /* Verhindert Grid-Overflow */
-        }
-        
-        .search-widget {
-            background: rgba(0,0,0,0.8);
-            border: 2px solid #333;
-            border-radius: 12px;
-            padding: 20px;
-            height: fit-content;
+        /* Header mit vertikalen Texten */
+        .grid-header {
+            grid-column: 1 / -1;
+            background: #111111;
+            border-bottom: 2px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
             position: sticky;
-            top: 20px;
+            top: 0;
+            z-index: 100;
         }
         
-        .search-widget h3 {
-            color: #00FF88;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-            text-align: center;
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.02em;
         }
         
-        .search-widget .form-group {
-            margin-bottom: 15px;
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
         }
         
-        .search-widget .form-group label {
+        /* User Liste (erste Spalte) */
+        .users-column {
+            background: #111111;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+            max-height: calc(100vh - 80px);
+        }
+        
+        .users-header {
+            padding: 20px 15px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #333;
+            font-weight: 600;
+            color: #666;
             font-size: 0.9rem;
-            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
         
-        .search-widget .form-group input {
-            font-size: 0.85rem;
-            padding: 8px 10px;
+        .user-item {
+            padding: 15px;
+            border-bottom: 1px solid #222;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
         }
         
-        .search-widget .btn {
-            width: 100%;
-            margin-bottom: 8px;
-            font-size: 0.85rem;
-            padding: 8px 12px;
+        .user-item:hover {
+            background: #1a1a1a;
+            border-left: 3px solid #007acc;
         }
         
-        @media (max-width: 1200px) {
-            .main-layout {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .search-widget {
-                position: static;
-                order: -1; /* Widget kommt zuerst auf mobilen Geräten */
-            }
+        .user-item.active {
+            background: #1a1a1a;
+            border-left: 3px solid #007acc;
+            color: #007acc;
         }
         
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
+        .user-name {
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 3px;
         }
         
-        .header h1 {
-            color: #00FF88;
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        .user-planet {
+            font-size: 0.8rem;
+            color: #888;
         }
         
-        .header p {
-            color: #b0b0b0;
-            font-size: 1.1rem;
+        /* Hauptgrid (mittlere Spalte) */
+        .main-grid {
+            background: #0a0a0a;
+            overflow: auto;
+            position: relative;
         }
         
-        .stats-grid {
+        .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
+            gap: 1px;
+            background: #1a1a1a;
+            min-width: max-content;
         }
         
-        .stat-card {
-            background: rgba(0,0,0,0.8);
-            border: 2px solid #333;
-            border-radius: 12px;
-            padding: 25px;
+        /* Kategorien Header (vertikaler Text) */
+        .categories-header {
+            display: contents;
+        }
+        
+        .category-header {
+            background: #111111;
+            border-bottom: 2px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 10px;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            font-weight: 600;
+            color: #888;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            min-height: 120px;
+            transition: all 0.2s ease;
+        }
+        
+        .category-header:hover {
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        
+        /* Grid Zellen */
+        .grid-cell {
+            background: #0a0a0a;
+            border: 1px solid #222;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .grid-cell:hover {
+            background: #1a1a1a;
+            border-color: #333;
+            transform: scale(1.02);
+            z-index: 10;
+        }
+        
+        .grid-cell.has-data {
+            background: #0d1421;
+            border-color: #007acc;
+        }
+        
+        .grid-cell.has-data:hover {
+            background: #1a2332;
+            border-color: #0099ff;
+        }
+        
+        .cell-content {
             text-align: center;
+            color: #888;
+            font-size: 0.85rem;
+            font-weight: 500;
         }
         
-        .stat-card.active {
-            border-color: #00FF88;
+        .cell-content.has-data {
+            color: #007acc;
+            font-weight: 600;
         }
         
-        .stat-value {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #00FF88;
-            margin-bottom: 10px;
+        .cell-link {
+            color: #007acc;
+            text-decoration: none;
+            font-weight: 600;
         }
         
-        .stat-label {
-            color: #b0b0b0;
+        .cell-link:hover {
+            color: #0099ff;
+            text-decoration: underline;
+        }
+        
+        /* Sidebar (rechte Spalte) */
+        .sidebar {
+            background: #111111;
+            border-left: 1px solid #333;
+            overflow-y: auto;
+            max-height: calc(100vh - 80px);
+        }
+        
+        .sidebar-section {
+            padding: 20px 15px;
+            border-bottom: 1px solid #222;
+        }
+        
+        .sidebar-section h3 {
+            color: #ffffff;
             font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
         
+        /* Buttons */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
         
+        .btn.primary {
+            background: #007acc;
+            color: white;
+        }
+        
+        .btn.primary:hover {
+            background: #0099ff;
+        }
+        
+        .btn.secondary {
+            background: #333;
+            color: #ccc;
+            border: 1px solid #555;
+        }
+        
+        .btn.secondary:hover {
+            background: #444;
+            border-color: #666;
+        }
+        
+        /* Form Elements */
         .form-group {
             margin-bottom: 15px;
         }
         
         .form-group label {
             display: block;
-            color: #e0e0e0;
-            margin-bottom: 8px;
-            font-weight: 600;
+            color: #ccc;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+            font-weight: 500;
         }
         
-        .form-group input,
-        .form-group select {
+        .form-group input {
             width: 100%;
-            padding: 10px 12px;
-            border: 2px solid #444;
-            border-radius: 6px;
-            background: rgba(0,0,0,0.5);
-            color: #e0e0e0;
-            font-size: 0.95rem;
-        }
-        
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #00FF88;
-        }
-        
-        .btn {
-            padding: 10px 20px;
-            border-radius: 6px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 5px;
-            text-decoration: none;
-            display: inline-block;
-        }
-        
-        .btn.primary {
-            background: linear-gradient(135deg, #00FF88, #44FF99);
-            color: #000;
-        }
-        
-        .btn.primary:hover:not(:disabled) {
-            background: linear-gradient(135deg, #44FF99, #88FFBB);
-            transform: translateY(-2px);
-        }
-        
-        .btn.secondary {
-            background: linear-gradient(135deg, #3a5998, #4a90e2);
-            color: white;
-        }
-        
-        .btn.secondary:hover {
-            background: linear-gradient(135deg, #4a90e2, #5ba0f2);
-            transform: translateY(-2px);
-        }
-        
-        .btn.danger {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-        }
-        
-        .btn.danger:hover {
-            background: linear-gradient(135deg, #dc2626, #b91c1c);
-            transform: translateY(-2px);
-        }
-        
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-        
-        .reports-section {
-            background: rgba(0,0,0,0.8);
-            border: 2px solid #333;
-            border-radius: 12px;
-            padding: 30px;
-        }
-        
-        .reports-section h2 {
-            color: #00FF88;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-        }
-        
-        .reports-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 20px;
-        }
-        
-        .report-card {
-            background: rgba(0,0,0,0.3);
+            padding: 8px 12px;
             border: 1px solid #444;
-            border-radius: 8px;
-            padding: 20px;
-            transition: all 0.3s ease;
-        }
-        
-        .report-card:hover {
-            border-color: #00FF88;
-            transform: translateY(-2px);
-        }
-        
-        .report-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .report-title {
-            color: #ff8c42;
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-        
-        .report-date {
-            color: #b0b0b0;
-            font-size: 0.9rem;
-        }
-        
-        .report-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .report-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .report-item:last-child {
-            border-bottom: none;
-        }
-        
-        .report-label {
-            color: #b0b0b0;
-            font-size: 0.9rem;
-        }
-        
-        .report-value {
-            color: #e0e0e0;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-        
-        .threat-level {
-            padding: 2px 6px;
             border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 600;
+            background: #1a1a1a;
+            color: #fff;
+            font-size: 0.9rem;
         }
         
-        .threat-level.very_low {
-            background: rgba(76,175,80,0.2);
-            color: #4CAF50;
+        .form-group input:focus {
+            outline: none;
+            border-color: #007acc;
         }
         
-        .threat-level.low {
-            background: rgba(139,195,74,0.2);
-            color: #8BC34A;
-        }
-        
-        .threat-level.medium {
-            background: rgba(255,152,0,0.2);
-            color: #FF9800;
-        }
-        
-        .threat-level.high {
-            background: rgba(244,67,54,0.2);
-            color: #F44336;
-        }
-        
-        .threat-level.very_high {
-            background: rgba(156,39,176,0.2);
-            color: #9C27B0;
-        }
-        
-        .report-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 15px;
-        }
-        
-        .btn-small {
-            padding: 6px 12px;
-            font-size: 0.8rem;
-        }
-        
+        /* Loading States */
         .loading {
             text-align: center;
             padding: 40px;
-            color: #b0b0b0;
+            color: #888;
         }
         
         .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #333;
-            border-top: 4px solid #00FF88;
+            width: 32px;
+            height: 32px;
+            border: 3px solid #333;
+            border-top: 3px solid #007acc;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            margin: 0 auto 15px;
         }
         
         @keyframes spin {
@@ -361,129 +322,122 @@
         
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
-            color: #b0b0b0;
+            padding: 40px;
+            color: #888;
         }
         
         .empty-state h3 {
-            color: #ff8c42;
+            color: #ccc;
             margin-bottom: 10px;
-            font-size: 1.5rem;
         }
         
-        .empty-state p {
-            margin-bottom: 20px;
-            font-size: 1.1rem;
+        /* Stats Display */
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 5px 0;
+            border-bottom: 1px solid #222;
         }
         
-        .status-message {
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
+        .stat-label {
+            color: #888;
+            font-size: 0.85rem;
+        }
+        
+        .stat-value {
+            color: #007acc;
             font-weight: 600;
+            font-size: 0.85rem;
         }
         
-        .status-message.success {
-            background: rgba(34,197,94,0.1);
-            border: 1px solid #22c55e;
-            color: #22c55e;
-        }
-        
-        .status-message.error {
-            background: rgba(239,68,68,0.1);
-            border: 1px solid #ef4444;
-            color: #ef4444;
-        }
-        
-        .status-message.info {
-            background: rgba(59,130,246,0.1);
-            border: 1px solid #3b82f6;
-            color: #3b82f6;
-        }
-        
-        .navigation {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .back-link {
-            color: #00FF88;
-            text-decoration: none;
-            font-weight: 600;
-            margin-right: 20px;
-        }
-        
-        .back-link:hover {
-            color: #44FF99;
-            text-decoration: underline;
-        }
-        
-        .add-report-link {
-            color: #ff8c42;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        
-        .add-report-link:hover {
-            color: #ffb366;
-            text-decoration: underline;
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .spy-database-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: 80px auto auto 1fr;
+            }
+            
+            .users-column {
+                grid-row: 2;
+                max-height: 200px;
+                border-right: none;
+                border-bottom: 1px solid #333;
+            }
+            
+            .sidebar {
+                grid-row: 3;
+                max-height: 300px;
+                border-left: none;
+                border-bottom: 1px solid #333;
+            }
+            
+            .main-grid {
+                grid-row: 4;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Navigation -->
-        <div class="navigation">
-            <a href="alliance-dashboard.html" class="back-link">← Allianz-Dashboard</a>
-            <a href="spy-report-input.html" class="add-report-link">+ Neuen Bericht hinzufügen</a>
-        </div>
-        
-        <div class="header">
-            <h1>🕵️ Spy-Datenbank</h1>
-            <p>Übersicht aller Spionage-Berichte deiner Allianz</p>
-        </div>
-        
-        <!-- Status Messages -->
-        <div id="status-message" class="status-message" style="display: none;"></div>
-        
-        <!-- Main Layout -->
-        <div class="main-layout">
-            <!-- Main Content -->
-            <div class="main-content">
-                <!-- Reports -->
-                <div class="reports-section">
-                    <h2>📋 Spy-Reports</h2>
-                    <div id="reports-container">
-                        <div class="loading">
-                            <div class="spinner"></div>
-                            <p>Lade Spy-Reports...</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Statistics -->
-                <div class="stats-grid" id="stats-grid">
-                    <!-- Statistics werden hier eingefügt -->
+        <!-- Modern Grid Layout -->
+        <div class="spy-database-grid">
+            <!-- Header -->
+            <div class="grid-header">
+                <div class="header-title">🕵️ Spy Database</div>
+                <div class="header-actions">
+                    <button class="btn primary" onclick="window.open('spy-report-input.html', '_blank')">+ Neuer Bericht</button>
+                    <button class="btn secondary" onclick="window.location.href='user-dashboard.html'">← Dashboard</button>
                 </div>
             </div>
             
-            <!-- Search Widget -->
-            <div class="search-widget">
-                <h3>🔍 Suche</h3>
-                
-                <div class="form-group">
-                    <label for="search-player">Spieler:</label>
-                    <input type="text" id="search-player" placeholder="Spielername...">
+            <!-- User Liste (links) -->
+            <div class="users-column">
+                <div class="users-header">Spieler</div>
+                <div id="users-list">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Lade Spieler...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hauptgrid (mitte) -->
+            <div class="main-grid">
+                <div id="grid-container" class="grid-container">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Lade Spy-Reports...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar (rechts) -->
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <h3>🔍 Suche</h3>
+                    <div class="form-group">
+                        <label for="search-player">Spieler:</label>
+                        <input type="text" id="search-player" placeholder="Spielername...">
+                    </div>
+                    <div class="form-group">
+                        <label for="search-planet">Planet:</label>
+                        <input type="text" id="search-planet" placeholder="Planetname...">
+                    </div>
+                    <button class="btn primary" onclick="searchReports()" style="width: 100%; margin-bottom: 10px;">🔍 Suchen</button>
+                    <button class="btn secondary" onclick="clearFilters()" style="width: 100%; margin-bottom: 10px;">🗑️ Leeren</button>
+                    <button class="btn secondary" onclick="loadReports()" style="width: 100%;">🔄 Aktualisieren</button>
                 </div>
                 
-                <div class="form-group">
-                    <label for="search-planet">Planet:</label>
-                    <input type="text" id="search-planet" placeholder="Planetname oder Koordinaten...">
+                <div class="sidebar-section">
+                    <h3>📊 Statistiken</h3>
+                    <div id="stats-display">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Lade Statistiken...</p>
+                        </div>
+                    </div>
                 </div>
-                
-                <button class="btn primary" onclick="searchReports()">🔍 Suchen</button>
-                <button class="btn secondary" onclick="clearFilters()">🗑️ Leeren</button>
-                <button class="btn secondary" onclick="loadReports()">🔄 Aktualisieren</button>
             </div>
         </div>
     </div>
@@ -499,47 +453,51 @@
     <script>
         let currentReports = [];
         let currentStatistics = null;
+        let selectedUser = null;
         
-        // Initialize page
+        // Kategorien für das Grid
+        const categories = [
+            'Planet',
+            'Koordinaten', 
+            'Allianz',
+            'Ressourcen',
+            'Gebäude',
+            'Forschung',
+            'Schiffe',
+            'Angriffsstärke',
+            'Verteidigung',
+            'Bedrohung',
+            'Datum'
+        ];
+        
+        // Initialisierung
         document.addEventListener('DOMContentLoaded', async () => {
-            console.log('🕵️ Spy Database Page geladen');
+            console.log('🕵️ Spy Database Grid initialisiert');
             
-            // Warte auf APIs
-            await waitForAPIs();
-            
-            // Event Listeners für Filter
-            setupEventListeners();
-            
-            // Initiale Daten laden
-            await loadReports();
-            await loadStatistics();
-        });
-        
-        async function waitForAPIs() {
-            try {
-                // Warte auf Firebase
-                if (window.FirebaseConfig) {
-                    await window.FirebaseConfig.waitForReady();
-                }
-                
-                // Warte auf AuthManager
-                if (window.AuthAPI) {
-                    await window.AuthAPI.waitForInit();
-                }
-                
-                // Warte auf Spy APIs
-                if (window.SpyReportAPI && window.SpyDatabaseAPI) {
-                    console.log('✅ Alle APIs bereit');
-                    return true;
-                }
-                
-                throw new Error('Spy APIs nicht verfügbar');
-                
-            } catch (error) {
-                console.error('❌ API-Initialisierung fehlgeschlagen:', error);
+            // Warten auf APIs
+            if (!await waitForAPIs()) {
                 showMessage('Fehler beim Initialisieren der APIs', 'error');
                 return false;
             }
+            
+            setupEventListeners();
+            await loadReports();
+        });
+        
+        async function waitForAPIs() {
+            const maxWait = 10000; // 10 Sekunden
+            const startTime = Date.now();
+            
+            while (Date.now() - startTime < maxWait) {
+                if (window.SpyDatabaseAPI && window.SpyReportAPI) {
+                    console.log('✅ Alle APIs bereit');
+                    return true;
+                }
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            console.error('❌ APIs nicht verfügbar nach 10 Sekunden');
+            return false;
         }
         
         function setupEventListeners() {
@@ -561,6 +519,7 @@
                 currentReports = await window.SpyDatabaseAPI.getAllianceReports();
                 
                 await displayReports(currentReports);
+                await loadStatistics();
                 console.log(`✅ ${currentReports.length} Spy-Reports geladen`);
                 
             } catch (error) {
@@ -582,136 +541,170 @@
             }
         }
         
-        function displayStatistics(stats) {
-            const statsGrid = document.getElementById('stats-grid');
+        function displayReports(reports) {
+            // User Liste erstellen
+            const users = [...new Set(reports.map(r => r.playerName || r.player?.name).filter(Boolean))];
+            displayUsers(users);
             
-            statsGrid.innerHTML = `
-                <div class="stat-card active">
-                    <div class="stat-value">${stats.totalReports}</div>
-                    <div class="stat-label">Gesamte Berichte</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value">${stats.uniquePlayers}</div>
-                    <div class="stat-label">Eindeutige Spieler</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value">${stats.uniquePlanets}</div>
-                    <div class="stat-label">Eindeutige Planeten</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value">${Math.round(stats.totalAttackPower).toLocaleString()}</div>
-                    <div class="stat-label">Gesamt Angriffsstärke</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value">${Math.round(stats.averageResearchLevel)}</div>
-                    <div class="stat-label">Ø Forschungslevel</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value">${Math.round(stats.averageBuildingLevel)}</div>
-                    <div class="stat-label">Ø Gebäudelevel</div>
-                </div>
-            `;
+            // Grid erstellen
+            createGrid(reports);
         }
         
-        async function displayReports(reports) {
-            const container = document.getElementById('reports-container');
+        function displayUsers(users) {
+            const container = document.getElementById('users-list');
             
-            if (reports.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <h3>📭 Keine Spy-Reports gefunden</h3>
-                        <p>Es wurden noch keine Spionage-Berichte zu deiner Allianz hinzugefügt.</p>
-                        <a href="spy-report-input.html" class="btn primary">+ Ersten Bericht hinzufügen</a>
-                    </div>
-                `;
+            if (users.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>Keine Spieler gefunden</p></div>';
                 return;
             }
             
-            // Admin-Status prüfen
-            const userIsAdmin = await isAdmin();
-            
-            const reportsHtml = reports.map(report => {
-                const threatLevel = window.SpyReportAPI.formatThreatLevel(report.threatLevel);
-                const date = new Date(report.createdAt.toDate()).toLocaleDateString('de-DE');
+            container.innerHTML = users.map(user => {
+                const userReports = currentReports.filter(r => (r.playerName || r.player?.name) === user);
+                const firstReport = userReports[0];
                 
                 return `
-                    <div class="report-card">
-                        <div class="report-header">
-                            <div class="report-title">${report.playerName}</div>
-                            <div class="report-date">${date}</div>
-                        </div>
-                        
-                        <div class="report-info">
-                            <div>
-                                <div class="report-item">
-                                    <span class="report-label">Planet:</span>
-                                    <span class="report-value">${report.planetName}</span>
-                                </div>
-                                <div class="report-item">
-                                    <span class="report-label">Koordinaten:</span>
-                                    <span class="report-value">${report.planetCoordinates}</span>
-                                </div>
-                                <div class="report-item">
-                                    <span class="report-label">Allianz:</span>
-                                    <span class="report-value">${report.player?.allianceName || 'Keine'}</span>
-                                </div>
-                                <div class="report-item">
-                                    <span class="report-label">Gebäude:</span>
-                                    <span class="report-value">${report.buildings?.length || 0} Gebäude</span>
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <div class="report-item">
-                                    <span class="report-label">Angriffsstärke:</span>
-                                    <span class="report-value">${Math.round(report.totalAttackPower || 0).toLocaleString()}</span>
-                                </div>
-                                <div class="report-item">
-                                    <span class="report-label">Verteidigung:</span>
-                                    <span class="report-value">${Math.round(report.totalDefensePower || 0).toLocaleString()}</span>
-                                </div>
-                                <div class="report-item">
-                                    <span class="report-label">Schiffe:</span>
-                                    <span class="report-value">${report.shipTypes?.length || 0} Typen</span>
-                                </div>
-                                <div class="report-item">
-                                    <span class="report-label">Bedrohung:</span>
-                                    <span class="report-value">
-                                        <span class="threat-level ${report.threatLevel}">
-                                            ${threatLevel.icon} ${threatLevel.text}
-                                        </span>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="report-actions">
-                            <button class="btn btn-small secondary" onclick="viewReport('${report.id}')">
-                                👁️ Details
-                            </button>
-                            
-                            <button class="btn btn-small secondary" onclick="copyReportUrl('${report.originalUrl}')">
-                                📋 URL kopieren
-                            </button>
-                            
-                            ${userIsAdmin ? `
-                                <button class="btn btn-small danger" onclick="deleteReport('${report.id}', '${report.playerName}')">
-                                    🗑️ Löschen
-                                </button>
-                            ` : ''}
-                        </div>
+                    <div class="user-item" onclick="selectUser('${user}')">
+                        <div class="user-name">${user}</div>
+                        <div class="user-planet">${firstReport?.planetName || firstReport?.planet?.name || 'Unbekannt'}</div>
                     </div>
                 `;
             }).join('');
+        }
+        
+        function selectUser(userName) {
+            selectedUser = userName;
+            
+            // UI aktualisieren
+            document.querySelectorAll('.user-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            event.target.closest('.user-item').classList.add('active');
+            
+            // Grid für diesen User aktualisieren
+            const userReports = currentReports.filter(r => (r.playerName || r.player?.name) === userName);
+            createGrid(userReports);
+        }
+        
+        function createGrid(reports) {
+            const container = document.getElementById('grid-container');
+            
+            if (reports.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>Keine Berichte gefunden</p></div>';
+                return;
+            }
+            
+            // Grid-Struktur erstellen
+            const gridHTML = `
+                <div class="categories-header">
+                    ${categories.map(category => `
+                        <div class="category-header">${category}</div>
+                    `).join('')}
+                </div>
+                ${reports.map((report, index) => `
+                    <div class="grid-cell">
+                        <div class="cell-content">
+                            <div class="user-name">${report.playerName || report.player?.name || 'Unbekannt'}</div>
+                        </div>
+                    </div>
+                    ${categories.map(category => {
+                        const content = getCellContent(report, category);
+                        const hasData = content !== '–' && content !== '';
+                        
+                        return `
+                            <div class="grid-cell ${hasData ? 'has-data' : ''}" onclick="${hasData ? `viewReport('${report.id}')` : ''}">
+                                <div class="cell-content ${hasData ? 'has-data' : ''}">
+                                    ${hasData ? `<span class="cell-link">${content}</span>` : content}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                `).join('')}
+            `;
+            
+            container.innerHTML = gridHTML;
+        }
+        
+        function getCellContent(report, category) {
+            switch (category) {
+                case 'Planet':
+                    return report.planetName || report.planet?.name || '–';
+                case 'Koordinaten':
+                    return report.planetCoordinates || report.planet?.coordinates || '–';
+                case 'Allianz':
+                    return report.player?.allianceName || 'Keine';
+                case 'Ressourcen':
+                    const resources = report.resources;
+                    if (!resources) return '–';
+                    const totalRes = (resources.fe?.amount || 0) + (resources.si?.amount || 0) + (resources.c?.amount || 0);
+                    return totalRes > 0 ? Math.round(totalRes).toLocaleString() : '–';
+                case 'Gebäude':
+                    const buildings = report.buildings;
+                    if (!buildings) return '–';
+                    const buildingCount = Array.isArray(buildings) ? buildings.length : Object.keys(buildings).length;
+                    return buildingCount > 0 ? `${buildingCount} Gebäude` : '–';
+                case 'Forschung':
+                    const research = report.research || report.player?.research;
+                    if (!research) return '–';
+                    const researchCount = Array.isArray(research) ? research.length : Object.keys(research).length;
+                    return researchCount > 0 ? `${researchCount} Forschungen` : '–';
+                case 'Schiffe':
+                    const ships = report.shipTypes || report.player?.shipTypes;
+                    if (!ships) return '–';
+                    const shipCount = Array.isArray(ships) ? ships.length : 0;
+                    return shipCount > 0 ? `${shipCount} Typen` : '–';
+                case 'Angriffsstärke':
+                    return report.totalAttackPower ? Math.round(report.totalAttackPower).toLocaleString() : '–';
+                case 'Verteidigung':
+                    return report.totalDefensePower ? Math.round(report.totalDefensePower).toLocaleString() : '–';
+                case 'Bedrohung':
+                    if (!report.threatLevel) return '–';
+                    const threat = window.SpyReportAPI?.formatThreatLevel ? 
+                        window.SpyReportAPI.formatThreatLevel(report.threatLevel) : 
+                        { icon: '⚠️', text: report.threatLevel };
+                    return `${threat.icon} ${threat.text}`;
+                case 'Datum':
+                    const date = report.createdAt?.toDate ? 
+                        report.createdAt.toDate() : 
+                        new Date(report.createdAt || report.timestamp);
+                    return date.toLocaleDateString('de-DE');
+                default:
+                    return '–';
+            }
+        }
+        
+        function displayStatistics(stats) {
+            const container = document.getElementById('stats-display');
+            
+            if (!stats) {
+                container.innerHTML = '<div class="empty-state"><p>Keine Statistiken verfügbar</p></div>';
+                return;
+            }
             
             container.innerHTML = `
-                <div class="reports-grid">
-                    ${reportsHtml}
+                <div class="stat-item">
+                    <span class="stat-label">Gesamte Berichte:</span>
+                    <span class="stat-value">${stats.totalReports || 0}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Eindeutige Spieler:</span>
+                    <span class="stat-value">${stats.uniquePlayers || 0}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Eindeutige Planeten:</span>
+                    <span class="stat-value">${stats.uniquePlanets || 0}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Gesamt Angriffsstärke:</span>
+                    <span class="stat-value">${Math.round(stats.totalAttackPower || 0).toLocaleString()}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Ø Forschungslevel:</span>
+                    <span class="stat-value">${Math.round(stats.averageResearchLevel || 0)}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Ø Gebäudelevel:</span>
+                    <span class="stat-value">${Math.round(stats.averageBuildingLevel || 0)}</span>
                 </div>
             `;
         }
@@ -758,7 +751,7 @@
             try {
                 const report = await window.SpyDatabaseAPI.getReport(reportId);
                 if (report) {
-                    // Öffne Details in neuem Tab oder Modal
+                    // Öffne Details in neuem Tab
                     window.open(`spy-report-detail.html?id=${reportId}`, '_blank');
                 } else {
                     showMessage('Bericht nicht gefunden', 'error');
@@ -769,52 +762,24 @@
             }
         }
         
-        function copyReportUrl(url) {
-            navigator.clipboard.writeText(url).then(() => {
-                showMessage('URL in Zwischenablage kopiert', 'success');
-            }).catch(() => {
-                showMessage('Fehler beim Kopieren der URL', 'error');
-            });
-        }
-        
-        async function deleteReport(reportId, playerName) {
-            if (!confirm(`Möchtest du den Spy-Report für "${playerName}" wirklich löschen?`)) {
-                return;
-            }
-            
-            try {
-                await window.SpyDatabaseAPI.deleteReport(reportId);
-                showMessage('Spy-Report erfolgreich gelöscht', 'success');
-                
-                // Reports neu laden
-                await loadReports();
-                await loadStatistics();
-                
-            } catch (error) {
-                console.error('❌ Fehler beim Löschen des Berichts:', error);
-                showMessage('Fehler beim Löschen: ' + error.message, 'error');
-            }
-        }
-        
-        async function isAdmin() {
-            try {
-                return await window.SpyDatabaseAPI.isAdmin();
-            } catch (error) {
-                return false;
-            }
-        }
-        
         function showLoading() {
-            document.getElementById('reports-container').innerHTML = `
+            document.getElementById('users-list').innerHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
-                    <p>Lade Spy-Reports...</p>
+                    <p>Lade...</p>
+                </div>
+            `;
+            
+            document.getElementById('grid-container').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Lade...</p>
                 </div>
             `;
         }
         
         function showError(message) {
-            document.getElementById('reports-container').innerHTML = `
+            document.getElementById('grid-container').innerHTML = `
                 <div class="empty-state">
                     <h3>❌ Fehler</h3>
                     <p>${message}</p>
@@ -824,19 +789,8 @@
         }
         
         function showMessage(message, type) {
-            const messageEl = document.getElementById('status-message');
-            messageEl.textContent = message;
-            messageEl.className = `status-message ${type}`;
-            messageEl.style.display = 'block';
-            
-            // Auto-hide nach 3 Sekunden
-            setTimeout(() => {
-                hideMessage();
-            }, 3000);
-        }
-        
-        function hideMessage() {
-            document.getElementById('status-message').style.display = 'none';
+            // Einfache Nachrichten-Anzeige
+            console.log(`${type.toUpperCase()}: ${message}`);
         }
     </script>
 </body>
