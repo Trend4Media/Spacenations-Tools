@@ -468,7 +468,7 @@
     <script src="js/auth-manager.js"></script>
     <script src="js/firebase-sync.js"></script>
     <script src="js/spy-report-parser.js?v=2"></script>
-    <script src="js/spy-database-manager.js?v=9"></script>
+    <script src="js/spy-database-manager.js?v=10"></script>
 
     <script>
         let currentReports = [];
@@ -532,32 +532,55 @@
         }
         
         async function waitForFirebase() {
-            const maxWait = 15000; // 15 Sekunden
+            const maxWait = 20000; // 20 Sekunden
             const startTime = Date.now();
+            let lastLogTime = 0;
+            
+            console.log('⏳ Warte auf Firebase-Initialisierung...');
             
             while (Date.now() - startTime < maxWait) {
                 try {
+                    // Prüfe ob FirebaseConfig überhaupt existiert
+                    if (!window.FirebaseConfig) {
+                        if (Date.now() - lastLogTime > 2000) { // Alle 2 Sekunden loggen
+                            console.log('⏳ Warte auf FirebaseConfig...');
+                            lastLogTime = Date.now();
+                        }
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        continue;
+                    }
+                    
                     // Prüfe ob Firebase bereit ist
-                    if (window.FirebaseConfig && window.FirebaseConfig.getDB()) {
+                    if (window.FirebaseConfig.getDB && window.FirebaseConfig.getDB()) {
                         console.log('🔥 Firebase bereit für Spy-Database');
                         return true;
                     }
                     
                     // Falls FirebaseConfig noch nicht bereit, warten
-                    if (window.FirebaseConfig && typeof window.FirebaseConfig.waitForReady === 'function') {
+                    if (window.FirebaseConfig.waitForReady && typeof window.FirebaseConfig.waitForReady === 'function') {
+                        console.log('⏳ Verwende waitForReady...');
                         await window.FirebaseConfig.waitForReady();
                         console.log('🔥 Firebase über waitForReady bereit');
                         return true;
                     }
                     
+                    // Detailliertes Logging
+                    if (Date.now() - lastLogTime > 3000) { // Alle 3 Sekunden loggen
+                        console.log('⏳ FirebaseConfig vorhanden, aber DB noch nicht bereit...');
+                        lastLogTime = Date.now();
+                    }
+                    
                 } catch (error) {
-                    console.log('⏳ Warte auf Firebase-Initialisierung...', error.message);
+                    if (Date.now() - lastLogTime > 3000) {
+                        console.log('⏳ Firebase-Initialisierung läuft...', error.message);
+                        lastLogTime = Date.now();
+                    }
                 }
                 
-                await new Promise(resolve => setTimeout(resolve, 200));
+                await new Promise(resolve => setTimeout(resolve, 500));
             }
             
-            console.error('❌ Firebase nicht verfügbar nach 15 Sekunden');
+            console.error('❌ Firebase nicht verfügbar nach 20 Sekunden');
             throw new Error('Firebase-Initialisierung fehlgeschlagen');
         }
         
