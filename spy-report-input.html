@@ -10,7 +10,41 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <style>
+        :root {
+            /* Razer Color Scheme */
+            --razer-green: #00FF88;
+            --razer-green-dark: #00CC6A;
+            --razer-green-light: #44FF99;
+            --razer-black: #0A0A0A;
+            --razer-dark: #111111;
+            --razer-gray: #1A1A1A;
+            --razer-gray-light: #2A2A2A;
+            --razer-white: #FFFFFF;
+            --razer-silver: #C0C0C0;
+            
+            --text-primary: var(--razer-white);
+            --text-secondary: var(--razer-silver);
+            --text-accent: var(--razer-green);
+            
+            --bg-primary: var(--razer-black);
+            --bg-secondary: var(--razer-dark);
+            --bg-tertiary: var(--razer-gray);
+            --bg-card: var(--razer-gray-light);
+            
+            --glow-green: 0 0 20px rgba(0, 255, 136, 0.5);
+            --glow-green-strong: 0 0 30px rgba(0, 255, 136, 0.8);
+            --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.6);
+            
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            --font-gaming: 'Orbitron', monospace;
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -18,81 +52,339 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
-            color: #e0e0e0;
+            font-family: var(--font-primary);
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
-            padding: 20px;
+            line-height: 1.6;
         }
         
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
+        /* Header */
         .header {
+            background: var(--bg-secondary);
+            border-bottom: 2px solid var(--razer-green);
+            padding: 20px 0;
+            box-shadow: var(--glow-green);
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--razer-green), var(--razer-green-light));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--razer-black);
+            font-weight: 900;
+        }
+        
+        .nav-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: 2px solid var(--razer-green);
+            background: transparent;
+            color: var(--razer-green);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background: var(--razer-green);
+            color: var(--razer-black);
+            transform: translateY(-2px);
+            box-shadow: var(--glow-green);
+        }
+        
+        .btn.primary {
+            background: linear-gradient(135deg, var(--razer-green), var(--razer-green-light));
+            color: var(--razer-black);
+            border: none;
+            font-weight: 700;
+        }
+        
+        .btn.primary:hover {
+            background: linear-gradient(135deg, var(--razer-green-light), var(--razer-green));
+            transform: translateY(-3px);
+            box-shadow: var(--glow-green-strong);
+        }
+        
+        /* Main Content */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .page-header {
             text-align: center;
             margin-bottom: 40px;
         }
         
-        .header h1 {
-            color: #00FF88;
+        .page-title {
+            font-family: var(--font-gaming);
             font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+            color: var(--razer-green);
+            margin-bottom: 16px;
+            text-shadow: var(--glow-green);
+            font-weight: 700;
         }
         
-        .header p {
-            color: #b0b0b0;
+        .page-subtitle {
             font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
         }
         
-        .input-section {
-            background: rgba(0,0,0,0.8);
-            border: 2px solid #333;
+        /* Cards */
+        .input-section, .preview-section {
+            background: var(--bg-card);
+            border: 2px solid var(--razer-green);
             border-radius: 12px;
             padding: 30px;
             margin-bottom: 30px;
+            box-shadow: var(--glow-green);
+            transition: all 0.3s ease;
         }
         
-        .input-section h2 {
-            color: #00FF88;
-            margin-bottom: 20px;
+        .input-section:hover, .preview-section:hover {
+            box-shadow: var(--glow-green-strong);
+            transform: translateY(-2px);
+        }
+        
+        .section-title {
+            font-family: var(--font-gaming);
             font-size: 1.5rem;
-        }
-        
-        .form-group {
+            color: var(--razer-green);
             margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            color: #e0e0e0;
-            margin-bottom: 8px;
             font-weight: 600;
         }
         
-        .form-group input[type="url"],
-        .form-group input[type="text"] {
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-label {
+            display: block;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .form-input {
             width: 100%;
             padding: 12px 16px;
-            border: 2px solid #444;
+            border: 2px solid var(--razer-gray);
             border-radius: 8px;
-            background: rgba(0,0,0,0.5);
-            color: #e0e0e0;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
             font-size: 1rem;
             transition: all 0.3s ease;
         }
         
-        .form-group input[type="url"]:focus,
-        .form-group input[type="text"]:focus {
+        .form-input:focus {
             outline: none;
-            border-color: #00FF88;
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+            border-color: var(--razer-green);
+            box-shadow: var(--glow-green);
+            background: var(--bg-secondary);
         }
         
-        .form-group input[type="url"]:invalid {
-            border-color: #ef4444;
+        .form-input::placeholder {
+            color: var(--text-secondary);
+        }
+        
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .btn-large {
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            min-width: 200px;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        /* Preview Section */
+        .preview-section {
+            display: none;
+        }
+        
+        .preview-section.active {
+            display: block;
+            animation: fadeInUp 0.5s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .preview-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--razer-gray);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .preview-card h4 {
+            color: var(--razer-green);
+            margin-bottom: 12px;
+            font-family: var(--font-gaming);
+            font-size: 1.1rem;
+        }
+        
+        .preview-list {
+            list-style: none;
+        }
+        
+        .preview-list li {
+            padding: 4px 0;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--razer-gray);
+        }
+        
+        .preview-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .preview-list .highlight {
+            color: var(--razer-green);
+            font-weight: 600;
+        }
+        
+        /* Loading States */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--razer-gray);
+            border-radius: 50%;
+            border-top-color: var(--razer-green);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .status-message {
+            padding: 16px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+        
+        .status-success {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--razer-green);
+            color: var(--razer-green);
+        }
+        
+        .status-error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff4444;
+            color: #ff4444;
+        }
+        
+        .status-info {
+            background: rgba(0, 150, 255, 0.1);
+            border: 1px solid #0096ff;
+            color: #0096ff;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .nav-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 20px 10px;
+            }
+            
+            .input-section, .preview-section {
+                padding: 20px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn-large {
+                min-width: auto;
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .preview-grid {
+                grid-template-columns: 1fr;
+            }
+        }
         }
         
         .form-group input[type="url"]:valid {
@@ -290,28 +582,31 @@
             font-size: 0.9rem;
         }
         
-        .navigation {
-            text-align: center;
-            margin-top: 30px;
-        }
         
-        .back-link {
-            color: #00FF88;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        
-        .back-link:hover {
-            color: #44FF99;
-            text-decoration: underline;
-        }
     </style>
 </head>
 <body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="user-dashboard.html" class="logo">
+                <div class="logo-icon">🕵️</div>
+                <span>Spy-Report hinzufügen</span>
+            </a>
+            
+            <div class="nav-actions">
+                <a href="spy-database.html" class="btn">📊 Spy-Datenbank</a>
+                <a href="alliance-dashboard.html" class="btn">🤝 Alliance Dashboard</a>
+                <a href="user-dashboard.html" class="btn">← Zurück</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
     <div class="container">
-        <div class="header">
-            <h1>🕵️ Spy-Report hinzufügen</h1>
-            <p>Füge Spionage-Berichte zur Allianz-Datenbank hinzu</p>
+        <div class="page-header">
+            <h1 class="page-title">🕵️ Spy-Report hinzufügen</h1>
+            <p class="page-subtitle">Füge einen neuen Spionagebericht zur Allianz-Datenbank hinzu. Einfach die Spy-Report URL eingeben und das System verarbeitet automatisch alle Details.</p>
         </div>
         
         <!-- Status Messages -->
@@ -319,29 +614,37 @@
         
         <!-- Input Section -->
         <div class="input-section">
-            <h2>📡 Spy-Report URL eingeben</h2>
+            <h2 class="section-title">📡 Spy-Report URL eingeben</h2>
             
             <div class="form-group">
-                <label for="spy-report-url">Spy-Report URL:</label>
+                <label for="spy-report-url" class="form-label">Spy-Report URL:</label>
                 <input type="url" 
                        id="spy-report-url" 
+                       class="form-input"
                        placeholder="https://beta1.game.spacenations.eu/spy-report/..."
                        required>
+                <div class="help-text">Einfach die komplette Spy-Report URL hier einfügen. Das System erkennt automatisch die Report-ID und lädt alle Daten.</div>
             </div>
             
             <div class="examples">
                 <h4>📋 Beispiel-URLs:</h4>
-                <p>https://beta1.game.spacenations.eu/spy-report/FkDFah8pUtKktP3F3Iw0</p>
-                <p>https://beta1.game.spacenations.eu/spy-report/ABC123XYZ789</p>
+                <div style="background: var(--bg-tertiary); padding: 15px; border-radius: 8px; border: 1px solid var(--razer-gray); margin-top: 10px;">
+                    <p style="color: var(--text-secondary); font-family: monospace; font-size: 0.9rem; margin: 5px 0;">
+                        https://beta1.game.spacenations.eu/spy-report/FkDFah8pUtKktP3F3Iw0
+                    </p>
+                    <p style="color: var(--text-secondary); font-family: monospace; font-size: 0.9rem; margin: 5px 0;">
+                        https://beta1.game.spacenations.eu/spy-report/ABC123XYZ789
+                    </p>
+                </div>
             </div>
             
-            <div style="text-align: center; margin-top: 20px;">
-                <button class="btn primary" id="process-btn" onclick="processSpyReport()">
+            <div class="btn-group">
+                <button class="btn btn-large primary" id="process-btn" onclick="processSpyReport()">
                     <span id="btn-text">🚀 Bericht verarbeiten</span>
-                    <span id="btn-spinner" class="spinner" style="display: none;"></span>
+                    <span id="btn-spinner" class="loading" style="display: none;"></span>
                 </button>
                 
-                <button class="btn secondary" id="preview-btn" onclick="previewSpyReport()" style="display: none;">
+                <button class="btn btn-large" id="preview-btn" onclick="previewSpyReport()" style="display: none;">
                     👁️ Vorschau anzeigen
                 </button>
             </div>
@@ -349,26 +652,22 @@
         
         <!-- Preview Section -->
         <div class="preview-section" id="preview-section">
-            <h2>👁️ Bericht-Vorschau</h2>
+            <h2 class="section-title">👁️ Bericht-Vorschau</h2>
             <div class="preview-grid" id="preview-grid">
                 <!-- Preview content wird hier eingefügt -->
             </div>
             
-            <div style="text-align: center; margin-top: 20px;">
-                <button class="btn primary" id="save-btn" onclick="saveSpyReport()">
+            <div class="btn-group">
+                <button class="btn btn-large primary" id="save-btn" onclick="saveSpyReport()">
                     💾 Bericht speichern
                 </button>
                 
-                <button class="btn secondary" onclick="clearForm()">
+                <button class="btn btn-large" onclick="clearForm()">
                     🗑️ Formular leeren
                 </button>
             </div>
         </div>
         
-        <!-- Navigation -->
-        <div class="navigation">
-            <a href="alliance-dashboard.html" class="back-link">← Zurück zum Allianz-Dashboard</a>
-        </div>
     </div>
 
     <!-- Firebase Scripts -->
