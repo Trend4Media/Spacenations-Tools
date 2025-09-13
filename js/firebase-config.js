@@ -57,15 +57,19 @@ function initializeFirebase() {
                 cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
             });
             
-            // Globale Firebase-Services erstellen
-            window.firebaseServices = {
-                app: app,
-                auth: firebase.auth(),
-                db: db,
-                serverTimestamp: firebase.firestore.FieldValue.serverTimestamp,
-                initialized: true,
-                offline: false
-            };
+        // Globale Firebase-Services erstellen
+        window.firebaseServices = {
+            app: app,
+            auth: firebase.auth(),
+            db: db,
+            serverTimestamp: firebase.firestore.FieldValue.serverTimestamp,
+            initialized: true,
+            offline: false
+        };
+        
+        // Stelle sicher, dass die Auth-Services auch global verfügbar sind
+        window.firebaseAuth = firebase.auth();
+        window.firebaseDB = db;
             
         } else {
             console.log('🔥 Firebase bereits initialisiert');
@@ -80,6 +84,10 @@ function initializeFirebase() {
                 initialized: true,
                 offline: false
             };
+            
+            // Stelle sicher, dass die Auth-Services auch global verfügbar sind
+            window.firebaseAuth = firebase.auth();
+            window.firebaseDB = firebase.firestore();
         }
         
         console.log('✅ Firebase Services verfügbar');
@@ -215,8 +223,8 @@ function handleFirebaseInitError(error) {
 window.FirebaseConfig = {
     isReady: () => window.firebaseServices?.initialized || false,
     isOffline: () => window.firebaseServices?.offline || false,
-    getAuth: () => window.firebaseServices?.auth,
-    getDB: () => window.firebaseServices?.db,
+    getAuth: () => window.firebaseServices?.auth || window.firebaseAuth,
+    getDB: () => window.firebaseServices?.db || window.firebaseDB,
     getApp: () => window.firebaseServices?.app,
     getServerTimestamp: () => window.firebaseServices?.serverTimestamp(),
     
