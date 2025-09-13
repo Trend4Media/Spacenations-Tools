@@ -405,14 +405,9 @@
         <!-- Status Messages -->
         <div id="status-message" class="status-message" style="display: none;"></div>
         
-        <!-- Statistics -->
-        <div class="stats-grid" id="stats-grid">
-            <!-- Statistics werden hier eingefügt -->
-        </div>
-        
         <!-- Controls -->
         <div class="controls-section">
-            <h2>🔍 Filter & Suche</h2>
+            <h2>🔍 Suche</h2>
             
             <div class="controls-grid">
                 <div class="form-group">
@@ -423,41 +418,6 @@
                 <div class="form-group">
                     <label for="search-planet">Planet suchen:</label>
                     <input type="text" id="search-planet" placeholder="Planetname oder Koordinaten...">
-                </div>
-                
-                <div class="form-group">
-                    <label for="filter-threat">Bedrohungsstufe:</label>
-                    <select id="filter-threat">
-                        <option value="">Alle Stufen</option>
-                        <option value="very_low">Sehr Niedrig</option>
-                        <option value="low">Niedrig</option>
-                        <option value="medium">Mittel</option>
-                        <option value="high">Hoch</option>
-                        <option value="very_high">Sehr Hoch</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="min-attack">Min. Angriffsstärke:</label>
-                    <input type="number" id="min-attack" placeholder="0" min="0">
-                </div>
-                
-                <div class="form-group">
-                    <label for="sort-by">Sortieren nach:</label>
-                    <select id="sort-by">
-                        <option value="createdAt">Datum (neueste zuerst)</option>
-                        <option value="playerName">Spielername</option>
-                        <option value="totalAttackPower">Angriffsstärke</option>
-                        <option value="threatLevel">Bedrohungsstufe</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="sort-direction">Sortierrichtung:</label>
-                    <select id="sort-direction">
-                        <option value="desc">Absteigend</option>
-                        <option value="asc">Aufsteigend</option>
-                    </select>
                 </div>
             </div>
             
@@ -477,6 +437,11 @@
                     <p>Lade Spy-Reports...</p>
                 </div>
             </div>
+        </div>
+        
+        <!-- Statistics -->
+        <div class="stats-grid" id="stats-grid">
+            <!-- Statistics werden hier eingefügt -->
         </div>
     </div>
 
@@ -543,11 +508,6 @@
             document.getElementById('search-planet').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') searchReports();
             });
-            
-            // Auto-Search bei Änderungen
-            document.getElementById('filter-threat').addEventListener('change', searchReports);
-            document.getElementById('sort-by').addEventListener('change', searchReports);
-            document.getElementById('sort-direction').addEventListener('change', searchReports);
         }
         
         async function loadReports() {
@@ -712,10 +672,6 @@
                 const searchCriteria = {
                     playerName: document.getElementById('search-player').value.trim(),
                     planetName: document.getElementById('search-planet').value.trim(),
-                    threatLevel: document.getElementById('filter-threat').value,
-                    minAttackPower: parseInt(document.getElementById('min-attack').value) || undefined,
-                    sortBy: document.getElementById('sort-by').value,
-                    sortDirection: document.getElementById('sort-direction').value,
                     limit: 100
                 };
                 
@@ -742,11 +698,8 @@
         function clearFilters() {
             document.getElementById('search-player').value = '';
             document.getElementById('search-planet').value = '';
-            document.getElementById('filter-threat').value = '';
-            document.getElementById('min-attack').value = '';
-            document.getElementById('sort-by').value = 'createdAt';
-            document.getElementById('sort-direction').value = 'desc';
             
+            // Alle Reports laden
             loadReports();
         }
         
