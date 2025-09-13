@@ -551,7 +551,10 @@
             updateWelcomeMessage();
             
             // Allianz-Funktionalität initialisieren
-            initializeAllianceFeatures();
+            // Initialisiere Allianz-Features nach einer kurzen Verzögerung
+            setTimeout(() => {
+                initializeAllianceFeatures();
+            }, 1000);
             
             // Hier könnte später echte Benutzerdaten aus der Datenbank geladen werden
             // z.B. aus Firebase oder einer API
@@ -658,6 +661,26 @@
             return null;
         }
         
+        // Firebase für Allianz-Features initialisieren
+        async function initializeFirebaseForAlliance() {
+            return new Promise((resolve, reject) => {
+                const checkFirebase = () => {
+                    if (window.FirebaseConfig && window.FirebaseConfig.isReady()) {
+                        resolve();
+                    } else {
+                        setTimeout(checkFirebase, 100);
+                    }
+                };
+                
+                // Timeout nach 5 Sekunden
+                setTimeout(() => {
+                    reject(new Error('Firebase-Initialisierung Timeout'));
+                }, 5000);
+                
+                checkFirebase();
+            });
+        }
+        
         // Allianz-Funktionalität
         async function initializeAllianceFeatures() {
             try {
@@ -679,7 +702,7 @@
                 } else {
                     // Warte auf Firebase-Initialisierung
                     console.log('Warte auf Firebase-Initialisierung...');
-                    await window.FirebaseConfig.waitForInit();
+                    await window.FirebaseConfig.waitForReady();
                     console.log('Firebase initialisiert, lade Allianz-Status...');
                 }
                 
