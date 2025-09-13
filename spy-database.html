@@ -7,6 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Spy-Datenbank - Spacenations Tools</title>
+    <meta name="cache-bust" content="v2">
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -464,12 +465,12 @@
     </div>
 
     <!-- Firebase Scripts -->
-    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-config.js?v=2"></script>
     <script src="js/session-manager.js"></script>
     <script src="js/auth-manager.js"></script>
     <script src="js/firebase-sync.js"></script>
     <script src="js/spy-report-parser.js?v=2"></script>
-    <script src="js/spy-database-manager.js?v=12"></script>
+    <script src="js/spy-database-manager.js?v=13"></script>
 
     <script>
         let currentReports = [];
@@ -515,6 +516,17 @@
             await loadReports();
         });
         
+        // Debug: Firebase-Status überwachen
+        setInterval(() => {
+            if (window.FirebaseConfig) {
+                console.log('🔍 Firebase Status:', {
+                    isReady: window.FirebaseConfig.isReady(),
+                    isOffline: window.FirebaseConfig.isOffline(),
+                    hasDB: !!window.FirebaseConfig.getDB()
+                });
+            }
+        }, 5000);
+        
         async function waitForAPIs() {
             const maxWait = 10000; // 10 Sekunden
             const startTime = Date.now();
@@ -535,12 +547,24 @@
             console.log('⏳ Schneller Firebase-Check...');
             
             try {
+                // Prüfe ob FirebaseConfig verfügbar ist
+                if (!window.FirebaseConfig) {
+                    console.log('⏳ FirebaseConfig noch nicht verfügbar...');
+                    return false;
+                }
+                
+                // Prüfe ob Firebase bereits bereit ist
+                if (window.FirebaseConfig.isReady()) {
+                    console.log('🔥 Firebase bereits bereit');
+                    return true;
+                }
+                
                 // Verwende die neue Timeout-Funktion
                 await window.FirebaseConfig.waitForReadyWithTimeout(3000);
                 console.log('🔥 Firebase DB verfügbar');
                 return true;
             } catch (error) {
-                console.log('⏳ Firebase noch nicht bereit, versuche trotzdem...');
+                console.log('⏳ Firebase noch nicht bereit, versuche trotzdem...', error.message);
                 return false; // Nicht blockieren
             }
         }
@@ -549,12 +573,23 @@
             console.log('⏳ Warte auf Firebase-Initialisierung...');
             
             try {
+                // Prüfe ob FirebaseConfig verfügbar ist
+                if (!window.FirebaseConfig) {
+                    throw new Error('FirebaseConfig nicht verfügbar');
+                }
+                
+                // Prüfe ob Firebase bereits bereit ist
+                if (window.FirebaseConfig.isReady()) {
+                    console.log('🔥 Firebase bereits bereit');
+                    return true;
+                }
+                
                 // Verwende die neue Timeout-Funktion mit längerem Timeout
                 await window.FirebaseConfig.waitForReadyWithTimeout(10000);
                 console.log('🔥 Firebase DB verfügbar für Spy-Database');
                 return true;
             } catch (error) {
-                console.error('❌ Firebase nicht verfügbar nach 10 Sekunden');
+                console.error('❌ Firebase nicht verfügbar nach 10 Sekunden:', error.message);
                 throw new Error('Firebase-Initialisierung fehlgeschlagen');
             }
         }

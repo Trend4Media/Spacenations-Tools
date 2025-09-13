@@ -110,11 +110,11 @@ function waitForFirebase() {
             }
         }, 100);
         
-        // Timeout nach 5 Sekunden (reduziert von 10)
+        // Timeout nach 3 Sekunden (weiter reduziert)
         setTimeout(() => {
             clearInterval(checkInterval);
             reject(new Error('Firebase-Loading-Timeout'));
-        }, 5000);
+        }, 3000);
     });
 }
 
@@ -155,6 +155,11 @@ window.addEventListener('load', async () => {
         } catch (error) {
             console.error('❌ Firebase Retry fehlgeschlagen:', error);
             handleFirebaseInitError(error);
+            
+            // Dispatch error event for other modules
+            document.dispatchEvent(new CustomEvent('firebaseError', { 
+                detail: { error: error.message } 
+            }));
         }
     }
 });
