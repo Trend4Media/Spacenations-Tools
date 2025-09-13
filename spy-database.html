@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Spy-Datenbank - Spacenations Tools</title>
-    <meta name="cache-bust" content="v12">
+    <meta name="cache-bust" content="v13">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -492,7 +492,7 @@
     </div>
 
     <!-- Firebase Scripts -->
-    <script src="js/firebase-config.js?v=5"></script>
+    <script src="js/firebase-config.js?v=6"></script>
     <script src="js/session-manager.js"></script>
     <script src="js/auth-manager.js"></script>
     <script src="js/firebase-sync.js"></script>
@@ -736,11 +736,12 @@
                 const maxAttempts = 6; // 3 Sekunden bei 500ms Intervallen
                 
                 while (attempts < maxAttempts) {
-                    if (window.FirebaseConfig.isReady()) {
+                    if (window.FirebaseConfig && window.FirebaseConfig.isReady()) {
                         console.log('🔥 Firebase DB verfügbar');
                         return true;
                     }
                     
+                    console.log(`⏳ Schneller Firebase-Check ${attempts + 1}/${maxAttempts}...`);
                     await new Promise(resolve => setTimeout(resolve, 500));
                     attempts++;
                 }
@@ -780,11 +781,12 @@
                 const maxAttempts = 20; // 10 Sekunden bei 500ms Intervallen
                 
                 while (attempts < maxAttempts) {
-                    if (window.FirebaseConfig.isReady()) {
+                    if (window.FirebaseConfig && window.FirebaseConfig.isReady()) {
                         console.log('🔥 Firebase DB verfügbar für Spy-Database');
                         return true;
                     }
                     
+                    console.log(`⏳ Firebase-Check ${attempts + 1}/${maxAttempts}...`);
                     await new Promise(resolve => setTimeout(resolve, 500));
                     attempts++;
                 }

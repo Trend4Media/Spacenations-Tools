@@ -95,6 +95,17 @@ function initializeFirebase() {
         // Setze initialized Flag sofort
         window.firebaseServices.initialized = true;
         
+        // Stelle sicher, dass alle Services verfügbar sind
+        if (window.firebaseServices.auth && window.firebaseServices.db) {
+            console.log('🔥 Firebase Auth und DB verfügbar');
+        } else {
+            console.warn('⚠️ Firebase Services nicht vollständig verfügbar:', {
+                auth: !!window.firebaseServices.auth,
+                db: !!window.firebaseServices.db,
+                initialized: window.firebaseServices.initialized
+            });
+        }
+        
         // Dispatch ready event sofort
         document.dispatchEvent(new CustomEvent('firebaseReady'));
         console.log('🚀 Firebase bereit für andere Module');
@@ -229,7 +240,11 @@ function handleFirebaseInitError(error) {
 
 // Hilfsfunktionen für andere Module
 window.FirebaseConfig = {
-    isReady: () => window.firebaseServices?.initialized || false,
+    isReady: () => {
+        const ready = window.firebaseServices?.initialized || false;
+        console.log('🔍 FirebaseConfig.isReady():', ready, 'firebaseServices:', !!window.firebaseServices);
+        return ready;
+    },
     isOffline: () => window.firebaseServices?.offline || false,
     getAuth: () => window.firebaseServices?.auth || window.firebaseAuth,
     getDB: () => window.firebaseServices?.db || window.firebaseDB,
