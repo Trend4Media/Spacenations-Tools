@@ -8,7 +8,7 @@
     <meta http-equiv="Expires" content="0">
     <title>🕵️ Spacenations Spy Database</title>
     <meta name="description" content="Advanced spy intelligence database for Spacenations strategy game. Track players, planets, buildings, and military units.">
-    <meta name="cache-bust" content="v19">
+    <meta name="cache-bust" content="v20&force=1">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -490,12 +490,12 @@
     </div>
 
     <!-- Firebase Scripts -->
-    <script src="js/firebase-config.js?v=11&t=1734567894"></script>
-    <script src="js/session-manager.js"></script>
-    <script src="js/auth-manager.js"></script>
-    <script src="js/firebase-sync.js"></script>
-    <script src="js/spy-report-parser.js?v=2"></script>
-    <script src="js/spy-database-manager.js?v=15"></script>
+    <script src="js/firebase-config.js?v=12&t=1734567895&force=1"></script>
+    <script src="js/session-manager.js?v=1&t=1734567895"></script>
+    <script src="js/auth-manager.js?v=1&t=1734567895"></script>
+    <script src="js/firebase-sync.js?v=1&t=1734567895"></script>
+    <script src="js/spy-report-parser.js?v=3&t=1734567895"></script>
+    <script src="js/spy-database-manager.js?v=16&t=1734567895"></script>
 
     <script>
         // Global variables
@@ -503,9 +503,18 @@
         let currentStatistics = {};
         let filteredReports = [];
 
+        // Force cache refresh
+        if ('caches' in window) {
+            caches.keys().then(function(names) {
+                for (let name of names) {
+                    caches.delete(name);
+                }
+            });
+        }
+
         // Initialize the application
         document.addEventListener('DOMContentLoaded', async () => {
-            console.log('🕵️ Spy Database Grid initialisiert');
+            console.log('🕵️ Spy Database Grid initialisiert - Version v20');
             
             // Load demo data immediately
             console.log('🚀 Lade sofort Demo-Daten...');
