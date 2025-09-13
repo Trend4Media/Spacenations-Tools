@@ -407,6 +407,7 @@
                 <div class="header-title">🕵️ Spy Database</div>
                 <div class="header-actions">
                     <button class="btn primary" onclick="window.open('spy-report-input.html', '_blank')">+ Neuer Bericht</button>
+                    <button class="btn secondary" onclick="retryFirebaseConnection()" id="retry-btn" style="display: none;">🔄 Firebase retry</button>
                     <button class="btn secondary" onclick="window.location.href='user-dashboard.html'">← Dashboard</button>
                 </div>
             </div>
@@ -531,87 +532,31 @@
         }
         
         async function waitForFirebaseQuick() {
-            const maxWait = 5000; // Nur 5 Sekunden
-            const startTime = Date.now();
-            
             console.log('⏳ Schneller Firebase-Check...');
             
-            while (Date.now() - startTime < maxWait) {
-                try {
-                    // Prüfe ob FirebaseConfig existiert und DB verfügbar ist
-                    if (window.FirebaseConfig && window.FirebaseConfig.getDB) {
-                        const db = window.FirebaseConfig.getDB();
-                        if (db) {
-                            console.log('🔥 Firebase DB verfügbar');
-                            return true;
-                        }
-                    }
-                } catch (error) {
-                    // Firebase noch nicht bereit, das ist OK
-                }
-                
-                await new Promise(resolve => setTimeout(resolve, 200));
+            try {
+                // Verwende die neue Timeout-Funktion
+                await window.FirebaseConfig.waitForReadyWithTimeout(3000);
+                console.log('🔥 Firebase DB verfügbar');
+                return true;
+            } catch (error) {
+                console.log('⏳ Firebase noch nicht bereit, versuche trotzdem...');
+                return false; // Nicht blockieren
             }
-            
-            console.log('⏳ Firebase noch nicht bereit, versuche trotzdem...');
-            return false; // Nicht blockieren
         }
         
         async function waitForFirebase() {
-            const maxWait = 15000; // 15 Sekunden
-            const startTime = Date.now();
-            let lastLogTime = 0;
-            
             console.log('⏳ Warte auf Firebase-Initialisierung...');
             
-            while (Date.now() - startTime < maxWait) {
-                try {
-                    // Prüfe ob FirebaseConfig überhaupt existiert
-                    if (!window.FirebaseConfig) {
-                        if (Date.now() - lastLogTime > 2000) {
-                            console.log('⏳ Warte auf FirebaseConfig...');
-                            lastLogTime = Date.now();
-                        }
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                        continue;
-                    }
-                    
-                    // Direkte Firebase DB-Prüfung ohne waitForReady
-                    try {
-                        const db = window.FirebaseConfig.getDB();
-                        if (db) {
-                            console.log('🔥 Firebase DB verfügbar für Spy-Database');
-                            return true;
-                        }
-                    } catch (dbError) {
-                        // DB noch nicht bereit, das ist OK
-                    }
-                    
-                    // Prüfe ob Firebase App initialisiert ist
-                    if (window.FirebaseConfig.app && window.FirebaseConfig.app.name) {
-                        console.log('🔥 Firebase App initialisiert, warte auf DB...');
-                        await new Promise(resolve => setTimeout(resolve, 1000));
-                        continue;
-                    }
-                    
-                    // Logging
-                    if (Date.now() - lastLogTime > 3000) {
-                        console.log('⏳ Firebase-Initialisierung läuft...');
-                        lastLogTime = Date.now();
-                    }
-                    
-                } catch (error) {
-                    if (Date.now() - lastLogTime > 3000) {
-                        console.log('⏳ Firebase-Initialisierung...', error.message);
-                        lastLogTime = Date.now();
-                    }
-                }
-                
-                await new Promise(resolve => setTimeout(resolve, 500));
+            try {
+                // Verwende die neue Timeout-Funktion mit längerem Timeout
+                await window.FirebaseConfig.waitForReadyWithTimeout(10000);
+                console.log('🔥 Firebase DB verfügbar für Spy-Database');
+                return true;
+            } catch (error) {
+                console.error('❌ Firebase nicht verfügbar nach 10 Sekunden');
+                throw new Error('Firebase-Initialisierung fehlgeschlagen');
             }
-            
-            console.error('❌ Firebase nicht verfügbar nach 15 Sekunden');
-            throw new Error('Firebase-Initialisierung fehlgeschlagen');
         }
         
         function setupEventListeners() {
@@ -629,24 +574,42 @@
             try {
                 showLoading();
                 
-                // Versuche Firebase zu warten, aber nicht blockieren
-                await waitForFirebaseQuick();
+                // Prüfe ob Firebase verfügbar ist
+                const firebaseReady = await waitForFirebaseQuick();
                 
-                console.log('📋 Lade Spy-Reports...');
-                currentReports = await window.SpyDatabaseAPI.getAllianceReports();
-                
-                await displayReports(currentReports);
-                await loadStatistics();
-                console.log(`✅ ${currentReports.length} Spy-Reports geladen`);
+                if (firebaseReady) {
+                    console.log('📋 Lade Spy-Reports...');
+                    currentReports = await window.SpyDatabaseAPI.getAllianceReports();
+                    
+                    await displayReports(currentReports);
+                    await loadStatistics();
+                    console.log(`✅ ${currentReports.length} Spy-Reports geladen`);
+                    
+                    // Verstecke Retry-Button wenn Firebase funktioniert
+                    document.getElementById('retry-btn').style.display = 'none';
+                } else {
+                    // Firebase nicht verfügbar - zeige leere Datenbank
+                    console.log('🔄 Firebase nicht verfügbar, zeige leere Datenbank...');
+                    currentReports = [];
+                    await displayReports([]);
+                    showMessage('Datenbank wird geladen... Firebase noch nicht bereit.', 'info');
+                    
+                    // Zeige Retry-Button
+                    document.getElementById('retry-btn').style.display = 'inline-flex';
+                }
                 
             } catch (error) {
                 console.error('❌ Fehler beim Laden der Spy-Reports:', error);
                 
                 // Zeige leere Reports an, falls Firebase nicht bereit
-                if (error.message.includes('Firebase nicht initialisiert')) {
+                if (error.message.includes('Firebase nicht initialisiert') || error.message.includes('Firebase-Initialisierung fehlgeschlagen')) {
                     console.log('🔄 Firebase noch nicht bereit, zeige leere Datenbank...');
+                    currentReports = [];
                     await displayReports([]);
                     showMessage('Datenbank wird geladen... Firebase noch nicht bereit.', 'info');
+                    
+                    // Zeige Retry-Button
+                    document.getElementById('retry-btn').style.display = 'inline-flex';
                 } else {
                     showError('Fehler beim Laden der Spy-Reports: ' + error.message);
                 }
@@ -656,16 +619,21 @@
         async function loadStatistics() {
             try {
                 // Firebase-Bereitschaft prüfen (schnell)
-                await waitForFirebaseQuick();
+                const firebaseReady = await waitForFirebaseQuick();
                 
-                console.log('📊 Lade Statistiken...');
-                currentStatistics = await window.SpyDatabaseAPI.getStatistics();
-                
-                displayStatistics(currentStatistics);
-                console.log('✅ Statistiken geladen');
+                if (firebaseReady) {
+                    console.log('📊 Lade Statistiken...');
+                    currentStatistics = await window.SpyDatabaseAPI.getStatistics();
+                    displayStatistics(currentStatistics);
+                    console.log('✅ Statistiken geladen');
+                } else {
+                    // Zeige leere Statistiken
+                    displayStatistics(null);
+                }
                 
             } catch (error) {
                 console.error('❌ Fehler beim Laden der Statistiken:', error);
+                displayStatistics(null);
             }
         }
         
@@ -682,7 +650,12 @@
             const container = document.getElementById('users-list');
             
             if (users.length === 0) {
-                container.innerHTML = '<div class="empty-state"><p>Keine Spieler gefunden</p></div>';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <p>Keine Spieler gefunden</p>
+                        <small style="color: #666;">Firebase nicht verfügbar oder keine Daten</small>
+                    </div>
+                `;
                 return;
             }
             
@@ -718,7 +691,13 @@
             const container = document.getElementById('grid-container');
             
             if (reports.length === 0) {
-                container.innerHTML = '<div class="empty-state"><p>Keine Berichte gefunden</p></div>';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <p>Keine Berichte gefunden</p>
+                        <small style="color: #666;">Firebase nicht verfügbar oder keine Daten</small>
+                        <button class="btn primary" onclick="loadReports()" style="margin-top: 10px;">🔄 Erneut versuchen</button>
+                    </div>
+                `;
                 return;
             }
             
@@ -865,7 +844,12 @@
             const container = document.getElementById('stats-display');
             
             if (!stats) {
-                container.innerHTML = '<div class="empty-state"><p>Keine Statistiken verfügbar</p></div>';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <p>Keine Statistiken verfügbar</p>
+                        <small style="color: #666;">Firebase nicht verfügbar</small>
+                    </div>
+                `;
                 return;
             }
             
@@ -900,7 +884,12 @@
         async function searchReports() {
             try {
                 // Firebase-Bereitschaft prüfen (schnell)
-                await waitForFirebaseQuick();
+                const firebaseReady = await waitForFirebaseQuick();
+                
+                if (!firebaseReady) {
+                    showMessage('Firebase nicht verfügbar. Suche nicht möglich.', 'error');
+                    return;
+                }
                 
                 showLoading();
                 
@@ -982,6 +971,35 @@
         function showMessage(message, type) {
             // Einfache Nachrichten-Anzeige
             console.log(`${type.toUpperCase()}: ${message}`);
+        }
+        
+        async function retryFirebaseConnection() {
+            console.log('🔄 Versuche Firebase-Verbindung erneut...');
+            
+            // Verstecke Retry-Button
+            document.getElementById('retry-btn').style.display = 'none';
+            
+            // Zeige Loading
+            showLoading();
+            
+            try {
+                // Warte auf Firebase mit längerem Timeout
+                await waitForFirebase();
+                
+                // Lade Reports erneut
+                await loadReports();
+                
+                console.log('✅ Firebase-Verbindung erfolgreich wiederhergestellt');
+                
+            } catch (error) {
+                console.error('❌ Firebase-Retry fehlgeschlagen:', error);
+                
+                // Zeige leere Datenbank und Retry-Button
+                currentReports = [];
+                await displayReports([]);
+                document.getElementById('retry-btn').style.display = 'inline-flex';
+                showMessage('Firebase-Verbindung fehlgeschlagen. Bitte versuchen Sie es erneut.', 'error');
+            }
         }
     </script>
 </body>

@@ -48,25 +48,48 @@ function initializeFirebase() {
 
         // Firebase initialisieren (nur einmal)
         if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
+            const app = firebase.initializeApp(firebaseConfig);
             console.log('🔥 Firebase erfolgreich initialisiert');
+            
+            // Teste die Verbindung
+            const db = firebase.firestore();
+            db.settings({
+                cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
+            });
+            
+            // Globale Firebase-Services erstellen
+            window.firebaseServices = {
+                app: app,
+                auth: firebase.auth(),
+                db: db,
+                serverTimestamp: firebase.firestore.FieldValue.serverTimestamp,
+                initialized: true,
+                offline: false
+            };
+            
         } else {
             console.log('🔥 Firebase bereits initialisiert');
+            
+            // Services aus existierender App holen
+            const app = firebase.app();
+            window.firebaseServices = {
+                app: app,
+                auth: firebase.auth(),
+                db: firebase.firestore(),
+                serverTimestamp: firebase.firestore.FieldValue.serverTimestamp,
+                initialized: true,
+                offline: false
+            };
         }
-        
-        // Globale Firebase-Services erstellen
-        window.firebaseServices = {
-            auth: firebase.auth(),
-            db: firebase.firestore(),
-            serverTimestamp: firebase.firestore.FieldValue.serverTimestamp,
-            initialized: true
-        };
         
         console.log('✅ Firebase Services verfügbar');
         return true;
         
     } catch (error) {
         console.error('❌ Fehler bei Firebase-Initialisierung:', error);
+        
+        // Erstelle Fallback-Services
+        handleFirebaseInitError(error);
         return false;
     }
 }
@@ -87,11 +110,11 @@ function waitForFirebase() {
             }
         }, 100);
         
-        // Timeout nach 10 Sekunden
+        // Timeout nach 5 Sekunden (reduziert von 10)
         setTimeout(() => {
             clearInterval(checkInterval);
             reject(new Error('Firebase-Loading-Timeout'));
-        }, 10000);
+        }, 5000);
     });
 }
 
@@ -177,8 +200,10 @@ function handleFirebaseInitError(error) {
 // Hilfsfunktionen für andere Module
 window.FirebaseConfig = {
     isReady: () => window.firebaseServices?.initialized || false,
+    isOffline: () => window.firebaseServices?.offline || false,
     getAuth: () => window.firebaseServices?.auth,
     getDB: () => window.firebaseServices?.db,
+    getApp: () => window.firebaseServices?.app,
     getServerTimestamp: () => window.firebaseServices?.serverTimestamp(),
     
     // Warten bis Firebase bereit ist
@@ -189,6 +214,25 @@ window.FirebaseConfig = {
             } else {
                 document.addEventListener('firebaseReady', resolve, { once: true });
             }
+        });
+    },
+    
+    // Warten mit Timeout
+    waitForReadyWithTimeout: (timeoutMs = 5000) => {
+        return new Promise((resolve, reject) => {
+            if (window.firebaseServices?.initialized) {
+                resolve();
+                return;
+            }
+            
+            const timeout = setTimeout(() => {
+                reject(new Error('Firebase-Initialisierung fehlgeschlagen'));
+            }, timeoutMs);
+            
+            document.addEventListener('firebaseReady', () => {
+                clearTimeout(timeout);
+                resolve();
+            }, { once: true });
         });
     }
 };
