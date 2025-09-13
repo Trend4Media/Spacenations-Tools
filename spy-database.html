@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Spy-Datenbank - Spacenations Tools</title>
-    <meta name="cache-bust" content="v6">
+    <meta name="cache-bust" content="v7">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -557,6 +557,10 @@
                     if (firebaseReady) {
                         console.log('🔥 Firebase verbunden! Lade echte Daten...');
                         await loadReports();
+                        
+                        // Verstecke Retry-Button wenn echte Daten geladen wurden
+                        document.getElementById('retry-btn').style.display = 'none';
+                        showMessage('✅ Echte Daten geladen! Firebase-Verbindung erfolgreich.', 'success');
                     }
                 } catch (error) {
                     console.log('⚠️ Firebase-Verbindung fehlgeschlagen, bleibe im Demo-Modus');
@@ -1195,6 +1199,33 @@
         function showMessage(message, type) {
             // Einfache Nachrichten-Anzeige
             console.log(`${type.toUpperCase()}: ${message}`);
+            
+            // Zeige auch visuell für wichtige Nachrichten
+            if (type === 'success') {
+                // Temporäre grüne Nachricht anzeigen
+                const messageDiv = document.createElement('div');
+                messageDiv.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #10b981;
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    z-index: 1000;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                `;
+                messageDiv.textContent = message;
+                document.body.appendChild(messageDiv);
+                
+                // Nach 3 Sekunden entfernen
+                setTimeout(() => {
+                    if (messageDiv.parentNode) {
+                        messageDiv.parentNode.removeChild(messageDiv);
+                    }
+                }, 3000);
+            }
         }
         
         async function retryFirebaseConnection() {
