@@ -189,11 +189,16 @@ window.addEventListener('load', async () => {
             document.dispatchEvent(new CustomEvent('firebaseReady'));
         } catch (error) {
             console.error('❌ Firebase Retry fehlgeschlagen:', error);
-            handleFirebaseInitError(error);
+            
+            // Stelle sicher, dass firebaseServices existiert, auch wenn Firebase fehlschlägt
+            if (!window.firebaseServices) {
+                console.log('🔧 Erstelle Fallback-Services nach Retry-Fehler');
+                handleFirebaseInitError(error);
+            }
             
             // Dispatch error event for other modules
             document.dispatchEvent(new CustomEvent('firebaseError', { 
-                detail: { error: error.message } 
+                detail: { error: error.message }
             }));
         }
     }
@@ -207,6 +212,12 @@ function handleFirebaseInitError(error) {
     if (window.firebaseServices && !window.firebaseServices.offline) {
         console.log('🔧 Firebase bereits verfügbar, überspringe Fallback');
         return;
+    }
+    
+    // Stelle sicher, dass firebaseServices existiert
+    if (!window.firebaseServices) {
+        console.log('🔧 Erstelle firebaseServices-Objekt');
+        window.firebaseServices = {};
     }
     
     // Mock Firebase Services für Offline-Entwicklung (NUR wenn Firebase wirklich nicht verfügbar)
@@ -251,6 +262,14 @@ window.FirebaseConfig = {
     isReady: () => {
         const ready = window.firebaseServices?.initialized || false;
         console.log('🔍 FirebaseConfig.isReady():', ready, 'firebaseServices:', !!window.firebaseServices, 'auth:', !!window.firebaseServices?.auth, 'db:', !!window.firebaseServices?.db);
+        
+        // Wenn firebaseServices nicht existiert, erstelle Fallback
+        if (!window.firebaseServices) {
+            console.log('🔧 firebaseServices nicht gefunden, erstelle Fallback');
+            handleFirebaseInitError(new Error('firebaseServices nicht gefunden'));
+            return window.firebaseServices?.initialized || false;
+        }
+        
         return ready;
     },
     isOffline: () => window.firebaseServices?.offline || false,
