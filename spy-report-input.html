@@ -766,9 +766,13 @@
                 console.log('✅ Spy-Report verarbeitet:', currentReportData);
                 
                 // Prüfe ob Report bereits existiert
+                // Hole aktuelle Allianz-Daten für die Prüfung
+                const currentAlliance = window.SessionAPI ? window.SessionAPI.getCurrentAlliance() : null;
+                const allianceName = currentAlliance || 'unknown';
+                
                 const exists = await window.SpyDatabaseAPI.reportExists(
                     currentReportData.reportId,
-                    currentReportData.player.allianceName
+                    allianceName
                 );
                 
                 if (exists) {
@@ -830,7 +834,7 @@
                     </div>
                     <div class="preview-item">
                         <span class="preview-label">Schiffstypen:</span>
-                        <span class="preview-value">${currentReportData.player.shipTypes.length}</span>
+                        <span class="preview-value">${currentReportData.shipTypes ? currentReportData.shipTypes.length : 0}</span>
                     </div>
                 </div>
                 
@@ -862,27 +866,31 @@
                     </div>
                     <div class="preview-item">
                         <span class="preview-label">Fe:</span>
-                        <span class="preview-value">${Math.round(currentReportData.resources.fe || 0).toLocaleString()}</span>
+                        <span class="preview-value">${currentReportData.resources.fe ? currentReportData.resources.fe.formatted : '0'}</span>
                     </div>
                     <div class="preview-item">
                         <span class="preview-label">Si:</span>
-                        <span class="preview-value">${Math.round(currentReportData.resources.si || 0).toLocaleString()}</span>
+                        <span class="preview-value">${currentReportData.resources.si ? currentReportData.resources.si.formatted : '0'}</span>
                     </div>
                 </div>
                 
                 <div class="preview-card">
                     <h3>🏗️ Gebäude & Forschung</h3>
                     <div class="preview-item">
-                        <span class="preview-label">Durchschn. Gebäude:</span>
-                        <span class="preview-value">${Math.round(currentReportData.statistics.buildingLevel)}</span>
+                        <span class="preview-label">Gebäude-Anzahl:</span>
+                        <span class="preview-value">${currentReportData.statistics.buildingCount || 0}</span>
                     </div>
                     <div class="preview-item">
-                        <span class="preview-label">Durchschn. Forschung:</span>
-                        <span class="preview-value">${Math.round(currentReportData.statistics.researchLevel)}</span>
+                        <span class="preview-label">Forschungs-Anzahl:</span>
+                        <span class="preview-value">${currentReportData.statistics.researchCount || 0}</span>
+                    </div>
+                    <div class="preview-item">
+                        <span class="preview-label">Schiffstypen:</span>
+                        <span class="preview-value">${currentReportData.statistics.shipTypeCount || 0}</span>
                     </div>
                     <div class="preview-item">
                         <span class="preview-label">Flotten:</span>
-                        <span class="preview-value">${currentReportData.statistics.fleetCount}</span>
+                        <span class="preview-value">${currentReportData.statistics.fleetCount || 0}</span>
                     </div>
                 </div>
                 
