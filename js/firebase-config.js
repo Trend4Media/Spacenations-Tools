@@ -168,14 +168,20 @@ window.addEventListener('load', async () => {
 function handleFirebaseInitError(error) {
     console.warn('🔄 Starte Firebase-Fallback-Modus');
     
-    // Mock Firebase Services für Offline-Entwicklung
+    // Prüfe ob bereits echte Firebase-Services existieren
+    if (window.firebaseServices && !window.firebaseServices.offline) {
+        console.log('🔧 Firebase bereits verfügbar, überspringe Fallback');
+        return;
+    }
+    
+    // Mock Firebase Services für Offline-Entwicklung (NUR wenn Firebase wirklich nicht verfügbar)
     window.firebaseServices = {
         auth: {
             signInWithEmailAndPassword: () => Promise.reject(new Error('Firebase nicht verfügbar')),
             signOut: () => Promise.resolve(),
             onAuthStateChanged: (callback) => {
-                // Simuliere keinen eingeloggten User
-                setTimeout(() => callback(null), 100);
+                // NICHT automatisch ausloggen - lasse bestehenden Auth-Status
+                console.log('⚠️ Firebase Auth nicht verfügbar, behalte bestehenden Auth-Status');
                 return () => {}; // Unsubscribe function
             }
         },
@@ -199,7 +205,7 @@ function handleFirebaseInitError(error) {
         offline: true
     };
     
-    console.log('🔧 Firebase-Fallback-Services aktiviert');
+    console.log('🔧 Firebase-Fallback-Services aktiviert (ohne Auth-Änderung)');
     
     // Dispatch ready event auch im Fallback-Modus
     document.dispatchEvent(new CustomEvent('firebaseReady'));

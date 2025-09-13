@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Spy-Datenbank - Spacenations Tools</title>
-    <meta name="cache-bust" content="v8">
+    <meta name="cache-bust" content="v9">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -717,6 +717,12 @@
                     return true;
                 }
                 
+                // Prüfe ob Firebase im Offline-Modus ist (dann nicht verwenden)
+                if (window.FirebaseConfig.isOffline()) {
+                    console.log('⚠️ Firebase im Offline-Modus, verwende Demo-Daten');
+                    return false;
+                }
+                
                 // Verwende die neue Timeout-Funktion
                 await window.FirebaseConfig.waitForReadyWithTimeout(3000);
                 console.log('🔥 Firebase DB verfügbar');
@@ -741,6 +747,12 @@
                 if (window.FirebaseConfig.isReady()) {
                     console.log('🔥 Firebase bereits bereit');
                     return true;
+                }
+                
+                // Prüfe ob Firebase im Offline-Modus ist (dann nicht verwenden)
+                if (window.FirebaseConfig.isOffline()) {
+                    console.log('⚠️ Firebase im Offline-Modus, verwende Demo-Daten');
+                    return false;
                 }
                 
                 // Verwende die neue Timeout-Funktion mit längerem Timeout
