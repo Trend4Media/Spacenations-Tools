@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Spy-Datenbank - Spacenations Tools</title>
-    <meta name="cache-bust" content="v11">
+    <meta name="cache-bust" content="v12">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -492,7 +492,7 @@
     </div>
 
     <!-- Firebase Scripts -->
-    <script src="js/firebase-config.js?v=4"></script>
+    <script src="js/firebase-config.js?v=5"></script>
     <script src="js/session-manager.js"></script>
     <script src="js/auth-manager.js"></script>
     <script src="js/firebase-sync.js"></script>
@@ -731,10 +731,22 @@
                     return false;
                 }
                 
-                // Verwende die neue Timeout-Funktion
-                await window.FirebaseConfig.waitForReadyWithTimeout(3000);
-                console.log('🔥 Firebase DB verfügbar');
-                return true;
+                // Warte aktiv auf Firebase-Initialisierung (kürzerer Timeout)
+                let attempts = 0;
+                const maxAttempts = 6; // 3 Sekunden bei 500ms Intervallen
+                
+                while (attempts < maxAttempts) {
+                    if (window.FirebaseConfig.isReady()) {
+                        console.log('🔥 Firebase DB verfügbar');
+                        return true;
+                    }
+                    
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    attempts++;
+                }
+                
+                console.log('⚠️ Firebase nicht bereit nach 3 Sekunden');
+                return false;
             } catch (error) {
                 console.log('⏳ Firebase noch nicht bereit, versuche trotzdem...', error.message);
                 return false; // Nicht blockieren
@@ -763,10 +775,22 @@
                     return false;
                 }
                 
-                // Verwende die neue Timeout-Funktion mit längerem Timeout
-                await window.FirebaseConfig.waitForReadyWithTimeout(10000);
-                console.log('🔥 Firebase DB verfügbar für Spy-Database');
-                return true;
+                // Warte aktiv auf Firebase-Initialisierung
+                let attempts = 0;
+                const maxAttempts = 20; // 10 Sekunden bei 500ms Intervallen
+                
+                while (attempts < maxAttempts) {
+                    if (window.FirebaseConfig.isReady()) {
+                        console.log('🔥 Firebase DB verfügbar für Spy-Database');
+                        return true;
+                    }
+                    
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    attempts++;
+                }
+                
+                console.log('⚠️ Firebase nicht bereit nach 10 Sekunden');
+                return false;
             } catch (error) {
                 console.log('⚠️ Firebase nicht verfügbar nach 10 Sekunden:', error.message);
                 return false; // Nicht werfen, sondern false zurückgeben

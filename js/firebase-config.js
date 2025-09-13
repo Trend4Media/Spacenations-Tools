@@ -91,6 +91,14 @@ function initializeFirebase() {
         }
         
         console.log('✅ Firebase Services verfügbar');
+        
+        // Setze initialized Flag sofort
+        window.firebaseServices.initialized = true;
+        
+        // Dispatch ready event sofort
+        document.dispatchEvent(new CustomEvent('firebaseReady'));
+        console.log('🚀 Firebase bereit für andere Module');
+        
         return true;
         
     } catch (error) {
