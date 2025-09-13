@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Spy-Datenbank - Spacenations Tools</title>
-    <meta name="cache-bust" content="v7">
+    <meta name="cache-bust" content="v8">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -561,9 +561,13 @@
                         // Verstecke Retry-Button wenn echte Daten geladen wurden
                         document.getElementById('retry-btn').style.display = 'none';
                         showMessage('✅ Echte Daten geladen! Firebase-Verbindung erfolgreich.', 'success');
+                    } else {
+                        console.log('⚠️ Firebase nicht verfügbar, bleibe im Demo-Modus');
+                        showMessage('Demo-Modus: Firebase nicht verfügbar. Zeige Beispieldaten.', 'info');
                     }
                 } catch (error) {
-                    console.log('⚠️ Firebase-Verbindung fehlgeschlagen, bleibe im Demo-Modus');
+                    console.log('⚠️ Firebase-Verbindung fehlgeschlagen, bleibe im Demo-Modus:', error.message);
+                    showMessage('Demo-Modus: Firebase-Verbindung fehlgeschlagen. Zeige Beispieldaten.', 'info');
                 }
             }, 1000);
         });
@@ -729,7 +733,8 @@
             try {
                 // Prüfe ob FirebaseConfig verfügbar ist
                 if (!window.FirebaseConfig) {
-                    throw new Error('FirebaseConfig nicht verfügbar');
+                    console.log('⚠️ FirebaseConfig nicht verfügbar');
+                    return false;
                 }
                 
                 // Prüfe ob Firebase bereits bereit ist
@@ -743,8 +748,8 @@
                 console.log('🔥 Firebase DB verfügbar für Spy-Database');
                 return true;
             } catch (error) {
-                console.error('❌ Firebase nicht verfügbar nach 10 Sekunden:', error.message);
-                throw new Error('Firebase-Initialisierung fehlgeschlagen');
+                console.log('⚠️ Firebase nicht verfügbar nach 10 Sekunden:', error.message);
+                return false; // Nicht werfen, sondern false zurückgeben
             }
         }
         
@@ -777,8 +782,8 @@
                     // Verstecke Retry-Button wenn Firebase funktioniert
                     document.getElementById('retry-btn').style.display = 'none';
                 } else {
-                    // Firebase nicht verfügbar - zeige leere Datenbank mit Demo-Daten
-                    console.log('🔄 Firebase nicht verfügbar, zeige Demo-Datenbank...');
+                    // Firebase nicht verfügbar - zeige Demo-Daten
+                    console.log('🔄 Firebase nicht verfügbar, zeige Demo-Daten...');
                     currentReports = getDemoReports();
                     await displayReports(currentReports);
                     await loadStatistics();
@@ -791,19 +796,15 @@
             } catch (error) {
                 console.error('❌ Fehler beim Laden der Spy-Reports:', error);
                 
-                // Zeige Demo-Daten an, falls Firebase nicht bereit
-                if (error.message.includes('Firebase nicht initialisiert') || error.message.includes('Firebase-Initialisierung fehlgeschlagen')) {
-                    console.log('🔄 Firebase noch nicht bereit, zeige Demo-Daten...');
-                    currentReports = getDemoReports();
-                    await displayReports(currentReports);
-                    await loadStatistics();
-                    showMessage('Demo-Modus: Firebase nicht verfügbar. Zeige Beispieldaten.', 'info');
-                    
-                    // Zeige Retry-Button
-                    document.getElementById('retry-btn').style.display = 'inline-flex';
-                } else {
-                    showError('Fehler beim Laden der Spy-Reports: ' + error.message);
-                }
+                // Immer Demo-Daten anzeigen bei Fehlern
+                console.log('🔄 Fehler beim Laden, zeige Demo-Daten...');
+                currentReports = getDemoReports();
+                await displayReports(currentReports);
+                await loadStatistics();
+                showMessage('Demo-Modus: Fehler beim Laden. Zeige Beispieldaten.', 'info');
+                
+                // Zeige Retry-Button
+                document.getElementById('retry-btn').style.display = 'inline-flex';
             }
         }
         
@@ -1239,21 +1240,33 @@
             
             try {
                 // Warte auf Firebase mit längerem Timeout
-                await waitForFirebase();
+                const firebaseReady = await waitForFirebase();
                 
-                // Lade Reports erneut
-                await loadReports();
-                
-                console.log('✅ Firebase-Verbindung erfolgreich wiederhergestellt');
+                if (firebaseReady) {
+                    // Lade Reports erneut
+                    await loadReports();
+                    console.log('✅ Firebase-Verbindung erfolgreich wiederhergestellt');
+                } else {
+                    // Firebase nicht verfügbar - zeige Demo-Daten
+                    console.log('⚠️ Firebase nicht verfügbar, zeige Demo-Daten');
+                    currentReports = getDemoReports();
+                    await displayReports(currentReports);
+                    currentStatistics = getDemoStatistics();
+                    displayStatistics(currentStatistics);
+                    showMessage('Demo-Modus: Firebase nicht verfügbar. Zeige Beispieldaten.', 'info');
+                    document.getElementById('retry-btn').style.display = 'inline-flex';
+                }
                 
             } catch (error) {
                 console.error('❌ Firebase-Retry fehlgeschlagen:', error);
                 
-                // Zeige leere Datenbank und Retry-Button
-                currentReports = [];
-                await displayReports([]);
+                // Zeige Demo-Daten und Retry-Button
+                currentReports = getDemoReports();
+                await displayReports(currentReports);
+                currentStatistics = getDemoStatistics();
+                displayStatistics(currentStatistics);
                 document.getElementById('retry-btn').style.display = 'inline-flex';
-                showMessage('Firebase-Verbindung fehlgeschlagen. Bitte versuchen Sie es erneut.', 'error');
+                showMessage('Demo-Modus: Firebase-Verbindung fehlgeschlagen. Zeige Beispieldaten.', 'info');
             }
         }
     </script>
