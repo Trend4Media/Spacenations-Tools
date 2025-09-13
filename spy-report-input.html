@@ -767,7 +767,7 @@
                 
                 // Prüfe ob Report bereits existiert
                 // Hole aktuelle Allianz-Daten für die Prüfung
-                const currentAlliance = window.SessionAPI ? window.SessionAPI.getCurrentAlliance() : null;
+                const currentAlliance = window.SessionAPI ? (window.SessionAPI.getAllianceData()?.name || window.SessionAPI.getAllianceData()) : null;
                 const allianceName = currentAlliance || 'unknown';
                 
                 const exists = await window.SpyDatabaseAPI.reportExists(

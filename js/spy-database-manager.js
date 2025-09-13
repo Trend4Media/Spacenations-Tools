@@ -33,7 +33,8 @@ class SpyDatabaseManager {
             
             // Allianz-Daten aus SessionAPI laden (Fallback)
             if (window.SessionAPI && !this.currentAlliance) {
-                this.currentAlliance = window.SessionAPI.getCurrentAlliance();
+                const allianceData = window.SessionAPI.getAllianceData();
+                this.currentAlliance = allianceData?.name || allianceData;
                 console.log('📋 Allianz aus SessionAPI geladen:', this.currentAlliance);
             }
             
@@ -64,7 +65,8 @@ class SpyDatabaseManager {
                 
                 // 1. Versuche SessionAPI
                 if (window.SessionAPI) {
-                    alliance = window.SessionAPI.getCurrentAlliance();
+                    const allianceData = window.SessionAPI.getAllianceData();
+                    alliance = allianceData?.name || allianceData;
                     console.log('📋 Allianz aus SessionAPI (Fallback):', alliance);
                 }
                 
@@ -166,7 +168,8 @@ class SpyDatabaseManager {
                 
                 // 1. Versuche SessionAPI
                 if (window.SessionAPI) {
-                    alliance = window.SessionAPI.getCurrentAlliance();
+                    const allianceData = window.SessionAPI.getAllianceData();
+                    alliance = allianceData?.name || allianceData;
                     console.log('📋 Allianz aus SessionAPI (Fallback):', alliance);
                 }
                 
@@ -412,7 +415,8 @@ class SpyDatabaseManager {
                 
                 // 1. Versuche SessionAPI
                 if (window.SessionAPI) {
-                    alliance = window.SessionAPI.getCurrentAlliance();
+                    const allianceData = window.SessionAPI.getAllianceData();
+                    alliance = allianceData?.name || allianceData;
                     console.log('📋 Allianz aus SessionAPI (Fallback):', alliance);
                 }
                 
