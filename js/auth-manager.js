@@ -91,7 +91,10 @@ class AuthManager {
                 return userDoc.data();
             } else {
                 console.warn('⚠️ Benutzerdokument nicht gefunden für UID:', uid);
-                return null;
+                
+                // Automatisch Benutzerdokument erstellen
+                console.log('🔧 Erstelle automatisch Benutzerdokument...');
+                return await this.createUserDocument(uid);
             }
         } catch (error) {
             console.error('❌ Fehler beim Laden der Benutzerdaten:', error);
@@ -103,6 +106,42 @@ class AuthManager {
             }
             
             throw error;
+        }
+    }
+    
+    // Automatisch Benutzerdokument erstellen
+    async createUserDocument(uid) {
+        try {
+            const user = this.auth.currentUser;
+            if (!user) {
+                throw new Error('Kein authentifizierter Benutzer');
+            }
+            
+            const userData = {
+                uid: uid,
+                email: user.email,
+                username: user.displayName || user.email.split('@')[0],
+                createdAt: window.FirebaseConfig.getServerTimestamp(),
+                lastLogin: window.FirebaseConfig.getServerTimestamp(),
+                isActive: true,
+                role: 'user',
+                activities: [{
+                    icon: '👤',
+                    text: 'Account automatisch erstellt',
+                    timestamp: window.FirebaseConfig.getServerTimestamp()
+                }]
+            };
+            
+            await this.db.collection('users').doc(uid).set(userData);
+            console.log('✅ Benutzerdokument automatisch erstellt für:', userData.username);
+            
+            return userData;
+            
+        } catch (error) {
+            console.error('❌ Fehler beim Erstellen des Benutzerdokuments:', error);
+            
+            // Fallback-Benutzerdaten erstellen
+            return this.createFallbackUserData(uid);
         }
     }
     
