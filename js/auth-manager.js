@@ -128,7 +128,7 @@ class AuthManager {
                 activities: [{
                     icon: '👤',
                     text: 'Account automatisch erstellt',
-                    timestamp: window.FirebaseConfig.getServerTimestamp()
+                    timestamp: new Date()
                 }]
             };
             
