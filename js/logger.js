@@ -114,14 +114,33 @@ class Logger {
     // Fehler an Firebase senden
     async sendErrorToFirebase(logEntry) {
         try {
+            // Prüfen ob Firebase verfügbar ist
+            if (!window.firebaseServices || !window.firebaseServices.db) {
+                return;
+            }
+            
+            // Prüfen ob User eingeloggt ist
+            const currentUser = window.authManager?.getCurrentUser();
+            if (!currentUser) {
+                return;
+            }
+            
             await window.firebaseServices.db.collection('errorLogs').add({
                 ...logEntry,
-                userId: window.authManager?.getCurrentUser()?.uid || 'anonymous',
+                userId: currentUser.uid,
                 sessionId: this.getSessionId(),
                 createdAt: window.FirebaseConfig?.getServerTimestamp() || new Date()
             });
         } catch (error) {
-            console.error('Fehler beim Senden an Firebase:', error);
+            // Nur einmal pro Session über Permission-Fehler loggen
+            if (error.code === 'permission-denied' && !this.permissionErrorLogged) {
+                console.warn('⚠️ Firebase Permission Error - Error logs werden nur lokal gespeichert');
+                this.permissionErrorLogged = true;
+            }
+            // Andere Fehler normal loggen
+            else if (error.code !== 'permission-denied') {
+                console.error('Fehler beim Senden an Firebase:', error);
+            }
         }
     }
     
