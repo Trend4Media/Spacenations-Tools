@@ -88,7 +88,9 @@ class AuthManager {
         try {
             const userDoc = await this.db.collection('users').doc(uid).get();
             if (userDoc.exists) {
-                return userDoc.data();
+                const userData = userDoc.data();
+                // Migriere das Benutzerdokument falls nötig
+                return await this.migrateUserDocument(userData);
             } else {
                 console.warn('⚠️ Benutzerdokument nicht gefunden für UID:', uid);
                 
@@ -123,8 +125,27 @@ class AuthManager {
                 username: user.displayName || user.email.split('@')[0],
                 createdAt: window.FirebaseConfig.getServerTimestamp(),
                 lastLogin: window.FirebaseConfig.getServerTimestamp(),
+                lastUpdated: window.FirebaseConfig.getServerTimestamp(),
+                updatedAt: window.FirebaseConfig.getServerTimestamp(),
+                updatedBy: uid,
                 isActive: true,
+                isAllianceAdmin: false,
+                isSuperAdmin: false,
+                systemRole: 'user',
                 role: 'user',
+                loginCount: 0,
+                alliance: null,
+                allianceRole: null,
+                allianceTag: null,
+                discord: null,
+                permissions: {
+                    dashboard_access: true,
+                    profile_edit: true,
+                    admin_dashboard: false,
+                    user_management: false,
+                    alliance_management: false,
+                    system_settings: false
+                },
                 activities: [{
                     icon: '👤',
                     text: 'Account automatisch erstellt',
@@ -152,15 +173,79 @@ class AuthManager {
             username: 'Unknown User',
             email: 'unknown@example.com',
             isActive: true,
+            isAllianceAdmin: false,
+            isSuperAdmin: false,
+            systemRole: 'user',
             role: 'user',
+            loginCount: 0,
+            alliance: null,
+            allianceRole: null,
+            allianceTag: null,
+            discord: null,
+            permissions: {
+                dashboard_access: true,
+                profile_edit: true,
+                admin_dashboard: false,
+                user_management: false,
+                alliance_management: false,
+                system_settings: false
+            },
             createdAt: new Date(),
             lastLogin: new Date(),
+            lastUpdated: new Date(),
+            updatedAt: new Date(),
+            updatedBy: uid,
             activities: [{
                 icon: '⚠️',
                 text: 'Fallback-Benutzerdaten (Berechtigungsfehler)',
                 timestamp: new Date()
             }]
         };
+    }
+    
+    // Bestehende Benutzerdokumente migrieren (falls nötig)
+    async migrateUserDocument(userData) {
+        try {
+            const updates = {};
+            
+            // Prüfe und füge fehlende Felder hinzu
+            if (!userData.hasOwnProperty('isAllianceAdmin')) updates.isAllianceAdmin = false;
+            if (!userData.hasOwnProperty('isSuperAdmin')) updates.isSuperAdmin = false;
+            if (!userData.hasOwnProperty('systemRole')) updates.systemRole = userData.role || 'user';
+            if (!userData.hasOwnProperty('loginCount')) updates.loginCount = 0;
+            if (!userData.hasOwnProperty('alliance')) updates.alliance = null;
+            if (!userData.hasOwnProperty('allianceRole')) updates.allianceRole = null;
+            if (!userData.hasOwnProperty('allianceTag')) updates.allianceTag = null;
+            if (!userData.hasOwnProperty('discord')) updates.discord = null;
+            if (!userData.hasOwnProperty('permissions')) {
+                updates.permissions = {
+                    dashboard_access: true,
+                    profile_edit: true,
+                    admin_dashboard: false,
+                    user_management: false,
+                    alliance_management: false,
+                    system_settings: false
+                };
+            }
+            if (!userData.hasOwnProperty('lastUpdated')) updates.lastUpdated = window.FirebaseConfig.getServerTimestamp();
+            if (!userData.hasOwnProperty('updatedAt')) updates.updatedAt = window.FirebaseConfig.getServerTimestamp();
+            if (!userData.hasOwnProperty('updatedBy')) updates.updatedBy = userData.uid;
+            
+            // Nur aktualisieren wenn Updates nötig sind
+            if (Object.keys(updates).length > 0) {
+                await this.db.collection('users').doc(userData.uid).update(updates);
+                console.log('✅ Benutzerdokument migriert für:', userData.username);
+                
+                // Aktualisierte Daten zurückgeben
+                return { ...userData, ...updates };
+            }
+            
+            return userData;
+            
+        } catch (error) {
+            console.error('❌ Fehler bei Benutzerdokument-Migration:', error);
+            return userData; // Original-Daten zurückgeben
+        }
     }
     
     // LastLogin aktualisieren
@@ -245,12 +330,31 @@ class AuthManager {
                 username: username,
                 createdAt: window.FirebaseConfig.getServerTimestamp(),
                 lastLogin: window.FirebaseConfig.getServerTimestamp(),
+                lastUpdated: window.FirebaseConfig.getServerTimestamp(),
+                updatedAt: window.FirebaseConfig.getServerTimestamp(),
+                updatedBy: user.uid,
                 isActive: true,
+                isAllianceAdmin: false,
+                isSuperAdmin: false,
+                systemRole: 'user',
                 role: 'user',
+                loginCount: 0,
+                alliance: null,
+                allianceRole: null,
+                allianceTag: null,
+                discord: null,
+                permissions: {
+                    dashboard_access: true,
+                    profile_edit: true,
+                    admin_dashboard: false,
+                    user_management: false,
+                    alliance_management: false,
+                    system_settings: false
+                },
                 activities: [{
                     icon: '👤',
                     text: 'Account erstellt',
-                    timestamp: window.FirebaseConfig.getServerTimestamp()
+                    timestamp: new Date()
                 }]
             });
             
