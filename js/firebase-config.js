@@ -35,7 +35,8 @@ function initializeFirebase() {
         // Check for browser extension conflicts
         const hasExtensions = checkBrowserExtensions();
         
-        // Ihre Firebase-Konfiguration
+        // Firebase-Konfiguration
+        // TODO: Diese Werte sollten über den Server geladen werden
         const firebaseConfig = {
             apiKey: 'AIzaSyDr4-ap_EubUn0UdP7hkEpS2jkzLIVgvyc',
             authDomain: 'spacenations-tools.firebaseapp.com',

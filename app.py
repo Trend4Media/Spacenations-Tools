@@ -135,6 +135,8 @@ class SpacenationsRequestHandler(SimpleHTTPRequestHandler):
                 self.handle_health_check()
             elif path == '/api/status':
                 self.handle_status_check()
+            elif path == '/api/firebase-config':
+                self.handle_firebase_config()
             else:
                 self.send_error(404, "API endpoint not found")
                 
@@ -186,6 +188,24 @@ class SpacenationsRequestHandler(SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(json.dumps(status_data).encode())
     
+    def handle_firebase_config(self):
+        """Firebase configuration endpoint"""
+        firebase_config = {
+            "apiKey": os.getenv('FIREBASE_API_KEY', 'AIzaSyDr4-ap_EubUn0UdP7hkEpS2jkzLIVgvyc'),
+            "authDomain": os.getenv('FIREBASE_AUTH_DOMAIN', 'spacenations-tools.firebaseapp.com'),
+            "projectId": os.getenv('FIREBASE_PROJECT_ID', 'spacenations-tools'),
+            "storageBucket": os.getenv('FIREBASE_STORAGE_BUCKET', 'spacenations-tools.firebasestorage.app'),
+            "messagingSenderId": os.getenv('FIREBASE_MESSAGING_SENDER_ID', '651338201276'),
+            "appId": os.getenv('FIREBASE_APP_ID', '1:651338201276:web:89e7d9c19dbd2611d3f8b9'),
+            "measurementId": "G-SKWJWH2ERX"
+        }
+        
+        self.send_response(200)
+        self.send_header('Content-Type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.end_headers()
+        self.wfile.write(json.dumps(firebase_config).encode())
+    
     def handle_proxima_sync(self, post_data):
         """Handle Proxima sync requests"""
         try:
@@ -223,8 +243,17 @@ def start_proxima_scheduler():
     def scheduler():
         while True:
             try:
-                # Proxima sync logic would go here
-                logger.info("Proxima scheduler running...")
+                # Import and run Proxima fetcher
+                try:
+                    from proxima_fetcher import ProximaFetcher
+                    fetcher = ProximaFetcher()
+                    fetcher.run_sync()
+                    logger.info("Proxima sync completed successfully")
+                except ImportError:
+                    logger.warning("Proxima fetcher not available")
+                except Exception as e:
+                    logger.error(f"Proxima sync error: {e}")
+                
                 time.sleep(3600)  # Run every hour
             except Exception as e:
                 logger.error(f"Proxima scheduler error: {e}")

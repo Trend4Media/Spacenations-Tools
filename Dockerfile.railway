@@ -16,26 +16,13 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy only necessary files (exclude Node.js files)
-COPY *.py ./
-COPY *.html ./
-COPY *.css ./
-COPY *.js ./
-COPY *.json ./
-COPY *.md ./
-COPY *.txt ./
-COPY *.toml ./
-COPY css/ ./css/
-COPY js/ ./js/
-COPY assets/ ./assets/
+# Copy all necessary files
+COPY . .
 
-# Ensure no Node.js files exist
-RUN find . -name "package.json" -delete && \
-    find . -name "package-lock.json" -delete && \
-    find . -name "yarn.lock" -delete && \
-    find . -name "node_modules" -type d -exec rm -rf {} + 2>/dev/null || true && \
-    find . -name "build" -type d -exec rm -rf {} + 2>/dev/null || true && \
-    find . -name "dist" -type d -exec rm -rf {} + 2>/dev/null || true
+# Remove Node.js files after copying
+RUN rm -f package.json package-lock.json yarn.lock && \
+    rm -rf node_modules/ build/ dist/ && \
+    find . -name "*.log" -delete
 
 # Create non-root user
 RUN useradd --create-home --shell /bin/bash app && chown -R app:app /app
@@ -46,7 +33,7 @@ EXPOSE 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/api/health || exit 1
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')" || exit 1
 
 # Start the application
 CMD ["python", "app.py"]
