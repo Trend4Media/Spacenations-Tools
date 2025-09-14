@@ -1,0 +1,52 @@
+# Railway-specific Dockerfile for Python deployment
+FROM python:3.9-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy only necessary files (exclude Node.js files)
+COPY *.py ./
+COPY *.html ./
+COPY *.css ./
+COPY *.js ./
+COPY *.json ./
+COPY *.md ./
+COPY *.txt ./
+COPY *.toml ./
+COPY css/ ./css/
+COPY js/ ./js/
+COPY assets/ ./assets/
+
+# Ensure no Node.js files exist
+RUN find . -name "package.json" -delete && \
+    find . -name "package-lock.json" -delete && \
+    find . -name "yarn.lock" -delete && \
+    find . -name "node_modules" -type d -exec rm -rf {} + 2>/dev/null || true && \
+    find . -name "build" -type d -exec rm -rf {} + 2>/dev/null || true && \
+    find . -name "dist" -type d -exec rm -rf {} + 2>/dev/null || true
+
+# Create non-root user
+RUN useradd --create-home --shell /bin/bash app && chown -R app:app /app
+USER app
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/api/health || exit 1
+
+# Start the application
+CMD ["python", "app.py"]
