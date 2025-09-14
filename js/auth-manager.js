@@ -132,6 +132,15 @@ class AuthManager {
             });
         } catch (error) {
             console.error('❌ Fehler beim LastLogin-Update:', error);
+            
+            // Bei Berechtigungsfehlern: Fallback (nur loggen, nicht werfen)
+            if (error.code === 'permission-denied' || error.message.includes('permissions')) {
+                console.warn('⚠️ LastLogin-Update fehlgeschlagen - Berechtigungsfehler');
+                return; // Nicht werfen, nur loggen
+            }
+            
+            // Andere Fehler: auch nicht werfen, da es nicht kritisch ist
+            console.warn('⚠️ LastLogin-Update fehlgeschlagen - nicht kritisch');
         }
     }
     
