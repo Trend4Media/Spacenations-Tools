@@ -265,14 +265,14 @@
             
             <form id="admin-login-form">
                 <div class="form-group">
-                    <label class="form-label" for="email">E-Mail Adresse</label>
+                    <label class="form-label" for="email">Benutzername oder E-Mail</label>
                     <input 
-                        type="email" 
+                        type="text" 
                         id="email" 
                         class="form-input" 
-                        placeholder="admin@example.com" 
+                        placeholder="Benutzername oder E-Mail-Adresse" 
                         required
-                        autocomplete="email"
+                        autocomplete="username"
                     >
                 </div>
                 
@@ -524,11 +524,11 @@
                 await window.AuthAPI.waitForInit();
                 
                 // Get form values
-                const email = document.getElementById('email').value.trim();
+                const input = document.getElementById('email').value.trim();
                 const password = document.getElementById('password').value;
                 
                 // Attempt login
-                const result = await window.AuthAPI.login(email, password);
+                const result = await window.AuthAPI.login(input, password);
                 
                 if (!result.success) {
                     throw new Error(result.error || 'Anmeldung fehlgeschlagen');

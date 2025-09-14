@@ -884,10 +884,10 @@
             <h3 class="login-title">🎮 User Login</h3>
             <form class="login-form" id="login-form">
                 <input 
-                    type="email" 
+                    type="text" 
                     class="login-input" 
                     id="login-email" 
-                    placeholder="E-Mail-Adresse (z.B. benutzer@beispiel.de)" 
+                    placeholder="Benutzername oder E-Mail-Adresse" 
                     required
                 >
                 <input 
@@ -1023,18 +1023,17 @@
         async function handleLogin(event) {
             event.preventDefault();
             
-            const email = document.getElementById('login-email').value;
+            const input = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
             
-            if (!email || !password) {
+            if (!input || !password) {
                 alert('Bitte füllen Sie alle Felder aus.');
                 return;
             }
             
-            // E-Mail-Format validieren
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                alert('Bitte geben Sie eine gültige E-Mail-Adresse ein (z.B. benutzer@beispiel.de).');
+            // Grundlegende Eingabe-Validierung
+            if (input.length < 2) {
+                alert('Bitte geben Sie einen gültigen Benutzernamen oder eine E-Mail-Adresse ein.');
                 return;
             }
             
@@ -1046,11 +1045,11 @@
             
             try {
                 // Firebase Login verwenden
-                const result = await window.AuthAPI.login(email, password);
+                const result = await window.AuthAPI.login(input, password);
                 
                 if (result.success) {
                     // Erfolgreiche Anmeldung
-                    console.log('Login successful:', { email, user: result.user });
+                    console.log('Login successful:', { input, user: result.user });
                     
                     // Erfolgsmeldung anzeigen
                     const loginForm = document.getElementById('login-form');
@@ -1068,7 +1067,7 @@
                     }, 1500);
                 } else {
                     // Fehlerhafte Anmeldung
-                    console.log('Login failed:', { email, error: result.error });
+                    console.log('Login failed:', { input, error: result.error });
                     
                     // Fehlermeldung anzeigen
                     const loginForm = document.getElementById('login-form');

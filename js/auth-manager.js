@@ -268,20 +268,55 @@ class AuthManager {
         }
     }
     
-    // Login-Funktion
-    async login(email, password) {
+    // Hilfsfunktion: Benutzername zu E-Mail auflösen
+    async resolveUsernameToEmail(input) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        // Wenn es bereits eine E-Mail ist, direkt zurückgeben
+        if (emailRegex.test(input)) {
+            return input;
+        }
+        
+        // Ansonsten als Benutzername behandeln und in Firestore nachschlagen
         try {
-            console.log('🔐 Login-Versuch für:', email);
+            console.log('🔍 Suche E-Mail für Benutzername:', input);
+            const userQuery = await this.db.collection('users')
+                .where('username', '==', input)
+                .limit(1)
+                .get();
             
-            // E-Mail-Format validieren
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                console.log('❌ Ungültige E-Mail-Adresse:', email);
+            if (userQuery.empty) {
+                console.log('❌ Benutzername nicht gefunden:', input);
+                return null;
+            }
+            
+            const userDoc = userQuery.docs[0];
+            const userData = userDoc.data();
+            console.log('✅ E-Mail gefunden für Benutzername:', input, '->', userData.email);
+            return userData.email;
+            
+        } catch (error) {
+            console.error('❌ Fehler beim Auflösen des Benutzernamens:', error);
+            return null;
+        }
+    }
+
+    // Login-Funktion
+    async login(input, password) {
+        try {
+            console.log('🔐 Login-Versuch für:', input);
+            
+            // Eingabe auflösen (Benutzername oder E-Mail)
+            const email = await this.resolveUsernameToEmail(input);
+            if (!email) {
+                console.log('❌ Benutzer nicht gefunden:', input);
                 return { 
                     success: false, 
-                    error: 'Bitte geben Sie eine gültige E-Mail-Adresse ein (z.B. benutzer@beispiel.de).' 
+                    error: 'Benutzername oder E-Mail-Adresse nicht gefunden. Bitte überprüfen Sie Ihre Eingabe.' 
                 };
             }
+            
+            console.log('📧 Verwende E-Mail für Login:', email);
             
             // Zuerst prüfen, ob der Benutzer existiert
             try {
@@ -303,7 +338,7 @@ class AuthManager {
             console.log('✅ Login erfolgreich');
             
             // Aktivität hinzufügen
-            this.addActivity('🔐', 'Erfolgreich angemeldet');
+            this.addActivity('🔐', `Erfolgreich angemeldet (${input})`);
             
             // Login-Success Message setzen
             if (window.SessionAPI) {
@@ -319,13 +354,13 @@ class AuthManager {
             let errorMessage = 'Login fehlgeschlagen.';
             switch (error.code) {
                 case 'auth/user-not-found':
-                    errorMessage = 'Kein Account mit dieser E-Mail gefunden. Bitte registrieren Sie sich zuerst.';
+                    errorMessage = 'Kein Account mit diesem Benutzernamen oder dieser E-Mail gefunden. Bitte registrieren Sie sich zuerst.';
                     break;
                 case 'auth/wrong-password':
                     errorMessage = 'Falsches Passwort.';
                     break;
                 case 'auth/invalid-email':
-                    errorMessage = 'Ungültige E-Mail-Adresse. Bitte geben Sie eine gültige E-Mail-Adresse ein (z.B. benutzer@beispiel.de).';
+                    errorMessage = 'Ungültige E-Mail-Adresse. Bitte geben Sie eine gültige E-Mail-Adresse oder einen Benutzernamen ein.';
                     break;
                 case 'auth/user-disabled':
                     errorMessage = 'Dieser Account wurde deaktiviert.';
