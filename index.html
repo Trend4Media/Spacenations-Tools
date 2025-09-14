@@ -986,7 +986,7 @@
         };
         
         // Login functionality
-        function handleLogin(event) {
+        async function handleLogin(event) {
             event.preventDefault();
             
             const email = document.getElementById('login-email').value;
@@ -997,46 +997,56 @@
                 return;
             }
             
-            // Benutzer in der simulierten Datenbank suchen
-            const user = authenticateUser(email, password);
+            // Warten bis AuthAPI verfügbar ist
+            if (!window.AuthAPI) {
+                console.warn('⚠️ AuthAPI nicht verfügbar, warte...');
+                await waitForAuthAPI();
+            }
             
-            if (user) {
-                // Benutzername in localStorage und sessionStorage speichern
-                localStorage.setItem('currentUsername', user.username);
-                localStorage.setItem('currentUserEmail', email);
-                sessionStorage.setItem('currentUsername', user.username);
-                sessionStorage.setItem('currentUserEmail', email);
+            try {
+                // Firebase Login verwenden
+                const result = await window.AuthAPI.login(email, password);
                 
-                // Erfolgreiche Anmeldung
-                console.log('Login successful:', { email, username: user.username });
-                alert(`Anmeldung erfolgreich! Willkommen zurück, ${user.username}!`);
-                
-                // Weiterleitung zum User Dashboard mit korrektem Benutzername
-                setTimeout(() => {
-                    window.location.href = `user-dashboard.html?username=${encodeURIComponent(user.username)}&email=${encodeURIComponent(email)}`;
-                }, 1000);
-            } else {
-                // Fehlerhafte Anmeldung
-                alert('Ungültige E-Mail-Adresse oder Passwort. Bitte versuchen Sie es erneut.');
-                console.log('Login failed:', { email });
+                if (result.success) {
+                    // Erfolgreiche Anmeldung
+                    console.log('Login successful:', { email, user: result.user });
+                    alert(`Anmeldung erfolgreich! Willkommen zurück!`);
+                    
+                    // Weiterleitung zum User Dashboard
+                    setTimeout(() => {
+                        window.location.href = 'user-dashboard.html';
+                    }, 1000);
+                } else {
+                    // Fehlerhafte Anmeldung
+                    alert(result.error || 'Ungültige E-Mail-Adresse oder Passwort. Bitte versuchen Sie es erneut.');
+                    console.log('Login failed:', { email, error: result.error });
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Fehler beim Login. Bitte versuchen Sie es erneut.');
             }
         }
         
-        function authenticateUser(email, password) {
-            // Simuliert Benutzerauthentifizierung
-            const normalizedEmail = email.toLowerCase().trim();
-            console.log('Suche Benutzer für E-Mail:', normalizedEmail);
-            
-            const user = userDatabase[normalizedEmail];
-            
-            if (user && user.password === password) {
-                console.log('Benutzer gefunden:', user);
-                return user;
-            }
-            
-            console.log('Benutzer nicht gefunden oder falsches Passwort');
-            return null;
+        // Warten bis AuthAPI verfügbar ist
+        async function waitForAuthAPI() {
+            return new Promise((resolve) => {
+                const checkAuthAPI = setInterval(() => {
+                    if (window.AuthAPI) {
+                        clearInterval(checkAuthAPI);
+                        resolve();
+                    }
+                }, 100);
+                
+                // Timeout nach 5 Sekunden
+                setTimeout(() => {
+                    clearInterval(checkAuthAPI);
+                    console.warn('⚠️ AuthAPI Timeout - Login läuft ohne AuthAPI');
+                    resolve();
+                }, 5000);
+            });
         }
+        
+        // Alte authenticateUser Funktion entfernt - jetzt wird Firebase verwendet
         
         function showForgotPassword() {
             alert('Passwort vergessen Funktion wird implementiert. Kontaktieren Sie den Administrator.');
