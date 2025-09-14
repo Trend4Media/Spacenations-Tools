@@ -7,6 +7,7 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better caching
@@ -15,8 +16,13 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Copy application code (excluding Node.js files)
 COPY . .
+
+# Remove any Node.js files that might have been copied
+RUN rm -f package.json package-lock.json yarn.lock && \
+    rm -rf node_modules/ build/ dist/ && \
+    find . -name "*.log" -delete
 
 # Create non-root user
 RUN useradd --create-home --shell /bin/bash app && chown -R app:app /app
