@@ -95,8 +95,33 @@ class AuthManager {
             }
         } catch (error) {
             console.error('❌ Fehler beim Laden der Benutzerdaten:', error);
+            
+            // Bei Berechtigungsfehlern: Fallback-Benutzerdaten erstellen
+            if (error.code === 'permission-denied' || error.message.includes('permissions')) {
+                console.warn('⚠️ Berechtigungsfehler - erstelle Fallback-Benutzerdaten');
+                return this.createFallbackUserData(uid);
+            }
+            
             throw error;
         }
+    }
+    
+    // Fallback-Benutzerdaten erstellen bei Berechtigungsfehlern
+    createFallbackUserData(uid) {
+        return {
+            uid: uid,
+            username: 'Unknown User',
+            email: 'unknown@example.com',
+            isActive: true,
+            role: 'user',
+            createdAt: new Date(),
+            lastLogin: new Date(),
+            activities: [{
+                icon: '⚠️',
+                text: 'Fallback-Benutzerdaten (Berechtigungsfehler)',
+                timestamp: new Date()
+            }]
+        };
     }
     
     // LastLogin aktualisieren
