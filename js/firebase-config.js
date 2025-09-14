@@ -35,9 +35,11 @@ function initializeFirebase() {
         // Check for browser extension conflicts
         const hasExtensions = checkBrowserExtensions();
         
-        // Firebase-Konfiguration
-        // TODO: Diese Werte sollten über den Server geladen werden
-        const firebaseConfig = {
+        // Firebase-Konfiguration laden
+        let firebaseConfig = null;
+        
+        // Fallback-Konfiguration (für Entwicklung)
+        const fallbackConfig = {
             apiKey: 'AIzaSyDr4-ap_EubUn0UdP7hkEpS2jkzLIVgvyc',
             authDomain: 'spacenations-tools.firebaseapp.com',
             projectId: 'spacenations-tools',
@@ -46,6 +48,20 @@ function initializeFirebase() {
             appId: '1:651338201276:web:89e7d9c19dbd2611d3f8b9',
             measurementId: 'G-SKWJWH2ERX'
         };
+        
+        // Versuche API-Konfiguration zu laden
+        try {
+            const response = await fetch('/api/firebase-config');
+            if (response.ok) {
+                firebaseConfig = await response.json();
+                console.log('✅ Firebase-Konfiguration von API geladen');
+            } else {
+                throw new Error('API nicht verfügbar');
+            }
+        } catch (error) {
+            console.warn('⚠️ API-Konfiguration nicht verfügbar, verwende Fallback:', error.message);
+            firebaseConfig = fallbackConfig;
+        }
 
         // Firebase initialisieren (nur einmal)
         if (!firebase.apps.length) {
