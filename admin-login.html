@@ -353,6 +353,12 @@
         // Check auth state on load
         document.addEventListener('DOMContentLoaded', async () => {
             try {
+                // Warten bis AuthAPI verfügbar ist
+                if (!window.AuthAPI) {
+                    console.warn('⚠️ AuthAPI nicht verfügbar, warte...');
+                    await waitForAuthAPI();
+                }
+                
                 await window.AuthAPI.waitForInit();
                 
                 // Check if user is already logged in
@@ -370,6 +376,25 @@
                 console.error('Auth init error:', error);
             }
         });
+        
+        // Warten bis AuthAPI verfügbar ist
+        async function waitForAuthAPI() {
+            return new Promise((resolve) => {
+                const checkAuthAPI = setInterval(() => {
+                    if (window.AuthAPI) {
+                        clearInterval(checkAuthAPI);
+                        resolve();
+                    }
+                }, 100);
+                
+                // Timeout nach 5 Sekunden
+                setTimeout(() => {
+                    clearInterval(checkAuthAPI);
+                    console.warn('⚠️ AuthAPI Timeout - Admin Login läuft ohne AuthAPI');
+                    resolve();
+                }, 5000);
+            });
+        }
 
         // Show current user info and options
         function showCurrentUserInfo(user, userData) {
@@ -489,6 +514,12 @@
             button.textContent = 'Anmeldung läuft...';
             
             try {
+                // Warten bis AuthAPI verfügbar ist
+                if (!window.AuthAPI) {
+                    console.warn('⚠️ AuthAPI nicht verfügbar, warte...');
+                    await waitForAuthAPI();
+                }
+                
                 // Wait for auth to be ready
                 await window.AuthAPI.waitForInit();
                 

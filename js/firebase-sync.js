@@ -22,6 +22,12 @@ class FirebaseSync {
     
     async init() {
         try {
+            // Warten bis AuthAPI verfügbar ist
+            if (!window.AuthAPI) {
+                console.warn('⚠️ AuthAPI nicht verfügbar, warte...');
+                await this.waitForAuthAPI();
+            }
+            
             await window.AuthAPI.waitForInit();
             
             console.log('🔄 FirebaseSync initialisiert für Seite:', this.currentPage);
@@ -37,6 +43,25 @@ class FirebaseSync {
         } catch (error) {
             console.error('❌ FirebaseSync-Initialisierung fehlgeschlagen:', error);
         }
+    }
+    
+    // Warten bis AuthAPI verfügbar ist
+    async waitForAuthAPI() {
+        return new Promise((resolve) => {
+            const checkAuthAPI = setInterval(() => {
+                if (window.AuthAPI) {
+                    clearInterval(checkAuthAPI);
+                    resolve();
+                }
+            }, 100);
+            
+            // Timeout nach 5 Sekunden
+            setTimeout(() => {
+                clearInterval(checkAuthAPI);
+                console.warn('⚠️ AuthAPI Timeout - FirebaseSync läuft ohne AuthAPI');
+                resolve();
+            }, 5000);
+        });
     }
     
     detectCurrentPage() {

@@ -4,7 +4,7 @@
  */
 
 // Logger-Integration
-const log = window.log || {
+const authLog = window.log || {
     auth: (msg, data) => console.log('👤 AUTH:', msg, data),
     error: (msg, err, data) => console.error('❌ ERROR:', msg, err, data),
     debug: (msg, data) => console.log('🔍 DEBUG:', msg, data)
@@ -23,7 +23,7 @@ class AuthManager {
     
     async init() {
         try {
-            log.auth('AuthManager-Initialisierung gestartet');
+            authLog.auth('AuthManager-Initialisierung gestartet');
             await window.FirebaseConfig.waitForReady();
             this.auth = window.FirebaseConfig.getAuth();
             this.db = window.FirebaseConfig.getDB();
@@ -32,13 +32,13 @@ class AuthManager {
             this.startAuthStateListener();
             this.initialized = true;
             
-            log.auth('AuthManager erfolgreich initialisiert', { 
+            authLog.auth('AuthManager erfolgreich initialisiert', { 
                 authAvailable: !!this.auth, 
                 dbAvailable: !!this.db 
             });
             
         } catch (error) {
-            log.error('AuthManager-Initialisierung fehlgeschlagen', error, { 
+            authLog.error('AuthManager-Initialisierung fehlgeschlagen', error, { 
                 firebaseConfigAvailable: !!window.FirebaseConfig 
             });
         }
