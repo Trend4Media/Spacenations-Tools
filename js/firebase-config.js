@@ -3,13 +3,20 @@
  * Diese Datei muss als ERSTE geladen werden!
  */
 
+// Logger-Integration
+const log = window.log || {
+    firebase: (msg, data) => console.log('🔥 FIREBASE:', msg, data),
+    error: (msg, err, data) => console.error('❌ ERROR:', msg, err, data),
+    debug: (msg, data) => console.log('🔍 DEBUG:', msg, data)
+};
+
 // Prüfen ob Firebase verfügbar ist
 function checkFirebaseAvailability() {
     if (typeof firebase === 'undefined') {
-        console.error('❌ Firebase ist nicht geladen!');
+        log.error('Firebase SDK nicht verfügbar');
         throw new Error('Firebase SDK nicht verfügbar');
     }
-    console.log('✅ Firebase SDK erfolgreich geladen');
+    log.firebase('Firebase SDK erfolgreich geladen');
 }
 
 // Check for browser extension conflicts
@@ -51,22 +58,24 @@ async function initializeFirebase() {
         
         // Versuche API-Konfiguration zu laden
         try {
+            log.firebase('Lade Firebase-Konfiguration von API...');
             const response = await fetch('/api/firebase-config');
             if (response.ok) {
                 firebaseConfig = await response.json();
-                console.log('✅ Firebase-Konfiguration von API geladen');
+                log.firebase('Firebase-Konfiguration von API geladen', { source: 'api' });
             } else {
                 throw new Error('API nicht verfügbar');
             }
         } catch (error) {
-            console.warn('⚠️ API-Konfiguration nicht verfügbar, verwende Fallback:', error.message);
+            log.firebase('API-Konfiguration nicht verfügbar, verwende Fallback', { error: error.message });
             firebaseConfig = fallbackConfig;
         }
 
         // Firebase initialisieren (nur einmal)
         if (!firebase.apps.length) {
+            log.firebase('Initialisiere Firebase App...');
             const app = firebase.initializeApp(firebaseConfig);
-            console.log('🔥 Firebase erfolgreich initialisiert');
+            log.firebase('Firebase erfolgreich initialisiert', { appId: firebaseConfig.appId });
             
             // Teste die Verbindung
             const db = firebase.firestore();

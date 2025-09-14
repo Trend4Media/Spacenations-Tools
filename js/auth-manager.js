@@ -3,6 +3,13 @@
  * Abhängigkeiten: firebase-config.js muss geladen sein
  */
 
+// Logger-Integration
+const log = window.log || {
+    auth: (msg, data) => console.log('👤 AUTH:', msg, data),
+    error: (msg, err, data) => console.error('❌ ERROR:', msg, err, data),
+    debug: (msg, data) => console.log('🔍 DEBUG:', msg, data)
+};
+
 class AuthManager {
     constructor() {
         this.currentUser = null;
@@ -16,6 +23,7 @@ class AuthManager {
     
     async init() {
         try {
+            log.auth('AuthManager-Initialisierung gestartet');
             await window.FirebaseConfig.waitForReady();
             this.auth = window.FirebaseConfig.getAuth();
             this.db = window.FirebaseConfig.getDB();
@@ -24,10 +32,15 @@ class AuthManager {
             this.startAuthStateListener();
             this.initialized = true;
             
-            console.log('👤 AuthManager initialisiert');
+            log.auth('AuthManager erfolgreich initialisiert', { 
+                authAvailable: !!this.auth, 
+                dbAvailable: !!this.db 
+            });
             
         } catch (error) {
-            console.error('❌ AuthManager-Initialisierung fehlgeschlagen:', error);
+            log.error('AuthManager-Initialisierung fehlgeschlagen', error, { 
+                firebaseConfigAvailable: !!window.FirebaseConfig 
+            });
         }
     }
     
