@@ -28,7 +28,7 @@ function checkBrowserExtensions() {
 }
 
 // Firebase initialisieren
-function initializeFirebase() {
+async function initializeFirebase() {
     try {
         checkFirebaseAvailability();
         
@@ -148,16 +148,20 @@ function initializeFirebase() {
 
 // Warten bis Firebase geladen ist
 function waitForFirebase() {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         // Prüfe alle 100ms ob Firebase verfügbar ist
-        const checkInterval = setInterval(() => {
+        const checkInterval = setInterval(async () => {
             if (typeof firebase !== 'undefined') {
                 clearInterval(checkInterval);
-                const success = initializeFirebase();
-                if (success) {
-                    resolve();
-                } else {
-                    reject(new Error('Firebase-Initialisierung fehlgeschlagen'));
+                try {
+                    const success = await initializeFirebase();
+                    if (success) {
+                        resolve();
+                    } else {
+                        reject(new Error('Firebase-Initialisierung fehlgeschlagen'));
+                    }
+                } catch (error) {
+                    reject(error);
                 }
             }
         }, 100);
