@@ -160,7 +160,7 @@ function waitForFirebase() {
     return new Promise(async (resolve, reject) => {
         // Prüfe alle 100ms ob Firebase verfügbar ist
         const checkInterval = setInterval(async () => {
-            if (typeof firebase !== 'undefined') {
+            if (typeof firebase !== 'undefined' && firebase.apps) {
                 clearInterval(checkInterval);
                 try {
                     const success = await initializeFirebase();
@@ -175,11 +175,11 @@ function waitForFirebase() {
             }
         }, 100);
         
-        // Timeout nach 3 Sekunden (weiter reduziert)
+        // Timeout nach 10 Sekunden (erhöht für langsame Verbindungen)
         setTimeout(() => {
             clearInterval(checkInterval);
             reject(new Error('Firebase-Loading-Timeout'));
-        }, 3000);
+        }, 10000);
     });
 }
 
@@ -187,7 +187,13 @@ function waitForFirebase() {
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         // Wait a bit to avoid browser extension conflicts
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Prüfe ob Firebase SDKs geladen sind
+        if (typeof firebase === 'undefined') {
+            console.warn('⚠️ Firebase SDKs nicht geladen - warte länger...');
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
         
         await waitForFirebase();
         console.log('🚀 Firebase bereit für andere Module');
