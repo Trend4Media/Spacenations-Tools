@@ -141,6 +141,70 @@ class AuthManager {
         }
     }
     
+    // Registrierungs-Funktion
+    async register(email, password, username) {
+        try {
+            console.log('📝 Registrierungs-Versuch für:', email, 'Username:', username);
+            
+            // Firebase Auth User erstellen
+            const userCredential = await this.auth.createUserWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+            
+            console.log('✅ Firebase User erstellt:', user.uid);
+            
+            // Benutzerdaten in Firestore speichern
+            await this.db.collection('users').doc(user.uid).set({
+                uid: user.uid,
+                email: email,
+                username: username,
+                createdAt: window.FirebaseConfig.getServerTimestamp(),
+                lastLogin: window.FirebaseConfig.getServerTimestamp(),
+                isActive: true,
+                role: 'user',
+                activities: [{
+                    icon: '👤',
+                    text: 'Account erstellt',
+                    timestamp: window.FirebaseConfig.getServerTimestamp()
+                }]
+            });
+            
+            console.log('✅ Benutzerdaten gespeichert für:', username);
+            
+            // Aktivität hinzufügen
+            this.addActivity('👤', 'Account erfolgreich erstellt');
+            
+            // Session aktivieren
+            if (window.SessionAPI) {
+                window.SessionAPI.setSessionActive(true);
+                window.SessionAPI.setLoginSuccess('Registrierung erfolgreich! Willkommen bei Spacenations Tools.');
+            }
+            
+            return { success: true, user: user };
+            
+        } catch (error) {
+            console.error('❌ Registrierungs-Fehler:', error);
+            
+            // Benutzerfreundliche Fehlermeldungen
+            let errorMessage = 'Registrierung fehlgeschlagen.';
+            switch (error.code) {
+                case 'auth/email-already-in-use':
+                    errorMessage = 'Diese E-Mail-Adresse wird bereits verwendet.';
+                    break;
+                case 'auth/invalid-email':
+                    errorMessage = 'Ungültige E-Mail-Adresse.';
+                    break;
+                case 'auth/weak-password':
+                    errorMessage = 'Passwort ist zu schwach. Verwenden Sie mindestens 6 Zeichen.';
+                    break;
+                case 'auth/operation-not-allowed':
+                    errorMessage = 'Registrierung ist derzeit nicht möglich.';
+                    break;
+            }
+            
+            return { success: false, error: errorMessage };
+        }
+    }
+    
     // Logout-Funktion
     async logout() {
         try {
@@ -266,6 +330,7 @@ window.authManager = new AuthManager();
 // Globale Funktionen für einfache Nutzung
 window.AuthAPI = {
     login: (email, password) => window.authManager.login(email, password),
+    register: (email, password, username) => window.authManager.register(email, password, username),
     logout: () => window.authManager.logout(),
     resetPassword: (email) => window.authManager.resetPassword(email),
     addActivity: (icon, text) => window.authManager.addActivity(icon, text),

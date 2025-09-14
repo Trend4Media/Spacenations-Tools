@@ -618,7 +618,7 @@
                 };
                 
                 // Register user
-                const result = await window.AuthAPI.register(email, password, userData);
+                const result = await window.AuthAPI.register(email, password, userData.displayName);
                 
                 if (!result.success) {
                     throw new Error(result.error || 'Registrierung fehlgeschlagen');
