@@ -5,7 +5,7 @@ python = "3.9"
 nixPkgs = ["python39", "python39Packages.pip"]
 
 [phases.install]
-cmds = ["pip install -r requirements.txt"]
+cmds = ["pip install -e ."]
 
 [phases.build]
 cmds = ["echo 'Python project - no build needed'"]

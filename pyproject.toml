@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spacenations-tools"
+version = "1.0.0"
+description = "Spacenations-Helferlein - Tools und Utilities für Space Nations"
+authors = [
+    {name = "Spacenations Team", email = "team@spacenations.com"}
+]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "requests==2.31.0",
+    "schedule==1.2.0",
+    "gunicorn==21.2.0"
+]
+
+[project.scripts]
+spacenations-tools = "app:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*"]
+exclude = ["build*", "dist*", "*.egg-info*", "node_modules*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.html", "*.css", "*.js", "*.json", "*.md"]
