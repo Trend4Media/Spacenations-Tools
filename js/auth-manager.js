@@ -272,6 +272,23 @@ class AuthManager {
     async login(email, password) {
         try {
             console.log('🔐 Login-Versuch für:', email);
+            
+            // Zuerst prüfen, ob der Benutzer existiert
+            try {
+                const methods = await this.auth.fetchSignInMethodsForEmail(email);
+                if (methods.length === 0) {
+                    console.log('❌ Benutzer existiert nicht:', email);
+                    return { 
+                        success: false, 
+                        error: 'Kein Account mit dieser E-Mail gefunden. Bitte registrieren Sie sich zuerst.' 
+                    };
+                }
+                console.log('✅ Benutzer existiert:', email, 'Methoden:', methods);
+            } catch (fetchError) {
+                console.warn('⚠️ Konnte Benutzer-Existenz nicht prüfen:', fetchError);
+                // Weiter mit Login-Versuch
+            }
+            
             const userCredential = await this.auth.signInWithEmailAndPassword(email, password);
             console.log('✅ Login erfolgreich');
             
@@ -292,7 +309,7 @@ class AuthManager {
             let errorMessage = 'Login fehlgeschlagen.';
             switch (error.code) {
                 case 'auth/user-not-found':
-                    errorMessage = 'Kein Account mit dieser E-Mail gefunden.';
+                    errorMessage = 'Kein Account mit dieser E-Mail gefunden. Bitte registrieren Sie sich zuerst.';
                     break;
                 case 'auth/wrong-password':
                     errorMessage = 'Falsches Passwort.';
@@ -300,8 +317,14 @@ class AuthManager {
                 case 'auth/invalid-email':
                     errorMessage = 'Ungültige E-Mail-Adresse.';
                     break;
+                case 'auth/user-disabled':
+                    errorMessage = 'Dieser Account wurde deaktiviert.';
+                    break;
                 case 'auth/too-many-requests':
-                    errorMessage = 'Zu viele Fehlversuche. Versuchen Sie es später erneut.';
+                    errorMessage = 'Zu viele Login-Versuche. Bitte warten Sie einen Moment.';
+                    break;
+                case 'auth/network-request-failed':
+                    errorMessage = 'Netzwerkfehler. Bitte überprüfen Sie Ihre Internetverbindung.';
                     break;
                 case 'auth/invalid-credential':
                     errorMessage = 'Ungültige Anmeldedaten.';
