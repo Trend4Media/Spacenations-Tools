@@ -273,6 +273,16 @@ class AuthManager {
         try {
             console.log('🔐 Login-Versuch für:', email);
             
+            // E-Mail-Format validieren
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                console.log('❌ Ungültige E-Mail-Adresse:', email);
+                return { 
+                    success: false, 
+                    error: 'Bitte geben Sie eine gültige E-Mail-Adresse ein (z.B. benutzer@beispiel.de).' 
+                };
+            }
+            
             // Zuerst prüfen, ob der Benutzer existiert
             try {
                 const methods = await this.auth.fetchSignInMethodsForEmail(email);
@@ -315,7 +325,7 @@ class AuthManager {
                     errorMessage = 'Falsches Passwort.';
                     break;
                 case 'auth/invalid-email':
-                    errorMessage = 'Ungültige E-Mail-Adresse.';
+                    errorMessage = 'Ungültige E-Mail-Adresse. Bitte geben Sie eine gültige E-Mail-Adresse ein (z.B. benutzer@beispiel.de).';
                     break;
                 case 'auth/user-disabled':
                     errorMessage = 'Dieser Account wurde deaktiviert.';

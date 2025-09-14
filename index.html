@@ -604,6 +604,40 @@
             color: var(--text-secondary);
         }
         
+        .login-message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-family: var(--font-primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .login-message.success {
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid var(--razer-green);
+            color: var(--razer-green);
+        }
+        
+        .login-message.error {
+            background: rgba(255, 59, 48, 0.1);
+            border: 2px solid #ff3b30;
+            color: #ff3b30;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
         .login-btn {
             padding: 12px 20px;
             border-radius: 8px;
@@ -850,10 +884,10 @@
             <h3 class="login-title">🎮 User Login</h3>
             <form class="login-form" id="login-form">
                 <input 
-                    type="text" 
+                    type="email" 
                     class="login-input" 
                     id="login-email" 
-                    placeholder="Benutzername oder E-Mail" 
+                    placeholder="E-Mail-Adresse (z.B. benutzer@beispiel.de)" 
                     required
                 >
                 <input 
@@ -997,6 +1031,13 @@
                 return;
             }
             
+            // E-Mail-Format validieren
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Bitte geben Sie eine gültige E-Mail-Adresse ein (z.B. benutzer@beispiel.de).');
+                return;
+            }
+            
             // Warten bis AuthAPI verfügbar ist
             if (!window.AuthAPI) {
                 console.warn('⚠️ AuthAPI nicht verfügbar, warte...');
@@ -1010,16 +1051,41 @@
                 if (result.success) {
                     // Erfolgreiche Anmeldung
                     console.log('Login successful:', { email, user: result.user });
-                    alert(`Anmeldung erfolgreich! Willkommen zurück!`);
+                    
+                    // Erfolgsmeldung anzeigen
+                    const loginForm = document.getElementById('login-form');
+                    const existingMessage = loginForm.querySelector('.login-message');
+                    if (existingMessage) existingMessage.remove();
+                    
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'login-message success';
+                    successMessage.innerHTML = '✅ Anmeldung erfolgreich! Weiterleitung...';
+                    loginForm.appendChild(successMessage);
                     
                     // Weiterleitung zum User Dashboard
                     setTimeout(() => {
                         window.location.href = 'user-dashboard.html';
-                    }, 1000);
+                    }, 1500);
                 } else {
                     // Fehlerhafte Anmeldung
-                    alert(result.error || 'Ungültige E-Mail-Adresse oder Passwort. Bitte versuchen Sie es erneut.');
                     console.log('Login failed:', { email, error: result.error });
+                    
+                    // Fehlermeldung anzeigen
+                    const loginForm = document.getElementById('login-form');
+                    const existingMessage = loginForm.querySelector('.login-message');
+                    if (existingMessage) existingMessage.remove();
+                    
+                    const errorMessage = document.createElement('div');
+                    errorMessage.className = 'login-message error';
+                    errorMessage.innerHTML = `❌ ${result.error || 'Ungültige E-Mail-Adresse oder Passwort. Bitte versuchen Sie es erneut.'}`;
+                    loginForm.appendChild(errorMessage);
+                    
+                    // Fehlermeldung nach 5 Sekunden entfernen
+                    setTimeout(() => {
+                        if (errorMessage.parentNode) {
+                            errorMessage.remove();
+                        }
+                    }, 5000);
                 }
             } catch (error) {
                 console.error('Login error:', error);
