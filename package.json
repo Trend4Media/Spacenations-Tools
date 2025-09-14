@@ -5,8 +5,9 @@
   "main": "index.html",
   "scripts": {
     "dev": "python -m http.server 8000",
-    "build": "node build/build.js",
-    "build:prod": "NODE_ENV=production node build/build.js",
+    "start": "python -m http.server $PORT",
+    "build": "echo 'Static site - no build needed'",
+    "build:prod": "echo 'Static site - no build needed'",
     "clean": "rm -rf dist/",
     "lint": "eslint js/ --ext .js",
     "lint:fix": "eslint js/ --ext .js --fix",

@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["python311"]
+
+[phases.install]
+cmds = ["echo 'No dependencies to install for static site'"]
+
+[phases.build]
+cmds = ["echo 'Static site - no build needed'"]
+
+[start]
+cmd = "python -m http.server $PORT"
