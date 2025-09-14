@@ -1,3 +1,6 @@
+[providers]
+python = "3.9"
+
 [phases.setup]
 nixPkgs = ["python39", "python39Packages.pip"]
 
@@ -5,7 +8,7 @@ nixPkgs = ["python39", "python39Packages.pip"]
 cmds = ["pip install -r requirements.txt"]
 
 [phases.build]
-cmds = ["echo 'Build phase completed'"]
+cmds = ["echo 'Python project - no build needed'"]
 
 [start]
 cmd = "python app.py"

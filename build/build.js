@@ -12,7 +12,7 @@ const { execSync } = require('child_process');
 // Konfiguration
 const config = {
     rootDir: path.join(__dirname, '..'),
-    srcDir: path.join(__dirname, '..', 'main'),
+    srcDir: path.join(__dirname, '..'), // Verwende Root-Verzeichnis statt main/
     distDir: path.join(__dirname, '..', 'dist'),
     isProduction: process.env.NODE_ENV === 'production'
 };
@@ -50,10 +50,10 @@ const build = () => {
         }
         ensureDir(config.distDir);
         
-        // HTML-Dateien aus main/ kopieren und optimieren
+        // HTML-Dateien aus Root kopieren und optimieren
         log('HTML-Dateien werden verarbeitet...');
         const htmlFiles = fs.readdirSync(config.srcDir)
-            .filter(file => file.endsWith('.html'));
+            .filter(file => file.endsWith('.html') && !file.startsWith('.'));
         
         htmlFiles.forEach(file => {
             const srcPath = path.join(config.srcDir, file);
@@ -79,39 +79,45 @@ const build = () => {
             copyFile(rootIndex, path.join(config.distDir, 'index.html'));
         }
         
-        // CSS-Dateien aus main/ kopieren
-        log('CSS-Dateien werden kopiert...');
-        ensureDir(path.join(config.distDir, 'css'));
-        const cssFiles = fs.readdirSync(path.join(config.srcDir, 'css'));
-        cssFiles.forEach(file => {
-            copyFile(
-                path.join(config.srcDir, 'css', file),
-                path.join(config.distDir, 'css', file)
-            );
-        });
+        // CSS-Dateien kopieren (falls vorhanden)
+        const cssDir = path.join(config.srcDir, 'css');
+        if (fs.existsSync(cssDir)) {
+            log('CSS-Dateien werden kopiert...');
+            ensureDir(path.join(config.distDir, 'css'));
+            const cssFiles = fs.readdirSync(cssDir);
+            cssFiles.forEach(file => {
+                copyFile(
+                    path.join(cssDir, file),
+                    path.join(config.distDir, 'css', file)
+                );
+            });
+        }
         
-        // JavaScript-Dateien aus main/ kopieren
-        log('JavaScript-Dateien werden kopiert...');
-        ensureDir(path.join(config.distDir, 'js'));
-        const jsFiles = fs.readdirSync(path.join(config.srcDir, 'js'));
-        jsFiles.forEach(file => {
-            let srcPath = path.join(config.srcDir, 'js', file);
-            let destPath = path.join(config.distDir, 'js', file);
-            
-            let content = fs.readFileSync(srcPath, 'utf8');
-            
-            // Für Produktion: Erweiterte Console-Statement-Entfernung
-            if (config.isProduction) {
-                // Entferne Debug-Kommentare und console.log (aber nicht console.error/warn)
-                content = content.replace(/console\.log\([^)]*\);?\s*\n?/g, '');
-                content = content.replace(/\/\/ Debug.*\n/g, '');
-                content = content.replace(/\/\*\* Debug[\s\S]*?\*\//g, '');
-            }
-            
-            fs.writeFileSync(destPath, content);
-        });
+        // JavaScript-Dateien kopieren (falls vorhanden)
+        const jsDir = path.join(config.srcDir, 'js');
+        if (fs.existsSync(jsDir)) {
+            log('JavaScript-Dateien werden kopiert...');
+            ensureDir(path.join(config.distDir, 'js'));
+            const jsFiles = fs.readdirSync(jsDir);
+            jsFiles.forEach(file => {
+                let srcPath = path.join(jsDir, file);
+                let destPath = path.join(config.distDir, 'js', file);
+                
+                let content = fs.readFileSync(srcPath, 'utf8');
+                
+                // Für Produktion: Erweiterte Console-Statement-Entfernung
+                if (config.isProduction) {
+                    // Entferne Debug-Kommentare und console.log (aber nicht console.error/warn)
+                    content = content.replace(/console\.log\([^)]*\);?\s*\n?/g, '');
+                    content = content.replace(/\/\/ Debug.*\n/g, '');
+                    content = content.replace(/\/\*\* Debug[\s\S]*?\*\//g, '');
+                }
+                
+                fs.writeFileSync(destPath, content);
+            });
+        }
 
-        // Assets aus main/ kopieren (falls vorhanden)
+        // Assets kopieren (falls vorhanden)
         const assetsDir = path.join(config.srcDir, 'assets');
         if (fs.existsSync(assetsDir)) {
             log('Assets werden kopiert...');
