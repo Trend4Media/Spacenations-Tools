@@ -1,6 +1,10 @@
 # 🚀 Spacenations-Tools
 
+**🌐 Live Application:** [https://your-app.railway.app](https://your-app.railway.app)
+
 Ein umfassendes **Tool-System** für Space Nations Spieler mit Allianz-Management, Proxima-System, Kampf-Tools und erweiterten Analytics.
+
+> **🚀 Deployed on Railway** - Vollständige Backend-Infrastruktur mit Python-Server, Firebase-Integration und automatischem Deployment.
 
 ## 🌟 Hauptfunktionen
 
@@ -143,45 +147,63 @@ Das System bietet **4 verschiedene Kampf-Tools** für strategische Planung:
 - **Mitglieder bestätigen**: Verwaltung neuer Mitglieder
 - **Berechtigungen verwalten**: Admin-Funktionen
 
+## 🚀 Live Deployment
+
+### **Railway-Hosting**
+- **URL:** [https://your-app.railway.app](https://your-app.railway.app)
+- **Status:** ✅ Online
+- **Backend:** Python 3.9 + Firebase
+- **Deployment:** Automatisch bei Code-Push
+- **Monitoring:** Health Checks + Logs
+
+### **GitHub Pages**
+- **Status:** ❌ Deaktiviert
+- **Grund:** Railway bietet vollständige Backend-Infrastruktur
+- **Migration:** Abgeschlossen
+
 ## 🚀 Installation & Setup
 
 ### **Voraussetzungen**
-- Node.js (v16 oder höher)
-- NPM oder Yarn
+- Python 3.9+ (für lokale Entwicklung)
 - Firebase-Projekt
-- Python 3.8+ (für Proxima-System)
+- Railway Account (für Deployment)
 
-### **Installation**
+### **Lokale Installation**
 ```bash
 # Repository klonen
 git clone https://github.com/Trend4Media/Spacenations-Tools.git
 cd Spacenations-Tools
 
-# Abhängigkeiten installieren
-npm install
+# Python-Dependencies installieren
+pip install -r requirements.txt
 
 # Firebase-Konfiguration einrichten
-cp js/firebase-config.example.js js/firebase-config.js
-# Firebase-Daten in js/firebase-config.js eintragen
+# Kopieren Sie Ihre Firebase-Daten in js/firebase-config.js
 
-# Proxima-System einrichten
-python3 -m pip install -r requirements.txt
-python3 setup_proxima.py
+# Lokal starten
+python app.py
+```
+
+### **Railway-Deployment**
+```bash
+# Automatisches Deployment bei Push zum main Branch
+git add .
+git commit -m "feat: neue Funktion"
+git push origin main
+
+# Railway deployt automatisch
 ```
 
 ### **Entwicklung**
 ```bash
-# Entwicklungsserver starten
-npm run dev
+# Python-Server starten
+python app.py
 
-# Build erstellen
-npm run build
+# Health Check testen
+curl http://localhost:8000/api/health
 
-# Tests ausführen
-npm run test
-
-# Linting
-npm run lint
+# Anwendung öffnen
+open http://localhost:8000
 ```
 
 ## 📁 Projekt-Struktur
