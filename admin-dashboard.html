@@ -647,6 +647,127 @@
             text-shadow: var(--glow-green);
         }
         
+        /* Analytics Dashboard Styles */
+        .analytics-dashboard {
+            width: 100%;
+        }
+        
+        .analytics-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--razer-gray);
+        }
+        
+        .time-range-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .time-range-selector label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .time-range-selector select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 2px solid var(--razer-gray);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: var(--font-primary);
+        }
+        
+        .analytics-overview {
+            margin-bottom: 30px;
+        }
+        
+        .analytics-overview h3 {
+            color: var(--razer-green);
+            margin-bottom: 15px;
+            font-family: var(--font-gaming);
+        }
+        
+        .analytics-section {
+            margin-bottom: 30px;
+        }
+        
+        .analytics-section h3 {
+            color: var(--razer-green);
+            margin-bottom: 15px;
+            font-family: var(--font-gaming);
+        }
+        
+        .analytics-table {
+            overflow-x: auto;
+            width: 100%;
+        }
+        
+        .analytics-table table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
+        }
+        
+        .analytics-table th,
+        .analytics-table td {
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 12px 8px;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        
+        .analytics-table th {
+            color: var(--razer-green);
+            font-weight: 700;
+            background: var(--bg-secondary);
+            position: sticky;
+            top: 0;
+            font-family: var(--font-gaming);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--razer-green);
+        }
+        
+        .analytics-table tr:hover {
+            background: rgba(0, 255, 136, 0.05);
+        }
+        
+        .time-chart {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--razer-gray);
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .error h3 {
+            margin-top: 0;
+            color: #ef4444;
+        }
+        
+        .error p {
+            margin: 10px 0;
+        }
+        
         @media (max-width: 768px) {
             footer {
                 padding: 15px 10px;
@@ -741,6 +862,7 @@
                     <div class="tabs">
                         <div class="tab active" data-tab="users">👥 Benutzer</div>
                         <div class="tab" data-tab="alliances">🤝 Allianzen</div>
+                        <div class="tab" data-tab="analytics">📊 Statistiken</div>
                         <div class="tab" data-tab="system">⚙️ System</div>
                         <div class="tab" data-tab="proxima">🌌 ProximaDB</div>
                     </div>
@@ -829,6 +951,21 @@
                                     <tr><td colspan="8" style="text-align:center; color: var(--text-secondary)">Laden...</td></tr>
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+
+                    <!-- Analytics Tab -->
+                    <div class="tab-content" id="analytics-tab">
+                        <div class="header">
+                            <h3 class="title">📊 Plattform-Statistiken</h3>
+                            <div class="controls">
+                                <button class="btn primary" id="refresh-analytics-main">🔄 Aktualisieren</button>
+                                <button class="btn" id="export-analytics-main">📊 Export</button>
+                            </div>
+                        </div>
+                        
+                        <div id="analytics-content">
+                            <div class="hint">Lade Analytics-Daten...</div>
                         </div>
                     </div>
 
@@ -983,6 +1120,8 @@
     <script src="js/auth-manager.js"></script>
     <script src="js/firebase-sync.js"></script>
     <script src="js/admin-auth.js"></script>
+    <script src="js/analytics-tracker.js"></script>
+    <script src="js/analytics-dashboard.js"></script>
     <script src="js/admin-dashboard-enhanced.js"></script>
     <script src="js/global-footer-loader.js"></script>
 </body>

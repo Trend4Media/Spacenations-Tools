@@ -78,6 +78,9 @@
             case 'alliances':
                 loadAlliances();
                 break;
+            case 'analytics':
+                loadAnalytics();
+                break;
             case 'system':
                 loadSystemStatus();
                 break;
@@ -368,6 +371,30 @@
         } catch (error) {
             console.error('Fehler beim Laden der Aktivitäten:', error);
             document.getElementById('recent-activities').innerHTML = '<div style="color: #ef4444;">Fehler beim Laden der Aktivitäten</div>';
+        }
+    }
+
+    // Analytics integration
+    async function loadAnalytics() {
+        try {
+            if (window.AnalyticsDashboardAPI) {
+                await window.AnalyticsDashboardAPI.initializeDashboard('analytics-content');
+            } else {
+                document.getElementById('analytics-content').innerHTML = `
+                    <div class="error">
+                        <h3>❌ Analytics-Modul nicht verfügbar</h3>
+                        <p>Das Analytics-Modul konnte nicht geladen werden.</p>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('Fehler beim Laden der Analytics:', error);
+            document.getElementById('analytics-content').innerHTML = `
+                <div class="error">
+                    <h3>❌ Fehler beim Laden der Analytics</h3>
+                    <p>${error.message}</p>
+                </div>
+            `;
         }
     }
 
@@ -1125,6 +1152,19 @@
         document.getElementById('run-system-tests').addEventListener('click', () => {
             loadSystemStatus();
             alert('System Tests ausgeführt!');
+        });
+
+        // Analytics actions
+        document.getElementById('refresh-analytics-main').addEventListener('click', () => {
+            loadAnalytics();
+        });
+
+        document.getElementById('export-analytics-main').addEventListener('click', () => {
+            if (window.AnalyticsDashboardAPI) {
+                window.AnalyticsDashboardAPI.exportAnalyticsData();
+            } else {
+                alert('Analytics-Modul nicht verfügbar');
+            }
         });
 
         // ProximaDB actions
