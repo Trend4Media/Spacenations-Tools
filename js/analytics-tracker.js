@@ -341,5 +341,18 @@ window.AnalyticsAPI = {
     trackEvent: (type, data) => window.analyticsTracker.trackEvent(type, data),
     trackPageView: (path) => window.analyticsTracker.trackPageView(path),
     getStatus: () => window.analyticsTracker.getStatus(),
-    getLocalData: () => window.analyticsTracker.getLocalAnalytics()
+    getLocalData: () => window.analyticsTracker.getLocalAnalytics(),
+    getAnalyticsData: (timeRange = '7d') => {
+        // Mock-Funktion für Analytics-Dashboard
+        return Promise.resolve({
+            pageViews: [],
+            events: [],
+            sessions: [],
+            summary: {
+                totalPageViews: 0,
+                totalEvents: 0,
+                totalSessions: 0
+            }
+        });
+    }
 };
