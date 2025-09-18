@@ -19,7 +19,10 @@ class AnalyticsTracker {
         try {
             // Warten bis Firebase verfügbar ist
             await this.waitForFirebase();
-            this.firebaseReady = true;
+            
+            // Teste Firebase-Berechtigung
+            await this.testFirebasePermissions();
+            
             this.isInitialized = true;
             
             console.log('📊 Analytics Tracker initialisiert');
@@ -32,7 +35,15 @@ class AnalyticsTracker {
             
         } catch (error) {
             console.error('❌ Analytics Tracker Initialisierung fehlgeschlagen:', error);
-            this.isInitialized = false;
+            
+            // Fallback: Lokaler Modus
+            this.firebaseReady = false;
+            this.isInitialized = true;
+            console.warn('⚠️ Analytics läuft im lokalen Modus');
+            
+            // Erste Seitenaufruf erfassen (lokal)
+            this.trackPageView();
+            this.setupEventListeners();
         }
     }
     
@@ -60,6 +71,40 @@ class AnalyticsTracker {
     
     generateSessionId() {
         return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+    
+    // Teste Firebase-Berechtigungen
+    async testFirebasePermissions() {
+        try {
+            const db = window.FirebaseConfig.getDB();
+            
+            // Teste Schreibberechtigung mit einem Test-Event
+            await db.collection('analytics_events').add({
+                type: 'permission_test',
+                sessionId: this.sessionId,
+                timestamp: window.FirebaseConfig.getServerTimestamp(),
+                test: true
+            });
+            
+            // Test erfolgreich - lösche Test-Event
+            const testQuery = await db.collection('analytics_events')
+                .where('sessionId', '==', this.sessionId)
+                .where('type', '==', 'permission_test')
+                .limit(1)
+                .get();
+            
+            if (!testQuery.empty) {
+                await testQuery.docs[0].ref.delete();
+            }
+            
+            this.firebaseReady = true;
+            console.log('✅ Firebase Analytics-Berechtigungen OK');
+            
+        } catch (error) {
+            console.warn('⚠️ Firebase Analytics-Berechtigungen fehlen:', error);
+            this.firebaseReady = false;
+            throw error;
+        }
     }
     
     // Seitenaufruf erfassen
@@ -283,6 +328,9 @@ class AnalyticsTracker {
             
             if (this.firebaseReady) {
                 this.saveEvent(event);
+            } else {
+                // Fallback: Event nur lokal speichern
+                this.saveEventLocally(event);
             }
             
             console.log('📊 Event erfasst:', eventName, eventValue);
