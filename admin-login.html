@@ -316,19 +316,35 @@
         // Super-Admin-Verifikation (mit Fallback)
         async function verifySuperAdmin(user) {
             try {
-                // Verwende die neue checkSuperAdminStatus Methode
-                const isSuperAdmin = await window.AuthAPI.checkSuperAdminStatus(user);
+                console.log('🔍 Prüfe Super-Admin-Status für:', user.email);
                 
-                if (isSuperAdmin) {
+                // Hardcoded Admin-Liste (Fallback bei Firestore-Problemen)
+                const adminEmails = [
+                    't.o@trend4media.de',
+                    'info@trend4media.de', 
+                    'admin@spacenations.eu'
+                ];
+                
+                // Prüfe hardcoded Liste zuerst
+                if (adminEmails.includes(user.email.toLowerCase())) {
+                    console.log('✅ Super-Admin-Status bestätigt (Hardcoded-Liste)');
                     return true;
-                } else {
-                    // Nicht berechtigt
-                    await window.AuthAPI.logout();
-                    throw new Error('Zugriff verweigert. Nur für Super-Admins.');
+                }
+                
+                // Versuche Firestore-Check (optional)
+                try {
+                    const isSuperAdmin = await window.AuthAPI.checkSuperAdminStatus(user);
+                    console.log('✅ Super-Admin-Status bestätigt (Firestore):', isSuperAdmin);
+                    return isSuperAdmin;
+                } catch (firestoreError) {
+                    console.warn('⚠️ Firestore-Check fehlgeschlagen, verwende Fallback:', firestoreError.message);
+                    // Fallback bereits oben geprüft
+                    return false;
                 }
                 
             } catch (error) {
-                throw error;
+                console.error('❌ Super-Admin-Verifikation fehlgeschlagen:', error);
+                throw new Error('Berechtigung konnte nicht überprüft werden.');
             }
         }
         
@@ -374,7 +390,12 @@
                 showSuccess('Anmeldung erfolgreich. Prüfe Berechtigung...');
                 
                 // Super-Admin-Status prüfen (mit Fallback)
-                await verifySuperAdmin(result.user);
+                const isAuthorized = await verifySuperAdmin(result.user);
+                
+                if (!isAuthorized) {
+                    // Nicht berechtigt - ABER NICHT AUSLOGGEN
+                    throw new Error('Zugriff verweigert. Nur für Super-Admins.');
+                }
                 
                 // Erfolgreich - Weiterleitung
                 updateStatus('Berechtigung bestätigt. Weiterleitung...', 'success');
