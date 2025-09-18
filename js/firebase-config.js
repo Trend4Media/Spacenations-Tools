@@ -250,6 +250,28 @@ function handleFirebaseInitError(error) {
         return;
     }
     
+    // Prüfe ob Firebase SDK tatsächlich verfügbar ist
+    if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0) {
+        console.log('🔧 Firebase SDK verfügbar, aber Services nicht initialisiert - versuche erneut');
+        try {
+            // Versuche Firebase-Services direkt zu verwenden
+            const app = firebase.app();
+            window.firebaseServices = {
+                app: app,
+                auth: firebase.auth(),
+                db: firebase.firestore(),
+                serverTimestamp: firebase.firestore.FieldValue.serverTimestamp,
+                initialized: true,
+                offline: false
+            };
+            console.log('🔧 Firebase-Services erfolgreich wiederhergestellt');
+            document.dispatchEvent(new CustomEvent('firebaseReady'));
+            return; // Erfolgreiche Wiederherstellung, kein Fallback nötig
+        } catch (retryError) {
+            console.warn('🔧 Firebase-Wiederherstellung fehlgeschlagen, verwende Fallback:', retryError);
+        }
+    }
+    
     // Stelle sicher, dass firebaseServices existiert
     if (!window.firebaseServices) {
         console.log('🔧 Erstelle firebaseServices-Objekt');
@@ -261,6 +283,7 @@ function handleFirebaseInitError(error) {
         auth: {
             signInWithEmailAndPassword: () => Promise.reject(new Error('Firebase nicht verfügbar')),
             signOut: () => Promise.resolve(),
+            fetchSignInMethodsForEmail: () => Promise.resolve([]), // Mock für fetchSignInMethodsForEmail
             onAuthStateChanged: (callback) => {
                 // NICHT automatisch ausloggen - lasse bestehenden Auth-Status
                 console.log('⚠️ Firebase Auth nicht verfügbar, behalte bestehenden Auth-Status');

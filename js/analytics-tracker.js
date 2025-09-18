@@ -78,6 +78,13 @@ class AnalyticsTracker {
         try {
             const db = window.FirebaseConfig.getDB();
             
+            // Prüfe ob es echte Firebase-Services sind
+            if (window.FirebaseConfig.isOffline()) {
+                console.warn('⚠️ Firebase im Offline-Modus - Analytics deaktiviert');
+                this.firebaseReady = false;
+                return;
+            }
+            
             // Teste Schreibberechtigung mit einem Test-Event
             await db.collection('analytics_events').add({
                 type: 'permission_test',
