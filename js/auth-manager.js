@@ -307,28 +307,36 @@ class AuthManager {
             console.log('🔐 Login-Versuch für:', input);
             
             // Eingabe auflösen (Benutzername oder E-Mail)
-            const email = await this.resolveUsernameToEmail(input);
+            let email = await this.resolveUsernameToEmail(input);
+            
+            // Wenn kein Benutzer in Firestore gefunden wurde, prüfe ob es bereits eine E-Mail ist
             if (!email) {
-                console.log('❌ Benutzer nicht gefunden:', input);
-                return { 
-                    success: false, 
-                    error: 'Benutzername oder E-Mail-Adresse nicht gefunden. Bitte überprüfen Sie Ihre Eingabe.' 
-                };
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (emailRegex.test(input)) {
+                    email = input;
+                    console.log('📧 Verwende direkte E-Mail für Login:', email);
+                } else {
+                    console.log('❌ Benutzer nicht gefunden:', input);
+                    return { 
+                        success: false, 
+                        error: 'Benutzername oder E-Mail-Adresse nicht gefunden. Bitte überprüfen Sie Ihre Eingabe oder erstellen Sie einen Account.' 
+                    };
+                }
+            } else {
+                console.log('📧 Verwende E-Mail für Login:', email);
             }
             
-            console.log('📧 Verwende E-Mail für Login:', email);
-            
-            // Zuerst prüfen, ob der Benutzer existiert
+            // Zuerst prüfen, ob der Benutzer in Firebase Auth existiert
             try {
                 const methods = await this.auth.fetchSignInMethodsForEmail(email);
                 if (methods.length === 0) {
-                    console.log('❌ Benutzer existiert nicht:', email);
+                    console.log('❌ Benutzer existiert nicht in Firebase Auth:', email);
                     return { 
                         success: false, 
-                        error: 'Kein Account mit dieser E-Mail gefunden. Bitte registrieren Sie sich zuerst.' 
+                        error: 'Kein Account mit dieser E-Mail gefunden. Bitte registrieren Sie sich zuerst oder verwenden Sie das Admin-Erstellungstool.' 
                     };
                 }
-                console.log('✅ Benutzer existiert:', email, 'Methoden:', methods);
+                console.log('✅ Benutzer existiert in Firebase Auth:', email, 'Methoden:', methods);
             } catch (fetchError) {
                 console.warn('⚠️ Konnte Benutzer-Existenz nicht prüfen:', fetchError);
                 // Weiter mit Login-Versuch

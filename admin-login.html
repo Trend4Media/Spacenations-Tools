@@ -548,7 +548,22 @@
                 
             } catch (error) {
                 console.error('Login error:', error);
-                showError(error.message || 'Ein Fehler ist aufgetreten');
+                let errorMessage = error.message || 'Ein Fehler ist aufgetreten';
+                
+                // Spezielle Behandlung für "Benutzer nicht gefunden" Fehler
+                if (errorMessage.includes('Kein Account mit dieser E-Mail gefunden') || 
+                    errorMessage.includes('nicht gefunden')) {
+                    errorMessage += '<br><br><a href="create-admin-user.html" style="color: var(--primary); text-decoration: underline;">→ Admin-Benutzer erstellen</a>';
+                    
+                    // HTML in Error-Element setzen
+                    const errorEl = document.getElementById('msg-error');
+                    errorEl.innerHTML = errorMessage;
+                    errorEl.style.display = 'block';
+                    document.getElementById('msg-success').style.display = 'none';
+                    return; // Frühes Return, um doppelte Anzeige zu vermeiden
+                }
+                
+                showError(errorMessage);
             } finally {
                 // Re-enable button
                 button.disabled = false;
