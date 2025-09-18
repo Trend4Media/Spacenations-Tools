@@ -108,10 +108,28 @@ class FirebaseSync {
 
         if (this.currentPage === 'admin-dashboard') {
             if (!isLoggedIn) return; // oben bereits handled
-            if (pageConfig.requiresSuperAdmin && userData?.isSuperAdmin !== true) {
-                console.log('🚫 Kein Super-Admin - Weiterleitung zum Admin-Login');
+            
+            // Verbesserte Super-Admin-Prüfung mit Fallback
+            const isSuperAdmin = userData?.isSuperAdmin === true || 
+                                userData?.systemRole === 'superadmin' ||
+                                userData?.role === 'superadmin' ||
+                                (user?.email === 't.o@trend4media.de') || // Hardcoded Fallback
+                                (user?.email === 'info@trend4media.de');
+            
+            if (pageConfig.requiresSuperAdmin && !isSuperAdmin) {
+                console.log('🚫 Kein Super-Admin - Weiterleitung zum Admin-Login', {
+                    email: user?.email,
+                    isSuperAdmin: userData?.isSuperAdmin,
+                    systemRole: userData?.systemRole,
+                    fallbackMatch: user?.email === 't.o@trend4media.de'
+                });
                 this.redirectAfterDelay('admin-login.html', 1000);
                 return;
+            } else if (isSuperAdmin) {
+                console.log('✅ Super-Admin-Zugriff bestätigt für Dashboard', {
+                    email: user?.email,
+                    method: userData?.isSuperAdmin === true ? 'firestore' : 'fallback'
+                });
             }
         }
         
