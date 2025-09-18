@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - Spacenations Tools (FIXED)</title>
+    <title>Admin Login - Spacenations Tools</title>
     <style>
         :root {
             --primary: #00FF88;
@@ -179,17 +179,6 @@
             transform: translateX(-4px);
         }
         
-        .status-info {
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 20px;
-            font-size: 12px;
-            color: #3b82f6;
-            text-align: center;
-        }
-        
         .tools-links {
             margin-top: 24px;
             text-align: center;
@@ -212,6 +201,32 @@
             border-color: var(--primary);
             background: rgba(0, 255, 136, 0.05);
         }
+        
+        .status-info {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 12px;
+            color: #3b82f6;
+            text-align: center;
+        }
+        
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 32px 24px;
+            }
+            
+            .login-title {
+                font-size: 24px;
+            }
+            
+            .back-link {
+                position: static;
+                margin-bottom: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -225,7 +240,7 @@
             <div class="login-header">
                 <div class="login-icon">🔐</div>
                 <h1 class="login-title">Admin Login</h1>
-                <p class="login-subtitle">FIXED - Firestore-unabhängig</p>
+                <p class="login-subtitle">Restricted Access</p>
             </div>
             
             <div id="status-info" class="status-info">
@@ -234,12 +249,12 @@
             
             <form id="admin-login-form">
                 <div class="form-group">
-                    <label class="form-label" for="email">E-Mail</label>
+                    <label class="form-label" for="email">E-Mail oder Benutzername</label>
                     <input 
-                        type="email" 
+                        type="text" 
                         id="email" 
                         class="form-input" 
-                        placeholder="E-Mail-Adresse" 
+                        placeholder="E-Mail-Adresse oder Benutzername" 
                         required
                         autocomplete="username"
                         value="t.o@trend4media.de"
@@ -267,9 +282,9 @@
             <div id="msg-success" class="message success"></div>
             
             <div class="tools-links">
-                <a href="debug-specific-user.html">🔍 Debug User</a>
-                <a href="test-complete-system.html">🧪 System-Test</a>
-                <a href="diagnose-database-access.html">🔧 Diagnose</a>
+                <a href="sync-firestore-to-auth.html">🔄 Firestore Sync</a>
+                <a href="create-admin-user.html">👤 Admin erstellen</a>
+                <a href="diagnose-database-access.html">🔍 Diagnose</a>
             </div>
         </div>
     </div>
@@ -279,9 +294,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-    <!-- FIXED System-Dateien -->
-    <script src="js/firebase-config.js"></script>
-    <script src="js/auth-manager-fixed.js"></script>
+    <!-- Neue Firebase-Konfiguration -->
+    <script src="js/firebase-config-new.js"></script>
+    <script src="js/auth-manager-new.js"></script>
     
     <script>
         // Status-Updates
@@ -313,19 +328,22 @@
             document.getElementById('msg-success').style.display = 'none';
         }
         
-        // Super-Admin-Verifikation (mit Fallback)
+        // Super-Admin-Verifikation
         async function verifySuperAdmin(user) {
             try {
-                // Verwende die neue checkSuperAdminStatus Methode
-                const isSuperAdmin = await window.AuthAPI.checkSuperAdminStatus(user);
+                const db = window.FirebaseConfig.getDB();
+                const doc = await db.collection('users').doc(user.uid).get();
                 
-                if (isSuperAdmin) {
-                    return true;
-                } else {
-                    // Nicht berechtigt
-                    await window.AuthAPI.logout();
-                    throw new Error('Zugriff verweigert. Nur für Super-Admins.');
+                if (doc.exists) {
+                    const data = doc.data();
+                    if (data.isSuperAdmin === true) {
+                        return true;
+                    }
                 }
+                
+                // Nicht berechtigt
+                await window.AuthAPI.logout();
+                throw new Error('Zugriff verweigert. Nur für Super-Admins.');
                 
             } catch (error) {
                 throw error;
@@ -353,27 +371,27 @@
                     throw new Error('AuthAPI konnte nicht initialisiert werden');
                 }
                 
-                updateStatus('Firebase bereit - Anmeldung läuft...', 'info');
-                
                 // Form-Daten holen
-                const email = document.getElementById('email').value.trim();
+                const input = document.getElementById('email').value.trim();
                 const password = document.getElementById('password').value;
                 
-                if (!email || !password) {
+                if (!input || !password) {
                     throw new Error('Bitte füllen Sie alle Felder aus');
                 }
                 
-                // Login-Versuch (DIREKT mit Firebase Auth)
-                const result = await window.AuthAPI.login(email, password);
+                updateStatus('Anmeldung läuft...', 'info');
+                
+                // Login-Versuch
+                const result = await window.AuthAPI.login(input, password);
                 
                 if (!result.success) {
                     throw new Error(result.error || 'Anmeldung fehlgeschlagen');
                 }
                 
-                updateStatus('Anmeldung erfolgreich - Prüfe Berechtigung...', 'success');
+                updateStatus('Prüfe Berechtigung...', 'info');
                 showSuccess('Anmeldung erfolgreich. Prüfe Berechtigung...');
                 
-                // Super-Admin-Status prüfen (mit Fallback)
+                // Super-Admin-Status prüfen
                 await verifySuperAdmin(result.user);
                 
                 // Erfolgreich - Weiterleitung
@@ -391,14 +409,16 @@
                 let errorMessage = error.message || 'Ein Fehler ist aufgetreten';
                 
                 // Spezielle Behandlung für verschiedene Fehlertypen
-                if (errorMessage.includes('Zugriff verweigert')) {
-                    errorMessage += '<br><br><strong>Hinweis:</strong> Ihr Account wurde gefunden, aber Sie haben keine Admin-Berechtigung.';
+                if (errorMessage.includes('nicht in Firebase Authentication')) {
+                    errorMessage += '<br><br><strong>Lösung:</strong><br>';
+                    errorMessage += '<a href="sync-firestore-to-auth.html" style="color: var(--primary); text-decoration: underline; font-weight: bold;">🔄 Firestore zu Firebase Auth synchronisieren</a>';
+                } else if (errorMessage.includes('Kein Account') || errorMessage.includes('nicht gefunden')) {
+                    errorMessage += '<br><br><strong>Lösungen:</strong><br>';
+                    errorMessage += '<a href="sync-firestore-to-auth.html" style="color: var(--primary); text-decoration: underline;">🔄 Firestore Sync</a><br>';
+                    errorMessage += '<a href="create-admin-user.html" style="color: var(--primary); text-decoration: underline;">👤 Admin erstellen</a>';
                 } else if (errorMessage.includes('AuthAPI konnte nicht initialisiert werden')) {
                     errorMessage += '<br><br><strong>System-Problem:</strong><br>';
-                    errorMessage += '<a href="debug-specific-user.html" style="color: var(--primary); text-decoration: underline;">🔍 System-Diagnose</a>';
-                } else if (errorMessage.includes('Kein Account') || errorMessage.includes('user-not-found')) {
-                    errorMessage += '<br><br><strong>Benutzer-Problem:</strong><br>';
-                    errorMessage += '<a href="debug-specific-user.html" style="color: var(--primary); text-decoration: underline;">🔍 Benutzer-Debug</a>';
+                    errorMessage += '<a href="diagnose-database-access.html" style="color: var(--primary); text-decoration: underline;">🔍 System-Diagnose</a>';
                 }
                 
                 showError(errorMessage);
@@ -419,44 +439,29 @@
                 const firebaseReady = await window.FirebaseConfig.waitForReadyWithTimeout(10000);
                 
                 if (firebaseReady) {
-                    updateStatus('Firebase bereit...', 'info');
+                    updateStatus('Firebase bereit. Sie können sich anmelden.', 'success');
                     
-                    // Warten bis AuthAPI bereit ist
-                    const authReady = await window.AuthAPI.waitForInit();
-                    
-                    if (authReady) {
-                        const firestoreStatus = window.AuthAPI.getFirestoreStatus();
-                        updateStatus(
-                            `System bereit. Firestore: ${firestoreStatus ? 'Verfügbar' : 'Fallback-Modus'}`, 
-                            'success'
-                        );
+                    // Prüfe ob bereits angemeldet
+                    if (window.AuthAPI && window.AuthAPI.isLoggedIn()) {
+                        const currentUser = window.AuthAPI.getCurrentUser();
+                        const userData = window.AuthAPI.getUserData();
                         
-                        // Prüfe ob bereits angemeldet
-                        if (window.AuthAPI.isLoggedIn()) {
-                            const currentUser = window.AuthAPI.getCurrentUser();
-                            const userData = window.AuthAPI.getUserData();
+                        if (userData?.isSuperAdmin) {
+                            updateStatus('Bereits als Super-Admin angemeldet', 'success');
+                            showSuccess(`Bereits angemeldet als ${userData.username || currentUser.email}. Weiterleitung...`);
                             
-                            if (userData?.isSuperAdmin || currentUser.email === 't.o@trend4media.de') {
-                                updateStatus('Bereits als Admin angemeldet', 'success');
-                                showSuccess(`Bereits angemeldet als ${userData?.username || currentUser.email}. Weiterleitung...`);
-                                
-                                setTimeout(() => {
-                                    window.location.href = 'admin-dashboard.html';
-                                }, 2000);
-                            } else {
-                                updateStatus('Angemeldet, aber keine Admin-Berechtigung', 'error');
-                                showError('Sie sind angemeldet, haben aber keine Admin-Berechtigung.');
-                            }
+                            setTimeout(() => {
+                                window.location.href = 'admin-dashboard.html';
+                            }, 2000);
+                        } else {
+                            updateStatus('Angemeldet, aber keine Admin-Berechtigung', 'error');
+                            showError('Sie sind angemeldet, haben aber keine Admin-Berechtigung.');
                         }
-                        
-                    } else {
-                        updateStatus('AuthAPI-Initialisierung fehlgeschlagen', 'error');
-                        showError('Auth-System konnte nicht initialisiert werden.');
                     }
                     
                 } else {
                     updateStatus('Firebase-Initialisierung fehlgeschlagen', 'error');
-                    showError('Firebase konnte nicht initialisiert werden.');
+                    showError('System konnte nicht initialisiert werden. Bitte versuchen Sie die Diagnose-Tools.');
                 }
                 
             } catch (error) {
@@ -470,6 +475,18 @@
                 document.getElementById('email').focus();
             }, 100);
         });
+        
+        // Auto-Hide Messages
+        setInterval(() => {
+            const errorEl = document.getElementById('msg-error');
+            const successEl = document.getElementById('msg-success');
+            
+            if (errorEl.style.display === 'block' && !errorEl.innerHTML.includes('<a')) {
+                setTimeout(() => {
+                    errorEl.style.display = 'none';
+                }, 5000);
+            }
+        }, 1000);
     </script>
 </body>
 </html>
