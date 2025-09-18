@@ -305,6 +305,40 @@ class AnalyticsTracker {
             
         } catch (error) {
             console.error('❌ Fehler beim Speichern des Events:', error);
+            
+            // Bei Berechtigungsfehlern: Analytics deaktivieren
+            if (error.code === 'permission-denied' || error.message.includes('permissions')) {
+                console.warn('⚠️ Analytics deaktiviert - Berechtigungsfehler');
+                this.firebaseReady = false;
+                this.isInitialized = false;
+                
+                // Fallback: Events nur lokal speichern
+                this.saveEventLocally(event);
+            }
+        }
+    }
+    
+    // Lokales Event-Speichern als Fallback
+    saveEventLocally(event) {
+        try {
+            const localEvents = JSON.parse(localStorage.getItem('analytics_events') || '[]');
+            localEvents.push({
+                ...event,
+                timestamp: new Date().toISOString(),
+                sessionId: this.sessionId,
+                stored: 'locally'
+            });
+            
+            // Nur die letzten 100 Events behalten
+            if (localEvents.length > 100) {
+                localEvents.splice(0, localEvents.length - 100);
+            }
+            
+            localStorage.setItem('analytics_events', JSON.stringify(localEvents));
+            console.log('📊 Event lokal gespeichert:', event.type);
+            
+        } catch (localError) {
+            console.warn('⚠️ Lokales Event-Speichern fehlgeschlagen:', localError);
         }
     }
     
@@ -327,6 +361,12 @@ class AnalyticsTracker {
             
         } catch (error) {
             console.error('❌ Fehler beim Beenden der Session:', error);
+            
+            // Bei Berechtigungsfehlern: Analytics deaktivieren
+            if (error.code === 'permission-denied' || error.message.includes('permissions')) {
+                console.warn('⚠️ Analytics deaktiviert - Session-Berechtigungsfehler');
+                this.firebaseReady = false;
+            }
         }
     }
     
