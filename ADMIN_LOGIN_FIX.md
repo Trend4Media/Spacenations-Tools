@@ -7,12 +7,27 @@ Das Admin-Login schlägt mit folgendem Fehler fehl:
 Login error: Error: Kein Account mit dieser E-Mail gefunden. Bitte registrieren Sie sich zuerst.
 ```
 
-## Ursache
-Der Benutzer `t.o@trend4media.de` existiert nicht in der Firebase Authentication oder der Firestore-Datenbank.
+## ✅ Ursache identifiziert
+**UPDATE:** Der Benutzer `t.o@trend4media.de` existiert **korrekt in der Firestore-Datenbank** als Super-Admin, aber **nicht in Firebase Authentication**. Das ist ein Synchronisationsproblem zwischen den beiden Firebase-Services.
 
 ## Lösungen
 
-### 🚀 Lösung 1: Admin-Benutzer erstellen (Empfohlen)
+### 🔄 Lösung 1: Firestore zu Firebase Auth synchronisieren (Empfohlen)
+
+Da der Benutzer bereits in Firestore existiert, synchronisieren Sie ihn zu Firebase Auth:
+
+1. **Öffnen Sie das Sync-Tool:**
+   ```
+   http://ihre-domain.com/sync-firestore-to-auth.html
+   ```
+
+2. **Geben Sie ein neues Passwort ein** (E-Mail ist bereits vorausgefüllt)
+
+3. **Klicken Sie auf "Benutzer in Firebase Auth erstellen"**
+
+4. **Nach erfolgreicher Synchronisation können Sie sich im Admin-Login anmelden**
+
+### 🚀 Lösung 2: Admin-Benutzer neu erstellen
 
 1. **Öffnen Sie das Admin-Erstellungstool:**
    ```

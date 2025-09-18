@@ -552,8 +552,18 @@
                 
                 // Spezielle Behandlung für "Benutzer nicht gefunden" Fehler
                 if (errorMessage.includes('Kein Account mit dieser E-Mail gefunden') || 
-                    errorMessage.includes('nicht gefunden')) {
-                    errorMessage += '<br><br><a href="create-admin-user.html" style="color: var(--primary); text-decoration: underline;">→ Admin-Benutzer erstellen</a>';
+                    errorMessage.includes('nicht gefunden') ||
+                    errorMessage.includes('existiert in der Datenbank, aber nicht in Firebase Authentication')) {
+                    
+                    let linkHtml = '<br><br>';
+                    
+                    if (errorMessage.includes('existiert in der Datenbank, aber nicht in Firebase Authentication')) {
+                        linkHtml += '<a href="sync-firestore-to-auth.html" style="color: var(--primary); text-decoration: underline; font-weight: bold;">🔄 Firestore zu Firebase Auth synchronisieren</a><br>';
+                    }
+                    
+                    linkHtml += '<a href="create-admin-user.html" style="color: var(--primary); text-decoration: underline;">→ Admin-Benutzer erstellen</a>';
+                    
+                    errorMessage += linkHtml;
                     
                     // HTML in Error-Element setzen
                     const errorEl = document.getElementById('msg-error');

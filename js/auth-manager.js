@@ -331,6 +331,25 @@ class AuthManager {
                 const methods = await this.auth.fetchSignInMethodsForEmail(email);
                 if (methods.length === 0) {
                     console.log('❌ Benutzer existiert nicht in Firebase Auth:', email);
+                    
+                    // Prüfe, ob der Benutzer in Firestore existiert (für manuelle Erstellung)
+                    try {
+                        const userQuery = await this.db.collection('users')
+                            .where('email', '==', email)
+                            .limit(1)
+                            .get();
+                        
+                        if (!userQuery.empty) {
+                            console.log('⚠️ Benutzer existiert in Firestore, aber nicht in Firebase Auth:', email);
+                            return { 
+                                success: false, 
+                                error: 'Benutzer existiert in der Datenbank, aber nicht in Firebase Authentication. Bitte wenden Sie sich an einen Administrator oder verwenden Sie das Admin-Erstellungstool.' 
+                            };
+                        }
+                    } catch (firestoreError) {
+                        console.warn('⚠️ Konnte Firestore nicht prüfen:', firestoreError);
+                    }
+                    
                     return { 
                         success: false, 
                         error: 'Kein Account mit dieser E-Mail gefunden. Bitte registrieren Sie sich zuerst oder verwenden Sie das Admin-Erstellungstool.' 
