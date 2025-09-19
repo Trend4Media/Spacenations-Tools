@@ -281,7 +281,8 @@
 
     <!-- FIXED System-Dateien -->
     <script src="js/firebase-config.js"></script>
-    <script src="js/auth-manager-fixed.js"></script>
+    <script src="js/user-data-structure.js"></script>
+    <script src="js/auth-manager.js"></script>
     
     <script>
         // Status-Updates
@@ -389,21 +390,50 @@
                 updateStatus('Anmeldung erfolgreich - Prüfe Berechtigung...', 'success');
                 showSuccess('Anmeldung erfolgreich. Prüfe Berechtigung...');
                 
-                // Super-Admin-Status prüfen (mit Fallback)
-                const isAuthorized = await verifySuperAdmin(result.user);
+                // ÜBERARBEITETE Admin-Berechtigung mit neuer User-Struktur
+                updateStatus('Prüfe Admin-Berechtigung...', 'info');
+                
+                // Warte kurz auf User-Daten
+                await new Promise(resolve => setTimeout(resolve, 500));
+                const userData = window.AuthAPI.getUserData();
+                
+                console.log('🛡️ Prüfe Admin-Berechtigung für:', result.user.email, userData);
+                
+                // Prüfe Admin-Berechtigung mit neuer Struktur
+                const isAuthorized = userData?.canAccessAdminDashboard || 
+                                   userData?.isSuperAdmin || 
+                                   userData?.systemRole === 'superadmin' ||
+                                   // Fallback für bekannte Admin-E-Mails
+                                   ['t.o@trend4media.de', 'info@trend4media.de', 'admin@spacenations.eu'].includes(result.user.email.toLowerCase());
                 
                 if (!isAuthorized) {
-                    // Nicht berechtigt - ABER NICHT AUSLOGGEN
-                    throw new Error('Zugriff verweigert. Nur für Super-Admins.');
+                    updateStatus('Zugriff verweigert - Keine Admin-Berechtigung', 'error');
+                    const permissionInfo = userData ? `
+                        <br><br><strong>Ihre aktuellen Berechtigungen:</strong><br>
+                        🏠 User-Dashboard: ${userData.canAccessUserDashboard ? '✅' : '❌'}<br>
+                        🤝 Allianz-Dashboard: ${userData.canAccessAllianceDashboard ? '✅' : '❌'}<br>
+                        🛡️ Admin-Dashboard: ${userData.canAccessAdminDashboard ? '✅' : '❌'}<br>
+                        📊 System-Role: ${userData.systemRole || 'user'}<br><br>
+                        Für Admin-Zugriff wenden Sie sich an einen Super-Administrator.
+                    ` : '<br><br>User-Daten konnten nicht geladen werden.';
+                    
+                    throw new Error('Zugriff verweigert. Sie haben keine Admin-Berechtigung.' + permissionInfo);
                 }
                 
+                console.log('✅ Admin-Berechtigung bestätigt:', {
+                    email: result.user.email,
+                    canAccessAdminDashboard: userData?.canAccessAdminDashboard,
+                    isSuperAdmin: userData?.isSuperAdmin,
+                    systemRole: userData?.systemRole
+                });
+                
                 // Erfolgreich - Weiterleitung
-                updateStatus('Berechtigung bestätigt. Weiterleitung...', 'success');
-                showSuccess('Berechtigung bestätigt. Weiterleitung zum Admin-Dashboard...');
+                updateStatus('Admin-Berechtigung bestätigt - Weiterleitung...', 'success');
+                showSuccess(`✅ Berechtigung bestätigt!<br><br>Willkommen im Admin-Dashboard, ${userData?.username || result.user.email}!<br><br>Weiterleitung...`);
                 
                 setTimeout(() => {
                     window.location.href = 'admin-dashboard.html';
-                }, 1500);
+                }, 2500);
                 
             } catch (error) {
                 console.error('Admin-Login Fehler:', error);

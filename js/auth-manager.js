@@ -310,10 +310,10 @@ class AuthManager {
         }
     }
     
-    // Registrierung (vereinfacht)
-    async register(email, password, username) {
+    // ÜBERARBEITETE Registrierung mit einheitlicher User-Struktur
+    async registerWithUnifiedStructure(email, password, username, additionalData = {}) {
         try {
-            authLog.auth('Registrierungs-Versuch für:', email);
+            authLog.auth('🔄 Neue Registrierung mit einheitlicher User-Struktur für:', email);
             
             await this.waitForInit();
             
@@ -321,53 +321,83 @@ class AuthManager {
                 throw new Error('Firebase Auth nicht verfügbar');
             }
             
+            if (!window.UserDataStructure) {
+                throw new Error('UserDataStructure nicht verfügbar');
+            }
+            
             // Firebase Auth User erstellen
             const userCredential = await this.auth.createUserWithEmailAndPassword(email, password);
             const user = userCredential.user;
             
-            authLog.auth('Firebase User erstellt:', user.uid);
+            authLog.auth('✅ Firebase User erstellt:', user.uid);
             
-            // Versuche Benutzerdaten in Firestore zu speichern (optional)
+            // Prüfe ob es sich um einen Super-Admin handelt
+            const adminEmails = [
+                't.o@trend4media.de',
+                'info@trend4media.de', 
+                'admin@spacenations.eu'
+            ];
+            
+            const isSuperAdmin = adminEmails.includes(email.toLowerCase());
+            
+            // Erstelle einheitliche User-Datenstruktur
+            let userData;
+            if (isSuperAdmin) {
+                userData = window.UserDataStructure.createSuperAdmin(user, username, additionalData);
+                authLog.auth('🛡️ Super-Admin Account erstellt');
+            } else {
+                userData = window.UserDataStructure.createStandardUser(user, username, additionalData);
+                authLog.auth('👤 Standard-User Account erstellt');
+            }
+            
+            // Validiere User-Daten
+            const validation = window.UserDataStructure.validateUserData(userData);
+            if (!validation.isValid) {
+                throw new Error('User-Datenvalidierung fehlgeschlagen: ' + validation.errors.join(', '));
+            }
+            
+            authLog.auth('✅ User-Daten validiert');
+            
+            // Speichere in Firestore (falls verfügbar)
             if (this.firestoreAvailable) {
                 try {
-                    const userData = {
-                        uid: user.uid,
-                        email: email,
-                        username: username,
-                        createdAt: window.FirebaseConfig.getServerTimestamp(),
-                        lastLogin: window.FirebaseConfig.getServerTimestamp(),
-                        isActive: true,
-                        isAllianceAdmin: false,
-                        isSuperAdmin: false,
-                        systemRole: 'user',
-                        role: 'user',
-                        loginCount: 1,
-                        permissions: {
-                            dashboard_access: true,
-                            profile_edit: true,
-                            admin_dashboard: false,
-                            user_management: false,
-                            alliance_management: false,
-                            system_settings: false
+                    // Firestore-spezifische Timestamps hinzufügen
+                    const firestoreUserData = {
+                        ...userData,
+                        metadata: {
+                            ...userData.metadata,
+                            createdAt: window.FirebaseConfig.getServerTimestamp(),
+                            updatedAt: window.FirebaseConfig.getServerTimestamp()
+                        },
+                        stats: {
+                            ...userData.stats,
+                            lastLogin: window.FirebaseConfig.getServerTimestamp(),
+                            firstLogin: window.FirebaseConfig.getServerTimestamp()
                         }
                     };
                     
-                    await this.db.collection('users').doc(user.uid).set(userData);
-                    authLog.auth('Benutzerdaten in Firestore gespeichert');
+                    await this.db.collection('users').doc(user.uid).set(firestoreUserData);
+                    authLog.auth('✅ Einheitliche User-Daten in Firestore gespeichert');
+                    
+                    // Activity-Log hinzufügen
+                    await this.addRegistrationActivity(user.uid, userData);
                     
                 } catch (firestoreError) {
-                    authLog.auth('Firestore-Speicherung fehlgeschlagen, aber Auth erfolgreich', firestoreError);
+                    authLog.auth('⚠️ Firestore-Speicherung fehlgeschlagen, aber Auth erfolgreich', firestoreError);
                     // Nicht werfen - Firebase Auth hat funktioniert
                 }
+            } else {
+                authLog.auth('ℹ️ Firestore nicht verfügbar - User-Daten nur in Firebase Auth');
             }
             
             return {
                 success: true,
-                user: user
+                user: user,
+                userData: userData
             };
             
         } catch (error) {
-            authLog.error('Registrierung fehlgeschlagen', error);
+            authLog.error('❌ Registrierung mit einheitlicher Struktur fehlgeschlagen', error);
             
             let errorMessage = 'Registrierung fehlgeschlagen.';
             switch (error.code) {
@@ -392,6 +422,12 @@ class AuthManager {
                 error: errorMessage
             };
         }
+    }
+    
+    // Legacy Registrierung (für Rückwärtskompatibilität)
+    async register(email, password, username) {
+        authLog.auth('⚠️ Legacy-Registrierung verwendet - empfohlen: registerWithUnifiedStructure');
+        return this.registerWithUnifiedStructure(email, password, username);
     }
     
     // Logout
@@ -679,24 +715,70 @@ class AuthManager {
             // Nicht kritisch, daher nicht werfen
         }
     }
+    
+    // Registrierungs-Aktivität hinzufügen
+    async addRegistrationActivity(userId, userData) {
+        if (!this.firestoreAvailable) {
+            return;
+        }
+        
+        try {
+            const activityData = {
+                userId: userId,
+                icon: userData.isSuperAdmin ? '🛡️' : '👤',
+                text: `Account registriert: ${userData.username} (${userData.email})`,
+                type: 'registration',
+                metadata: {
+                    userRole: userData.systemRole,
+                    isSuperAdmin: userData.isSuperAdmin,
+                    email: userData.email,
+                    username: userData.username
+                },
+                timestamp: window.FirebaseConfig.getServerTimestamp()
+            };
+            
+            await this.db.collection('userActivities').add(activityData);
+            authLog.auth('📝 Registrierungs-Aktivität hinzugefügt');
+            
+        } catch (error) {
+            authLog.error('Fehler beim Hinzufügen der Registrierungs-Aktivität', error);
+            // Nicht kritisch, daher nicht werfen
+        }
+    }
 }
 
 // Globale AuthManager-Instanz
 window.authManager = new AuthManager();
 
-// Vereinfachte API
+// Erweiterte API mit neuen Funktionen
 window.AuthAPI = {
+    // Authentication
     login: (input, password) => window.authManager.login(input, password),
-    register: (email, password, username) => window.authManager.register(email, password, username),
     logout: () => window.authManager.logout(),
     resetPassword: (email) => window.authManager.resetPassword(email),
-    addActivity: (icon, text) => window.authManager.addActivity(icon, text),
+    
+    // Registration
+    register: (email, password, username) => window.authManager.register(email, password, username),
+    registerWithUnifiedStructure: (email, password, username, additionalData) => 
+        window.authManager.registerWithUnifiedStructure(email, password, username, additionalData),
+    
+    // User Data
     getCurrentUser: () => window.authManager.getCurrentUser(),
     getUserData: () => window.authManager.getUserData(),
     isLoggedIn: () => window.authManager.isLoggedIn(),
+    
+    // Status
     isInitialized: () => window.authManager.isInitialized(),
     getFirestoreStatus: () => window.authManager.getFirestoreStatus(),
+    
+    // Permissions
     checkSuperAdminStatus: (user) => window.authManager.checkSuperAdminStatus(user),
+    
+    // Events
     onAuthStateChange: (callback) => window.authManager.onAuthStateChange(callback),
-    waitForInit: () => window.authManager.waitForInit()
+    waitForInit: () => window.authManager.waitForInit(),
+    
+    // Activities
+    addActivity: (icon, text) => window.authManager.addActivity(icon, text),
+    addRegistrationActivity: (userId, userData) => window.authManager.addRegistrationActivity(userId, userData)
 };

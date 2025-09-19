@@ -1023,23 +1023,26 @@
             'player@spacenations.eu': { username: 'Player', password: 'player123' }
         };
         
-        // Login functionality
+        // ÜBERARBEITETES USER-LOGIN SYSTEM
         async function handleLogin(event) {
             event.preventDefault();
             
-            const input = document.getElementById('login-email').value;
+            const input = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
             
             if (!input || !password) {
-                alert('Bitte füllen Sie alle Felder aus.');
+                showLoginMessage('❌ Bitte füllen Sie alle Felder aus.', 'error');
                 return;
             }
             
             // Grundlegende Eingabe-Validierung
             if (input.length < 2) {
-                alert('Bitte geben Sie einen gültigen Benutzernamen oder eine E-Mail-Adresse ein.');
+                showLoginMessage('❌ Bitte geben Sie einen gültigen Benutzernamen oder eine E-Mail-Adresse ein.', 'error');
                 return;
             }
+            
+            // Loading anzeigen
+            showLoginMessage('🔄 Anmeldung läuft...', 'loading');
             
             // Warten bis AuthAPI verfügbar ist
             if (!window.AuthAPI) {
@@ -1052,51 +1055,91 @@
             }
             
             try {
+                console.log('🔄 Starte User-Login für:', input);
+                
                 // Firebase Login verwenden
                 const result = await window.AuthAPI.login(input, password);
                 
                 if (result.success) {
-                    // Erfolgreiche Anmeldung
-                    console.log('Login successful:', { input, user: result.user });
+                    console.log('✅ User-Login erfolgreich:', result.user.email);
                     
-                    // Erfolgsmeldung anzeigen
-                    const loginForm = document.getElementById('login-form');
-                    const existingMessage = loginForm.querySelector('.login-message');
-                    if (existingMessage) existingMessage.remove();
+                    // Warte kurz auf User-Daten
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    const userData = window.AuthAPI.getUserData();
                     
-                    const successMessage = document.createElement('div');
-                    successMessage.className = 'login-message success';
-                    successMessage.innerHTML = '✅ Anmeldung erfolgreich! Weiterleitung...';
-                    loginForm.appendChild(successMessage);
+                    console.log('📋 User-Daten geladen:', userData);
+                    
+                    // Erfolgsmeldung mit User-Info anzeigen
+                    let welcomeMessage = `✅ Willkommen zurück, ${userData?.username || userData?.displayName || result.user.email}!`;
+                    
+                    // Berechtigungen anzeigen
+                    if (userData) {
+                        welcomeMessage += '<br><br><strong>Ihre Berechtigungen:</strong><br>';
+                        
+                        if (userData.canAccessUserDashboard) welcomeMessage += '🏠 User-Dashboard<br>';
+                        if (userData.canAccessAllianceDashboard) welcomeMessage += '🤝 Allianz-Dashboard<br>';
+                        if (userData.canAccessAdminDashboard) welcomeMessage += '🛡️ Admin-Dashboard<br>';
+                        if (userData.canUseSpyDatabase) welcomeMessage += '📊 Spionage-Datenbank<br>';
+                        
+                        welcomeMessage += '<br>Weiterleitung zum User-Dashboard...';
+                    } else {
+                        welcomeMessage += '<br>Weiterleitung zum User-Dashboard...';
+                    }
+                    
+                    showLoginMessage(welcomeMessage, 'success');
                     
                     // Weiterleitung zum User Dashboard
                     setTimeout(() => {
                         window.location.href = 'user-dashboard.html';
-                    }, 1500);
+                    }, 3000);
+                    
                 } else {
                     // Fehlerhafte Anmeldung
-                    console.log('Login failed:', { input, error: result.error });
+                    console.log('❌ User-Login failed:', { input, error: result.error });
                     
-                    // Fehlermeldung anzeigen
-                    const loginForm = document.getElementById('login-form');
-                    const existingMessage = loginForm.querySelector('.login-message');
-                    if (existingMessage) existingMessage.remove();
+                    // Benutzerfreundliche Fehlermeldungen
+                    let errorMessage = '❌ Anmeldung fehlgeschlagen.';
                     
-                    const errorMessage = document.createElement('div');
-                    errorMessage.className = 'login-message error';
-                    errorMessage.innerHTML = `❌ ${result.error || 'Ungültige E-Mail-Adresse oder Passwort. Bitte versuchen Sie es erneut.'}`;
-                    loginForm.appendChild(errorMessage);
-                    
-                    // Fehlermeldung nach 5 Sekunden entfernen
-                    setTimeout(() => {
-                        if (errorMessage.parentNode) {
-                            errorMessage.remove();
+                    if (result.error) {
+                        if (result.error.includes('user-not-found')) {
+                            errorMessage = '❌ Kein Account mit diesen Anmeldedaten gefunden.';
+                        } else if (result.error.includes('wrong-password')) {
+                            errorMessage = '❌ Falsches Passwort.';
+                        } else if (result.error.includes('invalid-email')) {
+                            errorMessage = '❌ Ungültige E-Mail-Adresse.';
+                        } else if (result.error.includes('too-many-requests')) {
+                            errorMessage = '❌ Zu viele Login-Versuche. Bitte warten Sie einen Moment.';
+                        } else {
+                            errorMessage = '❌ ' + result.error;
                         }
-                    }, 5000);
+                    }
+                    
+                    showLoginMessage(errorMessage, 'error');
                 }
             } catch (error) {
-                console.error('Login error:', error);
-                alert('Fehler beim Login. Bitte versuchen Sie es erneut.');
+                console.error('❌ User-Login error:', error);
+                showLoginMessage('❌ Fehler beim Login. Bitte versuchen Sie es erneut.', 'error');
+            }
+        }
+        
+        // Hilfsfunktion für Login-Messages
+        function showLoginMessage(message, type) {
+            const loginForm = document.getElementById('login-form');
+            const existingMessage = loginForm.querySelector('.login-message');
+            if (existingMessage) existingMessage.remove();
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = `login-message ${type}`;
+            messageElement.innerHTML = message;
+            loginForm.appendChild(messageElement);
+            
+            // Auto-remove nach Zeit (außer loading)
+            if (type !== 'loading') {
+                setTimeout(() => {
+                    if (messageElement.parentNode) {
+                        messageElement.remove();
+                    }
+                }, type === 'success' ? 8000 : 5000);
             }
         }
         
@@ -1234,6 +1277,7 @@
     <!-- Session Management Scripts -->
     <script src="js/logger.js" onerror="console.warn('⚠️ Logger Script Fehler ignoriert')"></script>
     <script src="js/firebase-config.js" onerror="console.warn('⚠️ Firebase Config Script Fehler ignoriert')"></script>
+    <script src="js/user-data-structure.js" onerror="console.warn('⚠️ User Data Structure Script Fehler ignoriert')"></script>
     <script src="js/session-manager.js" onerror="console.warn('⚠️ Session Manager Script Fehler ignoriert')"></script>
     <script src="js/auth-manager.js" onerror="console.warn('⚠️ Auth Manager Script Fehler ignoriert')"></script>
     <script src="js/firebase-sync.js" onerror="console.warn('⚠️ Firebase Sync Script Fehler ignoriert')"></script>
