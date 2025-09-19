@@ -93,22 +93,31 @@ class FirebaseManager {
     }
     
     async loadConfig() {
-        try {
-            firebaseLog.firebase('Versuche API-Konfiguration zu laden...');
-            const response = await fetch('/api/firebase-config');
-            
-            if (response.ok) {
-                const config = await response.json();
-                firebaseLog.firebase('API-Konfiguration geladen');
-                return config;
-            } else {
-                throw new Error(`API Response: ${response.status}`);
+        // Versuche mehrere mögliche Endpunkte in Reihenfolge
+        const origin = (typeof window !== 'undefined' && window.location && window.location.origin) ? window.location.origin : '';
+        const candidates = [
+            origin ? `${origin}/api/firebase-config` : '/api/firebase-config',
+            'https://spacenations-tools-production.up.railway.app/api/firebase-config'
+        ];
+        
+        for (const url of candidates) {
+            try {
+                firebaseLog.firebase('Versuche API-Konfiguration zu laden...', { url });
+                const response = await fetch(url, { method: 'GET', mode: 'cors' });
+                if (response.ok) {
+                    const config = await response.json();
+                    firebaseLog.firebase('API-Konfiguration geladen', { source: url });
+                    return config;
+                } else {
+                    firebaseLog.debug('API-Konfiguration nicht ok', { url, status: response.status });
+                }
+            } catch (e) {
+                firebaseLog.debug('API-Konfiguration Versuch fehlgeschlagen', { url, error: e?.message });
             }
-            
-        } catch (error) {
-            firebaseLog.firebase('API nicht verfügbar, verwende Fallback-Konfiguration');
-            return FIREBASE_CONFIG;
         }
+        
+        firebaseLog.firebase('API nicht verfügbar, verwende Fallback-Konfiguration');
+        return FIREBASE_CONFIG;
     }
     
     async testConnection() {

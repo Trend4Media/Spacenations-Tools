@@ -11,7 +11,8 @@ class FirebaseSync {
             'dashboard': { requiresAuth: true, redirectTo: 'index.html' },
             'user-dashboard': { requiresAuth: true, redirectTo: 'index.html' },
             'register': { requiresAuth: false, redirectTo: 'dashboard.html' },
-            'spy-database': { requiresAuth: true, redirectTo: 'index.html' },
+            // Spy-Database: Im Demo-Modus erlauben, ohne Redirect
+            'spy-database': { requiresAuth: false, redirectTo: 'index.html' },
             'spy-report-input': { requiresAuth: true, redirectTo: 'index.html' },
             'admin-login': { requiresAuth: false, adminLogin: true },
             'admin-dashboard': { requiresAuth: true, requiresSuperAdmin: true, redirectTo: 'admin-login.html' }
