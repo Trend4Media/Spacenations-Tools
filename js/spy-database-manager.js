@@ -84,8 +84,37 @@ class SpyDatabaseManager {
                     }
                 }
                 
+                // 3. User-basierte Allianz-Zuordnung (für bekannte User)
+                if (!alliance && this.currentUser?.email) {
+                    const userEmail = this.currentUser.email.toLowerCase();
+                    const userAllianceMap = {
+                        't.o@trend4media.de': 'Trend4Media Alliance',
+                        'info@trend4media.de': 'Trend4Media Alliance',
+                        'admin@spacenations.eu': 'SpaceNations Admin'
+                    };
+                    
+                    alliance = userAllianceMap[userEmail];
+                    if (alliance) {
+                        console.log('📋 Allianz aus User-Mapping (Fallback):', alliance);
+                        // Speichere die Zuordnung für zukünftige Verwendung
+                        this.currentAlliance = alliance;
+                        if (window.SessionAPI) {
+                            window.SessionAPI.setAllianceData({ name: alliance });
+                        }
+                    }
+                }
+                
+                // 4. Demo-Allianz als letzter Fallback
                 if (!alliance) {
-                    throw new Error('Keine Allianz zugeordnet. Bitte melde dich über das User-Dashboard an.');
+                    alliance = 'Demo Alliance';
+                    console.log('📋 Verwende Demo-Allianz als Fallback:', alliance);
+                    console.info('ℹ️ Hinweis: Um echte Allianz-Daten zu verwenden, melden Sie sich über das User-Dashboard an und konfigurieren Sie Ihre Allianz.');
+                    
+                    // Speichere Demo-Allianz temporär
+                    this.currentAlliance = alliance;
+                    if (window.SessionAPI) {
+                        window.SessionAPI.setAllianceData({ name: alliance, isDemo: true });
+                    }
                 }
             }
             
@@ -187,8 +216,37 @@ class SpyDatabaseManager {
                     }
                 }
                 
+                // 3. User-basierte Allianz-Zuordnung (für bekannte User)
+                if (!alliance && this.currentUser?.email) {
+                    const userEmail = this.currentUser.email.toLowerCase();
+                    const userAllianceMap = {
+                        't.o@trend4media.de': 'Trend4Media Alliance',
+                        'info@trend4media.de': 'Trend4Media Alliance',
+                        'admin@spacenations.eu': 'SpaceNations Admin'
+                    };
+                    
+                    alliance = userAllianceMap[userEmail];
+                    if (alliance) {
+                        console.log('📋 Allianz aus User-Mapping (Fallback):', alliance);
+                        // Speichere die Zuordnung für zukünftige Verwendung
+                        this.currentAlliance = alliance;
+                        if (window.SessionAPI) {
+                            window.SessionAPI.setAllianceData({ name: alliance });
+                        }
+                    }
+                }
+                
+                // 4. Demo-Allianz als letzter Fallback
                 if (!alliance) {
-                    throw new Error('Keine Allianz zugeordnet. Bitte melde dich über das User-Dashboard an.');
+                    alliance = 'Demo Alliance';
+                    console.log('📋 Verwende Demo-Allianz als Fallback:', alliance);
+                    console.info('ℹ️ Hinweis: Um echte Allianz-Daten zu verwenden, melden Sie sich über das User-Dashboard an und konfigurieren Sie Ihre Allianz.');
+                    
+                    // Speichere Demo-Allianz temporär
+                    this.currentAlliance = alliance;
+                    if (window.SessionAPI) {
+                        window.SessionAPI.setAllianceData({ name: alliance, isDemo: true });
+                    }
                 }
             }
             
@@ -424,8 +482,37 @@ class SpyDatabaseManager {
                     }
                 }
                 
+                // 3. User-basierte Allianz-Zuordnung (für bekannte User)
+                if (!alliance && this.currentUser?.email) {
+                    const userEmail = this.currentUser.email.toLowerCase();
+                    const userAllianceMap = {
+                        't.o@trend4media.de': 'Trend4Media Alliance',
+                        'info@trend4media.de': 'Trend4Media Alliance',
+                        'admin@spacenations.eu': 'SpaceNations Admin'
+                    };
+                    
+                    alliance = userAllianceMap[userEmail];
+                    if (alliance) {
+                        console.log('📋 Allianz aus User-Mapping (Fallback):', alliance);
+                        // Speichere die Zuordnung für zukünftige Verwendung
+                        this.currentAlliance = alliance;
+                        if (window.SessionAPI) {
+                            window.SessionAPI.setAllianceData({ name: alliance });
+                        }
+                    }
+                }
+                
+                // 4. Demo-Allianz als letzter Fallback
                 if (!alliance) {
-                    throw new Error('Keine Allianz zugeordnet. Bitte melde dich über das User-Dashboard an.');
+                    alliance = 'Demo Alliance';
+                    console.log('📋 Verwende Demo-Allianz als Fallback:', alliance);
+                    console.info('ℹ️ Hinweis: Um echte Allianz-Daten zu verwenden, melden Sie sich über das User-Dashboard an und konfigurieren Sie Ihre Allianz.');
+                    
+                    // Speichere Demo-Allianz temporär
+                    this.currentAlliance = alliance;
+                    if (window.SessionAPI) {
+                        window.SessionAPI.setAllianceData({ name: alliance, isDemo: true });
+                    }
                 }
             }
             
