@@ -200,6 +200,15 @@ class AuthManager {
             
             // DIREKTER Login-Versuch (OHNE fetchSignInMethodsForEmail)
             // Das ist der Schlüssel: Firebase Auth funktioniert ohne Firestore!
+            // Auf GitHub Pages (statische Umgebung) keine autorisierte Domain für Firebase Auth
+            const host = (typeof window !== 'undefined' && window.location) ? window.location.hostname : '';
+            if (host.endsWith('github.io')) {
+                return {
+                    success: false,
+                    error: 'Login in der GitHub Pages Vorschau ist nicht möglich (nicht autorisierte Domain). Bitte die Railway-URL verwenden.'
+                };
+            }
+
             const userCredential = await this.auth.signInWithEmailAndPassword(email, password);
             authLog.auth('Login erfolgreich für:', email);
             

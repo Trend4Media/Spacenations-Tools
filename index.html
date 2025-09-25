@@ -1135,7 +1135,9 @@
             if (event.message && (
                 event.message.includes('listener indicated an asynchronous response') ||
                 event.message.includes('message channel closed') ||
-                event.message.includes('Extension context invalidated')
+                event.message.includes('Extension context invalidated') ||
+                event.message.includes('background page') ||
+                event.message.includes('back/forward cache')
             )) {
                 console.warn('⚠️ Browser-Extension Fehler ignoriert:', event.message);
                 event.preventDefault();
@@ -1154,11 +1156,15 @@
                 (event.reason.message && (
                     event.reason.message.includes('listener indicated an asynchronous response') ||
                     event.reason.message.includes('message channel closed') ||
-                    event.reason.message.includes('Extension context invalidated')
+                    event.reason.message.includes('Extension context invalidated') ||
+                    event.reason.message.includes('background page') ||
+                    event.reason.message.includes('back/forward cache')
                 )) ||
                 (typeof event.reason === 'string' && (
                     event.reason.includes('listener indicated an asynchronous response') ||
-                    event.reason.includes('message channel closed')
+                    event.reason.includes('message channel closed') ||
+                    event.reason.includes('background page') ||
+                    event.reason.includes('back/forward cache')
                 ))
             )) {
                 console.warn('⚠️ Browser-Extension Promise Fehler ignoriert:', event.reason);

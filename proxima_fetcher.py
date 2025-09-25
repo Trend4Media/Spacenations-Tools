@@ -185,6 +185,20 @@ class ProximaFetcher:
                 logging.error("Fehler beim Speichern der Proxima-Daten")
         else:
             logging.error("Keine Daten von der API erhalten")
+
+    def run_sync(self):
+        """Kompatibilitätsmethode für Scheduler: führt Update und Report aus"""
+        try:
+            self.update_planets()
+            html = self.generate_html_report()
+            if html:
+                with open('proxima_report.html', 'w', encoding='utf-8') as f:
+                    f.write(html)
+                logging.info("HTML-Report generiert: proxima_report.html")
+            return True
+        except Exception as e:
+            logging.error(f"Proxima run_sync Fehler: {e}")
+            return False
     
     def generate_html_report(self):
         """Generiert einen HTML-Bericht der aktuellen Planeten"""
