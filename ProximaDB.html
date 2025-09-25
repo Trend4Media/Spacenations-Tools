@@ -1,412 +1,3 @@
-<!doctype html>
-<html lang="de">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Spacenations – Proxima Daten</title>
-    <style>
-      :root {
-        --bg: #0b0e14;
-        --panel: #111622;
-        --text: #e6edf3;
-        --muted: #a0a8b8;
-        --accent: #3b82f6;
-        --success: #22c55e;
-        --warn: #f59e0b;
-        --error: #ef4444;
-        --border: #22304a;
-      }
-
-      html, body {
-        height: 100%;
-        margin: 0;
-        background: var(--bg);
-        color: var(--text);
-        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      }
-
-      .container {
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-
-      h1 {
-        margin: 0 0 16px 0;
-        font-size: 22px;
-        letter-spacing: 0.3px;
-      }
-
-      .controls {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        margin-bottom: 12px;
-      }
-
-      button, .btn {
-        appearance: none;
-        border: 1px solid var(--border);
-        background: var(--panel);
-        color: var(--text);
-        border-radius: 8px;
-        padding: 8px 12px;
-        cursor: pointer;
-        transition: background 0.15s ease, border-color 0.15s ease;
-      }
-
-      button:hover {
-        background: #0f1628;
-        border-color: #2b3d61;
-      }
-
-      .status {
-        font-size: 13px;
-        color: var(--muted);
-      }
-
-      .status strong { color: var(--text); }
-
-      .status .ok { color: var(--success); }
-      .status .warn { color: var(--warn); }
-      .status .err { color: var(--error); }
-
-      .panel {
-        background: var(--panel);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        overflow: hidden;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      thead th {
-        text-align: left;
-        font-weight: 600;
-        font-size: 13px;
-        color: var(--muted);
-        background: #0f1628;
-        border-bottom: 1px solid var(--border);
-        padding: 10px 12px;
-        user-select: none;
-        cursor: pointer;
-      }
-
-      tbody td {
-        padding: 10px 12px;
-        border-bottom: 1px solid var(--border);
-        font-size: 14px;
-      }
-
-      tbody tr:hover {
-        background: #0e1424;
-      }
-
-      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace; }
-      .right { text-align: right; }
-
-      .hidden { display: none; }
-
-      .footer {
-        margin-top: 12px;
-        font-size: 12px;
-        color: var(--muted);
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <h1>Proxima Daten</h1>
-      <div class="controls">
-        <button id="refreshButton" type="button">Aktualisieren</button>
-        <span class="status" id="statusText">Lade Proxima‑Daten…</span>
-      </div>
-      <div class="panel">
-        <table aria-label="Proxima Daten Tabelle">
-          <thead>
-            <tr>
-              <th data-key="name">Name</th>
-              <th data-key="coordinates">Koordinaten</th>
-              <th data-key="score" class="right">Score</th>
-              <th data-key="deleteOn">Löschdatum</th>
-              <th data-key="ttl" class="right">TTL</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody">
-            <tr id="placeholderRow"><td colspan="5">Noch keine Daten geladen…</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="footer">
-        Quelle: <span class="mono">https://beta1.game.spacenations.eu/api/proxima</span>
-      </div>
-    </div>
-
-    <script>
-      (function () {
-        "use strict";
-
-        const API_URL = "https://beta1.game.spacenations.eu/api/proxima";
-        const AUTO_REFRESH_MS = 60_000;
-        const REQUEST_TIMEOUT_MS = 12_000;
-
-        /** @type {Array<{ name: string; coordinates: string; score: number; deleteOn: string; }>} */
-        let currentItems = [];
-        /** @type {{ key: 'name'|'coordinates'|'score'|'deleteOn'|'ttl'; dir: 'asc'|'desc'; }} */
-        let sortState = { key: 'score', dir: 'desc' };
-        /** @type {number | null} */
-        let refreshTimerId = null;
-        /** @type {boolean} */
-        let isFetching = false;
-        /** @type {number} */
-        let backoffMs = AUTO_REFRESH_MS; // dynamischer Backoff bei Fehlern
-
-        const statusText = document.getElementById('statusText');
-        const tableBody = document.getElementById('tableBody');
-        const refreshButton = document.getElementById('refreshButton');
-        const placeholderRow = document.getElementById('placeholderRow');
-
-        function formatIsoDate(isoString) {
-          if (!isoString) return '';
-          const d = new Date(isoString);
-          if (Number.isNaN(d.getTime())) return isoString;
-          return new Intl.DateTimeFormat('de-DE', {
-            dateStyle: 'medium',
-            timeStyle: 'short'
-          }).format(d);
-        }
-
-        function computeTtl(deleteOnIso) {
-          if (!deleteOnIso) return '';
-          const target = new Date(deleteOnIso).getTime();
-          const now = Date.now();
-          const deltaMs = target - now;
-          if (Number.isNaN(target)) return '';
-          const inPast = deltaMs < 0;
-          const abs = Math.abs(deltaMs);
-          const mins = Math.floor(abs / 60_000);
-          const hours = Math.floor(mins / 60);
-          const days = Math.floor(hours / 24);
-          if (days > 0) return (inPast ? '-' : '') + days + ' d';
-          if (hours > 0) return (inPast ? '-' : '') + hours + ' h';
-          return (inPast ? '-' : '') + mins + ' min';
-        }
-
-        function updateStatus(message, type) {
-          const safeMsg = String(message || '').trim();
-          statusText.innerHTML = '';
-          const strong = document.createElement('strong');
-          strong.textContent = safeMsg;
-          if (type === 'ok') strong.className = 'ok';
-          if (type === 'warn') strong.className = 'warn';
-          if (type === 'err') strong.className = 'err';
-          statusText.appendChild(strong);
-        }
-
-        function setLoading(loading) {
-          isFetching = loading;
-          refreshButton.disabled = loading;
-          if (loading) updateStatus('Lade Proxima‑Daten…');
-        }
-
-        function compareValues(a, b) {
-          if (a === b) return 0;
-          return a < b ? -1 : 1;
-        }
-
-        function sortItems(items) {
-          const key = sortState.key;
-          const dir = sortState.dir;
-          const factor = dir === 'asc' ? 1 : -1;
-          const copy = items.slice();
-          copy.sort((x, y) => {
-            if (key === 'ttl') {
-              const xt = new Date(x.deleteOn).getTime();
-              const yt = new Date(y.deleteOn).getTime();
-              return factor * compareValues(xt, yt);
-            }
-            if (key === 'score') {
-              return factor * compareValues(Number(x.score) || 0, Number(y.score) || 0);
-            }
-            if (key === 'deleteOn') {
-              const xd = new Date(x.deleteOn).getTime();
-              const yd = new Date(y.deleteOn).getTime();
-              return factor * compareValues(xd, yd);
-            }
-            return factor * compareValues(String(x[key] || ''), String(y[key] || ''));
-          });
-          return copy;
-        }
-
-        function render(items) {
-          const data = sortItems(items);
-          tableBody.innerHTML = '';
-          if (!data.length) {
-            const tr = document.createElement('tr');
-            const td = document.createElement('td');
-            td.colSpan = 5;
-            td.textContent = 'Keine Daten verfügbar';
-            tr.appendChild(td);
-            tableBody.appendChild(tr);
-            return;
-          }
-          for (const item of data) {
-            const tr = document.createElement('tr');
-
-            const tdName = document.createElement('td');
-            tdName.textContent = item.name ?? '';
-            tr.appendChild(tdName);
-
-            const tdCoord = document.createElement('td');
-            tdCoord.textContent = item.coordinates ?? '';
-            tdCoord.className = 'mono';
-            tr.appendChild(tdCoord);
-
-            const tdScore = document.createElement('td');
-            tdScore.textContent = String(item.score ?? '');
-            tdScore.className = 'right';
-            tr.appendChild(tdScore);
-
-            const tdDelete = document.createElement('td');
-            tdDelete.textContent = formatIsoDate(item.deleteOn);
-            tr.appendChild(tdDelete);
-
-            const tdTtl = document.createElement('td');
-            tdTtl.textContent = computeTtl(item.deleteOn);
-            tdTtl.className = 'right mono';
-            tr.appendChild(tdTtl);
-
-            tableBody.appendChild(tr);
-          }
-        }
-
-        async function fetchWithTimeout(resource, options = {}) {
-          const { timeout = REQUEST_TIMEOUT_MS, ...rest } = options;
-          const controller = new AbortController();
-          const id = setTimeout(() => controller.abort(), timeout);
-          try {
-            const response = await fetch(resource, { ...rest, signal: controller.signal });
-            return response;
-          } finally {
-            clearTimeout(id);
-          }
-        }
-
-        async function loadData() {
-          if (isFetching) return;
-          setLoading(true);
-          try {
-            const response = await fetchWithTimeout(API_URL, {
-              headers: { 'Accept': 'application/json' },
-              cache: 'no-store',
-              timeout: REQUEST_TIMEOUT_MS,
-              keepalive: false
-            });
-            if (!response.ok) {
-              throw new Error('HTTP ' + response.status + ' ' + response.statusText);
-            }
-            /** @type {unknown} */
-            const body = await response.json();
-            if (!Array.isArray(body)) {
-              throw new Error('Unerwartetes Antwortformat (Array erwartet)');
-            }
-            // Normalize minimal erwartete Felder
-            currentItems = body.map((row) => ({
-              name: String(row.name ?? ''),
-              coordinates: String(row.coordinates ?? ''),
-              score: Number(row.score ?? 0),
-              deleteOn: String(row.deleteOn ?? '')
-            }));
-            render(currentItems);
-            updateStatus(`OK – ${currentItems.length} Einträge`, 'ok');
-            backoffMs = AUTO_REFRESH_MS; // Reset Backoff bei Erfolg
-          } catch (err) {
-            console.error(err);
-            updateStatus('Fehler beim Laden: ' + (err && err.message ? err.message : String(err)), 'err');
-            // Progressiver Backoff: 60s → 90s → 120s (max)
-            backoffMs = Math.min(Math.floor(backoffMs * 1.5), 120_000);
-          } finally {
-            setLoading(false);
-            scheduleNextRefresh();
-          }
-        }
-
-        function scheduleNextRefresh() {
-          clearScheduledRefresh();
-          if (document.visibilityState !== 'visible') return; // pausieren im Hintergrund
-          refreshTimerId = window.setTimeout(() => {
-            loadData().catch(() => {});
-          }, backoffMs);
-        }
-
-        function clearScheduledRefresh() {
-          if (refreshTimerId !== null) {
-            clearTimeout(refreshTimerId);
-            refreshTimerId = null;
-          }
-        }
-
-        function setSort(key) {
-          if (sortState.key === key) {
-            sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
-          } else {
-            sortState.key = key;
-            sortState.dir = key === 'name' || key === 'coordinates' ? 'asc' : 'desc';
-          }
-          if (currentItems.length) render(currentItems);
-        }
-
-        function wireSorting() {
-          const headers = document.querySelectorAll('thead th[data-key]');
-          headers.forEach((th) => {
-            th.addEventListener('click', () => {
-              const key = th.getAttribute('data-key');
-              if (!key) return;
-              setSort(/** @type {any} */ (key));
-            });
-          });
-        }
-
-        function wireControls() {
-          refreshButton.addEventListener('click', () => {
-            backoffMs = AUTO_REFRESH_MS; // manuelles Refresh setzt Intervall zurück
-            loadData().catch(() => {});
-          });
-
-          document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') {
-              scheduleNextRefresh();
-            } else {
-              clearScheduledRefresh();
-            }
-          });
-
-          // Cleanups ohne deprecated "unload"
-          window.addEventListener('pagehide', () => {
-            clearScheduledRefresh();
-          });
-        }
-
-        function init() {
-          if (placeholderRow) placeholderRow.classList.add('hidden');
-          wireSorting();
-          wireControls();
-          loadData().catch(() => {});
-        }
-
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', init);
-        } else {
-          init();
-        }
-      })();
-    </script>
-  </body>
-  </html>
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -897,23 +488,31 @@
     </main>
 
     <script>
-        // ProximaDB API Endpoint
-        const API_BASE = 'https://trend4media.github.io/Spacenations-Tools/';
-        
+        const API_URL = 'https://beta1.game.spacenations.eu/api/proxima';
+        const AUTO_REFRESH_MS = 60000;
+        const REQUEST_TIMEOUT_MS = 12000;
+
+        let refreshTimerId = null;
+        let backoffMs = AUTO_REFRESH_MS;
+
+        function withTimeout(promise, ms) {
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), ms);
+            return Promise.race([
+                fetch(API_URL, { headers: { 'Accept': 'application/json' }, cache: 'no-store', signal: controller.signal }),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout nach ' + ms + ' ms')), ms))
+            ]).finally(() => clearTimeout(id));
+        }
+
         async function loadData() {
             const content = document.getElementById('content');
             content.innerHTML = '<div class="loading"><p>Lade Proxima-Daten...</p></div>';
-            
             try {
-                // Lade JSON-Daten
-                const response = await fetch(API_BASE + 'proxima_data.json');
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
+                const response = await withTimeout(fetch(API_URL, { headers: { 'Accept': 'application/json' }, cache: 'no-store' }), REQUEST_TIMEOUT_MS);
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 const data = await response.json();
                 displayData(data);
-                
+                backoffMs = AUTO_REFRESH_MS;
             } catch (error) {
                 console.error('Fehler beim Laden der Daten:', error);
                 content.innerHTML = `
@@ -922,36 +521,50 @@
                         <p>Die Proxima-Daten konnten nicht geladen werden.</p>
                         <p><strong>Fehler:</strong> ${error.message}</p>
                         <p>Bitte versuchen Sie es später erneut oder kontaktieren Sie den Administrator.</p>
-                        <button class="refresh-btn" onclick="loadData()">🔄 Erneut versuchen</button>
+                        <button class="refresh-btn" onclick="manualRefresh()">🔄 Erneut versuchen</button>
                     </div>
                 `;
+                backoffMs = Math.min(Math.floor(backoffMs * 1.5), 120000);
+            } finally {
+                scheduleNextRefresh();
             }
         }
-        
-        function displayData(planets) {
-            if (!Array.isArray(planets)) {
-                throw new Error('Ungültiges Datenformat');
-            }
-            
-            // Konvertiere Array-Format zu Objekt-Format
-            const planetObjects = planets.map(planet => ({
-                name: planet[0],
-                coordinates: planet[1],
-                score: planet[2],
-                deleteOn: planet[3],
-                weekNumber: planet[4]
+
+        function scheduleNextRefresh() {
+            clearTimeout(refreshTimerId);
+            if (document.visibilityState !== 'visible') return;
+            refreshTimerId = setTimeout(() => loadData(), backoffMs);
+        }
+
+        function manualRefresh() {
+            backoffMs = AUTO_REFRESH_MS;
+            clearTimeout(refreshTimerId);
+            loadData();
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') scheduleNextRefresh();
+            else clearTimeout(refreshTimerId);
+        });
+        window.addEventListener('pagehide', () => clearTimeout(refreshTimerId));
+
+        function displayData(items) {
+            if (!Array.isArray(items)) throw new Error('Ungültiges Datenformat');
+
+            const planets = items.map(p => ({
+                name: String(p.name ?? ''),
+                coordinates: String(p.coordinates ?? ''),
+                score: Number(p.score ?? 0),
+                deleteOn: String(p.deleteOn ?? ''),
+                weekNumber: extractWeekNumber(String(p.name ?? ''))
             }));
-            
-            // Statistiken berechnen
-            const totalPlanets = planetObjects.length;
-            const weekNumbers = [...new Set(planetObjects.map(p => p.weekNumber))];
-            const latestWeek = Math.max(...weekNumbers);
-            
-            // Planeten nach Punktzahl sortieren (höchste zuerst)
-            planetObjects.sort((a, b) => {
-                return b.score - a.score;
-            });
-            
+
+            const totalPlanets = planets.length;
+            const weekNumbers = [...new Set(planets.map(p => p.weekNumber))].filter(n => Number.isFinite(n) && n > 0);
+            const latestWeek = weekNumbers.length ? Math.max(...weekNumbers) : '-';
+
+            planets.sort((a, b) => b.score - a.score);
+
             const content = document.getElementById('content');
             content.innerHTML = `
                 <div class="stats">
@@ -981,13 +594,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            ${planetObjects.map(planet => `
+                            ${planets.map(planet => `
                                 <tr>
                                     <td><strong>${planet.name}</strong></td>
                                     <td><code>${planet.coordinates}</code></td>
-                                    <td class="${getScoreClass(planet.score)}">${planet.score.toLocaleString()}</td>
+                                    <td class="${getScoreClass(planet.score)}">${Number.isFinite(planet.score) ? planet.score.toLocaleString('de-DE') : ''}</td>
                                     <td>${formatDeleteDate(planet.deleteOn)}</td>
-                                    <td><span class="week-badge">Woche ${planet.weekNumber}</span></td>
+                                    <td><span class="week-badge">Woche ${planet.weekNumber || '-'}</span></td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -995,39 +608,38 @@
                 </div>
                 
                 <div class="footer">
-                    <p>Automatisch aktualisiert jeden Mittwoch um 18:45 Uhr</p>
+                    <p>Automatisch aktualisiert alle 60 Sekunden</p>
                     <p>Datenquelle: <a href="https://beta1.game.spacenations.eu/api/proxima" target="_blank" style="color: var(--razer-green);">Spacenations API</a></p>
                 </div>
             `;
         }
-        
+
         function extractWeekNumber(planetName) {
             const match = planetName.match(/Proxima (\d+)-/);
             return match ? parseInt(match[1]) : 0;
         }
-        
-        function extractPlanetNumber(planetName) {
-            const match = planetName.match(/Proxima \d+-(\d+)/);
-            return match ? parseInt(match[1]) : 0;
-        }
-        
+
         function getScoreClass(score) {
             if (score >= 500) return 'score-high';
             if (score >= 200) return 'score-medium';
             return 'score-low';
         }
-        
+
         function formatDeleteDate(deleteOnStr) {
             try {
                 const date = new Date(deleteOnStr);
+                if (isNaN(date.getTime())) return deleteOnStr;
                 return date.toLocaleDateString('de-DE') + ' ' + date.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit'});
             } catch (e) {
                 return deleteOnStr;
             }
         }
-        
-        // Beim Laden der Seite Daten laden
-        document.addEventListener('DOMContentLoaded', loadData);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            const headerBtn = document.querySelector('.refresh-btn');
+            if (headerBtn) headerBtn.addEventListener('click', manualRefresh);
+        });
     </script>
 </body>
 </html>
