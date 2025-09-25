@@ -9,6 +9,7 @@ class AnalyticsDashboard {
         this.analyticsData = null;
         this.processedStats = null;
         this.isInitialized = false;
+        this._containerId = null;
         
         this.init();
     }
@@ -54,7 +55,11 @@ class AnalyticsDashboard {
             
             if (window.AnalyticsAPI) {
                 this.analyticsData = await window.AnalyticsAPI.getAnalyticsData(timeRange);
-                this.processedStats = window.AnalyticsAPI.processAnalyticsData(this.analyticsData);
+                if (window.AnalyticsAPI.processAnalyticsData && typeof window.AnalyticsAPI.processAnalyticsData === 'function') {
+                    this.processedStats = window.AnalyticsAPI.processAnalyticsData(this.analyticsData);
+                } else {
+                    this.processedStats = this.processData(this.analyticsData);
+                }
             } else {
                 // Fallback: Direkt aus Firebase laden
                 this.analyticsData = await this.loadDataFromFirebase(timeRange);
@@ -394,7 +399,7 @@ class AnalyticsDashboard {
         if (timeRangeSelect) {
             timeRangeSelect.addEventListener('change', async (e) => {
                 await this.loadAnalyticsData(e.target.value);
-                this.renderDashboard('analytics-tab');
+                this.renderDashboard(this._containerId || 'analytics-content');
             });
         }
         
@@ -403,7 +408,7 @@ class AnalyticsDashboard {
         if (refreshBtn) {
             refreshBtn.addEventListener('click', async () => {
                 await this.loadAnalyticsData(this.currentTimeRange);
-                this.renderDashboard('analytics-tab');
+                this.renderDashboard(this._containerId || 'analytics-content');
             });
         }
         
@@ -446,6 +451,7 @@ class AnalyticsDashboard {
     // Dashboard initialisieren
     async initializeDashboard(containerId) {
         try {
+            this._containerId = containerId;
             await this.loadAnalyticsData(this.currentTimeRange);
             this.renderDashboard(containerId);
         } catch (error) {
@@ -471,5 +477,6 @@ window.analyticsDashboard = new AnalyticsDashboard();
 window.AnalyticsDashboardAPI = {
     loadAnalyticsData: (timeRange) => window.analyticsDashboard.loadAnalyticsData(timeRange),
     renderDashboard: (containerId) => window.analyticsDashboard.renderDashboard(containerId),
-    initializeDashboard: (containerId) => window.analyticsDashboard.initializeDashboard(containerId)
+    initializeDashboard: (containerId) => window.analyticsDashboard.initializeDashboard(containerId),
+    exportAnalyticsData: () => window.analyticsDashboard.exportAnalyticsData()
 };
