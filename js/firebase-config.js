@@ -93,22 +93,42 @@ class FirebaseManager {
     }
     
     async loadConfig() {
+        // Reihenfolge: lokale JSON -> API -> Inline-Fallback
+        // 1) Lokale JSON versuchen (funktioniert auch auf rein statischen Hosts)
+        try {
+            firebaseLog.firebase('Lade Konfiguration aus /firebase-config.json...');
+            const jsonResponse = await fetch('/firebase-config.json', { cache: 'no-store' });
+            if (jsonResponse.ok) {
+                const jsonConfig = await jsonResponse.json();
+                if (jsonConfig && jsonConfig.projectId) {
+                    firebaseLog.firebase('Konfiguration aus JSON geladen');
+                    return jsonConfig;
+                }
+            }
+        } catch (e) {
+            firebaseLog.debug('JSON-Konfiguration nicht verfügbar', { error: e?.message });
+        }
+
+        // 2) API-Endpunkt versuchen (wenn Backend läuft)
         try {
             firebaseLog.firebase('Versuche API-Konfiguration zu laden...');
-            const response = await fetch('/api/firebase-config');
-            
-            if (response.ok) {
-                const config = await response.json();
-                firebaseLog.firebase('API-Konfiguration geladen');
-                return config;
+            const apiResponse = await fetch('/api/firebase-config', { cache: 'no-store' });
+            if (apiResponse.ok) {
+                const apiConfig = await apiResponse.json();
+                if (apiConfig && apiConfig.projectId) {
+                    firebaseLog.firebase('API-Konfiguration geladen');
+                    return apiConfig;
+                }
             } else {
-                throw new Error(`API Response: ${response.status}`);
+                firebaseLog.debug('API nicht erreichbar', { status: apiResponse.status });
             }
-            
-        } catch (error) {
-            firebaseLog.firebase('API nicht verfügbar, verwende Fallback-Konfiguration');
-            return FIREBASE_CONFIG;
+        } catch (e) {
+            firebaseLog.debug('API-Konfiguration nicht verfügbar', { error: e?.message });
         }
+
+        // 3) Fallback auf inline Konfiguration
+        firebaseLog.firebase('Verwende Fallback-Konfiguration (inline)');
+        return FIREBASE_CONFIG;
     }
     
     async testConnection() {
