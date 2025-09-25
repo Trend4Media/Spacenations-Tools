@@ -20,7 +20,10 @@ class AuthManager {
         this.firestoreAvailable = false;
         
         // Initialisierung starten
-        this.initPromise = this.initialize();
+        this.initPromise = this.initialize().catch((error) => {
+            authLog.error('Init-Promise abgefangen', error);
+            return false;
+        });
     }
     
     async initialize() {
@@ -55,7 +58,8 @@ class AuthManager {
         } catch (error) {
             authLog.error('AuthManager-Initialisierung fehlgeschlagen', error);
             this.initialized = false;
-            throw error;
+            // Rejection vermeiden, stattdessen false zurückgeben
+            return false;
         }
     }
     
