@@ -1,0 +1,88 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function userDoc(uid) {
+      return get(/databases/$(database)/documents/users/$(uid));
+    }
+
+    function isGlobalAdmin() {
+      return isSignedIn() && userDoc(request.auth.uid).data.globalRole == 'global_admin';
+    }
+
+    function memberDoc(allianceId, uid) {
+      // Flache Collection: allianceMembers mit ID-Muster: <allianceId>_<uid>
+      return get(/databases/$(database)/documents/allianceMembers/$(allianceId + '_' + uid));
+    }
+
+    function isAllianceMember(allianceId) {
+      return isSignedIn() && exists(/databases/$(database)/documents/allianceMembers/$(allianceId + '_' + request.auth.uid));
+    }
+
+    function isAllianceAdmin(allianceId) {
+      let m = memberDoc(allianceId, request.auth.uid);
+      return isSignedIn() && m != null && (m.data.role == 'admin' || m.data.role == 'founder');
+    }
+
+    // Users: Jeder Nutzer darf sein eigenes Dokument lesen/schreiben. Global-Admins dürfen alles lesen/schreiben.
+    match /users/{uid} {
+      allow read: if isSignedIn() && (uid == request.auth.uid || isGlobalAdmin());
+      allow create: if isSignedIn() && uid == request.auth.uid;
+      allow update: if isSignedIn() && (uid == request.auth.uid || isGlobalAdmin());
+      allow delete: if isGlobalAdmin();
+    }
+
+    // Alliances: sichtbar für Mitglieder; änderbar von Allianz-Admins oder Global-Admins
+    match /alliances/{allianceId} {
+      allow read: if isSignedIn() && (isAllianceMember(allianceId) || isGlobalAdmin());
+      allow create: if isSignedIn() && (isGlobalAdmin());
+      allow update: if isSignedIn() && (isAllianceAdmin(allianceId) || isGlobalAdmin());
+      allow delete: if isGlobalAdmin();
+    }
+
+    // Alliance Members: Lesbar für angemeldete Nutzer (optional einschränken);
+    // Schreibrechte für Global-Admins oder Allianz-Admins der betroffenen Allianz
+    match /allianceMembers/{memberId} {
+      allow read: if isSignedIn();
+
+      allow create: if isSignedIn() && (
+        // Admins der Ziel-Allianz oder Global-Admin
+        isAllianceAdmin(request.resource.data.allianceId) || isGlobalAdmin()
+      );
+
+      allow update: if isSignedIn() && (
+        // Admins der Allianz des existierenden Dokuments oder Global-Admin
+        isAllianceAdmin(resource.data.allianceId) || isGlobalAdmin()
+      );
+
+      allow delete: if isSignedIn() && (
+        isAllianceAdmin(resource.data.allianceId) || isGlobalAdmin()
+      );
+    }
+
+    // Spy Reports: Sichtbar und schreibbar nur für Mitglieder der jeweiligen Allianz.
+    match /spyReports/{docId} {
+      allow read: if isSignedIn() && (isAllianceMember(resource.data.allianceId) || isGlobalAdmin());
+
+      allow create: if isSignedIn() && (
+        isAllianceMember(request.resource.data.allianceId) || isGlobalAdmin()
+      );
+
+      allow update: if isSignedIn() && (
+        // Mitglied der Allianz des Dokuments oder Global-Admin
+        isAllianceMember(resource.data.allianceId) || isGlobalAdmin()
+      );
+
+      allow delete: if isSignedIn() && (
+        // Ersteller, Allianz-Admin oder Global-Admin
+        resource.data.createdByUid == request.auth.uid ||
+        isAllianceAdmin(resource.data.allianceId) ||
+        isGlobalAdmin()
+      );
+    }
+  }
+}
+

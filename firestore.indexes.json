@@ -1,0 +1,30 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "spyReports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "allianceId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "spyReports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "allianceId", "order": "ASCENDING" },
+        { "fieldPath": "playerName", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "spyReports",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "allianceId", "order": "ASCENDING" },
+        { "fieldPath": "planetName", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
+
