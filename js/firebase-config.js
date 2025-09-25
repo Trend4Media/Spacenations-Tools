@@ -61,9 +61,10 @@ class FirebaseManager {
             this.auth = firebase.auth();
             this.db = firebase.firestore();
             
-            // Firestore-Einstellungen
+            // Firestore-Einstellungen (merge: true, um Warnungen zu vermeiden)
             this.db.settings({
-                cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
+                cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED,
+                merge: true
             });
             
             // Teste Verbindung
@@ -97,8 +98,11 @@ class FirebaseManager {
     }
     
     async loadConfig() {
-        // Reihenfolge: lokale JSON -> API -> Inline-Fallback
-        // 1) Lokale JSON versuchen (funktioniert auch auf rein statischen Hosts)
+        // Statische Hosts erkennen (z.B. GitHub Pages) – dort keine API-Calls loggen
+        const hostname = (typeof window !== 'undefined' && window.location) ? window.location.hostname : '';
+        const isStaticHost = hostname.endsWith('github.io') || hostname === '';
+
+        // Reihenfolge: lokale JSON -> (optional API) -> Inline-Fallback
         try {
             firebaseLog.firebase('Lade Konfiguration aus /firebase-config.json...');
             const jsonResponse = await fetch('/firebase-config.json', { cache: 'no-store' });
@@ -113,24 +117,27 @@ class FirebaseManager {
             firebaseLog.debug('JSON-Konfiguration nicht verfügbar', { error: e?.message });
         }
 
-        // 2) API-Endpunkt versuchen (wenn Backend läuft)
-        try {
-            firebaseLog.firebase('Versuche API-Konfiguration zu laden...');
-            const apiResponse = await fetch('/api/firebase-config', { cache: 'no-store' });
-            if (apiResponse.ok) {
-                const apiConfig = await apiResponse.json();
-                if (apiConfig && apiConfig.projectId) {
-                    firebaseLog.firebase('API-Konfiguration geladen');
-                    return apiConfig;
+        if (!isStaticHost) {
+            try {
+                firebaseLog.firebase('Versuche API-Konfiguration zu laden...');
+                const apiResponse = await fetch('/api/firebase-config', { cache: 'no-store' });
+                if (apiResponse.ok) {
+                    const apiConfig = await apiResponse.json();
+                    if (apiConfig && apiConfig.projectId) {
+                        firebaseLog.firebase('API-Konfiguration geladen');
+                        return apiConfig;
+                    }
+                } else {
+                    firebaseLog.debug('API nicht erreichbar', { status: apiResponse.status });
                 }
-            } else {
-                firebaseLog.debug('API nicht erreichbar', { status: apiResponse.status });
+            } catch (e) {
+                firebaseLog.debug('API-Konfiguration nicht verfügbar', { error: e?.message });
             }
-        } catch (e) {
-            firebaseLog.debug('API-Konfiguration nicht verfügbar', { error: e?.message });
+        } else {
+            firebaseLog.debug('Statischer Host – API-Config wird übersprungen');
         }
 
-        // 3) Fallback auf inline Konfiguration
+        // Fallback auf inline Konfiguration
         firebaseLog.firebase('Verwende Fallback-Konfiguration (inline)');
         return FIREBASE_CONFIG;
     }
