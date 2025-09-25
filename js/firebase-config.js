@@ -104,8 +104,9 @@ class FirebaseManager {
 
         // Reihenfolge: lokale JSON -> (optional API) -> Inline-Fallback
         try {
-            firebaseLog.firebase('Lade Konfiguration aus /firebase-config.json...');
-            const jsonResponse = await fetch('/firebase-config.json', { cache: 'no-store' });
+            firebaseLog.firebase('Lade Konfiguration aus firebase-config.json...');
+            // Relativer Pfad, damit GitHub Pages unter /<repo>/ funktioniert
+            const jsonResponse = await fetch('firebase-config.json', { cache: 'no-store' });
             if (jsonResponse.ok) {
                 const jsonConfig = await jsonResponse.json();
                 if (jsonConfig && jsonConfig.projectId) {
