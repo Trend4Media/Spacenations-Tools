@@ -30,7 +30,10 @@ class FirebaseManager {
         this.initPromise = null;
         
         // Sofort initialisieren
-        this.initPromise = this.initialize();
+        this.initPromise = this.initialize().catch((error) => {
+            firebaseLog.error('Init-Promise abgefangen', error);
+            return false;
+        });
     }
     
     async initialize() {
@@ -88,7 +91,8 @@ class FirebaseManager {
                 detail: { error: error.message }
             }));
             
-            throw error;
+            // Rejection vermeiden, stattdessen false zurückgeben
+            return false;
         }
     }
     
@@ -216,9 +220,10 @@ window.FirebaseConfig = {
     getServerTimestamp: () => window.firebaseManager.getServerTimestamp(),
     waitForReady: () => window.firebaseManager.waitForReady(),
     waitForReadyWithTimeout: (timeoutMs = 5000) => {
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve) => {
             const timeout = setTimeout(() => {
-                reject(new Error('Firebase-Initialisierung Timeout'));
+                // Timeout liefert false statt Exception
+                resolve(false);
             }, timeoutMs);
             
             try {
@@ -227,7 +232,8 @@ window.FirebaseConfig = {
                 resolve(ready);
             } catch (error) {
                 clearTimeout(timeout);
-                reject(error);
+                firebaseLog.error('Firebase-Initialisierung Timeout/Fehler abgefangen', error);
+                resolve(false);
             }
         });
     }
