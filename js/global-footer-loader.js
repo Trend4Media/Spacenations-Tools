@@ -589,7 +589,17 @@ class AutoGlobalFooterLoader {
     // Footer-Features initialisieren
     initializeFooterFeatures() {
         this.setupAutoThemeToggle();
-        this.setupAutoAdminLinks();
+        // Admin-Links auf der Startseite ausblenden
+        const isIndex = (window.location.pathname.split('/').pop().split('.')[0] || 'index') === 'index';
+        if (!isIndex) {
+            this.setupAutoAdminLinks();
+        } else {
+            const adminSection = document.querySelector('.footer-section .admin-links')?.closest('.footer-section');
+            if (adminSection) {
+                adminSection.style.display = 'none';
+                console.log('🙈 Admin-Sektion im Footer auf Startseite ausgeblendet');
+            }
+        }
         this.setupAutoDashboardLinks();
         this.setupAutoSystemStatus();
         this.setupAutoToolLinks();
