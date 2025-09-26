@@ -92,9 +92,34 @@ class FirebaseSync {
         } else if (!pageConfig.requiresAuth && isLoggedIn) {
             // Index/Register braucht keine Auth, aber User ist eingeloggt
             if (this.currentPage === 'index') {
-                console.log('✅ User eingeloggt - Weiterleitung zu Dashboard');
-                this.showWelcomeMessage(userData);
-                this.redirectAfterDelay(pageConfig.redirectTo, 2500);
+                // Unterdrücke Auto-Redirect falls gewünscht oder bei Rückkehr vom Dashboard
+                let suppressRedirect = false;
+                try {
+                    const params = new URLSearchParams(window.location.search || '');
+                    const paramKeys = ['stay', 'noRedirect', 'no-redirect'];
+                    suppressRedirect = paramKeys.some(key => {
+                        if (!params.has(key)) return false;
+                        const value = params.get(key);
+                        return value === null || value === '' || value === '1' || value === 'true';
+                    });
+                } catch (_) {}
+
+                let cameFromDashboard = false;
+                try {
+                    if (document.referrer) {
+                        const refUrl = new URL(document.referrer, window.location.href);
+                        const refPath = refUrl.pathname || '';
+                        cameFromDashboard = /(?:^|\/)user-dashboard\.html$/.test(refPath) || /(?:^|\/)dashboard\.html$/.test(refPath);
+                    }
+                } catch (_) {}
+
+                if (suppressRedirect || cameFromDashboard) {
+                    console.log('⏹️ Auto-Redirect auf Startseite unterdrückt', { suppressRedirect, cameFromDashboard });
+                } else {
+                    console.log('✅ User eingeloggt - Weiterleitung zu Dashboard');
+                    this.showWelcomeMessage(userData);
+                    this.redirectAfterDelay(pageConfig.redirectTo, 2500);
+                }
             }
         }
 
