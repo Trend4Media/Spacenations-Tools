@@ -594,6 +594,7 @@ class AutoGlobalFooterLoader {
         this.setupAutoDashboardLinks();
         this.setupAutoSystemStatus();
         this.setupAutoToolLinks();
+        this.hideAdminUiOnIndexAtRuntime();
         
         console.log('⚙️ Auto-Footer-Features initialisiert');
     }
@@ -721,6 +722,39 @@ class AutoGlobalFooterLoader {
     setupAutoToolLinks() {
         // Hier können weitere Tool-spezifische Links konfiguriert werden
         console.log('🔗 Auto Tool Links konfiguriert');
+    }
+    
+    // Laufzeit-Hide für Admin/Setup-UI auf der Startseite
+    hideAdminUiOnIndexAtRuntime() {
+        try {
+            const page = (window.location.pathname.split('/').pop().split('.')[0] || 'index');
+            if (page !== 'index') return;
+            
+            // Header: entferne Admin/Logout Buttons, lasse "Zum Spiel" bestehen
+            const navActions = document.querySelector('.header .nav .nav-actions');
+            if (navActions) {
+                const adminBtn = navActions.querySelector('.btn.btn-admin');
+                const logoutBtn = navActions.querySelector('.btn.btn-logout');
+                if (adminBtn && adminBtn.parentNode) adminBtn.parentNode.removeChild(adminBtn);
+                if (logoutBtn && logoutBtn.parentNode) logoutBtn.parentNode.removeChild(logoutBtn);
+            }
+            
+            // Sidebar: entferne gesamten Admin & System Block, falls noch vorhanden
+            const adminTitle = Array.from(document.querySelectorAll('.sidebar-title'))
+                .find(el => el.textContent && el.textContent.includes('Admin'));
+            if (adminTitle) {
+                // der nächste .sidebar-buttons-Block nach dem Titel
+                const buttons = adminTitle.nextElementSibling;
+                if (buttons && buttons.classList.contains('sidebar-buttons')) {
+                    buttons.remove();
+                }
+                adminTitle.remove();
+            }
+            
+            console.log('🧼 Admin/Setup UI auf Startseite zur Laufzeit entfernt');
+        } catch (e) {
+            console.warn('⚠️ Konnte Admin/Setup UI nicht zur Laufzeit entfernen:', e);
+        }
     }
     
     // Force-Reload für dynamische Inhalte
