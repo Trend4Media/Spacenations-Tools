@@ -410,6 +410,194 @@
             box-shadow: var(--glow-green-strong);
         }
         
+        .settings-btn {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--razer-green);
+            border: 2px solid var(--razer-green);
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: var(--font-gaming);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .settings-btn:hover {
+            background: var(--razer-green);
+            color: var(--razer-black);
+            transform: translateY(-2px);
+        }
+        
+        .settings-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .settings-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .settings-panel {
+            background: var(--bg-secondary);
+            border: 2px solid var(--razer-green);
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: var(--glow-green-strong);
+        }
+        
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid rgba(0, 255, 136, 0.2);
+        }
+        
+        .settings-header h2 {
+            font-family: var(--font-gaming);
+            color: var(--razer-green);
+            font-size: 28px;
+            margin: 0;
+        }
+        
+        .settings-close {
+            background: transparent;
+            border: none;
+            color: var(--razer-green);
+            font-size: 32px;
+            cursor: pointer;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .settings-close:hover {
+            color: var(--razer-white);
+            transform: rotate(90deg);
+        }
+        
+        .settings-group {
+            margin-bottom: 24px;
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+        
+        .settings-group h3 {
+            font-family: var(--font-gaming);
+            color: var(--razer-green);
+            font-size: 18px;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .settings-row {
+            display: grid;
+            grid-template-columns: 150px 1fr 1fr;
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .settings-label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .settings-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .settings-control input[type="number"] {
+            width: 80px;
+            padding: 8px;
+            background: var(--bg-secondary);
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        
+        .settings-control input[type="color"] {
+            width: 60px;
+            height: 36px;
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 4px;
+            cursor: pointer;
+            background: var(--bg-secondary);
+        }
+        
+        .settings-control input:focus {
+            outline: none;
+            border-color: var(--razer-green);
+        }
+        
+        .settings-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 2px solid rgba(0, 255, 136, 0.2);
+        }
+        
+        .btn-reset {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            border: 2px solid #ff6b6b;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-reset:hover {
+            background: #ff6b6b;
+            color: var(--razer-black);
+        }
+        
+        .btn-save {
+            background: var(--razer-green);
+            color: var(--razer-black);
+            border: 2px solid var(--razer-green);
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-save:hover {
+            background: var(--razer-green-light);
+            transform: translateY(-2px);
+        }
+        
         .back-btn {
             position: absolute;
             top: 20px;
@@ -486,6 +674,7 @@
                 <h1>🌌 ProximaDB</h1>
                 <p>Spacenations Tools - Planetenverfolgung</p>
                 <button class="refresh-btn" onclick="loadData()">🔄 Aktualisieren</button>
+                <button class="settings-btn" onclick="openSettings()">⚙️ Einstellungen</button>
             </div>
             
             <div id="content">
@@ -495,6 +684,90 @@
             </div>
         </div>
     </main>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="settings-modal">
+        <div class="settings-panel">
+            <div class="settings-header">
+                <h2>⚙️ Tabellen-Einstellungen</h2>
+                <button class="settings-close" onclick="closeSettings()">×</button>
+            </div>
+            
+            <div class="settings-group">
+                <h3>Spalten-Anpassung</h3>
+                
+                <div class="settings-row">
+                    <div class="settings-label">Name</div>
+                    <div class="settings-control">
+                        <label>Größe:</label>
+                        <input type="number" id="fontSize-name" min="10" max="30" value="16">
+                        <span>px</span>
+                    </div>
+                    <div class="settings-control">
+                        <label>Farbe:</label>
+                        <input type="color" id="color-name" value="#FFFFFF">
+                    </div>
+                </div>
+                
+                <div class="settings-row">
+                    <div class="settings-label">Koordinaten</div>
+                    <div class="settings-control">
+                        <label>Größe:</label>
+                        <input type="number" id="fontSize-coordinates" min="10" max="30" value="18">
+                        <span>px</span>
+                    </div>
+                    <div class="settings-control">
+                        <label>Farbe:</label>
+                        <input type="color" id="color-coordinates" value="#FFFFFF">
+                    </div>
+                </div>
+                
+                <div class="settings-row">
+                    <div class="settings-label">Punkte</div>
+                    <div class="settings-control">
+                        <label>Größe:</label>
+                        <input type="number" id="fontSize-score" min="10" max="30" value="16">
+                        <span>px</span>
+                    </div>
+                    <div class="settings-control">
+                        <label>Farbe:</label>
+                        <input type="color" id="color-score" value="#00FF88">
+                    </div>
+                </div>
+                
+                <div class="settings-row">
+                    <div class="settings-label">Zerstörung</div>
+                    <div class="settings-control">
+                        <label>Größe:</label>
+                        <input type="number" id="fontSize-deleteOn" min="10" max="30" value="16">
+                        <span>px</span>
+                    </div>
+                    <div class="settings-control">
+                        <label>Farbe:</label>
+                        <input type="color" id="color-deleteOn" value="#FFFFFF">
+                    </div>
+                </div>
+                
+                <div class="settings-row">
+                    <div class="settings-label">Woche</div>
+                    <div class="settings-control">
+                        <label>Größe:</label>
+                        <input type="number" id="fontSize-week" min="10" max="30" value="12">
+                        <span>px</span>
+                    </div>
+                    <div class="settings-control">
+                        <label>Farbe:</label>
+                        <input type="color" id="color-week" value="#0A0A0A">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-actions">
+                <button class="btn-reset" onclick="resetSettings()">🔄 Zurücksetzen</button>
+                <button class="btn-save" onclick="saveSettings()">💾 Speichern</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         const API_URL = 'https://beta2.game.spacenations.eu/api/proxima';
@@ -672,7 +945,156 @@
             }
         }
 
+        // === Settings Management ===
+        const DEFAULT_SETTINGS = {
+            name: { fontSize: 16, color: '#FFFFFF' },
+            coordinates: { fontSize: 18, color: '#FFFFFF' },
+            score: { fontSize: 16, color: '#00FF88' },
+            deleteOn: { fontSize: 16, color: '#FFFFFF' },
+            week: { fontSize: 12, color: '#0A0A0A' }
+        };
+        
+        function loadUserSettings() {
+            const saved = localStorage.getItem('proximaTableSettings');
+            return saved ? JSON.parse(saved) : DEFAULT_SETTINGS;
+        }
+        
+        function saveUserSettings(settings) {
+            localStorage.setItem('proximaTableSettings', JSON.stringify(settings));
+        }
+        
+        function applySettings() {
+            const settings = loadUserSettings();
+            
+            // Erstelle dynamisches Style-Element
+            let styleEl = document.getElementById('dynamic-table-styles');
+            if (!styleEl) {
+                styleEl = document.createElement('style');
+                styleEl.id = 'dynamic-table-styles';
+                document.head.appendChild(styleEl);
+            }
+            
+            // Generiere CSS basierend auf Settings
+            styleEl.textContent = `
+                .table-container table td:nth-child(1) strong {
+                    font-size: ${settings.name.fontSize}px !important;
+                    color: ${settings.name.color} !important;
+                }
+                .table-container table td:nth-child(2) code {
+                    font-size: ${settings.coordinates.fontSize}px !important;
+                    color: ${settings.coordinates.color} !important;
+                }
+                .table-container table td:nth-child(3) {
+                    font-size: ${settings.score.fontSize}px !important;
+                }
+                .table-container table td:nth-child(3).score-high,
+                .table-container table td:nth-child(3).score-medium,
+                .table-container table td:nth-child(3).score-low {
+                    color: ${settings.score.color} !important;
+                }
+                .table-container table td:nth-child(4) {
+                    font-size: ${settings.deleteOn.fontSize}px !important;
+                    color: ${settings.deleteOn.color} !important;
+                }
+                .table-container table td:nth-child(5) .week-badge {
+                    font-size: ${settings.week.fontSize}px !important;
+                    color: ${settings.week.color} !important;
+                }
+            `;
+        }
+        
+        function openSettings() {
+            const modal = document.getElementById('settingsModal');
+            const settings = loadUserSettings();
+            
+            // Lade aktuelle Werte in Formular
+            Object.keys(settings).forEach(key => {
+                const fontSizeInput = document.getElementById(`fontSize-${key}`);
+                const colorInput = document.getElementById(`color-${key}`);
+                if (fontSizeInput) fontSizeInput.value = settings[key].fontSize;
+                if (colorInput) colorInput.value = settings[key].color;
+            });
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeSettings() {
+            const modal = document.getElementById('settingsModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        function saveSettings() {
+            const settings = {
+                name: {
+                    fontSize: parseInt(document.getElementById('fontSize-name').value),
+                    color: document.getElementById('color-name').value
+                },
+                coordinates: {
+                    fontSize: parseInt(document.getElementById('fontSize-coordinates').value),
+                    color: document.getElementById('color-coordinates').value
+                },
+                score: {
+                    fontSize: parseInt(document.getElementById('fontSize-score').value),
+                    color: document.getElementById('color-score').value
+                },
+                deleteOn: {
+                    fontSize: parseInt(document.getElementById('fontSize-deleteOn').value),
+                    color: document.getElementById('color-deleteOn').value
+                },
+                week: {
+                    fontSize: parseInt(document.getElementById('fontSize-week').value),
+                    color: document.getElementById('color-week').value
+                }
+            };
+            
+            saveUserSettings(settings);
+            applySettings();
+            closeSettings();
+            
+            // Feedback
+            const saveBtn = document.querySelector('.btn-save');
+            const originalText = saveBtn.textContent;
+            saveBtn.textContent = '✅ Gespeichert!';
+            setTimeout(() => {
+                saveBtn.textContent = originalText;
+            }, 2000);
+        }
+        
+        function resetSettings() {
+            if (confirm('Möchten Sie wirklich alle Einstellungen zurücksetzen?')) {
+                saveUserSettings(DEFAULT_SETTINGS);
+                applySettings();
+                openSettings(); // Reload values in form
+                
+                // Feedback
+                const resetBtn = document.querySelector('.btn-reset');
+                const originalText = resetBtn.textContent;
+                resetBtn.textContent = '✅ Zurückgesetzt!';
+                setTimeout(() => {
+                    resetBtn.textContent = originalText;
+                }, 2000);
+            }
+        }
+        
+        // Schließe Modal bei Klick außerhalb
+        document.addEventListener('click', (e) => {
+            const modal = document.getElementById('settingsModal');
+            if (e.target === modal) {
+                closeSettings();
+            }
+        });
+        
+        // ESC-Taste zum Schließen
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeSettings();
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
+            applySettings(); // Settings beim Laden anwenden
             loadData();
             const headerBtn = document.querySelector('.refresh-btn');
             if (headerBtn) headerBtn.addEventListener('click', manualRefresh);
