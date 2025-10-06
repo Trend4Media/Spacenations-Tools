@@ -2,7 +2,7 @@
 """
 Spacenations Tools - Railway Deployment Server
 Hauptserver für die Space Nations Tools Web-Anwendung
-Version: 1.0.1 - ProximaDB Fallback Update
+Version: 1.0.2 - ProximaDB Auto-Updater Integration
 """
 
 import os
@@ -14,6 +14,14 @@ from urllib.parse import urlparse, parse_qs
 import threading
 import time
 from datetime import datetime
+
+# Import Auto-Updater
+try:
+    from proxima_auto_updater import check_and_update, is_update_time
+    PROXIMA_UPDATER_AVAILABLE = True
+except ImportError:
+    PROXIMA_UPDATER_AVAILABLE = False
+    logging.warning("⚠️ Proxima Auto-Updater nicht verfügbar")
 
 # Logging konfigurieren
 logging.basicConfig(
@@ -242,22 +250,24 @@ class SpacenationsRequestHandler(SimpleHTTPRequestHandler):
 def start_proxima_scheduler():
     """Start Proxima data scheduler in background thread"""
     def scheduler():
+        logger.info("🔄 Proxima Auto-Updater Scheduler gestartet")
+        logger.info("📅 Update-Zeitfenster: Mittwoch 17:00 - 23:00 Uhr")
+        logger.info("⏱️  Prüfintervall: Alle 5 Minuten")
+        
         while True:
             try:
-                # Import and run Proxima fetcher
-                try:
-                    from proxima_fetcher import ProximaFetcher
-                    fetcher = ProximaFetcher()
-                    fetcher.run_sync()
-                    logger.info("Proxima sync completed successfully")
-                except ImportError:
-                    logger.warning("Proxima fetcher not available")
-                except Exception as e:
-                    logger.error(f"Proxima sync error: {e}")
+                # Proxima Auto-Updater (jeden Mittwoch 17-23 Uhr, alle 5 Min)
+                if PROXIMA_UPDATER_AVAILABLE:
+                    try:
+                        check_and_update()
+                    except Exception as e:
+                        logger.error(f"❌ Proxima Auto-Updater Fehler: {e}")
                 
-                time.sleep(3600)  # Run every hour
+                # Warte 5 Minuten
+                time.sleep(300)
+                
             except Exception as e:
-                logger.error(f"Proxima scheduler error: {e}")
+                logger.error(f"❌ Proxima scheduler error: {e}")
                 time.sleep(60)  # Wait 1 minute on error
     
     thread = threading.Thread(target=scheduler, daemon=True)

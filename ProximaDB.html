@@ -597,14 +597,6 @@
 
             planets.sort((a, b) => b.score - a.score);
 
-            // Datenquellen-Indikator
-            const sourceInfo = source === 'beta2' 
-                ? '🟢 Live API (Beta2)' 
-                : '🟡 Fallback Daten';
-            const sourceLink = source === 'beta2'
-                ? '<a href="https://beta2.game.spacenations.eu/api/proxima" target="_blank" style="color: var(--razer-green);">Beta2 Spacenations API</a>'
-                : '<span style="color: var(--razer-green);">proxima_data.json</span>';
-
             const content = document.getElementById('content');
             content.innerHTML = `
                 <div class="stats">
@@ -615,10 +607,6 @@
                     <div class="stat">
                         <div class="stat-number">${latestWeek}</div>
                         <div class="stat-label">Aktuelle Woche</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-number">${sourceInfo}</div>
-                        <div class="stat-label">Datenquelle</div>
                     </div>
                 </div>
                 
@@ -649,7 +637,7 @@
                 
                 <div class="footer">
                     <p>Automatisch aktualisiert alle 60 Sekunden</p>
-                    <p>Datenquelle: ${sourceLink}</p>
+                    <p>Letzte Aktualisierung: Jeden Mittwoch 17-23 Uhr</p>
                 </div>
             `;
         }
