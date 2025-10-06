@@ -13,9 +13,9 @@ Das System lädt Proxima-Planetendaten von der **Beta2 Spacenations API** (`http
 - `setup_proxima.sh` - Setup-Skript für Installation und Cron-Job
 
 ### Web-Interface
-- `sabocounter.html` - Hauptseite für das Web-Interface
+- `ProximaDB.html` - Hauptseite für das Web-Interface mit Beta2 API Integration
 - `proxima_report.html` - Generierter HTML-Report
-- `proxima_data.json` - JSON-Daten für das Web-Interface
+- `proxima_data.json` - JSON-Daten als Fallback (60 echte Planeten-Einträge)
 
 ### Datenbank
 - `proxima.db` - SQLite Datenbank mit allen Planetendaten
@@ -34,11 +34,20 @@ Das System lädt Proxima-Planetendaten von der **Beta2 Spacenations API** (`http
 
 ## 📊 Datenstruktur
 
+### API-Endpunkte
+- **Primär**: `https://beta2.game.spacenations.eu/api/proxima` (Beta2 API)
+- **Fallback**: `proxima_data.json` (Lokale Daten mit 60 Planeten)
+
 Die API liefert folgende Daten für jeden Planeten:
 - **name**: Planetennamen (z.B. "Proxima 10-1", "Proxima 11-2")
 - **coordinates**: Koordinaten im Format "555:395:3"
 - **score**: Punkte als Zahl
 - **deleteOn**: Zerstörungsdatum im ISO-Format
+
+### Datenquellen-Logik
+1. **Primär**: Versucht Beta2 API zu laden (12 Sekunden Timeout)
+2. **Fallback**: Bei Fehler wird `proxima_data.json` verwendet
+3. **Anzeige**: Datenquelle wird im Interface angezeigt (🟢 Live API / 🟡 Fallback)
 
 ## 🗄️ Datenbank-Schema
 
@@ -141,9 +150,14 @@ python3 -u proxima_simple.py
 
 ## 📝 API-Dokumentation
 
-### Endpoint
+### Primary Endpoint (Beta2)
 ```
-GET https://beta1.game.spacenations.eu/api/proxima
+GET https://beta2.game.spacenations.eu/api/proxima
+```
+
+### Fallback Endpoint
+```
+GET proxima_data.json (lokal)
 ```
 
 ### Response Format
@@ -157,6 +171,11 @@ GET https://beta1.game.spacenations.eu/api/proxima
   }
 ]
 ```
+
+### Fehlerbehandlung
+- **Timeout**: 12 Sekunden für API-Anfragen
+- **Retry**: Automatischer Fallback zu lokalen Daten
+- **Logging**: Detaillierte Console-Logs für Debugging
 
 ## 🔄 Update-Prozess
 

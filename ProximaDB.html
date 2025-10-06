@@ -579,7 +579,7 @@
         });
         window.addEventListener('pagehide', () => clearTimeout(refreshTimerId));
 
-        function displayData(items) {
+        function displayData(items, source = 'api') {
             if (!Array.isArray(items)) throw new Error('Ungültiges Datenformat');
 
             const planets = items.map(p => ({
@@ -596,6 +596,14 @@
 
             planets.sort((a, b) => b.score - a.score);
 
+            // Datenquellen-Indikator
+            const sourceInfo = source === 'beta2' 
+                ? '🟢 Live API (Beta2)' 
+                : '🟡 Fallback Daten';
+            const sourceLink = source === 'beta2'
+                ? '<a href="https://beta2.game.spacenations.eu/api/proxima" target="_blank" style="color: var(--razer-green);">Beta2 Spacenations API</a>'
+                : '<span style="color: var(--razer-green);">proxima_data.json</span>';
+
             const content = document.getElementById('content');
             content.innerHTML = `
                 <div class="stats">
@@ -608,8 +616,8 @@
                         <div class="stat-label">Aktuelle Woche</div>
                     </div>
                     <div class="stat">
-                        <div class="stat-number">${new Date().toLocaleDateString('de-DE')}</div>
-                        <div class="stat-label">Letzte Aktualisierung</div>
+                        <div class="stat-number">${sourceInfo}</div>
+                        <div class="stat-label">Datenquelle</div>
                     </div>
                 </div>
                 
@@ -640,7 +648,7 @@
                 
                 <div class="footer">
                     <p>Automatisch aktualisiert alle 60 Sekunden</p>
-                    <p>Datenquelle: <a href="https://beta1.game.spacenations.eu/api/proxima" target="_blank" style="color: var(--razer-green);">Spacenations API</a></p>
+                    <p>Datenquelle: ${sourceLink}</p>
                 </div>
             `;
         }
