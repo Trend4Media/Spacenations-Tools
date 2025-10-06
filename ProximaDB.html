@@ -533,7 +533,8 @@
                 try {
                     // Fallback to local JSON file
                     const fallbackResponse = await fetch(FALLBACK_URL, { 
-                        cache: 'no-store' 
+                        cache: 'no-store',
+                        headers: { 'Accept': 'application/json' }
                     });
                     
                     if (!fallbackResponse.ok) throw new Error(`Fallback HTTP ${fallbackResponse.status}`);
