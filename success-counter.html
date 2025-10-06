@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success-Counter - Erfolgswahrscheinlichkeit für Sonderaktionen</title>
+    
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Razer Color Scheme */
+            --razer-green: #00FF88;
+            --razer-green-dark: #00CC6A;
+            --razer-green-light: #44FF99;
+            --razer-purple: #8B5CF6;
+            --razer-black: #0A0A0A;
+            --razer-dark: #111111;
+            --razer-gray: #1A1A1A;
+            --razer-gray-light: #2A2A2A;
+            --razer-white: #FFFFFF;
+            --razer-silver: #C0C0C0;
+            
+            --text-primary: var(--razer-white);
+            --text-secondary: var(--razer-silver);
+            
+            --bg-primary: var(--razer-black);
+            --bg-secondary: var(--razer-dark);
+            --bg-tertiary: var(--razer-gray);
+            --bg-card: var(--razer-gray-light);
+            
+            --glow-green: 0 0 20px rgba(0, 255, 136, 0.5);
+            --glow-green-strong: 0 0 30px rgba(0, 255, 136, 0.8);
+            --glow-purple: 0 0 20px rgba(139, 92, 246, 0.5);
+            
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            --font-gaming: 'Orbitron', monospace;
+            
+            /* Success colors */
+            --color-bad: #FF4444;
+            --color-ok: #FF9900;
+            --color-good: #00FF88;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-primary);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px 20px 0 20px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
+                linear-gradient(45deg, var(--razer-black) 0%, var(--razer-dark) 100%);
+            z-index: -1;
+            animation: backgroundPulse 8s ease-in-out infinite;
+        }
+        
+        @keyframes backgroundPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--bg-secondary);
+            border: 2px solid var(--razer-green);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), var(--glow-green);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            flex: 1;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--razer-purple), var(--razer-green));
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .back-button {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            color: var(--razer-green);
+            border: 2px solid var(--razer-green);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-gaming);
+        }
+        
+        .back-button:hover {
+            background: var(--razer-green);
+            color: var(--razer-black);
+            transform: translateY(-50%) translateY(-2px);
+            box-shadow: var(--glow-green);
+        }
+        
+        .header h1 {
+            font-family: var(--font-gaming);
+            font-size: 2.5rem;
+            color: var(--razer-green);
+            text-shadow: var(--glow-green);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            animation: titleGlow 4s ease-in-out infinite;
+        }
+        
+        @keyframes titleGlow {
+            0%, 100% { 
+                filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.3));
+            }
+            50% { 
+                filter: drop-shadow(0 0 30px rgba(0, 255, 136, 0.6));
+            }
+        }
+        
+        .header .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            font-weight: 400;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .card {
+            background: var(--bg-tertiary);
+            border: 2px solid rgba(139, 92, 246, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            border-color: var(--razer-purple);
+            box-shadow: var(--glow-purple);
+            transform: translateY(-2px);
+        }
+        
+        .card h2 {
+            font-family: var(--font-gaming);
+            color: var(--razer-purple);
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        input, select, button {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-family: var(--font-primary);
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--razer-purple);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+        
+        .row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .row > div {
+            flex: 1;
+        }
+        
+        .btn {
+            background: var(--razer-green);
+            color: var(--razer-black);
+            border: 2px solid var(--razer-green);
+            padding: 14px 20px;
+            font-weight: 700;
+            font-family: var(--font-gaming);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn:hover {
+            background: var(--razer-green-light);
+            transform: translateY(-2px);
+            box-shadow: var(--glow-green);
+        }
+        
+        .hint {
+            margin-top: 12px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            background: rgba(139, 92, 246, 0.1);
+            padding: 10px 12px;
+            border-radius: 6px;
+            border-left: 3px solid var(--razer-purple);
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(0, 255, 136, 0.1));
+            border: 2px solid rgba(0, 255, 136, 0.3);
+        }
+        
+        .result-card:hover {
+            border-color: var(--razer-green);
+            box-shadow: var(--glow-green);
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .muted {
+            color: var(--text-secondary);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .big {
+            font-size: clamp(24px, 4vw, 32px);
+            font-weight: 800;
+            font-family: var(--font-gaming);
+            color: var(--razer-green);
+            text-shadow: var(--glow-green);
+        }
+        
+        .mono {
+            font-variant-numeric: tabular-nums;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .pill {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: var(--bg-card);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-family: var(--font-gaming);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            text-align: right;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+        }
+        
+        th {
+            color: var(--razer-purple);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 13px;
+            background: rgba(139, 92, 246, 0.1);
+        }
+        
+        th:first-child, td:first-child {
+            text-align: left;
+        }
+        
+        tr:hover {
+            background: rgba(139, 92, 246, 0.05);
+        }
+        
+        .k-bad { 
+            color: var(--color-bad); 
+            font-weight: 700;
+        }
+        
+        .k-ok { 
+            color: var(--color-ok); 
+            font-weight: 700;
+        }
+        
+        .k-good { 
+            color: var(--color-good); 
+            font-weight: 700;
+        }
+        
+        .table-card {
+            background: var(--bg-tertiary);
+            border: 2px solid rgba(139, 92, 246, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        .table-card:hover {
+            border-color: var(--razer-purple);
+            box-shadow: var(--glow-purple);
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .table-header h3 {
+            font-family: var(--font-gaming);
+            color: var(--razer-green);
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+        }
+        
+        .legend {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .back-button {
+                position: static;
+                transform: none;
+                margin-bottom: 15px;
+            }
+            
+            .header {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .row {
+                flex-direction: column;
+            }
+            
+            .stat-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            table {
+                font-size: 14px;
+            }
+            
+            th, td {
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="back-button">← Zurück zur Hauptseite</a>
+            <h1>🎯 SUCCESS-COUNTER</h1>
+            <div class="subtitle">Erfolgswahrscheinlichkeit für Sonderaktionen</div>
+        </div>
+
+        <div class="grid">
+            <!-- Input Card -->
+            <div class="card">
+                <h2>⚙️ Parameter</h2>
+                
+                <div class="row">
+                    <div>
+                        <label for="att">Stufe Angreifer (A)</label>
+                        <input id="att" type="number" step="1" min="0" value="9" />
+                    </div>
+                    <div>
+                        <label for="def">Stufe Verteidiger (V)</label>
+                        <input id="def" type="number" step="1" min="0" value="9" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div>
+                        <label for="base">Basisfaktor</label>
+                        <input id="base" type="number" step="0.001" min="1.001" value="1.1" />
+                    </div>
+                    <div>
+                        <label for="k">Einheiten k (Versuche)</label>
+                        <input id="k" type="number" step="1" min="1" value="2" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div>
+                        <label for="target">Ziel-Erfolg (0–100%)</label>
+                        <input id="target" type="number" step="0.1" min="0" max="100" value="95" />
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <button class="btn" id="btnCalc">🔄 Berechnen</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Results Card -->
+            <div class="card result-card">
+                <h2>📈 Ergebnisse</h2>
+                
+                <div class="stat-row">
+                    <div>
+                        <div class="muted">Einzelerfolg (p)</div>
+                        <div id="p_single" class="big mono">–</div>
+                    </div>
+                    <div>
+                        <div class="muted">Gesamterfolg mit k</div>
+                        <div id="p_total" class="big mono">–</div>
+                    </div>
+                </div>
+
+                <div class="stat-row" style="margin-top: 20px;">
+                    <div>
+                        <div class="muted">Benötigtes k für Ziel</div>
+                        <div id="k_needed" class="big mono">–</div>
+                    </div>
+                    <div>
+                        <div class="muted">Basiswerte</div>
+                        <div style="margin-top: 8px;">
+                            <span id="a_val" class="pill">a=–</span>
+                            <span id="b_val" class="pill">b=–</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Table Card -->
+        <div class="table-card">
+            <div class="table-header">
+                <h3>📊 Übersichtstabelle</h3>
+                <div class="muted">k von 1 bis 20</div>
+            </div>
+            
+            <table id="tbl">
+                <thead>
+                    <tr>
+                        <th>k</th>
+                        <th>Gesamterfolg P<sub>k</sub></th>
+                        <th>Restfehler (1−P<sub>k</sub>)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <div class="legend">
+                <div class="muted" style="font-weight: 700;">Farblegende:</div>
+                <div class="legend-item">
+                    <span class="k-bad">●</span>
+                    <span>unter 80%</span>
+                </div>
+                <div class="legend-item">
+                    <span class="k-ok">●</span>
+                    <span>80–95%</span>
+                </div>
+                <div class="legend-item">
+                    <span class="k-good">●</span>
+                    <span>≥95%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const $ = sel => document.querySelector(sel);
+        const fmtPct = x => (100*x).toFixed(x >= 0.999 ? 5 : x >= 0.99 ? 3 : 2) + " %";
+        const clamp = (v,min,max) => Math.max(min, Math.min(max, v));
+
+        function calc() {
+            const A = parseInt($('#att').value, 10);
+            const V = parseInt($('#def').value, 10);
+            const base = parseFloat($('#base').value);
+            const k = Math.max(1, Math.floor(parseInt($('#k').value, 10) || 1));
+            const targetPct = clamp(parseFloat($('#target').value)/100, 0, 0.999999999999);
+
+            if (!(isFinite(A) && isFinite(V) && isFinite(base) && base > 1)) {
+                console.warn('Ungültige Eingabewerte');
+                return;
+            }
+
+            const a = Math.pow(base, A);
+            const b = Math.pow(base, V);
+
+            // Einzelerfolg p = a/(a+b) = 1/(1+base^(V-A))
+            const p = 1 / (1 + Math.pow(base, V - A));
+
+            // Gesamterfolg mit k
+            const Pk = 1 - Math.pow(1 - p, k);
+
+            // Benötigtes k für Ziel-P*
+            let kNeeded = '—';
+            if (p > 0 && p < 1 && targetPct > 0) {
+                const raw = Math.log(1 - targetPct) / Math.log(1 - p);
+                kNeeded = Math.max(1, Math.ceil(raw));
+            } else if (p === 1) {
+                kNeeded = 1;
+            }
+
+            // Ausgabe
+            $('#p_single').textContent = fmtPct(p);
+            $('#p_total').textContent = fmtPct(Pk);
+            $('#k_needed').textContent = (typeof kNeeded === 'number') ? kNeeded : '—';
+            $('#a_val').textContent = `a=${a.toFixed(6)}`;
+            $('#b_val').textContent = `b=${b.toFixed(6)}`;
+
+            // Tabelle
+            const tbody = $('#tbl tbody');
+            tbody.innerHTML = '';
+            for (let i = 1; i <= 20; i++) {
+                const pTot = 1 - Math.pow(1 - p, i);
+                const tr = document.createElement('tr');
+                const cls = pTot >= 0.95 ? 'k-good' : pTot >= 0.80 ? 'k-ok' : 'k-bad';
+                tr.innerHTML = `<td style="font-weight:700">${i}</td>
+                                <td class="mono ${cls}">${fmtPct(pTot)}</td>
+                                <td class="mono" style="color: var(--text-secondary)">${(1 - pTot).toExponential(3)}</td>`;
+                tbody.appendChild(tr);
+            }
+
+            console.log('✅ Berechnung abgeschlossen:', {
+                A, V, base, k,
+                einzelerfolg: fmtPct(p),
+                gesamterfolg: fmtPct(Pk),
+                benötigtes_k: kNeeded
+            });
+        }
+
+        // Events
+        $('#btnCalc').addEventListener('click', calc);
+        ['att','def','base','k','target'].forEach(id => {
+            $('#' + id).addEventListener('input', calc);
+            $('#' + id).addEventListener('change', calc);
+        });
+
+        // Initial calculation
+        document.addEventListener('DOMContentLoaded', function() {
+            calc();
+            console.log('🎯 Success-Counter initialisiert');
+        });
+
+        // Enter-Key Support
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    calc();
+                }
+            });
+        });
+    </script>
+
+    <!-- Global Footer Loader -->
+    <script src="js/global-footer-loader.js"></script>
+</body>
+</html>
