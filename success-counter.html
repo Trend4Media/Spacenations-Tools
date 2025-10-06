@@ -109,16 +109,10 @@
         }
         
         .header {
-            text-align: center;
             margin-bottom: 40px;
-            position: relative;
         }
         
         .back-button {
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
             background: transparent;
             color: var(--razer-green);
             border: 2px solid var(--razer-green);
@@ -128,20 +122,25 @@
             cursor: pointer;
             transition: all 0.3s ease;
             text-decoration: none;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 8px;
             font-family: var(--font-gaming);
+            margin-bottom: 20px;
         }
         
         .back-button:hover {
             background: var(--razer-green);
             color: var(--razer-black);
-            transform: translateY(-50%) translateY(-2px);
+            transform: translateY(-2px);
             box-shadow: var(--glow-green);
         }
         
-        .header h1 {
+        .header-title {
+            text-align: center;
+        }
+        
+        .header-title h1 {
             font-family: var(--font-gaming);
             font-size: 2.5rem;
             color: var(--razer-green);
@@ -160,17 +159,23 @@
             }
         }
         
-        .header .subtitle {
+        .header-title .subtitle {
             color: var(--text-secondary);
             font-size: 1.2rem;
             font-weight: 400;
         }
         
-        .grid {
+        .main-layout {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
             margin-bottom: 20px;
+        }
+        
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
         
         .card {
@@ -377,7 +382,6 @@
             border: 2px solid rgba(139, 92, 246, 0.2);
             border-radius: 12px;
             padding: 30px;
-            margin-top: 20px;
         }
         
         .table-card:hover {
@@ -433,15 +437,16 @@
                 margin-bottom: 15px;
             }
             
-            .header {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 10px;
+            .main-layout {
+                grid-template-columns: 1fr;
             }
             
-            .grid {
-                grid-template-columns: 1fr;
+            .left-column {
+                order: 1;
+            }
+            
+            .table-card {
+                order: 2;
             }
             
             .row {
@@ -468,13 +473,17 @@
     <div class="container">
         <div class="header">
             <a href="index.html" class="back-button">← Zurück zur Hauptseite</a>
-            <h1>🎯 SUCCESS-COUNTER</h1>
-            <div class="subtitle">Erfolgswahrscheinlichkeit für Sonderaktionen</div>
+            <div class="header-title">
+                <h1>🎯 SUCCESS-COUNTER</h1>
+                <div class="subtitle">Erfolgswahrscheinlichkeit für Sonderaktionen</div>
+            </div>
         </div>
 
-        <div class="grid">
-            <!-- Input Card -->
-            <div class="card">
+        <div class="main-layout">
+            <!-- Left Column: Parameters & Results -->
+            <div class="left-column">
+                <!-- Input Card -->
+                <div class="card">
                 <h2>⚙️ Parameter</h2>
                 
                 <div class="row">
@@ -540,14 +549,14 @@
                     </div>
                 </div>
 
+                </div>
             </div>
-        </div>
-
-        <!-- Table Card -->
-        <div class="table-card">
+            
+            <!-- Right Column: Table -->
+            <div class="table-card">
             <div class="table-header">
                 <h3>📊 Übersichtstabelle</h3>
-                <div class="muted">k von 1 bis 20</div>
+                <div class="muted">k von 20 bis 1</div>
             </div>
             
             <table id="tbl">
@@ -575,6 +584,7 @@
                     <span class="k-good">●</span>
                     <span>≥95%</span>
                 </div>
+            </div>
             </div>
         </div>
     </div>
@@ -621,10 +631,10 @@
             $('#a_val').textContent = `a=${a.toFixed(6)}`;
             $('#b_val').textContent = `b=${b.toFixed(6)}`;
 
-            // Tabelle
+            // Tabelle von 20 bis 1
             const tbody = $('#tbl tbody');
             tbody.innerHTML = '';
-            for (let i = 1; i <= 20; i++) {
+            for (let i = 20; i >= 1; i--) {
                 const pTot = 1 - Math.pow(1 - p, i);
                 const tr = document.createElement('tr');
                 const cls = pTot >= 0.95 ? 'k-good' : pTot >= 0.80 ? 'k-ok' : 'k-bad';
