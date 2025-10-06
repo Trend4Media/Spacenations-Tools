@@ -488,7 +488,8 @@
     </main>
 
     <script>
-        const API_URL = 'https://beta1.game.spacenations.eu/api/proxima';
+        const API_URL = 'https://beta2.game.spacenations.eu/api/proxima';
+        const FALLBACK_URL = 'proxima_data.json';
         const AUTO_REFRESH_MS = 60000;
         const REQUEST_TIMEOUT_MS = 12000;
 
@@ -499,7 +500,7 @@
             const controller = new AbortController();
             const id = setTimeout(() => controller.abort(), ms);
             return Promise.race([
-                fetch(API_URL, { headers: { 'Accept': 'application/json' }, cache: 'no-store', signal: controller.signal }),
+                promise,
                 new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout nach ' + ms + ' ms')), ms))
             ]).finally(() => clearTimeout(id));
         }
@@ -507,24 +508,54 @@
         async function loadData() {
             const content = document.getElementById('content');
             content.innerHTML = '<div class="loading"><p>Lade Proxima-Daten...</p></div>';
+            
             try {
-                const response = await withTimeout(fetch(API_URL, { headers: { 'Accept': 'application/json' }, cache: 'no-store' }), REQUEST_TIMEOUT_MS);
+                // Try primary API (beta2)
+                console.log('🚀 Lade Daten von beta2 API...');
+                const response = await withTimeout(
+                    fetch(API_URL, { 
+                        headers: { 'Accept': 'application/json' }, 
+                        cache: 'no-store' 
+                    }), 
+                    REQUEST_TIMEOUT_MS
+                );
+                
                 if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 const data = await response.json();
-                displayData(data);
+                console.log('✅ Beta2 API Daten erfolgreich geladen:', data.length, 'Planeten');
+                displayData(data, 'beta2');
                 backoffMs = AUTO_REFRESH_MS;
-            } catch (error) {
-                console.error('Fehler beim Laden der Daten:', error);
-                content.innerHTML = `
-                    <div class="error">
-                        <h3>⚠️ Fehler beim Laden der Daten</h3>
-                        <p>Die Proxima-Daten konnten nicht geladen werden.</p>
-                        <p><strong>Fehler:</strong> ${error.message}</p>
-                        <p>Bitte versuchen Sie es später erneut oder kontaktieren Sie den Administrator.</p>
-                        <button class="refresh-btn" onclick="manualRefresh()">🔄 Erneut versuchen</button>
-                    </div>
-                `;
-                backoffMs = Math.min(Math.floor(backoffMs * 1.5), 120000);
+                
+            } catch (apiError) {
+                console.warn('⚠️ Beta2 API Fehler:', apiError.message);
+                console.log('🔄 Versuche Fallback zu proxima_data.json...');
+                
+                try {
+                    // Fallback to local JSON file
+                    const fallbackResponse = await fetch(FALLBACK_URL, { 
+                        cache: 'no-store' 
+                    });
+                    
+                    if (!fallbackResponse.ok) throw new Error(`Fallback HTTP ${fallbackResponse.status}`);
+                    const fallbackData = await fallbackResponse.json();
+                    console.log('✅ Fallback Daten geladen:', fallbackData.length, 'Planeten');
+                    displayData(fallbackData, 'fallback');
+                    backoffMs = AUTO_REFRESH_MS;
+                    
+                } catch (fallbackError) {
+                    console.error('❌ Beide Datenquellen fehlgeschlagen:', fallbackError);
+                    content.innerHTML = `
+                        <div class="error">
+                            <h3>⚠️ Fehler beim Laden der Daten</h3>
+                            <p>Die Proxima-Daten konnten nicht geladen werden.</p>
+                            <p><strong>Beta2 API Fehler:</strong> ${apiError.message}</p>
+                            <p><strong>Fallback Fehler:</strong> ${fallbackError.message}</p>
+                            <p>Bitte versuchen Sie es später erneut oder kontaktieren Sie den Administrator.</p>
+                            <button class="refresh-btn" onclick="manualRefresh()">🔄 Erneut versuchen</button>
+                        </div>
+                    `;
+                    backoffMs = Math.min(Math.floor(backoffMs * 1.5), 120000);
+                }
             } finally {
                 scheduleNextRefresh();
             }

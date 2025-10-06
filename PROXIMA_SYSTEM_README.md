@@ -1,10 +1,10 @@
-# 🌌 Proxima Sabocounter System
+# 🌌 ProximaDB System
 
 Ein automatisiertes System zur Verfolgung von Proxima-Planeten aus der Spacenations API.
 
 ## 📋 Übersicht
 
-Das System lädt jeden Mittwoch um 18:45 Uhr automatisch die aktuellen Proxima-Planetendaten von der API `https://beta1.game.spacenations.eu/api/proxima` und stellt sie in einer übersichtlichen Web-Oberfläche zur Verfügung.
+Das System lädt Proxima-Planetendaten von der **Beta2 Spacenations API** (`https://beta2.game.spacenations.eu/api/proxima`) mit automatischem Fallback zu `proxima_data.json`. Die Daten werden jeden Mittwoch um 18:45 Uhr automatisch aktualisiert und in einer übersichtlichen Web-Oberfläche dargestellt.
 
 ## 🗂️ Dateien
 
