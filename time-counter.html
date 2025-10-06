@@ -115,17 +115,17 @@
             text-align: center;
             margin-bottom: 40px;
             position: relative;
+            padding-top: 60px;
         }
         
         .back-button {
             position: absolute;
             left: 0;
-            top: 50%;
-            transform: translateY(-50%);
+            top: 0;
             background: transparent;
             color: var(--accent-primary);
             border: 2px solid var(--accent-primary);
-            padding: 12px 24px;
+            padding: 10px 20px;
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
@@ -135,20 +135,20 @@
             align-items: center;
             gap: 8px;
             font-family: 'Orbitron', monospace;
+            font-size: 14px;
         }
 
         .back-button:hover {
             background: var(--accent-primary);
             color: var(--razer-black);
-            transform: translateY(-50%) translateY(-2px);
+            transform: translateY(-2px);
             box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
         }
         
         .theme-toggle {
             position: absolute;
             right: 0;
-            top: 50%;
-            transform: translateY(-50%);
+            top: 0;
             background: transparent;
             color: var(--accent-primary);
             border: 2px solid var(--accent-primary);
@@ -166,7 +166,7 @@
         .theme-toggle:hover {
             background: var(--accent-primary);
             color: var(--razer-black);
-            transform: translateY(-50%) translateY(-2px);
+            transform: translateY(-2px);
             box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
         }
         
@@ -177,6 +177,7 @@
             color: var(--accent-primary);
             text-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
             letter-spacing: 2px;
+            margin-top: 10px;
         }
         
         .subtitle {
@@ -438,8 +439,9 @@
             .back-button,
             .theme-toggle {
                 position: static;
-                transform: none;
                 margin-bottom: 12px;
+                width: 100%;
+                justify-content: center;
             }
             
             .header {
@@ -447,6 +449,7 @@
                 flex-direction: column;
                 align-items: center;
                 gap: 10px;
+                padding-top: 0;
             }
             
             .spacenations {
