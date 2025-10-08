@@ -368,7 +368,7 @@
             font-family: var(--font-gaming);
             font-size: clamp(48px, 8vw, 96px);
             font-weight: 900;
-            line-height: 0.9;
+            line-height: 1.1;
             margin-bottom: 24px;
             letter-spacing: -1px;
             background: linear-gradient(180deg, var(--razer-green) 0%, var(--razer-green-dark) 100%);
@@ -377,28 +377,31 @@
             background-clip: text;
             filter: drop-shadow(0 2px 8px rgba(0, 255, 136, 0.3));
             text-transform: uppercase;
-            word-break: break-word;
-            overflow-wrap: break-word;
+            white-space: nowrap;
         }
         
         .hero-subtitle {
             font-size: clamp(18px, 2.5vw, 28px);
             color: var(--text-primary);
-            margin-bottom: 16px;
-            line-height: 1.3;
-            font-weight: 300;
+            margin-bottom: 24px;
+            line-height: 1.4;
+            font-weight: 400;
             letter-spacing: 0.5px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
         }
         
         .hero-description {
-            font-size: clamp(14px, 1.8vw, 18px);
+            font-size: clamp(15px, 1.8vw, 18px);
             color: var(--text-secondary);
             margin-bottom: 48px;
-            line-height: 1.6;
-            max-width: 600px;
+            line-height: 1.8;
+            max-width: 700px;
             margin-left: auto;
             margin-right: auto;
-            opacity: 0.9;
+            opacity: 0.95;
+            font-weight: 400;
         }
         
         .hero-cta {
@@ -718,6 +721,8 @@
             .hero-title {
                 font-size: clamp(40px, 12vw, 64px);
                 letter-spacing: 0px;
+                white-space: normal;
+                word-break: break-word;
             }
             
             .stats-section {
@@ -853,11 +858,10 @@
         <!-- Hero Section -->
         <section class="hero">
             <div class="hero-container">
-                <h1 class="hero-title">Spacenations<br>Tools</h1>
+                <h1 class="hero-title">Spacenations Tools</h1>
                 <p class="hero-subtitle">Professional Gaming Analytics Platform</p>
                 <p class="hero-description">
-                    Advanced counter tools, raid calculators, and battle analytics designed for competitive Spacenations players. 
-                    Optimize your gameplay with precision-engineered tools.
+                    Advanced counter tools, raid calculators, and battle analytics designed for competitive Spacenations players. Optimize your gameplay with precision-engineered tools.
                 </p>
                 <div class="hero-cta">
                     <a href="as-counter.html" class="btn btn-primary">
