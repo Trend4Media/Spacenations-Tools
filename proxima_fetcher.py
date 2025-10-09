@@ -195,9 +195,35 @@ class ProximaFetcher:
                 with open('proxima_report.html', 'w', encoding='utf-8') as f:
                     f.write(html)
                 logging.info("HTML-Report generiert: proxima_report.html")
+            
+            # Discord Webhook Integration
+            self.send_to_discord()
+            
             return True
         except Exception as e:
             logging.error(f"Proxima run_sync Fehler: {e}")
+            return False
+    
+    def send_to_discord(self):
+        """Sendet die Proxima-Daten an Discord (falls Webhook konfiguriert)"""
+        try:
+            webhook_url = os.getenv('DISCORD_WEBHOOK_URL')
+            if not webhook_url:
+                logging.info("Kein Discord Webhook konfiguriert (DISCORD_WEBHOOK_URL nicht gesetzt)")
+                return False
+            
+            from proxima_discord_webhook import ProximaDiscordWebhook
+            webhook = ProximaDiscordWebhook(webhook_url, self.db_path)
+            success = webhook.send_to_discord(use_embed=True)
+            
+            if success:
+                logging.info("✅ ProximaDB-Daten erfolgreich an Discord gesendet")
+            else:
+                logging.warning("⚠️ Discord-Versand fehlgeschlagen")
+            
+            return success
+        except Exception as e:
+            logging.error(f"Discord Integration Fehler: {e}")
             return False
     
     def generate_html_report(self):
