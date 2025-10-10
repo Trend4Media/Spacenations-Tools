@@ -25,7 +25,7 @@ logging.basicConfig(
 
 class ProximaFetcher:
     def __init__(self, db_path='proxima.db'):
-        self.api_url = "https://beta1.game.spacenations.eu/api/proxima"
+        self.api_url = "https://beta2.game.spacenations.eu/api/proxima"
         self.db_path = db_path
         self.init_database()
     
@@ -195,9 +195,37 @@ class ProximaFetcher:
                 with open('proxima_report.html', 'w', encoding='utf-8') as f:
                     f.write(html)
                 logging.info("HTML-Report generiert: proxima_report.html")
+            
+            # Discord Webhook Integration
+            self.send_to_discord()
+            
             return True
         except Exception as e:
             logging.error(f"Proxima run_sync Fehler: {e}")
+            return False
+    
+    def send_to_discord(self):
+        """Sendet die Proxima-Daten an Discord (falls Webhook konfiguriert)"""
+        try:
+            webhook_url = os.getenv('DISCORD_WEBHOOK_URL')
+            if not webhook_url:
+                logging.info("Kein Discord Webhook konfiguriert (DISCORD_WEBHOOK_URL nicht gesetzt)")
+                return False
+            
+            from proxima_discord_webhook import ProximaDiscordWebhook
+            webhook = ProximaDiscordWebhook(webhook_url, self.db_path)
+            
+            # Sende Tabellen-Format (Website-Stil)
+            success = webhook.send_to_discord(use_embed=False, table_style='website')
+            
+            if success:
+                logging.info("✅ ProximaDB-Daten erfolgreich an Discord gesendet")
+            else:
+                logging.warning("⚠️ Discord-Versand fehlgeschlagen")
+            
+            return success
+        except Exception as e:
+            logging.error(f"Discord Integration Fehler: {e}")
             return False
     
     def generate_html_report(self):
@@ -374,7 +402,7 @@ class ProximaFetcher:
         
         <div class="footer">
             <p>Automatisch aktualisiert jeden Mittwoch um 18:45 Uhr</p>
-            <p>Datenquelle: <a href="https://beta1.game.spacenations.eu/api/proxima" target="_blank">Spacenations API</a></p>
+            <p>Datenquelle: <a href="https://beta2.game.spacenations.eu/api/proxima" target="_blank">Spacenations API</a></p>
         </div>
     </div>
 </body>
@@ -399,10 +427,10 @@ def main():
         logging.info("HTML-Report generiert: proxima_report.html")
     
     # Scheduler für wöchentliche Updates (Mittwoch 18:45)
-    schedule.every().wednesday.at("18:45").do(fetcher.update_planets)
-    schedule.every().wednesday.at("18:46").do(lambda: fetcher.generate_html_report() and open('proxima_report.html', 'w', encoding='utf-8').write(fetcher.generate_html_report()))
+    schedule.every().wednesday.at("18:45").do(fetcher.run_sync)
     
     logging.info("Scheduler gestartet - wöchentliche Updates jeden Mittwoch um 18:45")
+    logging.info("Automatischer Discord-Webhook aktiviert (falls DISCORD_WEBHOOK_URL gesetzt)")
     
     # Hauptschleife
     while True:
