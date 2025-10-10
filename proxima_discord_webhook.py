@@ -112,7 +112,7 @@ class ProximaDiscordWebhook:
             "footer": {
                 "text": "Spacenations Tools • ProximaDB"
             },
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(datetime.now().astimezone().tzinfo).isoformat()
         }
         
         return embed
