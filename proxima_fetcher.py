@@ -427,10 +427,10 @@ def main():
         logging.info("HTML-Report generiert: proxima_report.html")
     
     # Scheduler für wöchentliche Updates (Mittwoch 18:45)
-    schedule.every().wednesday.at("18:45").do(fetcher.update_planets)
-    schedule.every().wednesday.at("18:46").do(lambda: fetcher.generate_html_report() and open('proxima_report.html', 'w', encoding='utf-8').write(fetcher.generate_html_report()))
+    schedule.every().wednesday.at("18:45").do(fetcher.run_sync)
     
     logging.info("Scheduler gestartet - wöchentliche Updates jeden Mittwoch um 18:45")
+    logging.info("Automatischer Discord-Webhook aktiviert (falls DISCORD_WEBHOOK_URL gesetzt)")
     
     # Hauptschleife
     while True:
