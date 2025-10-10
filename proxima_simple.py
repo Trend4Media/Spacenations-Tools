@@ -13,7 +13,7 @@ import os
 
 class ProximaFetcher:
     def __init__(self, db_path='proxima.db'):
-        self.api_url = "https://beta1.game.spacenations.eu/api/proxima"
+        self.api_url = "https://beta2.game.spacenations.eu/api/proxima"
         self.db_path = db_path
         self.init_database()
     
@@ -354,7 +354,7 @@ class ProximaFetcher:
         
         <div class="footer">
             <p>Automatisch aktualisiert jeden Mittwoch um 18:45 Uhr</p>
-            <p>Datenquelle: <a href="https://beta1.game.spacenations.eu/api/proxima" target="_blank">Spacenations API</a></p>
+            <p>Datenquelle: <a href="https://beta2.game.spacenations.eu/api/proxima" target="_blank">Spacenations API</a></p>
         </div>
     </div>
 </body>
