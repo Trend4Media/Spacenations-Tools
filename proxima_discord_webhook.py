@@ -119,7 +119,7 @@ class ProximaDiscordWebhook:
     
     def create_simple_table_message(self, data: Dict) -> str:
         """Erstellt eine einfache Tabellen-Nachricht als Alternative"""
-        planets = data['planets'][:15]
+        planets = data['planets'][:25]
         
         message = f"""🌌 **ProximaDB - Planetenübersicht**
 
@@ -140,12 +140,41 @@ Rang | Name                | Koordinaten    | Punkte  | Woche
         
         return message
     
-    def send_to_discord(self, use_embed: bool = True) -> bool:
+    def create_website_style_table(self, data: Dict) -> str:
+        """Erstellt eine Website-ähnliche Tabelle für Discord"""
+        planets = data['planets'][:15]  # Reduziert auf Top 15 wegen Discord Limit
+        
+        # Header im Website-Stil
+        message = f"""🌌 **ProximaDB - Spacenations Tools**
+📊 **{data['total_planets']} Planeten** | 📅 **Woche {data['latest_week']}**
+
+```
+┌────┬──────────────────┬──────────────┬─────────┬────────────────────┬──────┐
+│ #  │ Name             │ Koordinaten  │ Punkte  │ Zerstörung         │ Wo.  │
+├────┼──────────────────┼──────────────┼─────────┼────────────────────┼──────┤"""
+        
+        for i, planet in enumerate(planets, 1):
+            name, coordinates, score, delete_on, week_number = planet
+            formatted_date = self.format_delete_date(delete_on)
+            
+            # Emoji für Top 3
+            rank = "🥇" if i == 1 else "🥈" if i == 2 else "🥉" if i == 3 else f"{i:2}"
+            
+            message += f"\n│ {rank:<2} │ {name[:16]:<16} │ {coordinates:<12} │ {score:7,} │ {formatted_date:<18} │ W{week_number:<3} │"
+        
+        message += f"""\n└────┴──────────────────┴──────────────┴─────────┴────────────────────┴──────┘
+```
+⏰ Letzte Aktualisierung: {data['last_update']}"""
+        
+        return message
+    
+    def send_to_discord(self, use_embed: bool = True, table_style: str = 'website') -> bool:
         """
         Sendet die Proxima-Daten an Discord
         
         Args:
-            use_embed: True für formatierte Embeds, False für einfache Nachricht
+            use_embed: True für formatierte Embeds, False für Tabellen-Nachricht
+            table_style: 'simple', 'website' oder 'compact' - nur relevant wenn use_embed=False
         """
         try:
             data = self.get_proxima_data()
@@ -161,7 +190,11 @@ Rang | Name                | Koordinaten    | Punkte  | Woche
                     "embeds": [embed]
                 }
             else:
-                message = self.create_simple_table_message(data)
+                if table_style == 'website':
+                    message = self.create_website_style_table(data)
+                else:
+                    message = self.create_simple_table_message(data)
+                    
                 payload = {
                     "username": "ProximaDB Bot",
                     "content": message
@@ -182,6 +215,71 @@ Rang | Name                | Koordinaten    | Punkte  | Woche
                 
         except Exception as e:
             logging.error(f"❌ Fehler beim Senden an Discord: {e}")
+            return False
+    
+    def send_multi_table(self, planets_per_page: int = 15) -> bool:
+        """Sendet die Daten als mehrere Tabellen-Nachrichten (alle Planeten)"""
+        try:
+            data = self.get_proxima_data()
+            if not data:
+                return False
+            
+            all_planets = data['planets']
+            total_pages = (len(all_planets) + planets_per_page - 1) // planets_per_page
+            
+            for page in range(total_pages):
+                start_idx = page * planets_per_page
+                end_idx = min(start_idx + planets_per_page, len(all_planets))
+                page_planets = all_planets[start_idx:end_idx]
+                
+                # Header für erste Seite, kompakter für weitere
+                if page == 0:
+                    message = f"""🌌 **ProximaDB - Spacenations Tools**
+📊 **{data['total_planets']} Planeten** | 📅 **Woche {data['latest_week']}** | 📄 Seite 1/{total_pages}
+
+```
+┌────┬──────────────────┬──────────────┬─────────┬────────────────────┬──────┐
+│ #  │ Name             │ Koordinaten  │ Punkte  │ Zerstörung         │ Wo.  │
+├────┼──────────────────┼──────────────┼─────────┼────────────────────┼──────┤"""
+                else:
+                    message = f"""📄 **Seite {page+1}/{total_pages}**
+
+```
+┌────┬──────────────────┬──────────────┬─────────┬────────────────────┬──────┐"""
+                
+                for i, planet in enumerate(page_planets, start_idx + 1):
+                    name, coordinates, score, delete_on, week_number = planet
+                    formatted_date = self.format_delete_date(delete_on)
+                    rank = "🥇" if i == 1 else "🥈" if i == 2 else "🥉" if i == 3 else f"{i:2}"
+                    message += f"\n│ {rank:<2} │ {name[:16]:<16} │ {coordinates:<12} │ {score:7,} │ {formatted_date:<18} │ W{week_number:<3} │"
+                
+                message += "\n└────┴──────────────────┴──────────────┴─────────┴────────────────────┴──────┘\n```"
+                
+                if page == total_pages - 1:
+                    message += f"\n⏰ Letzte Aktualisierung: {data['last_update']}"
+                
+                # Sende Nachricht
+                payload = {"username": "ProximaDB Bot", "content": message}
+                response = requests.post(
+                    self.webhook_url,
+                    json=payload,
+                    headers={'Content-Type': 'application/json'}
+                )
+                
+                if response.status_code != 204:
+                    logging.error(f"❌ Fehler bei Seite {page+1}: {response.status_code}")
+                    return False
+                
+                # Kurze Pause zwischen Nachrichten
+                if page < total_pages - 1:
+                    import time
+                    time.sleep(0.5)
+            
+            logging.info(f"✅ {total_pages} Seiten erfolgreich gesendet!")
+            return True
+            
+        except Exception as e:
+            logging.error(f"❌ Fehler beim Multi-Tabellen-Versand: {e}")
             return False
     
     def send_full_data_as_file(self) -> bool:
@@ -254,9 +352,9 @@ def main():
     
     webhook = ProximaDiscordWebhook(WEBHOOK_URL)
     
-    # Sende Embed-Nachricht
-    print("📤 Sende ProximaDB-Daten an Discord...")
-    success = webhook.send_to_discord(use_embed=True)
+    # Sende Website-Style Tabelle (Standard)
+    print("📤 Sende ProximaDB-Daten als Tabelle an Discord...")
+    success = webhook.send_to_discord(use_embed=False, table_style='website')
     
     if success:
         print("✅ Erfolgreich gesendet!")

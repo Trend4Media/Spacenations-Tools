@@ -214,7 +214,9 @@ class ProximaFetcher:
             
             from proxima_discord_webhook import ProximaDiscordWebhook
             webhook = ProximaDiscordWebhook(webhook_url, self.db_path)
-            success = webhook.send_to_discord(use_embed=True)
+            
+            # Sende Tabellen-Format (Website-Stil)
+            success = webhook.send_to_discord(use_embed=False, table_style='website')
             
             if success:
                 logging.info("✅ ProximaDB-Daten erfolgreich an Discord gesendet")
