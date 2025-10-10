@@ -140,6 +140,24 @@ Rang | Name                | Koordinaten    | Punkte  | Woche
         
         return message
     
+    def create_minimal_list(self, data: Dict) -> str:
+        """Erstellt eine minimalistische Liste: Name : Punkte : Koordinaten"""
+        planets = data['planets'][:30]
+        
+        message = f"""📊 **ProximaDB** | {data['total_planets']} Planeten | Woche {data['latest_week']}
+
+```
+Name                : Punkte   : Koordinaten
+--------------------:---------:-------------"""
+        
+        for planet in planets:
+            name, coordinates, score, delete_on, week_number = planet
+            message += f"\n{name[:20]:<20}: {score:8,} : {coordinates}"
+        
+        message += f"\n```\n⏰ {data['last_update']}"
+        
+        return message
+    
     def create_website_style_table(self, data: Dict) -> str:
         """Erstellt eine Website-ähnliche Tabelle für Discord"""
         planets = data['planets'][:15]  # Reduziert auf Top 15 wegen Discord Limit
@@ -168,6 +186,102 @@ Rang | Name                | Koordinaten    | Punkte  | Woche
         
         return message
     
+    def create_excel_file(self, filename: str = None) -> str:
+        """Erstellt eine Excel-Datei mit den Proxima-Daten"""
+        try:
+            import pandas as pd
+            from datetime import datetime
+            
+            if filename is None:
+                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                filename = f'proxima_data_{timestamp}.xlsx'
+            
+            data = self.get_proxima_data()
+            if not data:
+                return None
+            
+            # Konvertiere Daten für DataFrame
+            planets_list = []
+            for planet in data['planets']:
+                name, coordinates, score, delete_on, week_number = planet
+                planets_list.append({
+                    'Name': name,
+                    'Punkte': score,
+                    'Koordinaten': coordinates,
+                    'Zerstörung': self.format_delete_date(delete_on),
+                    'Woche': week_number
+                })
+            
+            df = pd.DataFrame(planets_list)
+            
+            # Excel mit Formatierung erstellen
+            with pd.ExcelWriter(filename, engine='openpyxl') as writer:
+                df.to_excel(writer, sheet_name='ProximaDB', index=False)
+                
+                # Formatierung
+                worksheet = writer.sheets['ProximaDB']
+                
+                # Spaltenbreiten anpassen
+                worksheet.column_dimensions['A'].width = 25  # Name
+                worksheet.column_dimensions['B'].width = 12  # Punkte
+                worksheet.column_dimensions['C'].width = 15  # Koordinaten
+                worksheet.column_dimensions['D'].width = 20  # Zerstörung
+                worksheet.column_dimensions['E'].width = 10  # Woche
+                
+                # Header formatieren
+                from openpyxl.styles import Font, PatternFill, Alignment
+                header_fill = PatternFill(start_color='00FF88', end_color='00FF88', fill_type='solid')
+                header_font = Font(bold=True, color='000000')
+                
+                for cell in worksheet[1]:
+                    cell.fill = header_fill
+                    cell.font = header_font
+                    cell.alignment = Alignment(horizontal='center')
+            
+            logging.info(f"✅ Excel-Datei erstellt: {filename}")
+            return filename
+            
+        except ImportError:
+            logging.error("❌ pandas oder openpyxl nicht installiert! Installieren Sie: pip install pandas openpyxl")
+            return None
+        except Exception as e:
+            logging.error(f"❌ Fehler beim Erstellen der Excel-Datei: {e}")
+            return None
+    
+    def send_excel_to_discord(self) -> bool:
+        """Erstellt und sendet Excel-Datei an Discord"""
+        try:
+            filename = self.create_excel_file()
+            if not filename:
+                return False
+            
+            data = self.get_proxima_data()
+            
+            # Sende als Datei
+            with open(filename, 'rb') as f:
+                response = requests.post(
+                    self.webhook_url,
+                    data={
+                        "content": f"📊 **ProximaDB Excel-Export**\n\n• {data['total_planets']} Planeten\n• Woche {data['latest_week']}\n• Sortiert nach Punkten (höchste zuerst)"
+                    },
+                    files={'file': (filename, f, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')}
+                )
+            
+            # Lösche temporäre Datei
+            import os
+            os.remove(filename)
+            
+            if response.status_code == 204 or response.status_code == 200:
+                logging.info(f"✅ Excel-Datei erfolgreich gesendet und gelöscht!")
+                return True
+            else:
+                logging.error(f"❌ Fehler beim Senden: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            logging.error(f"❌ Fehler beim Excel-Versand: {e}")
+            return False
+    
     def send_to_discord(self, use_embed: bool = True, table_style: str = 'website') -> bool:
         """
         Sendet die Proxima-Daten an Discord
@@ -192,6 +306,8 @@ Rang | Name                | Koordinaten    | Punkte  | Woche
             else:
                 if table_style == 'website':
                     message = self.create_website_style_table(data)
+                elif table_style == 'minimal':
+                    message = self.create_minimal_list(data)
                 else:
                     message = self.create_simple_table_message(data)
                     
