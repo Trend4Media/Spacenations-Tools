@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Success-Counter - Erfolgswahrscheinlichkeit für Sonderaktionen</title>
-    
-    <!-- Modern Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <style>
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Success-Counter - Erfolgswahrscheinlichkeit für Sonderaktionen</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+      <style>
         :root {
             /* Razer Color Scheme */
             --razer-green: #00FF88;
@@ -467,215 +464,176 @@
                 padding: 8px 10px;
             }
         }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
+      </style>
+   </head>
+   <body>
+      <div class="container">
+         <div class="header">
             <a href="index.html" class="back-button">← Zurück zur Hauptseite</a>
             <div class="header-title">
-                <h1>🎯 SUCCESS-COUNTER</h1>
-                <div class="subtitle">Erfolgswahrscheinlichkeit für Sonderaktionen</div>
+               <h1>🎯 SUCCESS-COUNTER</h1>
+               <div class="subtitle">Erfolgswahrscheinlichkeit für Sonderaktionen</div>
             </div>
-        </div>
-
-        <div class="main-layout">
-            <!-- Left Column: Parameters & Results -->
+         </div>
+         <div class="main-layout">
             <div class="left-column">
-                <!-- Input Card -->
-                <div class="card">
-                <h2>⚙️ Parameter</h2>
-                
-                <div class="row">
-                    <div>
-                        <label for="att">Stufe Angreifer (A)</label>
-                        <input id="att" type="number" step="1" min="0" value="9" />
-                    </div>
-                    <div>
-                        <label for="def">Stufe Verteidiger (V)</label>
-                        <input id="def" type="number" step="1" min="0" value="9" />
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div>
-                        <label for="base">Basisfaktor</label>
-                        <input id="base" type="number" step="0.001" min="1.001" value="1.1" />
-                    </div>
-                    <div>
-                        <label for="k">Einheiten k (Versuche)</label>
-                        <input id="k" type="number" step="1" min="1" value="2" />
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div>
-                        <label for="target">Ziel-Erfolg (0–100%)</label>
-                        <input id="target" type="number" step="0.1" min="0" max="100" value="95" />
-                    </div>
-                    <div style="display: flex; align-items: flex-end;">
-                        <button class="btn" id="btnCalc">🔄 Berechnen</button>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Results Card -->
-            <div class="card result-card">
-                <h2>📈 Ergebnisse</h2>
-                
-                <div class="stat-row">
-                    <div>
+               <div class="card">
+                  <h2>⚙️ Parameter</h2>
+                  <div class="row">
+                     <div><label for="att">Stufe Angreifer (A)</label><input id="att" type="number" step="1" min="0" value="9"></div>
+                     <div><label for="def">Stufe Verteidiger (V)</label><input id="def" type="number" step="1" min="0" value="9"></div>
+                  </div>
+                  <div class="row">
+                     <div><label for="base">Basisfaktor</label><input id="base" type="number" step="0.001" min="1.001" value="1.1"></div>
+                     <div><label for="k">Einheiten k (Versuche)</label><input id="k" type="number" step="1" min="1" value="2"></div>
+                  </div>
+                  <div class="row">
+                     <div><label for="target">Ziel-Erfolg (0–100%)</label><input id="target" type="number" step="0.1" min="0" max="100" value="95"></div>
+                     <div style="display:flex;align-items:flex-end;"><button class="btn" id="btnCalc">🔄 Berechnen</button></div>
+                  </div>
+               </div>
+               <div class="card result-card">
+                  <h2>📈 Ergebnisse</h2>
+                  <div class="stat-row">
+                     <div>
                         <div class="muted">Einzelerfolg (p)</div>
                         <div id="p_single" class="big mono">–</div>
-                    </div>
-                    <div>
+                     </div>
+                     <div>
                         <div class="muted">Gesamterfolg mit k</div>
                         <div id="p_total" class="big mono">–</div>
-                    </div>
-                </div>
-
-                <div class="stat-row" style="margin-top: 20px;">
-                    <div>
+                     </div>
+                  </div>
+                  <!-- Sonderaktion & Dauer -->
+                  <div class="stat-row" style="margin-top:20px;">
+                     <div >
+                        <label for="action">Sonderaktion</label>
+                        <select id="action">
+                           <option value="spionage">Spionage</option>
+                           <option value="pluenderung">Plünderung</option>
+                           <option value="sabotage">Sabotage</option>
+                           <option value="recycling">Recycling</option>
+                           <option value="kolonisation">Kolonisation</option>
+                           <option value="invasion">Invasion</option>
+                        </select>
+                     </div>
+                     <div >
+                        <div class="muted">Dauer</div>
+                        <div id="duration" class="big mono">–</div>
+                     </div>
+                  </div>
+                  <div class="stat-row" style="margin-top:20px;">
+                     <div>
                         <div class="muted">Benötigtes k für Ziel</div>
                         <div id="k_needed" class="big mono">–</div>
-                    </div>
-                    <div>
+                     </div>
+                     <div>
                         <div class="muted">Basiswerte</div>
-                        <div style="margin-top: 8px;">
-                            <span id="a_val" class="pill">a=–</span>
-                            <span id="b_val" class="pill">b=–</span>
-                        </div>
-                    </div>
-                </div>
-
-                </div>
+                        <div style="margin-top:8px;"><span id="a_val" class="pill">a=–</span> <span id="b_val" class="pill">b=–</span></div>
+                     </div>
+                  </div>
+               </div>
             </div>
-            
-            <!-- Right Column: Table -->
             <div class="table-card">
-            <div class="table-header">
-                <h3>📊 Übersichtstabelle</h3>
-                <div class="muted">k von 20 bis 1</div>
-            </div>
-            
-            <table id="tbl">
-                <thead>
-                    <tr>
+               <div class="table-header">
+                  <h3>📊 Übersichtstabelle</h3>
+                  <div class="muted">k von 20 bis 1</div>
+               </div>
+               <table id="tbl">
+                  <thead>
+                     <tr>
                         <th>k</th>
-                        <th>Gesamterfolg P<sub>k</sub></th>
-                        <th>Restfehler (1−P<sub>k</sub>)</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-
-            <div class="legend">
-                <div class="muted" style="font-weight: 700;">Farblegende:</div>
-                <div class="legend-item">
-                    <span class="k-bad">●</span>
-                    <span>unter 80%</span>
-                </div>
-                <div class="legend-item">
-                    <span class="k-ok">●</span>
-                    <span>80–95%</span>
-                </div>
-                <div class="legend-item">
-                    <span class="k-good">●</span>
-                    <span>≥95%</span>
-                </div>
+                        <th>Gesamterfolg Pₖ</th>
+                        <th>Restfehler (1−Pₖ)</th>
+                     </tr>
+                  </thead>
+                  <tbody></tbody>
+               </table>
+               <div class="legend">
+                  <div class="muted" style="font-weight:700;">Farblegende:</div>
+                  <div class="legend-item"><span class="k-bad">●</span><span>unter 80%</span></div>
+                  <div class="legend-item"><span class="k-ok">●</span><span>80–95%</span></div>
+                  <div class="legend-item"><span class="k-good">●</span><span>≥95%</span></div>
+               </div>
             </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const $ = sel => document.querySelector(sel);
-        const fmtPct = x => (100*x).toFixed(x >= 0.999 ? 5 : x >= 0.99 ? 3 : 2) + " %";
-        const clamp = (v,min,max) => Math.max(min, Math.min(max, v));
-
-        function calc() {
-            const A = parseInt($('#att').value, 10);
-            const V = parseInt($('#def').value, 10);
-            const base = parseFloat($('#base').value);
-            const k = Math.max(1, Math.floor(parseInt($('#k').value, 10) || 1));
-            const targetPct = clamp(parseFloat($('#target').value)/100, 0, 0.999999999999);
-
-            if (!(isFinite(A) && isFinite(V) && isFinite(base) && base > 1)) {
-                console.warn('Ungültige Eingabewerte');
-                return;
-            }
-
-            const a = Math.pow(base, A);
-            const b = Math.pow(base, V);
-
-            // Einzelerfolg p = a/(a+b) = 1/(1+base^(V-A))
-            const p = 1 / (1 + Math.pow(base, V - A));
-
-            // Gesamterfolg mit k
-            const Pk = 1 - Math.pow(1 - p, k);
-
-            // Benötigtes k für Ziel-P*
-            let kNeeded = '—';
-            if (p > 0 && p < 1 && targetPct > 0) {
-                const raw = Math.log(1 - targetPct) / Math.log(1 - p);
-                kNeeded = Math.max(1, Math.ceil(raw));
-            } else if (p === 1) {
-                kNeeded = 1;
-            }
-
-            // Ausgabe
-            $('#p_single').textContent = fmtPct(p);
-            $('#p_total').textContent = fmtPct(Pk);
-            $('#k_needed').textContent = (typeof kNeeded === 'number') ? kNeeded : '—';
-            $('#a_val').textContent = `a=${a.toFixed(6)}`;
-            $('#b_val').textContent = `b=${b.toFixed(6)}`;
-
-            // Tabelle von 20 bis 1
-            const tbody = $('#tbl tbody');
-            tbody.innerHTML = '';
-            for (let i = 20; i >= 1; i--) {
-                const pTot = 1 - Math.pow(1 - p, i);
-                const tr = document.createElement('tr');
-                const cls = pTot >= 0.95 ? 'k-good' : pTot >= 0.80 ? 'k-ok' : 'k-bad';
-                tr.innerHTML = `<td style="font-weight:700">${i}</td>
-                                <td class="mono ${cls}">${fmtPct(pTot)}</td>
-                                <td class="mono" style="color: var(--text-secondary)">${(1 - pTot).toExponential(3)}</td>`;
-                tbody.appendChild(tr);
-            }
-
-            console.log('✅ Berechnung abgeschlossen:', {
-                A, V, base, k,
-                einzelerfolg: fmtPct(p),
-                gesamterfolg: fmtPct(Pk),
-                benötigtes_k: kNeeded
-            });
-        }
-
-        // Events
-        $('#btnCalc').addEventListener('click', calc);
-        ['att','def','base','k','target'].forEach(id => {
-            $('#' + id).addEventListener('input', calc);
-            $('#' + id).addEventListener('change', calc);
-        });
-
-        // Initial calculation
-        document.addEventListener('DOMContentLoaded', function() {
-            calc();
-            console.log('🎯 Success-Counter initialisiert');
-        });
-
-        // Enter-Key Support
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    calc();
-                }
-            });
-        });
-    </script>
-
-    <!-- Global Footer Loader -->
-    <script src="js/global-footer-loader.js"></script>
-</body>
+         </div>
+      </div>
+      <script>
+         const $ = s => document.querySelector(s);
+         const fmtPct = x => (100*x).toFixed(x>=0.999?5:x>=0.99?3:2)+" %";
+         const clamp = (v,min,max) => Math.max(min,Math.min(max,v));
+         
+         function calcDuration(){
+           const action = $('#action').value;
+           const A = parseFloat($('#att').value);
+           const V = parseFloat($('#def').value);
+           if(!isFinite(A)||!isFinite(V)){ $('#duration').textContent='–'; return; }
+         
+           let minutes=0;
+           switch(action){
+             case 'spionage':
+             case 'pluenderung':
+             case 'sabotage':
+               minutes=15; break;
+             case 'recycling':
+               minutes=10*Math.pow(1.11,V)/Math.pow(0.91,A); break;
+             case 'kolonisation':
+               minutes=30*Math.pow(1.11,V)/Math.pow(0.91,A); break;
+             case 'invasion':
+               const hours=24*Math.pow(0.91,A)*Math.pow(1.11,V);
+               minutes=hours*60; break;
+           }
+           const h=Math.floor(minutes/60);
+           const m=Math.round(minutes%60);
+           const txt=(minutes>=60)?`${h}h ${m}m`:minutes.toFixed(1)+' Min';
+           $('#duration').textContent=txt;
+         }
+         
+         function calc(){
+           const A=parseInt($('#att').value,10);
+           const V=parseInt($('#def').value,10);
+           const base=parseFloat($('#base').value);
+           const k=Math.max(1,Math.floor(parseInt($('#k').value,10)||1));
+           const targetPct=clamp(parseFloat($('#target').value)/100,0,0.999999999999);
+           if(!(isFinite(A)&&isFinite(V)&&isFinite(base)&&base>1))return;
+         
+           const a=Math.pow(base,A);
+           const b=Math.pow(base,V);
+           const p=1/(1+Math.pow(base,V-A));
+           const Pk=1-Math.pow(1-p,k);
+         
+           let kNeeded='—';
+           if(p>0&&p<1&&targetPct>0){
+             const raw=Math.log(1-targetPct)/Math.log(1-p);
+             kNeeded=Math.max(1,Math.ceil(raw));
+           } else if(p===1) kNeeded=1;
+         
+           $('#p_single').textContent=fmtPct(p);
+           $('#p_total').textContent=fmtPct(Pk);
+           $('#k_needed').textContent=(typeof kNeeded==='number')?kNeeded:'—';
+           $('#a_val').textContent=`a=${a.toFixed(6)}`;
+           $('#b_val').textContent=`b=${b.toFixed(6)}`;
+         
+           const tbody=$('#tbl tbody'); tbody.innerHTML='';
+           for(let i=20;i>=1;i--){
+             const pTot=1-Math.pow(1-p,i);
+             const cls=pTot>=0.95?'k-good':pTot>=0.80?'k-ok':'k-bad';
+             const tr=document.createElement('tr');
+             tr.innerHTML=`<td style="font-weight:700">${i}</td>
+                           <td class="mono ${cls}">${fmtPct(pTot)}</td>
+                           <td class="mono" style="color:var(--text-secondary)">${(1-pTot).toExponential(3)}</td>`;
+             tbody.appendChild(tr);
+           }
+           calcDuration();
+         }
+         
+         ['att','def','base','k','target','action'].forEach(id=>{
+           $('#'+id).addEventListener('input',calc);
+           $('#'+id).addEventListener('change',calc);
+         });
+         $('#btnCalc').addEventListener('click',calc);
+         document.addEventListener('DOMContentLoaded',()=>calc());
+      </script>
+      <script src="js/global-footer-loader.js"></script>
+   </body>
 </html>
