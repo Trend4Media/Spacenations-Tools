@@ -220,7 +220,7 @@ async reportExists(reportId, allianceName)
 #### 2.2 `spy-report-parser.js` - Report-Parser
 **Kernklasse:** `SpyReportParser`
 
-**API-Endpoint:** `https://beta1.game.spacenations.eu/api/spy-report/{reportId}`
+**API-Endpoint:** `https://beta2.game.spacenations.eu/api/spy-report/{reportId}`
 
 ##### A. URL-Parsing
 ```javascript
@@ -871,7 +871,7 @@ match /allianceSpyReports/{document} {
 - Optional: Composite Indizes für erweiterte Suche
 
 ✅ **API-Endpoints:**
-- `https://beta1.game.spacenations.eu/api/spy-report/{id}` funktioniert
+- `https://beta2.game.spacenations.eu/api/spy-report/{id}` funktioniert
 
 ✅ **Dependencies:**
 - Firebase SDK 9.23.0
