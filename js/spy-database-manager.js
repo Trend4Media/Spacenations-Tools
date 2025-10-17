@@ -118,11 +118,12 @@ class SpyDatabaseManager {
                 // Report-Daten
                 planet: reportData.planet,
                 player: reportData.player,
-                buildings: reportData.buildings,
+                buildings: reportData.legacy?.buildings || reportData.buildings, // Legacy-Format für Tabelle
                 resources: reportData.resources,
                 defense: reportData.defense,
                 fleets: reportData.fleets,
                 fleet: reportData.fleet,
+                research: reportData.legacy?.player?.research || reportData.research, // Legacy-Format für Tabelle
                 
                 // Berechnete Statistiken
                 statistics: reportData.statistics,

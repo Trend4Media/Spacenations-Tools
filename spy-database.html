@@ -620,35 +620,74 @@
                 return;
             }
             
-            tbody.innerHTML = reports.map(report => `
-                <tr>
-                    <td class="player-name">${report.player}</td>
-                    <td>${report.planet}</td>
-                    <td class="coordinates">${report.coordinates}</td>
-                    <td class="alliance">${report.alliance || '—'}</td>
-                    <td class="building-value">${report.planetenzentrale || '—'}</td>
-                    <td class="building-value">${report.raumhafen || '—'}</td>
-                    <td class="building-value">${report.eisenmine || '—'}</td>
-                    <td class="building-value">${report.siliziumraffinerie || '—'}</td>
-                    <td class="building-value">${report.kohlenstoffgewinnungsanlage || '—'}</td>
-                    <td class="building-value">${report.schiffsfabrik || '—'}</td>
-                    <td class="building-value">${report.waffenfabrik || '—'}</td>
-                    <td class="building-value">${report.forschungszentrum || '—'}</td>
-                    <td class="research-value">───────</td>
-                    <td class="unit-value">${report.spionageeinheit || '—'}</td>
-                    <td class="unit-value">${report.tarneinheit || '—'}</td>
-                    <td class="unit-value">${report.invasionseinheit || '—'}</td>
-                    <td class="unit-value">${report.pluendereinheit || '—'}</td>
-                    <td class="unit-value">${report.sabotageeinheit || '—'}</td>
-                    <td>${report.datum || '—'}</td>
-                    <td>
-                        ${report.originalUrl ? 
-                            `<button class="copy-btn" onclick="copyToClipboard('${report.coordinates}')">📋</button>` : 
-                            '—'
-                        }
-                    </td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = reports.map(report => {
+                // Extrahiere Werte aus der Firebase-Struktur
+                const playerName = report.playerName || report.player?.name || report.player || '—';
+                const planetName = report.planetName || report.planet?.name || report.planet || '—';
+                const coordinates = report.planetCoordinates || report.planet?.coordinates || report.coordinates || '—';
+                const alliance = report.player?.allianceName || report.alliance || '—';
+                
+                // Gebäude aus buildings Object oder legacy fields
+                const buildings = report.buildings || {};
+                const planetenzentrale = buildings.PZ || report.planetenzentrale || '—';
+                const raumhafen = buildings.RH || report.raumhafen || '—';
+                const eisenmine = buildings.Fe || report.eisenmine || '—';
+                const siliziumraffinerie = buildings.Si || report.siliziumraffinerie || '—';
+                const kohlenstoffgewinnungsanlage = buildings.C || report.kohlenstoffgewinnungsanlage || '—';
+                const schiffsfabrik = buildings.SF || report.schiffsfabrik || '—';
+                const waffenfabrik = buildings.WF || report.waffenfabrik || '—';
+                const forschungszentrum = buildings.FZ || report.forschungszentrum || '—';
+                
+                // Forschung/Einheiten aus research Object oder legacy fields
+                const research = report.research || {};
+                const spionageeinheit = research.spio || report.spionageeinheit || '—';
+                const tarneinheit = research.tarn || report.tarneinheit || '—';
+                const invasionseinheit = research.inva || report.invasionseinheit || '—';
+                const pluendereinheit = research.raid || report.pluendereinheit || '—';
+                const sabotageeinheit = research.sabo || report.sabotageeinheit || '—';
+                
+                // Datum formatieren
+                let datum = '—';
+                if (report.createdAt) {
+                    const date = report.createdAt.toDate ? report.createdAt.toDate() : new Date(report.createdAt);
+                    datum = date.toLocaleDateString('de-DE');
+                } else if (report.timestamp) {
+                    const date = new Date(report.timestamp);
+                    datum = date.toLocaleDateString('de-DE');
+                } else if (report.datum) {
+                    datum = report.datum;
+                }
+                
+                return `
+                    <tr>
+                        <td class="player-name">${playerName}</td>
+                        <td>${planetName}</td>
+                        <td class="coordinates">${coordinates}</td>
+                        <td class="alliance">${alliance}</td>
+                        <td class="building-value">${planetenzentrale}</td>
+                        <td class="building-value">${raumhafen}</td>
+                        <td class="building-value">${eisenmine}</td>
+                        <td class="building-value">${siliziumraffinerie}</td>
+                        <td class="building-value">${kohlenstoffgewinnungsanlage}</td>
+                        <td class="building-value">${schiffsfabrik}</td>
+                        <td class="building-value">${waffenfabrik}</td>
+                        <td class="building-value">${forschungszentrum}</td>
+                        <td class="research-value">───────</td>
+                        <td class="unit-value">${spionageeinheit}</td>
+                        <td class="unit-value">${tarneinheit}</td>
+                        <td class="unit-value">${invasionseinheit}</td>
+                        <td class="unit-value">${pluendereinheit}</td>
+                        <td class="unit-value">${sabotageeinheit}</td>
+                        <td>${datum}</td>
+                        <td>
+                            ${report.originalUrl ? 
+                                `<button class="copy-btn" onclick="copyToClipboard('${coordinates}')">📋</button>` : 
+                                '—'
+                            }
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         // Display statistics (simplified)
@@ -678,7 +717,7 @@
             displayReports(filteredReports);
         }
 
-        function addSpyReport() {
+        async function addSpyReport() {
             const spyReportInput = document.getElementById('spyReportInput');
             const spyReportLink = spyReportInput.value.trim();
             
@@ -687,57 +726,63 @@
                 return;
             }
             
-            // Spy-Bericht parsen und verarbeiten
+            // Validiere URL
+            if (!window.SpyReportAPI || !window.SpyReportAPI.isValidUrl(spyReportLink)) {
+                showMessage('❌ Ungültige Spy-Report URL. Bitte überprüfen Sie die URL.', 'error');
+                return;
+            }
+            
+            // Zeige Loading-State
+            const addButton = document.querySelector('button[onclick*="addSpyReport"]');
+            const originalText = addButton ? addButton.innerHTML : '';
+            if (addButton) {
+                addButton.disabled = true;
+                addButton.innerHTML = '⏳ Verarbeite...';
+            }
+            
             try {
                 console.log('🔍 Verarbeite Spy-Bericht:', spyReportLink);
+                showMessage('🔄 Lade und parse Spy-Report Daten...', 'info');
                 
-                // Hier würde normalerweise der Spy-Bericht geparst werden
-                // Für jetzt fügen wir einen Demo-Bericht hinzu
-                const newReport = {
-                    id: 'spy-' + Date.now(),
-                    player: 'Neuer Spieler',
-                    planet: 'Neuer Planet',
-                    alliance: 'Neue Allianz',
-                    timestamp: new Date(),
-                    buildings: {
-                        planetCenter: Math.floor(Math.random() * 20),
-                        spaceport: Math.floor(Math.random() * 15),
-                        ironMine: Math.floor(Math.random() * 25),
-                        siliconRefinery: Math.floor(Math.random() * 20),
-                        carbonPlant: Math.floor(Math.random() * 18),
-                        shipFactory: Math.floor(Math.random() * 12),
-                        weaponFactory: Math.floor(Math.random() * 10),
-                        researchCenter: Math.floor(Math.random() * 8),
-                        research: Math.floor(Math.random() * 5)
-                    },
-                    military: {
-                        spyUnit: Math.floor(Math.random() * 15),
-                        stealthUnit: Math.floor(Math.random() * 12),
-                        invasionUnit: Math.floor(Math.random() * 20),
-                        plunderUnit: Math.floor(Math.random() * 18),
-                        sabotageUnit: Math.floor(Math.random() * 10)
-                    },
-                    source: 'Manuell hinzugefügt'
-                };
+                // 1. Parse Spy-Report von API
+                const reportData = await window.SpyReportAPI.processUrl(spyReportLink);
+                console.log('✅ Spy-Report geparst:', reportData);
                 
-                // Bericht zur aktuellen Liste hinzufügen
-                currentReports.unshift(newReport);
-                filteredReports = [...currentReports];
+                // 2. Prüfe ob Report bereits existiert
+                const exists = await window.SpyDatabaseAPI.reportExists(reportData.reportId);
+                if (exists) {
+                    showMessage('⚠️ Dieser Spy-Report wurde bereits hinzugefügt!', 'info');
+                    spyReportInput.value = '';
+                    if (addButton) {
+                        addButton.disabled = false;
+                        addButton.innerHTML = originalText;
+                    }
+                    return;
+                }
                 
-                // Tabelle aktualisieren
-                displayReports(filteredReports);
+                // 3. Speichere in Firebase
+                showMessage('💾 Speichere Spy-Report in Datenbank...', 'info');
+                const docId = await window.SpyDatabaseAPI.saveReport(reportData);
+                console.log('✅ Spy-Report in Firebase gespeichert:', docId);
                 
-                // Eingabefeld leeren
+                // 4. Lade Reports neu
+                await loadReports();
+                
+                // 5. Erfolgsmeldung
                 spyReportInput.value = '';
+                showMessage(`✅ Spy-Report erfolgreich hinzugefügt! Spieler: ${reportData.player.name}, Planet: ${reportData.planet.name}`, 'success');
                 
-                // Erfolgsmeldung anzeigen
-                showStatusMessage('✅ Spy-Bericht erfolgreich hinzugefügt!', 'success');
-                
-                console.log('✅ Spy-Bericht hinzugefügt:', newReport);
+                console.log('✅ Spy-Bericht erfolgreich verarbeitet und gespeichert');
                 
             } catch (error) {
                 console.error('❌ Fehler beim Hinzufügen des Spy-Berichts:', error);
-                alert('Fehler beim Hinzufügen des Spy-Berichts: ' + error.message);
+                showMessage(`❌ Fehler: ${error.message}`, 'error');
+            } finally {
+                // Reset Button
+                if (addButton) {
+                    addButton.disabled = false;
+                    addButton.innerHTML = originalText;
+                }
             }
         }
 
@@ -857,6 +902,14 @@
         // Add event listeners for real-time search
         document.getElementById('playerSearch').addEventListener('input', performSearch);
         document.getElementById('planetSearch').addEventListener('input', performSearch);
+        
+        // Add Enter key support for spy report input
+        document.getElementById('spyReportInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addSpyReport();
+            }
+        });
     </script>
 </body>
 </html>
