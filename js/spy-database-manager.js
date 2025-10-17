@@ -84,8 +84,22 @@ class SpyDatabaseManager {
                     }
                 }
                 
+                // 3. Super-Admin Fallback (kann für alle Allianzen speichern)
                 if (!alliance) {
-                    throw new Error('Keine Allianz zugeordnet. Bitte melde dich über das User-Dashboard an.');
+                    const userData = window.AuthAPI?.getUserData();
+                    const currentUser = window.AuthAPI?.getCurrentUser();
+                    const isSuperAdmin = userData?.isSuperAdmin === true || 
+                                       userData?.systemRole === 'superadmin' ||
+                                       userData?.role === 'superadmin' ||
+                                       currentUser?.email === 't.o@trend4media.de' ||
+                                       currentUser?.email === 'info@trend4media.de';
+                    
+                    if (isSuperAdmin) {
+                        console.log('🛡️ Super-Admin erkannt - speichere in Test-Allianz');
+                        alliance = 'TEST_ALLIANCE'; // Super-Admins speichern in Test-Allianz
+                    } else {
+                        throw new Error('Keine Allianz zugeordnet. Bitte melde dich über das User-Dashboard an.');
+                    }
                 }
             }
             
@@ -104,11 +118,12 @@ class SpyDatabaseManager {
                 // Report-Daten
                 planet: reportData.planet,
                 player: reportData.player,
-                buildings: reportData.buildings,
+                buildings: reportData.legacy?.buildings || reportData.buildings, // Legacy-Format für Tabelle
                 resources: reportData.resources,
                 defense: reportData.defense,
                 fleets: reportData.fleets,
                 fleet: reportData.fleet,
+                research: reportData.legacy?.player?.research || reportData.research, // Legacy-Format für Tabelle
                 
                 // Berechnete Statistiken
                 statistics: reportData.statistics,
@@ -187,8 +202,22 @@ class SpyDatabaseManager {
                     }
                 }
                 
+                // 3. Super-Admin Fallback (darf alle Reports sehen)
                 if (!alliance) {
-                    throw new Error('Keine Allianz zugeordnet. Bitte melde dich über das User-Dashboard an.');
+                    const userData = window.AuthAPI?.getUserData();
+                    const currentUser = window.AuthAPI?.getCurrentUser();
+                    const isSuperAdmin = userData?.isSuperAdmin === true || 
+                                       userData?.systemRole === 'superadmin' ||
+                                       userData?.role === 'superadmin' ||
+                                       currentUser?.email === 't.o@trend4media.de' ||
+                                       currentUser?.email === 'info@trend4media.de';
+                    
+                    if (isSuperAdmin) {
+                        console.log('🛡️ Super-Admin erkannt - zeige Test-Allianz-Daten');
+                        alliance = 'TEST_ALLIANCE'; // Super-Admins sehen Test-Daten
+                    } else {
+                        throw new Error('Keine Allianz zugeordnet. Bitte melde dich über das User-Dashboard an.');
+                    }
                 }
             }
             
@@ -424,8 +453,22 @@ class SpyDatabaseManager {
                     }
                 }
                 
+                // 3. Super-Admin Fallback
                 if (!alliance) {
-                    throw new Error('Keine Allianz zugeordnet. Bitte melde dich über das User-Dashboard an.');
+                    const userData = window.AuthAPI?.getUserData();
+                    const currentUser = window.AuthAPI?.getCurrentUser();
+                    const isSuperAdmin = userData?.isSuperAdmin === true || 
+                                       userData?.systemRole === 'superadmin' ||
+                                       userData?.role === 'superadmin' ||
+                                       currentUser?.email === 't.o@trend4media.de' ||
+                                       currentUser?.email === 'info@trend4media.de';
+                    
+                    if (isSuperAdmin) {
+                        console.log('🛡️ Super-Admin erkannt - zeige Test-Allianz-Daten');
+                        alliance = 'TEST_ALLIANCE';
+                    } else {
+                        throw new Error('Keine Allianz zugeordnet. Bitte melde dich über das User-Dashboard an.');
+                    }
                 }
             }
             
