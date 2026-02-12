@@ -5,7 +5,7 @@
 
 class SpyReportParser {
     constructor() {
-        this.apiBaseUrl = 'https://beta1.game.spacenations.eu/api/spy-report/';
+        this.apiBaseUrl = 'https://beta2.game.spacenations.eu/api/spy-report/';
         this.init();
     }
     
